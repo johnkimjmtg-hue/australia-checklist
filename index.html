@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>한국에가면</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html { height: 100%; }
+      body {
+        height: 100%;
+        font-family: 'Noto Sans KR', sans-serif;
+        background: #e8edf5;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      #root {
+        min-height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+      }
+      button { cursor: pointer; font-family: inherit; border: none; }
+      input  { font-family: inherit; }
+
+      /* Mobile shell */
+      .app-shell {
+        width: 100%;
+        max-width: 430px;
+        min-height: 100vh;
+        background: #f0f4f8;
+        position: relative;
+        box-shadow: 0 0 60px rgba(0,0,0,0.15);
+        overflow: hidden;
+      }
+
+      @keyframes floatA {
+        0%,100% { transform: translateY(0)   rotate(var(--rot,0deg)); }
+        50%      { transform: translateY(-9px) rotate(var(--rot,0deg)); }
+      }
+      @keyframes floatB {
+        0%,100% { transform: translateY(0)  rotate(var(--rot,0deg)); }
+        50%      { transform: translateY(7px) rotate(var(--rot,0deg)); }
+      }
+      @keyframes shimmer {
+        0%   { background-position: -300% center; }
+        100% { background-position:  300% center; }
+      }
+      @keyframes fadeInUp {
+        from { opacity:0; transform:translateY(18px); }
+        to   { opacity:1; transform:translateY(0);    }
+      }
+      @keyframes fadeIn {
+        from { opacity:0; }
+        to   { opacity:1; }
+      }
+      @keyframes slideUp {
+        from { transform:translateY(100%); }
+        to   { transform:translateY(0);    }
+      }
+      @keyframes scaleIn {
+        from { opacity:0; transform:scale(0.92); }
+        to   { opacity:1; transform:scale(1);    }
+      }
+      @keyframes shake {
+        0%,100% { transform:translateX(0); }
+        20%     { transform:translateX(-6px); }
+        40%     { transform:translateX(6px); }
+        60%     { transform:translateX(-4px); }
+        80%     { transform:translateX(4px); }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
