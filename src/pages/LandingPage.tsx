@@ -20,6 +20,9 @@ export default function LandingPage({ state, onStart }: Props) {
       fontFamily: '-apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
     }}>
 
+      {/* shimmer keyframe */}
+      <style>{}</style>
+
       {/* Subtle grid */}
       <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0.035, pointerEvents:'none' }}>
         <defs>
@@ -30,7 +33,7 @@ export default function LandingPage({ state, onStart }: Props) {
         <rect width="100%" height="100%" fill="url(#grid)"/>
       </svg>
 
-      {/* Content wrapper — centered */}
+      {/* ── Content ── */}
       <div style={{
         flex: 1,
         display: 'flex',
@@ -38,62 +41,61 @@ export default function LandingPage({ state, onStart }: Props) {
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
-        paddingBottom: 100,
+        paddingBottom: 110,
         paddingTop: 20,
+        textAlign: 'center',
       }}>
 
-        {/* ── LOGO: 호주가자 ── */}
-        <div style={{ animation: 'fadeInUp 0.5s ease both', marginBottom: 6, textAlign: 'center' }}>
+        {/* 호주가자 — bold + shimmer */}
+        <div style={{ animation: 'fadeInUp 0.5s ease both', marginBottom: 14 }}>
           <span style={{
-            fontSize: 42,
+            fontSize: 52,
             fontWeight: 900,
-            color: '#1E4D83',
-            letterSpacing: -1.5,
+            letterSpacing: -2.5,
             lineHeight: 1.1,
             display: 'block',
-            fontFamily: '-apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
+            background: 'linear-gradient(90deg, #1E4D83 0%, #1E4D83 20%, #5B9BD5 40%, #A8C8F0 50%, #5B9BD5 60%, #1E4D83 80%, #1E4D83 100%)',
+            backgroundSize: '300% auto',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            animation: 'shimmerLR 3s linear infinite',
           }}>호주가자</span>
         </div>
 
-        {/* Subtitle */}
+        {/* Subtitle — 2줄, 2배 크기 */}
         <p style={{
-          fontSize: 13,
-          color: '#5A7090',
-          fontWeight: 500,
-          letterSpacing: 0.5,
-          marginBottom: 32,
-          marginTop: 4,
+          fontSize: 16,
+          color: '#3A5A7A',
+          fontWeight: 700,
+          lineHeight: 1.7,
+          margin: '0 0 28px',
           animation: 'fadeInUp 0.5s ease 0.08s both',
-        }}>여행 버킷리스트</p>
-
-        {/* ── BUCKET ILLUSTRATION ── */}
-        <div style={{
-          animation: 'fadeInUp 0.6s ease 0.15s both',
-          display: 'flex',
-          justifyContent: 'center',
-          width: '100%',
+          letterSpacing: -0.3,
         }}>
+          호주가면 꼭 해야하는 버킷리스트<br/>
+          미리 확인하자
+        </p>
+
+        {/* Bucket illustration — 1.5배 */}
+        <div style={{ animation: 'fadeInUp 0.6s ease 0.15s both' }}>
           <img
             src={BUCKET_IMG}
             alt="버킷리스트"
-            style={{
-              width: 240,
-              height: 'auto',
-              objectFit: 'contain',
-            }}
+            style={{ width: 360, height: 'auto', objectFit: 'contain' }}
           />
         </div>
 
         {/* Stats chip */}
         <div style={{
-          display: 'flex',
+          display: 'inline-flex',
           alignItems: 'center',
-          gap: 8,
+          gap: 7,
           background: 'rgba(30,77,131,0.07)',
           border: '1px solid rgba(30,77,131,0.12)',
           borderRadius: 999,
           padding: '7px 18px',
-          marginTop: 20,
+          marginTop: 16,
           animation: 'fadeInUp 0.6s ease 0.22s both',
         }}>
           <span style={{ fontSize: 16 }}>🦘</span>
@@ -103,19 +105,15 @@ export default function LandingPage({ state, onStart }: Props) {
         </div>
       </div>
 
-      {/* ── CTA fixed bottom ── */}
+      {/* ── CTA ── */}
       <div style={{
-        position: 'fixed',
+        position: 'sticky',
         bottom: 0,
-        left: '50%',
-        transform: 'translateX(-50%)',
         width: '100%',
-        maxWidth: 390,
         padding: '10px 16px 28px',
-        background: 'linear-gradient(to top, #F4F7FB 65%, transparent)',
-        zIndex: 20,
-        animation: 'fadeInUp 0.6s ease 0.28s both',
+        background: 'linear-gradient(to top, #EBF0F8 65%, transparent)',
         boxSizing: 'border-box',
+        animation: 'fadeInUp 0.6s ease 0.28s both',
       }}>
         <button
           onClick={onStart}
@@ -131,11 +129,8 @@ export default function LandingPage({ state, onStart }: Props) {
             cursor: 'pointer',
             letterSpacing: 0.3,
             boxShadow: '0 4px 16px rgba(30,77,131,0.28)',
-            display: 'block',
           }}
-        >
-          출발하기 →
-        </button>
+        >출발하기 →</button>
         <p style={{ textAlign: 'center', fontSize: 11, color: '#8AAAC8', marginTop: 8, fontWeight: 500 }}>
           호주에서 꼭 해야 할 것들을 정리해보세요
         </p>
