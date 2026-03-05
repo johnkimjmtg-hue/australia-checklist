@@ -284,7 +284,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                   }}>
                     {/* Checkbox */}
                     <button onClick={() => {
-                      if (!trip) { setModal('tripPicker'); return }
+                      if (!trip) { setModal('noTrip'); return }
                       setState(toggleItem(state, item.id))
                     }} style={{
                       width:20, height:20, borderRadius:6, flexShrink:0,
@@ -304,7 +304,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                     <span style={{ fontSize:15, opacity: checked ? 1 : 0.4, flexShrink:0 }}>{item.emoji}</span>
 
                     <span onClick={() => {
-                      if (!trip) { setModal('tripPicker'); return }
+                      if (!trip) { setModal('noTrip'); return }
                       setState(toggleItem(state, item.id))
                     }} style={{
                       flex:1, fontSize:13, fontWeight: checked ? 600 : 400,
@@ -351,12 +351,6 @@ export default function ChecklistPage({ state, setState }: Props) {
               </div>
             )}
             <div style={{ display:'flex', gap:8 }}>
-              <button onClick={() => setModal('confirmReset')} style={{
-                height:48, padding:'0 14px',
-                background:'#fff', color:'#5A7090',
-                border:'1px solid rgba(30,77,131,0.2)', borderRadius:12, fontSize:13, fontWeight:700, cursor:'pointer',
-                flexShrink:0,
-              }}>다시 시작</button>
               <button onClick={handleIssue} style={{
                 flex:1, height:48,
                 background:'linear-gradient(160deg,#3A7FCC,#1E4D83)', color:'#fff',
@@ -364,6 +358,12 @@ export default function ChecklistPage({ state, setState }: Props) {
                 animation: shakeBtn ? 'shake 0.5s ease' : 'none',
                 boxShadow:'0 4px 16px rgba(30,77,131,0.28)',
               }}>버킷리스트 발행하기</button>
+              <button onClick={() => setModal('confirmReset')} style={{
+                height:48, padding:'0 14px',
+                background:'#fff', color:'#5A7090',
+                border:'1px solid rgba(30,77,131,0.2)', borderRadius:12, fontSize:13, fontWeight:700, cursor:'pointer',
+                flexShrink:0,
+              }}>↻ 다시 시작하기</button>
             </div>
             <div style={{ fontSize:10, color:'#8AAAC8', textAlign:'center', marginTop:5 }}>
               선택한 항목들로 버킷리스트를 만들어요
@@ -390,7 +390,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       )}
       {modal==='noTrip' && (
         <AlertModal title="여행일정을 먼저 설정해주세요"
-          confirmLabel="날짜 입력하기" onConfirm={() => { setModal('none'); setTimeout(handleOpenTripPicker, 100) }} onCancel={() => setModal('none')} />
+          confirmLabel="날짜 입력하기" confirmFirst onConfirm={() => { setModal('none'); setTimeout(handleOpenTripPicker, 100) }} onCancel={() => setModal('none')} />
       )}
       {modal==='noDate' && (
         <AlertModal title="출발일과 도착일을 모두 선택해주세요"
@@ -633,8 +633,8 @@ function EmptyServices() {
 }
 
 /* ── Alert Modal ── */
-function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onCancel, hideCancel }:
-  { title:string; message?:string; confirmLabel:string; confirmColor?:string; onConfirm:()=>void; onCancel:()=>void; hideCancel?:boolean }) {
+function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onCancel, hideCancel, confirmFirst }:
+  { title:string; message?:string; confirmLabel:string; confirmColor?:string; onConfirm:()=>void; onCancel:()=>void; hideCancel?:boolean; confirmFirst?:boolean }) {
   return (
     <>
       <div onClick={onCancel} style={{ position:'fixed', inset:0, background:'rgba(10,20,40,0.45)', zIndex:600, animation:'fadeIn 0.2s ease' }}/>
@@ -650,12 +650,19 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
         <p style={{ fontSize:14, fontWeight:800, color:'#0F1B2D', marginBottom: message ? 8 : 20, lineHeight:1.5 }}>{title}</p>
         {message && <p style={{ fontSize:12, color:'#5A7090', marginBottom:20, lineHeight:1.6 }}>{message}</p>}
         <div style={{ display:'flex', gap:8 }}>
+          {confirmFirst && (
+            <button onClick={onConfirm} style={{ flex:2, height:42, border:'none', borderRadius:10, background: confirmColor ?? '#1E4D83', color:'#fff', fontWeight:700, fontSize:13, cursor:'pointer' }}>
+              {confirmLabel}
+            </button>
+          )}
           {!hideCancel && (
             <button onClick={onCancel} style={{ flex:1, height:42, border:'1px solid rgba(30,77,131,0.15)', borderRadius:10, background:'#fff', color:'#5A7090', fontWeight:700, fontSize:13, cursor:'pointer' }}>취소</button>
           )}
-          <button onClick={onConfirm} style={{ flex:2, height:42, border:'none', borderRadius:10, background: confirmColor ?? '#1E4D83', color:'#fff', fontWeight:700, fontSize:13, cursor:'pointer' }}>
-            {confirmLabel}
-          </button>
+          {!confirmFirst && (
+            <button onClick={onConfirm} style={{ flex:2, height:42, border:'none', borderRadius:10, background: confirmColor ?? '#1E4D83', color:'#fff', fontWeight:700, fontSize:13, cursor:'pointer' }}>
+              {confirmLabel}
+            </button>
+          )}
         </div>
       </div>
     </>
