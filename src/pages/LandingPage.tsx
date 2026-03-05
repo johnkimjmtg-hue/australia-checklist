@@ -134,7 +134,7 @@ export default function LandingPage({ state, onStart }: Props) {
         </p>
 
         {/* 버킷 이미지 */}
-        <div style={{ width:'52%', maxWidth:190, marginBottom:16 }}>
+        <div style={{ width:'32%', maxWidth:120, marginBottom:16 }}>
           <img src={BUCKET_IMG} alt="버킷" style={{
             width:'100%', height:'auto', objectFit:'contain', display:'block',
             animation:'driftBucket 7s ease-in-out infinite',
