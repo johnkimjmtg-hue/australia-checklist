@@ -37,16 +37,12 @@ export default function ReceiptModal({ state, trip, issuedAt, onClose, onReset }
         borderTop:'1px solid rgba(30,77,131,0.08)',
         display:'flex', gap:8, zIndex:2,
       }}>
-        <button onClick={() => {
-          if (window.confirm('모든 데이터를 초기화할까요?\n선택 항목, 일정, 직접입력 항목이 모두 삭제됩니다.')) {
-            onReset()
-          }
-        }} title="완전 초기화" style={{
-          height:46, padding:'0 12px', borderRadius:10, cursor:'pointer',
+        <button onClick={onReset} title="초기화" style={{
+          width:46, height:46, borderRadius:10, cursor:'pointer',
           border:'1px solid rgba(30,77,131,0.15)', background:'#fff',
-          fontSize:11, fontWeight:700, color:'#5A7090', flexShrink:0,
-          display:'flex', alignItems:'center', gap:4,
-        }}>↻ 다시 시작</button>
+          fontSize:18, display:'flex', alignItems:'center', justifyContent:'center',
+          color:'#5A7090', flexShrink:0,
+        }}>↻</button>
         <button onClick={async () => {
           if (isIOS()) { setShowIOSModal(true); return }
           setSaving(true); await downloadPng(); setSaving(false)

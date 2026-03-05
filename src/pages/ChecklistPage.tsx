@@ -146,9 +146,9 @@ export default function ChecklistPage({ state, setState }: Props) {
                 <button onClick={handleOpenTripPicker} style={{
                   height:30, padding:'0 10px', borderRadius:8,
                   border:'1px solid', cursor:'pointer',
-                  borderColor: tripLabel ? '#1E4D83' : '#E67E00',
-                  background: tripLabel ? '#1E4D83' : '#E67E00',
-                  color: '#fff',
+                  borderColor: tripLabel ? '#1E4D83' : 'rgba(30,77,131,0.2)',
+                  background: tripLabel ? '#1E4D83' : '#fff',
+                  color: tripLabel ? '#fff' : '#5A7090',
                   fontSize:11, fontWeight:700,
                   animation: tripLabel ? 'none' : 'pulse 1.4s ease-in-out infinite',
                 }}>
@@ -350,13 +350,21 @@ export default function ChecklistPage({ state, setState }: Props) {
                 ⚠️ {unscheduledCount}개 항목에 날짜를 지정해주세요
               </div>
             )}
-            <button onClick={handleIssue} style={{
-              width:'100%', height:48,
-              background:'linear-gradient(160deg,#3A7FCC,#1E4D83)', color:'#fff',
-              border:'none', borderRadius:12, fontSize:14, fontWeight:800, cursor:'pointer',
-              animation: shakeBtn ? 'shake 0.5s ease' : 'none',
-              boxShadow:'0 4px 16px rgba(30,77,131,0.28)',
-            }}>버킷리스트 발행하기</button>
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={() => setModal('confirmReset')} style={{
+                height:48, padding:'0 14px',
+                background:'#fff', color:'#5A7090',
+                border:'1px solid rgba(30,77,131,0.2)', borderRadius:12, fontSize:13, fontWeight:700, cursor:'pointer',
+                flexShrink:0,
+              }}>다시 시작</button>
+              <button onClick={handleIssue} style={{
+                flex:1, height:48,
+                background:'linear-gradient(160deg,#3A7FCC,#1E4D83)', color:'#fff',
+                border:'none', borderRadius:12, fontSize:14, fontWeight:800, cursor:'pointer',
+                animation: shakeBtn ? 'shake 0.5s ease' : 'none',
+                boxShadow:'0 4px 16px rgba(30,77,131,0.28)',
+              }}>버킷리스트 발행하기</button>
+            </div>
             <div style={{ fontSize:10, color:'#8AAAC8', textAlign:'center', marginTop:5 }}>
               선택한 항목들로 버킷리스트를 만들어요
             </div>
