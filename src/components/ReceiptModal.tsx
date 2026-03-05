@@ -24,7 +24,7 @@ export default function ReceiptModal({ state, trip, issuedAt, onClose, onReset }
           display:'flex', alignItems:'center', justifyContent:'center',
           boxShadow:'0 2px 8px rgba(30,77,131,0.12)',
         }}>✕</button>
-        <div style={{ animation:'scaleIn 0.3s ease', transformOrigin:'center center' }}>
+        <div style={{ animation:'fadeInUp 0.3s ease', transformOrigin:'center center' }}>
           <ReceiptPaper state={state} trip={trip} issuedAt={issuedAt}/>
         </div>
       </div>

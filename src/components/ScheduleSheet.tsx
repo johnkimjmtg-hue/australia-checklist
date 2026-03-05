@@ -17,7 +17,7 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
         background:'#fff', borderRadius:'18px 18px 0 0',
         zIndex:501, padding:'18px 16px 36px',
         maxHeight:'70vh', overflowY:'auto',
-        animation:'slideUp 0.25s ease',
+        animation:'slideUpSheet 0.25s ease',
         boxShadow:'0 -4px 24px rgba(30,77,131,0.12)',
       }}>
         <div style={{ width:36, height:4, background:'rgba(30,77,131,0.15)', borderRadius:2, margin:'0 auto 14px' }}/>
