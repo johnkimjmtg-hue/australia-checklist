@@ -424,117 +424,149 @@ function ScheduleGrid({ state, trip, allItems }: { state: AppState; trip: TripIn
   )
 }
 
+/* ── Mini Calendar ── */
+function MiniCalendar({ year, month, selected, minDate, onSelect }: {
+  year: number; month: number; selected: string; minDate?: string;
+  onSelect: (d: string) => void
+}) {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const firstDay = new Date(year, month - 1, 1).getDay()
+  const daysInMonth = new Date(year, month, 0).getDate()
+  const cells: (number | null)[] = []
+  for (let i = 0; i < firstDay; i++) cells.push(null)
+  for (let i = 1; i <= daysInMonth; i++) cells.push(i)
+  while (cells.length % 7 !== 0) cells.push(null)
+
+  const DAYS = ['일', '월', '화', '수', '목', '금', '토']
+
+  return (
+    <div style={{ width: '100%' }}>
+      {/* 요일 헤더 */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', marginBottom: 4 }}>
+        {DAYS.map((d, i) => (
+          <div key={d} style={{
+            textAlign: 'center', fontSize: 11, fontWeight: 700, padding: '4px 0',
+            color: i === 0 ? '#E05050' : i === 6 ? '#4477CC' : '#8AAAC8',
+          }}>{d}</div>
+        ))}
+      </div>
+      {/* 날짜 그리드 */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '3px 0' }}>
+        {cells.map((day, idx) => {
+          if (!day) return <div key={idx} />
+          const dateStr = `${year}-${pad(month)}-${pad(day)}`
+          const isSelected = dateStr === selected
+          const isDisabled = !!minDate && dateStr < minDate
+          const dayOfWeek = (firstDay + day - 1) % 7
+          const isToday = dateStr === new Date().toISOString().slice(0, 10)
+          return (
+            <div key={idx} onClick={() => !isDisabled && onSelect(dateStr)} style={{
+              textAlign: 'center', padding: '6px 0', borderRadius: 8, cursor: isDisabled ? 'default' : 'pointer',
+              background: isSelected ? '#1E4D83' : 'transparent',
+              color: isDisabled ? '#C8D4E4'
+                : isSelected ? '#fff'
+                : dayOfWeek === 0 ? '#E05050'
+                : dayOfWeek === 6 ? '#4477CC'
+                : '#2A3A4C',
+              fontSize: 13, fontWeight: isSelected || isToday ? 800 : 500,
+              border: isToday && !isSelected ? '1.5px solid #1E4D83' : '1.5px solid transparent',
+              boxSizing: 'border-box',
+            }}>{day}</div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 /* ── Trip Picker Modal ── */
 function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
-  { step:'start'|'end'; startDate:string; onSelect:(v:string)=>void; onReset:()=>void; onClose:()=>void }) {
-  const [y, setY] = useState('')
-  const [m, setM] = useState('')
-  const [d, setD] = useState('')
-  const [err, setErr] = useState('')
+  { step: 'start' | 'end'; startDate: string; onSelect: (v: string) => void; onReset: () => void; onClose: () => void }) {
 
+  const today = new Date()
+  const [year, setYear] = useState(today.getFullYear())
+  const [month, setMonth] = useState(today.getMonth() + 1)
+  const [selected, setSelected] = useState('')
   const isStart = step === 'start'
+  const minDate = !isStart && startDate ? startDate : undefined
 
-  const handleConfirm = () => {
-    const yNum = parseInt(y), mNum = parseInt(m), dNum = parseInt(d)
-    if (!y || !m || !d || isNaN(yNum) || isNaN(mNum) || isNaN(dNum)) {
-      setErr('날짜를 모두 입력해주세요'); return
-    }
-    if (mNum < 1 || mNum > 12) { setErr('월은 1~12 사이로 입력해주세요'); return }
-    if (dNum < 1 || dNum > 31) { setErr('일은 1~31 사이로 입력해주세요'); return }
-    const pad = (n: number) => String(n).padStart(2,'0')
-    const dateStr = `${yNum}-${pad(mNum)}-${pad(dNum)}`
-    if (!isStart && startDate && dateStr < startDate) {
-      setErr('도착일은 출발일 이후여야 해요'); return
-    }
-    setErr('')
-    onSelect(dateStr)
+  const prevMonth = () => {
+    if (month === 1) { setYear(y => y - 1); setMonth(12) }
+    else setMonth(m => m - 1)
   }
-
-  const isValid = y.length>=4 && m.length>=1 && d.length>=1
+  const nextMonth = () => {
+    if (month === 12) { setYear(y => y + 1); setMonth(1) }
+    else setMonth(m => m + 1)
+  }
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(10,20,40,0.5)', zIndex:500, animation:'fadeIn 0.2s ease' }}/>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(10,20,40,0.5)', zIndex: 500, animation: 'fadeIn 0.2s ease' }} />
       <div style={{
-        position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-        width:'calc(100% - 40px)', maxWidth:320,
-        background:'#fff', borderRadius:20, padding:'24px 20px 20px',
-        zIndex:501, boxShadow:'0 16px 40px rgba(30,77,131,0.16)',
-        animation:'scaleIn 0.2s ease',
+        position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+        width: 'calc(100% - 32px)', maxWidth: 340,
+        background: '#fff', borderRadius: 20, padding: '20px 16px 16px',
+        zIndex: 501, boxShadow: '0 16px 40px rgba(30,77,131,0.18)',
+        animation: 'scaleIn 0.2s ease',
+        maxHeight: '90vh', overflowY: 'auto',
       }}>
-        <div style={{ textAlign:'center', marginBottom:20 }}>
-          <div style={{ fontSize:11, color:'#8AAAC8', fontWeight:700, letterSpacing:1, marginBottom:6 }}>
+        {/* 헤더 */}
+        <div style={{ textAlign: 'center', marginBottom: 14 }}>
+          <div style={{ fontSize: 11, color: '#8AAAC8', fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>
             {isStart ? 'STEP 1 / 2' : 'STEP 2 / 2'}
           </div>
-          <div style={{ fontSize:16, fontWeight:800, color:'#1E4D83' }}>
-            {isStart ? '출발일을 입력해주세요' : '도착일을 입력해주세요'}
+          <div style={{ fontSize: 15, fontWeight: 800, color: '#1E4D83' }}>
+            {isStart ? '✈️ 출발일을 선택해주세요' : '🏠 도착일을 선택해주세요'}
           </div>
           {!isStart && startDate && (
-            <div style={{ fontSize:11, color:'#8AAAC8', marginTop:4 }}>출발일: {startDate}</div>
+            <div style={{ fontSize: 11, color: '#8AAAC8', marginTop: 3 }}>출발일: {startDate}</div>
           )}
         </div>
 
-        {/* 년 / 월 / 일 입력 */}
-        <div style={{ display:'flex', gap:8, marginBottom:8 }}>
-          <div style={{ flex:2 }}>
-            <div style={{ fontSize:10, color:'#8AAAC8', fontWeight:700, marginBottom:4, textAlign:'center' }}>년</div>
-            <input
-              type="number" placeholder="2026"
-              value={y} onChange={e => { setY(e.target.value); setErr('') }}
-              style={{
-                width:'100%', height:48, textAlign:'center', borderRadius:10,
-                border:'1.5px solid rgba(30,77,131,0.2)', background:'#F4F7FB',
-                fontSize:16, color:'#1E4D83', fontWeight:700, outline:'none',
-                boxSizing:'border-box',
-              }}
-            />
-          </div>
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:10, color:'#8AAAC8', fontWeight:700, marginBottom:4, textAlign:'center' }}>월</div>
-            <input
-              type="number" placeholder="3"
-              value={m} onChange={e => { setM(e.target.value); setErr('') }}
-              style={{
-                width:'100%', height:48, textAlign:'center', borderRadius:10,
-                border:'1.5px solid rgba(30,77,131,0.2)', background:'#F4F7FB',
-                fontSize:16, color:'#1E4D83', fontWeight:700, outline:'none',
-                boxSizing:'border-box',
-              }}
-            />
-          </div>
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:10, color:'#8AAAC8', fontWeight:700, marginBottom:4, textAlign:'center' }}>일</div>
-            <input
-              type="number" placeholder="5"
-              value={d} onChange={e => { setD(e.target.value); setErr('') }}
-              style={{
-                width:'100%', height:48, textAlign:'center', borderRadius:10,
-                border:'1.5px solid rgba(30,77,131,0.2)', background:'#F4F7FB',
-                fontSize:16, color:'#1E4D83', fontWeight:700, outline:'none',
-                boxSizing:'border-box',
-              }}
-            />
-          </div>
+        {/* 월 네비게이션 */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <button onClick={prevMonth} style={{
+            width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(30,77,131,0.15)',
+            background: '#F4F7FB', cursor: 'pointer', fontSize: 14, color: '#1E4D83', fontWeight: 800,
+          }}>‹</button>
+          <div style={{ fontSize: 14, fontWeight: 800, color: '#1E4D83' }}>{year}년 {month}월</div>
+          <button onClick={nextMonth} style={{
+            width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(30,77,131,0.15)',
+            background: '#F4F7FB', cursor: 'pointer', fontSize: 14, color: '#1E4D83', fontWeight: 800,
+          }}>›</button>
         </div>
 
-        {/* 에러 메시지 */}
-        {err && (
-          <div style={{ fontSize:11, color:'#D93025', textAlign:'center', marginBottom:8, fontWeight:600 }}>
-            ⚠️ {err}
-          </div>
-        )}
+        {/* 캘린더 */}
+        <MiniCalendar
+          year={year} month={month} selected={selected}
+          minDate={minDate}
+          onSelect={d => setSelected(d)}
+        />
 
-        <button onClick={handleConfirm} style={{
-          width:'100%', height:46, borderRadius:12, border:'none', cursor:'pointer',
-          background: isValid ? 'linear-gradient(160deg,#3A7FCC,#1E4D83)' : '#E8EDF5',
-          color: isValid ? '#fff' : '#8AAAC8', fontSize:14, fontWeight:800, marginBottom:4,
-          boxShadow: isValid ? '0 4px 14px rgba(30,77,131,0.25)' : 'none',
+        {/* 선택된 날짜 표시 */}
+        <div style={{
+          marginTop: 12, padding: '10px 14px', borderRadius: 10,
+          background: selected ? 'rgba(30,77,131,0.06)' : '#F4F7FB',
+          textAlign: 'center', fontSize: 13, fontWeight: 700,
+          color: selected ? '#1E4D83' : '#B0BECC',
+          border: selected ? '1.5px solid rgba(30,77,131,0.15)' : '1.5px solid transparent',
+        }}>
+          {selected ? `📅 ${selected}` : '날짜를 선택해주세요'}
+        </div>
+
+        {/* 확인 버튼 */}
+        <button onClick={() => selected && onSelect(selected)} style={{
+          width: '100%', height: 46, borderRadius: 12, border: 'none', cursor: selected ? 'pointer' : 'default',
+          background: selected ? 'linear-gradient(160deg,#3A7FCC,#1E4D83)' : '#E8EDF5',
+          color: selected ? '#fff' : '#8AAAC8', fontSize: 14, fontWeight: 800,
+          marginTop: 10, marginBottom: 4,
+          boxShadow: selected ? '0 4px 14px rgba(30,77,131,0.25)' : 'none',
         }}>
           {isStart ? '다음 →' : '완료'}
         </button>
         <button onClick={onReset} style={{
-          width:'100%', height:36, border:'none', background:'transparent',
-          color:'#8AAAC8', fontSize:12, cursor:'pointer',
+          width: '100%', height: 34, border: 'none', background: 'transparent',
+          color: '#B0BECC', fontSize: 12, cursor: 'pointer',
         }}>일정 초기화</button>
       </div>
     </>
