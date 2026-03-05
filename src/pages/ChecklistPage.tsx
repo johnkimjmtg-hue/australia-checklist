@@ -509,6 +509,7 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
         background: '#fff', borderRadius: 20, padding: '20px 16px 16px',
         zIndex: 501, boxShadow: '0 16px 40px rgba(30,77,131,0.18)',
         animation: 'scaleIn 0.2s ease',
+        transformOrigin: 'center center',
         maxHeight: '90vh', overflowY: 'auto',
       }}>
         {/* 헤더 */}
@@ -598,6 +599,7 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
         background:'#fff', borderRadius:20, padding:'24px 20px',
         zIndex:601, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
         animation:'scaleIn 0.22s ease',
+        transformOrigin:'center center',
         boxShadow:'0 16px 40px rgba(30,77,131,0.15)',
         border:'1px solid rgba(30,77,131,0.08)',
       }}>

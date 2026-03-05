@@ -24,7 +24,7 @@ export default function ReceiptModal({ state, trip, issuedAt, onClose, onReset }
           display:'flex', alignItems:'center', justifyContent:'center',
           boxShadow:'0 2px 8px rgba(30,77,131,0.12)',
         }}>✕</button>
-        <div style={{ animation:'scaleIn 0.3s ease' }}>
+        <div style={{ animation:'scaleIn 0.3s ease', transformOrigin:'center center' }}>
           <ReceiptPaper state={state} trip={trip} issuedAt={issuedAt}/>
         </div>
       </div>
@@ -75,6 +75,7 @@ export default function ReceiptModal({ state, trip, issuedAt, onClose, onReset }
             width:280, textAlign:'center',
             boxShadow:'0 8px 32px rgba(30,77,131,0.18)',
             animation:'scaleIn 0.2s ease',
+            transformOrigin:'center center',
           }}>
             <div style={{ fontSize:36, marginBottom:12 }}>📱</div>
             <div style={{ fontSize:14, fontWeight:800, color:'#1E4D83', marginBottom:8 }}>iOS에서 이미지 저장하기</div>
