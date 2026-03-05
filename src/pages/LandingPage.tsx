@@ -73,7 +73,7 @@ export default function LandingPage({ state, onStart }: Props) {
 
       {/* Hero */}
       <div style={{
-        marginTop:'38%',
+        marginTop:'22%',
         display:'flex', flexDirection:'column', alignItems:'center',
         zIndex:2, animation:'fadeInUp 0.7s ease both',
       }}>
@@ -90,7 +90,7 @@ export default function LandingPage({ state, onStart }: Props) {
 
         {/* 타이틀 */}
         <h1 style={{
-          fontSize:52, fontWeight:900, letterSpacing:-2,
+          fontSize:35, fontWeight:900, letterSpacing:-2,
           background:'linear-gradient(135deg, #e8420a 0%, #ff7b2c 35%, #ffb347 65%, #ff6b1a 100%)',
           backgroundSize:'200% auto',
           WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',

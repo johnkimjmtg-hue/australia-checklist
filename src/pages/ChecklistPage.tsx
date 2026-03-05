@@ -103,7 +103,7 @@ export default function ChecklistPage({ state, setState }: Props) {
             호주가자 보딩패스
           </div>
           {/* Australian beach & nature skyline SVG */}
-          <svg viewBox="0 0 430 48" width="100%" height="48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+          <svg viewBox="0 0 430 48" width="100%" height="24" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
             <rect width="430" height="48" fill="transparent"/>
 
             {/* Ocean waves */}
@@ -174,21 +174,27 @@ export default function ChecklistPage({ state, setState }: Props) {
 
         {/* Trip date input */}
         {showTripBar && (
-          <div style={{ padding:'0 16px 14px', borderTop:'1px solid #f5f5f5', animation:'fadeInUp 0.2s ease' }}>
-            <div style={{ display:'flex', gap:8, alignItems:'center', margin:'10px 0 10px' }}>
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-                style={{ flex:1, padding:'9px 10px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:14, color:'#333', outline:'none' }} />
+          <div style={{ padding:'0 16px 10px', borderTop:'1px solid #f5f5f5', animation:'fadeInUp 0.2s ease' }}>
+            <div style={{ display:'flex', gap:6, alignItems:'center', margin:'8px 0 8px' }}>
+              <div style={{ flex:1, position:'relative' }}>
+                <span style={{ position:'absolute', top:'50%', left:10, transform:'translateY(-50%)', fontSize:11, color:'#bbb', pointerEvents:'none', display: startDate ? 'none' : 'block' }}>출발일</span>
+                <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+                  style={{ width:'100%', padding:'7px 8px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:13, color: startDate ? '#333' : 'transparent', outline:'none' }} />
+              </div>
               <span style={{ color:'#ccc', fontWeight:700 }}>—</span>
-              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-                style={{ flex:1, padding:'9px 10px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:14, color:'#333', outline:'none' }} />
+              <div style={{ flex:1, position:'relative' }}>
+                <span style={{ position:'absolute', top:'50%', left:10, transform:'translateY(-50%)', fontSize:11, color:'#bbb', pointerEvents:'none', display: endDate ? 'none' : 'block' }}>도착일</span>
+                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
+                  style={{ width:'100%', padding:'7px 8px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:13, color: endDate ? '#333' : 'transparent', outline:'none' }} />
+              </div>
             </div>
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={handleReset}
-                style={{ flex:1, padding:'10px', border:'1.5px solid #e0e0e0', borderRadius:10, background:'#fff', color:'#888', fontWeight:600, fontSize:14 }}>
+                style={{ flex:1, padding:'7px', border:'1.5px solid #e0e0e0', borderRadius:10, background:'#fff', color:'#888', fontWeight:600, fontSize:13 }}>
                 초기화
               </button>
               <button onClick={handleMakeTrip}
-                style={{ flex:2, padding:'10px', border:'none', borderRadius:10, background:'#e8420a', color:'#fff', fontWeight:700, fontSize:14 }}>
+                style={{ flex:2, padding:'7px', border:'none', borderRadius:10, background:'#e8420a', color:'#fff', fontWeight:700, fontSize:13 }}>
                 만들기
               </button>
             </div>
