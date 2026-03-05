@@ -442,7 +442,7 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
     if (mNum < 1 || mNum > 12) { setErr('월은 1~12 사이로 입력해주세요'); return }
     if (dNum < 1 || dNum > 31) { setErr('일은 1~31 사이로 입력해주세요'); return }
     const pad = (n: number) => String(n).padStart(2,'0')
-    const dateStr = \`\${yNum}-\${pad(mNum)}-\${pad(dNum)}\`
+    const dateStr = `${yNum}-${pad(mNum)}-${pad(dNum)}`
     if (!isStart && startDate && dateStr < startDate) {
       setErr('도착일은 출발일 이후여야 해요'); return
     }
