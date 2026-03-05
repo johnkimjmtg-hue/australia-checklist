@@ -5,9 +5,12 @@ import { AppState, TripInfo } from '../store/state'
 
 type Props = { state: AppState; trip: TripInfo; issuedAt: string; onClose: () => void; onReset: () => void }
 
+const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
+
 export default function ReceiptModal({ state, trip, issuedAt, onClose, onReset }: Props) {
   const [saving, setSaving]   = useState(false)
   const [sharing, setSharing] = useState(false)
+  const [showIOSModal, setShowIOSModal] = useState(false)
 
   return (
     <div style={{ position:'fixed', inset:0, zIndex:400, animation:'fadeIn 0.2s ease' }}>
@@ -40,7 +43,10 @@ export default function ReceiptModal({ state, trip, issuedAt, onClose, onReset }
           fontSize:18, display:'flex', alignItems:'center', justifyContent:'center',
           color:'#5A7090', flexShrink:0,
         }}>↻</button>
-        <button onClick={async () => { setSaving(true); await downloadPng(); setSaving(false) }}
+        <button onClick={async () => {
+          if (isIOS()) { setShowIOSModal(true); return }
+          setSaving(true); await downloadPng(); setSaving(false)
+        }}
           disabled={saving} style={{
           flex:1, height:46, borderRadius:10, cursor:'pointer',
           border:'1px solid rgba(30,77,131,0.15)', background:'#fff',
@@ -58,6 +64,33 @@ export default function ReceiptModal({ state, trip, issuedAt, onClose, onReset }
           boxShadow:'0 4px 14px rgba(30,77,131,0.28)',
         }}>{sharing ? '공유 중...' : '공유하기'}</button>
       </div>
+      {/* iOS 안내 모달 */}
+      {showIOSModal && (
+        <div style={{ position:'fixed', inset:0, zIndex:500, display:'flex', alignItems:'center', justifyContent:'center', animation:'fadeIn 0.2s ease' }}>
+          <div onClick={() => setShowIOSModal(false)} style={{ position:'absolute', inset:0, background:'rgba(10,20,40,0.5)' }}/>
+          <div style={{
+            position:'relative', zIndex:1,
+            background:'#fff', borderRadius:16,
+            padding:'28px 24px 20px',
+            width:280, textAlign:'center',
+            boxShadow:'0 8px 32px rgba(30,77,131,0.18)',
+            animation:'scaleIn 0.2s ease',
+          }}>
+            <div style={{ fontSize:36, marginBottom:12 }}>📱</div>
+            <div style={{ fontSize:14, fontWeight:800, color:'#1E4D83', marginBottom:8 }}>iOS에서 이미지 저장하기</div>
+            <div style={{ fontSize:13, color:'#5A7090', lineHeight:1.6, marginBottom:20 }}>
+              아래 <strong>공유하기</strong> 버튼을 누른 후<br/>
+              <strong>"이미지 저장"</strong>을 선택해주세요
+            </div>
+            <button onClick={() => setShowIOSModal(false)} style={{
+              width:'100%', height:44, borderRadius:10,
+              background:'linear-gradient(160deg,#3A7FCC,#1E4D83)',
+              color:'#fff', fontWeight:700, fontSize:14,
+              border:'none', cursor:'pointer',
+            }}>확인</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
