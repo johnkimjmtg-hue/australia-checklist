@@ -146,10 +146,11 @@ export default function ChecklistPage({ state, setState }: Props) {
                 <button onClick={handleOpenTripPicker} style={{
                   height:30, padding:'0 10px', borderRadius:8,
                   border:'1px solid', cursor:'pointer',
-                  borderColor: tripLabel ? '#1E4D83' : 'rgba(30,77,131,0.2)',
-                  background: tripLabel ? '#1E4D83' : '#fff',
-                  color: tripLabel ? '#fff' : '#5A7090',
+                  borderColor: tripLabel ? '#1E4D83' : '#E67E00',
+                  background: tripLabel ? '#1E4D83' : '#E67E00',
+                  color: '#fff',
                   fontSize:11, fontWeight:700,
+                  animation: tripLabel ? 'none' : 'pulse 1.4s ease-in-out infinite',
                 }}>
                   {tripLabel ? `📅 ${tripLabel}` : '🗓 여행시작하기'}
                 </button>
@@ -605,10 +606,6 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
         }}>
           {isStart ? '다음 →' : '완료'}
         </button>
-        <button onClick={onReset} style={{
-          width: '100%', height: 34, border: 'none', background: 'transparent',
-          color: '#B0BECC', fontSize: 12, cursor: 'pointer',
-        }}>일정 초기화</button>
       </div>
     </>
   )
