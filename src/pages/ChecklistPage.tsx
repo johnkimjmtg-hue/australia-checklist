@@ -97,49 +97,35 @@ export default function ChecklistPage({ state, setState }: Props) {
       {/* ── Top header ── */}
       <div style={{ background:'#fff', boxShadow:'0 1px 0 #eee', position:'sticky', top:0, zIndex:30 }}>
 
-        {/* Beach & nature skyline strip */}
-        <div style={{ background:'linear-gradient(135deg,#e8420a 0%,#ff7b2c 60%,#ffb347 100%)', padding:'10px 0 0', overflow:'hidden' }}>
-          <div style={{ textAlign:'center', color:'rgba(255,255,255,0.45)', fontSize:9, letterSpacing:6, marginBottom:6, fontWeight:600 }}>
+        {/* Beach & nature header — no bg color, SVG split left/right, text center */}
+        <div style={{ background:'#fff', overflow:'hidden', display:'flex', alignItems:'center', height:36 }}>
+          {/* Left SVG */}
+          <svg viewBox="0 0 215 48" width="38%" height="36" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+            <path d="M0 38 Q20 32 40 38 Q60 44 80 38 Q100 32 120 38 Q140 44 160 38 Q180 32 215 36 L215 48 L0 48 Z" fill="rgba(232,66,10,0.15)"/>
+            <path d="M0 42 Q25 36 50 42 Q75 48 100 42 Q125 36 150 42 Q175 48 215 44 L215 48 L0 48 Z" fill="rgba(232,66,10,0.08)"/>
+            <line x1="30" y1="48" x2="30" y2="18" stroke="rgba(232,66,10,0.4)" strokeWidth="2"/>
+            <path d="M30 18 Q18 10 8 14" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
+            <path d="M30 18 Q20 8 24 2" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
+            <path d="M30 18 Q42 8 50 12" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
+            <path d="M80 48 Q110 28 150 35 Q180 40 215 32 L215 48 Z" fill="rgba(232,66,10,0.1)"/>
+            <path d="M200 12 Q204 8 208 12" fill="none" stroke="rgba(232,66,10,0.3)" strokeWidth="1.2"/>
+          </svg>
+
+          {/* Center text */}
+          <div style={{ flex:1, textAlign:'center', fontSize:9, letterSpacing:4, fontWeight:700, color:'#e8420a', whiteSpace:'nowrap' }}>
             호주가자 보딩패스
           </div>
-          {/* Australian beach & nature skyline SVG */}
-          <svg viewBox="0 0 430 48" width="100%" height="24" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
-            <rect width="430" height="48" fill="transparent"/>
 
-            {/* Ocean waves */}
-            <path d="M0 38 Q20 32 40 38 Q60 44 80 38 Q100 32 120 38 Q140 44 160 38 Q180 32 200 38 Q220 44 240 38 Q260 32 280 38 Q300 44 320 38 Q340 32 360 38 Q380 44 400 38 Q415 32 430 38 L430 48 L0 48 Z" fill="rgba(255,255,255,0.2)"/>
-            <path d="M0 42 Q25 36 50 42 Q75 48 100 42 Q125 36 150 42 Q175 48 200 42 Q225 36 250 42 Q275 48 300 42 Q325 36 350 42 Q375 48 400 42 Q415 38 430 42 L430 48 L0 48 Z" fill="rgba(255,255,255,0.12)"/>
-
-            {/* Palm trees left */}
-            <line x1="30" y1="48" x2="30" y2="18" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5"/>
-            <path d="M30 18 Q18 10 8 14" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2"/>
-            <path d="M30 18 Q20 8 24 2" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2"/>
-            <path d="M30 18 Q42 8 50 12" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2"/>
-            <path d="M30 18 Q38 12 44 6" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
-
-            {/* Palm tree middle */}
-            <line x1="130" y1="48" x2="133" y2="22" stroke="rgba(255,255,255,0.3)" strokeWidth="2"/>
-            <path d="M133 22 Q120 14 110 18" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.8"/>
-            <path d="M133 22 Q125 12 128 6" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.8"/>
-            <path d="M133 22 Q144 14 152 16" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.8"/>
-
-            {/* Rolling hills / dunes */}
-            <path d="M80 48 Q110 28 150 35 Q190 42 220 30 Q250 18 290 28 Q320 36 350 24 Q380 14 430 22 L430 48 Z" fill="rgba(255,255,255,0.13)"/>
-            <path d="M160 48 Q200 32 250 38 Q290 44 330 32 Q370 22 430 30 L430 48 Z" fill="rgba(255,255,255,0.1)"/>
-
-            {/* Sun / moon reflection on water */}
-            <ellipse cx="320" cy="40" rx="35" ry="4" fill="rgba(255,255,255,0.15)"/>
-
-            {/* Birds */}
-            <path d="M200 12 Q204 8 208 12" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.2"/>
-            <path d="M215 8 Q220 4 225 8" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.2"/>
-            <path d="M240 14 Q244 10 248 14" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1.2"/>
-
-            {/* Kangaroo silhouette right */}
-            <path d="M380 38 Q382 30 386 28 Q390 26 392 28 Q394 24 396 26 Q398 22 400 24 Q401 26 400 28 Q402 28 403 32 Q402 36 400 38 Q396 40 392 38 Q388 40 384 38 Z" fill="rgba(255,255,255,0.25)"/>
-
-            {/* Water line */}
-            <line x1="0" y1="47" x2="430" y2="47" stroke="rgba(255,255,255,0.15)" strokeWidth="1"/>
+          {/* Right SVG (mirrored) */}
+          <svg viewBox="0 0 215 48" width="38%" height="36" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet" style={{ transform:'scaleX(-1)' }}>
+            <path d="M0 38 Q20 32 40 38 Q60 44 80 38 Q100 32 120 38 Q140 44 160 38 Q180 32 215 36 L215 48 L0 48 Z" fill="rgba(232,66,10,0.15)"/>
+            <path d="M0 42 Q25 36 50 42 Q75 48 100 42 Q125 36 150 42 Q175 48 215 44 L215 48 L0 48 Z" fill="rgba(232,66,10,0.08)"/>
+            <line x1="30" y1="48" x2="30" y2="18" stroke="rgba(232,66,10,0.4)" strokeWidth="2"/>
+            <path d="M30 18 Q18 10 8 14" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
+            <path d="M30 18 Q20 8 24 2" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
+            <path d="M30 18 Q42 8 50 12" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
+            <path d="M80 48 Q110 28 150 35 Q180 40 215 32 L215 48 Z" fill="rgba(232,66,10,0.1)"/>
+            <path d="M180 38 Q183 30 187 28 Q191 26 193 28 Q195 24 197 26 Q199 22 201 24 Q202 26 201 28 Q203 28 204 32 Q203 36 201 38 Q197 40 193 38 Q189 40 185 38 Z" fill="rgba(232,66,10,0.25)"/>
           </svg>
         </div>
 
@@ -174,27 +160,27 @@ export default function ChecklistPage({ state, setState }: Props) {
 
         {/* Trip date input */}
         {showTripBar && (
-          <div style={{ padding:'0 16px 10px', borderTop:'1px solid #f5f5f5', animation:'fadeInUp 0.2s ease' }}>
-            <div style={{ display:'flex', gap:6, alignItems:'center', margin:'8px 0 8px' }}>
-              <div style={{ flex:1, position:'relative' }}>
-                <span style={{ position:'absolute', top:'50%', left:10, transform:'translateY(-50%)', fontSize:11, color:'#bbb', pointerEvents:'none', display: startDate ? 'none' : 'block' }}>출발일</span>
+          <div style={{ padding:'0 12px 8px', borderTop:'1px solid #f5f5f5', animation:'fadeInUp 0.2s ease' }}>
+            <div style={{ display:'flex', gap:6, alignItems:'center', margin:'8px 0 6px' }}>
+              <div style={{ flex:1, position:'relative', minWidth:0 }}>
+                <span style={{ position:'absolute', top:'50%', left:8, transform:'translateY(-50%)', fontSize:11, color:'#bbb', pointerEvents:'none', display: startDate ? 'none' : 'block' }}>출발일</span>
                 <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-                  style={{ width:'100%', padding:'7px 8px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:13, color: startDate ? '#333' : 'transparent', outline:'none' }} />
+                  style={{ width:'100%', padding:'6px 6px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:12, color: startDate ? '#333' : 'transparent', outline:'none', boxSizing:'border-box' }} />
               </div>
-              <span style={{ color:'#ccc', fontWeight:700 }}>—</span>
-              <div style={{ flex:1, position:'relative' }}>
-                <span style={{ position:'absolute', top:'50%', left:10, transform:'translateY(-50%)', fontSize:11, color:'#bbb', pointerEvents:'none', display: endDate ? 'none' : 'block' }}>도착일</span>
+              <span style={{ color:'#ccc', fontWeight:700, flexShrink:0 }}>—</span>
+              <div style={{ flex:1, position:'relative', minWidth:0 }}>
+                <span style={{ position:'absolute', top:'50%', left:8, transform:'translateY(-50%)', fontSize:11, color:'#bbb', pointerEvents:'none', display: endDate ? 'none' : 'block' }}>도착일</span>
                 <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-                  style={{ width:'100%', padding:'7px 8px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:13, color: endDate ? '#333' : 'transparent', outline:'none' }} />
+                  style={{ width:'100%', padding:'6px 6px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:12, color: endDate ? '#333' : 'transparent', outline:'none', boxSizing:'border-box' }} />
               </div>
             </div>
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={handleReset}
-                style={{ flex:1, padding:'7px', border:'1.5px solid #e0e0e0', borderRadius:10, background:'#fff', color:'#888', fontWeight:600, fontSize:13 }}>
+                style={{ flex:1, padding:'6px', border:'1.5px solid #e0e0e0', borderRadius:10, background:'#fff', color:'#888', fontWeight:600, fontSize:13 }}>
                 초기화
               </button>
               <button onClick={handleMakeTrip}
-                style={{ flex:2, padding:'7px', border:'none', borderRadius:10, background:'#e8420a', color:'#fff', fontWeight:700, fontSize:13 }}>
+                style={{ flex:2, padding:'6px', border:'none', borderRadius:10, background:'#e8420a', color:'#fff', fontWeight:700, fontSize:13 }}>
                 만들기
               </button>
             </div>
