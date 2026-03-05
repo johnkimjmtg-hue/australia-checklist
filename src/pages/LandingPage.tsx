@@ -1,185 +1,169 @@
 import { AppState } from '../store/state'
 import { ITEMS } from '../data/checklist'
 
-const BG_ICONS = [
-  { icon:'🐨', top:'20%', left:'3%',   size:50, delay:0.4 },
-  { icon:'🦘', top:'26%', right:'4%',  size:44, delay:1.2 },
-  { icon:'🌏', top:'50%', left:'2%',   size:38, delay:0.6 },
-  { icon:'🪃', top:'55%', right:'3%',  size:46, delay:1.8 },
-  { icon:'🦘', top:'65%', left:'18%',  size:42, delay:0.4 },
-  { icon:'⭐', top:'75%', right:'5%',  size:44, delay:1.4 },
-]
-
-const FLOATERS = [
-  { label:'🦘 캥거루',    top:'5%',  left:'6%',    anim:'floatA', delay:0    },
-  { label:'🏖 골드코스트', top:'8%',  right:'5%',   anim:'floatB', delay:0.9  },
-  { label:'🐨 코알라',    top:'30%', right:'4%',   anim:'floatB', delay:1.4  },
-  { label:'🌿 멜버른',    top:'28%', left:'4%',    anim:'floatA', delay:0.8  },
-  { label:'🪃 부메랑',    top:'63%', right:'4%',   anim:'floatA', delay:1.1  },
-  { label:'🦘 울루루',    top:'76%', left:'8%',    anim:'floatB', delay:0.5  },
-  { label:'🌟 시드니',    top:'80%', right:'6%',   anim:'floatB', delay:0.6  },
-]
-
-const PREVIEW_DEFAULTS = [
-  { label:'본다이비치 가기', emoji:'🌊' },
-  { label:'오포르토 햄버거 먹기', emoji:'🍔' },
-]
-
 type Props = { state: AppState; onStart: () => void }
 
 export default function LandingPage({ state, onStart }: Props) {
   const total = ITEMS.length + state.customItems.length
-  const previewItems = PREVIEW_DEFAULTS
 
   return (
     <div style={{
-      minHeight:'100vh',
-      background:'linear-gradient(160deg, #EEF2FF 0%, #F0F4FF 50%, #F5F8FF 100%)',
-      position:'relative', overflow:'hidden',
-      display:'flex', flexDirection:'column', alignItems:'center',
+      minHeight: '100vh',
+      background: 'linear-gradient(180deg, #F4F7FB 0%, #EBF0F8 100%)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      position: 'relative', overflow: 'hidden',
+      fontFamily: '-apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
     }}>
-      {/* Glow top right */}
-      <div style={{ position:'absolute', top:-80, right:-80, width:280, height:280, borderRadius:'50%', background:'radial-gradient(circle, rgba(79,107,220,0.12) 0%, transparent 70%)', pointerEvents:'none' }}/>
-      {/* Glow bottom left */}
-      <div style={{ position:'absolute', bottom:100, left:-60, width:220, height:220, borderRadius:'50%', background:'radial-gradient(circle, rgba(48,79,180,0.08) 0%, transparent 70%)', pointerEvents:'none' }}/>
 
-      {/* Background icons */}
-      {BG_ICONS.map((b, i) => (
-        <div key={i} style={{
-          position:'absolute', top:b.top,
-          left:(b as any).left, right:(b as any).right,
-          fontSize:b.size, opacity:0.07,
-          filter:'grayscale(30%) brightness(0.5)',
-          animation:`${i%2===0?'floatA':'floatB'} ${3.5+i*0.4}s ease-in-out ${b.delay}s infinite`,
-          userSelect:'none', pointerEvents:'none', zIndex:0,
-        } as React.CSSProperties}>{b.icon}</div>
-      ))}
+      {/* Subtle grid pattern */}
+      <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0.04, pointerEvents:'none' }}>
+        <defs>
+          <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+            <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#1E4D83" strokeWidth="0.8"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)"/>
+      </svg>
 
-      {/* Floating pills */}
-      {FLOATERS.map((f, i) => (
-        <div key={i} style={{
-          position:'absolute', top:f.top,
-          left:(f as any).left, right:(f as any).right,
-          background:'rgba(255,255,255,0.75)',
-          backdropFilter:'blur(8px)',
-          borderRadius:40, padding:'6px 14px',
-          fontSize:12.5, fontWeight:700, color:'#304FB4',
-          whiteSpace:'nowrap',
-          border:'1px solid rgba(48,79,180,0.12)',
-          boxShadow:'0 2px 10px rgba(48,79,180,0.08)',
-          animation:`${f.anim} ${2.8+i*0.3}s ease-in-out ${f.delay}s infinite`,
-          zIndex:1,
-        } as React.CSSProperties}>{f.label}</div>
-      ))}
+      {/* Top spacing */}
+      <div style={{ height: '8vh' }} />
 
-      {/* Hero */}
-      <div style={{
-        marginTop:'22%',
-        display:'flex', flexDirection:'column', alignItems:'center',
-        zIndex:2, animation:'fadeInUp 0.7s ease both',
-      }}>
-        {/* 알약 */}
-        <div style={{
-          background:'rgba(255,255,255,0.85)',
-          backdropFilter:'blur(8px)',
-          borderRadius:40, padding:'8px 20px',
-          fontSize:13, fontWeight:700, color:'#304FB4',
-          marginBottom:24,
-          border:'1px solid rgba(48,79,180,0.14)',
-          boxShadow:'0 2px 12px rgba(48,79,180,0.10)',
-          animation:'floatB 3.2s ease-in-out 0.4s infinite',
-        }}>✈️ 호주 여행 체크리스트</div>
-
-        {/* 타이틀 */}
-        <h1 style={{
-          fontSize:35, fontWeight:900, letterSpacing:-1.5,
-          background:'linear-gradient(135deg, #304FB4 0%, #4F6BDC 50%, #304FB4 100%)',
-          backgroundSize:'200% auto',
-          WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
-          animation:'shimmer 4s linear infinite',
-          marginBottom:10, lineHeight:1.1,
-        }}>호주가자</h1>
-
-        <p style={{ color:'#6B7280', fontSize:14, fontWeight:500, marginBottom:28, letterSpacing:0.2 }}>
-          호주 가기 전에 꼭 체크하자!
-        </p>
+      {/* ── LOGO ── */}
+      <div style={{ animation: 'fadeInUp 0.6s ease both', marginBottom: 8 }}>
+        <svg width="200" height="52" viewBox="0 0 200 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* 호 */}
+          <text x="2" y="42" fontFamily="-apple-system, Arial Black, sans-serif" fontSize="38" fontWeight="900" fill="#1E4D83" letterSpacing="-2">호주가자</text>
+          {/* Underline accent */}
+          <rect x="2" y="47" width="196" height="3" rx="1.5" fill="#1E4D83" opacity="0.25"/>
+          {/* Dot accent */}
+          <circle cx="192" cy="14" r="5" fill="#3A7FCC" opacity="0.7"/>
+        </svg>
       </div>
 
-      {/* Boarding pass card */}
-      <div style={{
-        width:'calc(100% - 48px)', maxWidth:310,
-        borderRadius:20, overflow:'hidden',
-        boxShadow:'0 10px 36px rgba(48,79,180,0.16)',
-        zIndex:2, animation:'fadeInUp 0.8s ease 0.15s both',
-        marginBottom:100,
-        border:'1px solid rgba(48,79,180,0.10)',
-      }}>
-        {/* Header band */}
-        <div style={{
-          background:'linear-gradient(135deg, #4F6BDC 0%, #304FB4 100%)',
-          padding:'14px 18px 12px', position:'relative', overflow:'hidden',
-        }}>
-          <div style={{ position:'absolute', top:-20, right:-20, width:80, height:80, borderRadius:'50%', background:'rgba(255,255,255,0.08)' }}/>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-            <div>
-              <div style={{ color:'rgba(255,255,255,0.6)', fontSize:8, letterSpacing:3, fontWeight:700, marginBottom:3 }}>BOARDING PASS</div>
-              <div style={{ color:'#fff', fontSize:17, fontWeight:900, letterSpacing:0.5 }}>호주가자 🦘</div>
-            </div>
-            <div style={{ textAlign:'right' }}>
-              <div style={{ color:'rgba(255,255,255,0.6)', fontSize:8, letterSpacing:2, marginBottom:3 }}>DESTINATION</div>
-              <div style={{ color:'#fff', fontSize:20, fontWeight:900, letterSpacing:1 }}>AUS</div>
-            </div>
-          </div>
-          <div style={{ display:'flex', gap:14, marginTop:10, paddingTop:8, borderTop:'1px solid rgba(255,255,255,0.2)' }}>
-            <div>
-              <div style={{ color:'rgba(255,255,255,0.6)', fontSize:7.5, letterSpacing:1.5 }}>ROUTE</div>
-              <div style={{ color:'#fff', fontSize:11, fontWeight:700 }}>KOR ✈ AUS</div>
-            </div>
-            <div>
-              <div style={{ color:'rgba(255,255,255,0.6)', fontSize:7.5, letterSpacing:1.5 }}>CHECKED</div>
-              <div style={{ color:'#fff', fontSize:11, fontWeight:700 }}>12/{total}</div>
-            </div>
-          </div>
-        </div>
+      {/* Subtitle */}
+      <p style={{
+        fontSize: 13, color: '#5A7090', fontWeight: 500,
+        letterSpacing: 0.5, marginBottom: 36,
+        animation: 'fadeInUp 0.6s ease 0.1s both',
+      }}>여행 버킷리스트</p>
 
-        {/* Perforation */}
-        <div style={{ display:'flex', alignItems:'center', background:'#F0F4FF', padding:'0 12px', height:18 }}>
-          <div style={{ flex:1, borderTop:'2px dashed rgba(48,79,180,0.2)' }}/>
-          <div style={{ width:18, height:18, borderRadius:'50%', background:'#EEF2FF', border:'1px solid rgba(48,79,180,0.15)', margin:'0 6px', flexShrink:0 }}/>
-          <div style={{ flex:1, borderTop:'2px dashed rgba(48,79,180,0.2)' }}/>
-        </div>
+      {/* ── BUCKET ILLUSTRATION ── */}
+      <div style={{ animation: 'fadeInUp 0.7s ease 0.15s both' }}>
+        <svg width="220" height="260" viewBox="0 0 220 260" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-        {/* Items */}
-        <div style={{ background:'#fff', padding:'12px 18px 14px' }}>
-          <div style={{ fontSize:8, color:'#aaa', letterSpacing:2.5, fontWeight:700, marginBottom:10 }}>RECEIPT TO DO [AU]</div>
-          {previewItems.map((item, i) => (
-            <div key={i} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:13, color:'#555', padding:'4px 0', borderBottom:'1px solid #EEF2FF' }}>
-              <span>{item.emoji} {item.label}</span>
-              <span style={{ color:'#304FB4', fontWeight:700 }}>✓</span>
-            </div>
-          ))}
-          {[1,2].map(i => (
-            <div key={i} style={{ height:11, background:'#EEF2FF', borderRadius:4, margin:'6px 0' }}/>
-          ))}
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:10, paddingTop:8, borderTop:'1px dashed rgba(48,79,180,0.15)' }}>
-            <span style={{ fontWeight:800, fontSize:13 }}>TOTAL</span>
-            <span style={{ color:'#304FB4', fontWeight:800, fontSize:13 }}>12/{total}건</span>
-          </div>
-        </div>
+          {/* Shadow under bucket */}
+          <ellipse cx="110" cy="248" rx="55" ry="8" fill="rgba(30,77,131,0.08)"/>
+
+          {/* ── Bucket body ── */}
+          {/* Main body trapezoid */}
+          <path d="M62 100 L158 100 L148 230 L72 230 Z" fill="url(#bucketGrad)" />
+          {/* Bucket rim */}
+          <rect x="56" y="92" width="108" height="16" rx="8" fill="url(#rimGrad)"/>
+          {/* Bucket shine */}
+          <path d="M72 110 L80 222" stroke="rgba(255,255,255,0.3)" strokeWidth="6" strokeLinecap="round"/>
+          {/* Bucket rivets */}
+          <circle cx="72" cy="100" r="4" fill="#1E4D83" opacity="0.4"/>
+          <circle cx="148" cy="100" r="4" fill="#1E4D83" opacity="0.4"/>
+          {/* Bucket handle */}
+          <path d="M76 92 Q110 60 144 92" stroke="#2E6BB0" strokeWidth="6" strokeLinecap="round" fill="none" opacity="0.6"/>
+          <circle cx="76" cy="92" r="5" fill="#2E6BB0" opacity="0.5"/>
+          <circle cx="144" cy="92" r="5" fill="#2E6BB0" opacity="0.5"/>
+
+          {/* ── Notes/tickets sticking out ── */}
+          {/* Left note - tilted left */}
+          <g transform="rotate(-18, 82, 80)">
+            <rect x="68" y="30" width="28" height="74" rx="3" fill="#FFF8E7" stroke="#E8D5A3" strokeWidth="1"/>
+            <rect x="68" y="30" width="28" height="8" rx="3" fill="#E8D5A3" opacity="0.6"/>
+            <line x1="74" y1="48" x2="90" y2="48" stroke="#C4A882" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="74" y1="55" x2="90" y2="55" stroke="#C4A882" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="74" y1="62" x2="86" y2="62" stroke="#C4A882" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="74" y1="69" x2="88" y2="69" stroke="#C4A882" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="74" y1="76" x2="84" y2="76" stroke="#C4A882" strokeWidth="1.5" strokeLinecap="round"/>
+          </g>
+
+          {/* Center note - straight up */}
+          <g transform="rotate(3, 110, 78)">
+            <rect x="96" y="18" width="28" height="84" rx="3" fill="#F0F7FF" stroke="#BDD4EE" strokeWidth="1"/>
+            <rect x="96" y="18" width="28" height="8" rx="3" fill="#BDD4EE" opacity="0.7"/>
+            <line x1="102" y1="36" x2="118" y2="36" stroke="#7AAAD4" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="102" y1="43" x2="118" y2="43" stroke="#7AAAD4" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="102" y1="50" x2="114" y2="50" stroke="#7AAAD4" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="102" y1="57" x2="116" y2="57" stroke="#7AAAD4" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="102" y1="64" x2="112" y2="64" stroke="#7AAAD4" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="102" y1="71" x2="116" y2="71" stroke="#7AAAD4" strokeWidth="1.5" strokeLinecap="round"/>
+            {/* Checkmark on one line */}
+            <path d="M102 79 L105 82 L112 75" stroke="#1E4D83" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          </g>
+
+          {/* Right note - tilted right */}
+          <g transform="rotate(15, 138, 76)">
+            <rect x="124" y="26" width="28" height="78" rx="3" fill="#FFF0F0" stroke="#F0C4C4" strokeWidth="1"/>
+            <rect x="124" y="26" width="28" height="8" rx="3" fill="#F0C4C4" opacity="0.6"/>
+            <line x1="130" y1="44" x2="146" y2="44" stroke="#D4A0A0" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="130" y1="51" x2="146" y2="51" stroke="#D4A0A0" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="130" y1="58" x2="142" y2="58" stroke="#D4A0A0" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="130" y1="65" x2="144" y2="65" stroke="#D4A0A0" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="130" y1="72" x2="140" y2="72" stroke="#D4A0A0" strokeWidth="1.5" strokeLinecap="round"/>
+          </g>
+
+          {/* ── BUCKET LIST label on bucket ── */}
+          <text x="110" y="168" textAnchor="middle" fontFamily="-apple-system, Arial Black, sans-serif" fontSize="11" fontWeight="900" fill="rgba(255,255,255,0.85)" letterSpacing="2">BUCKET</text>
+          <text x="110" y="183" textAnchor="middle" fontFamily="-apple-system, Arial Black, sans-serif" fontSize="11" fontWeight="900" fill="rgba(255,255,255,0.85)" letterSpacing="2">LIST</text>
+
+          {/* Small decorative stars */}
+          <text x="30" y="80" fontSize="14" opacity="0.5">✦</text>
+          <text x="182" y="60" fontSize="10" opacity="0.4">✦</text>
+          <text x="20" y="150" fontSize="8" opacity="0.3">✦</text>
+          <text x="192" y="140" fontSize="12" opacity="0.35">✦</text>
+
+          {/* Gradients */}
+          <defs>
+            <linearGradient id="bucketGrad" x1="62" y1="100" x2="158" y2="230" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#2E6BB0"/>
+              <stop offset="100%" stopColor="#1E4D83"/>
+            </linearGradient>
+            <linearGradient id="rimGrad" x1="56" y1="92" x2="164" y2="92" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#3A7FCC"/>
+              <stop offset="100%" stopColor="#1E4D83"/>
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
 
-      {/* CTA */}
+      {/* Stats chip */}
       <div style={{
-        position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-        width:'100%', maxWidth:430,
-        padding:'8px 16px 20px', background:'transparent', zIndex:20,
+        display: 'flex', alignItems: 'center', gap: 8,
+        background: 'rgba(30,77,131,0.07)',
+        border: '1px solid rgba(30,77,131,0.12)',
+        borderRadius: 999, padding: '7px 16px',
+        marginTop: 8, marginBottom: 32,
+        animation: 'fadeInUp 0.7s ease 0.25s both',
       }}>
-        <button onClick={onStart} className="hg-btn hg-btn--primary hg-btn--full" style={{ borderRadius:16, fontSize:15 }}>
-          보딩패스 발급하기
+        <span style={{ fontSize: 18 }}>🦘</span>
+        <span style={{ fontSize: 12, color: '#1E4D83', fontWeight: 700 }}>
+          호주 여행 버킷리스트 {total}가지
+        </span>
+      </div>
+
+      {/* CTA Button */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+        width: '100%', maxWidth: 390,
+        padding: '10px 16px 28px',
+        background: 'linear-gradient(to top, #F4F7FB 60%, transparent)',
+        zIndex: 20,
+        animation: 'fadeInUp 0.7s ease 0.3s both',
+      }}>
+        <button
+          onClick={onStart}
+          className="hg-btn hg-btn--primary hg-btn--full"
+          style={{ fontSize: 15, fontWeight: 800, letterSpacing: 0.3, borderRadius: 14, height: 52 }}
+        >
+          출발하기 →
         </button>
-        <div style={{ fontSize:11, color:'#9CA3AF', textAlign:'center', marginTop:5 }}>
-          호주에서 꼭 해야 할 것들을 기록하세요
-        </div>
+        <p style={{ textAlign: 'center', fontSize: 11, color: '#8AAAC8', marginTop: 8, fontWeight: 500 }}>
+          호주에서 꼭 해야 할 것들을 정리해보세요
+        </p>
       </div>
     </div>
   )
