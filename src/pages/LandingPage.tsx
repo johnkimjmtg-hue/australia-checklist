@@ -20,10 +20,8 @@ export default function LandingPage({ state, onStart }: Props) {
       fontFamily: '-apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
     }}>
 
-      {/* shimmer keyframe */}
       <style>{}</style>
 
-      {/* Subtle grid */}
       <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0.035, pointerEvents:'none' }}>
         <defs>
           <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
@@ -33,7 +31,6 @@ export default function LandingPage({ state, onStart }: Props) {
         <rect width="100%" height="100%" fill="url(#grid)"/>
       </svg>
 
-      {/* ── Content ── */}
       <div style={{
         flex: 1,
         display: 'flex',
@@ -44,10 +41,11 @@ export default function LandingPage({ state, onStart }: Props) {
         paddingBottom: 110,
         paddingTop: 20,
         textAlign: 'center',
+        gap: 0,
       }}>
 
-        {/* 호주가자 — bold + shimmer */}
-        <div style={{ animation: 'fadeInUp 0.5s ease both', marginBottom: 14 }}>
+        {/* 호주가자 */}
+        <div style={{ animation: 'fadeInUp 0.5s ease both', marginBottom: 8 }}>
           <span style={{
             fontSize: 52,
             fontWeight: 900,
@@ -63,13 +61,13 @@ export default function LandingPage({ state, onStart }: Props) {
           }}>호주가자</span>
         </div>
 
-        {/* Subtitle — 2줄, 2배 크기 */}
+        {/* 서브타이틀 */}
         <p style={{
           fontSize: 16,
           color: '#3A5A7A',
           fontWeight: 700,
-          lineHeight: 1.7,
-          margin: '0 0 28px',
+          lineHeight: 1.6,
+          margin: '0 0 12px',
           animation: 'fadeInUp 0.5s ease 0.08s both',
           letterSpacing: -0.3,
         }}>
@@ -77,12 +75,22 @@ export default function LandingPage({ state, onStart }: Props) {
           미리 확인하자
         </p>
 
-        {/* Bucket illustration — 1.5배 */}
-        <div style={{ animation: 'fadeInUp 0.6s ease 0.15s both' }}>
+        {/* 버킷 이미지 — 80%, bobbing */}
+        <div style={{
+          animation: 'fadeInUp 0.6s ease 0.15s both',
+          width: '80%',
+          maxWidth: 300,
+        }}>
           <img
             src={BUCKET_IMG}
             alt="버킷리스트"
-            style={{ width: 360, height: 'auto', objectFit: 'contain' }}
+            style={{
+              width: '100%',
+              height: 'auto',
+              objectFit: 'contain',
+              animation: 'bobbing 3.5s ease-in-out infinite',
+              display: 'block',
+            }}
           />
         </div>
 
@@ -95,7 +103,7 @@ export default function LandingPage({ state, onStart }: Props) {
           border: '1px solid rgba(30,77,131,0.12)',
           borderRadius: 999,
           padding: '7px 18px',
-          marginTop: 16,
+          marginTop: 12,
           animation: 'fadeInUp 0.6s ease 0.22s both',
         }}>
           <span style={{ fontSize: 16 }}>🦘</span>
@@ -105,7 +113,7 @@ export default function LandingPage({ state, onStart }: Props) {
         </div>
       </div>
 
-      {/* ── CTA ── */}
+      {/* CTA */}
       <div style={{
         position: 'sticky',
         bottom: 0,
