@@ -129,12 +129,12 @@ export default function LandingPage({ state, onStart }: Props) {
           animation:'shimmer 3s linear infinite',
         }}>호주가자</h1>
 
-        <p style={{ color:'#7a8fb5', fontSize:13, fontWeight:700, marginBottom:16, lineHeight:1.7 }}>
+        <p style={{ color:'#7a8fb5', fontSize:13, fontWeight:700, marginBottom:24, lineHeight:1.7 }}>
           호주 여행 버킷리스트,<br/>지금 바로 기록하자
         </p>
 
         {/* 버킷 이미지 */}
-        <div style={{ width:'16%', maxWidth:60, marginBottom:16 }}>
+        <div style={{ width:'16%', maxWidth:60, marginBottom:24, marginTop:8 }}>
           <img src={BUCKET_IMG} alt="버킷" style={{
             width:'100%', height:'auto', objectFit:'contain', display:'block',
             animation:'driftBucket 7s ease-in-out infinite',
