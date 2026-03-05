@@ -90,7 +90,8 @@ export default function ChecklistPage({ state, setState }: Props) {
 
   return (
     <div style={{ minHeight:'100vh', background:'#F4F7FB', display:'flex', flexDirection:'column',
-      fontFamily:'-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif' }}>
+      fontFamily:'-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
+      paddingLeft:'5mm', paddingRight:'5mm', boxSizing:'border-box' }}>
 
       {/* ── MAIN TABS (견출지) ── */}
       <div style={{ background:'#fff', borderBottom:'1.5px solid rgba(30,77,131,0.10)', position:'sticky', top:0, zIndex:30 }}>
@@ -301,8 +302,8 @@ export default function ChecklistPage({ state, setState }: Props) {
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:390, padding:'8px 14px 20px',
-            background:'rgba(244,247,251,0.95)', backdropFilter:'blur(10px)',
-            borderTop:'1px solid rgba(30,77,131,0.08)', zIndex:20,
+            background:'transparent',
+            zIndex:20,
           }}>
             {unscheduledCount>0 && done>0 && (
               <div style={{ fontSize:10, color:'#E67E00', textAlign:'center', marginBottom:4, fontWeight:700 }}>

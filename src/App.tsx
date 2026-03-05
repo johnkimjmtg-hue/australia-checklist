@@ -8,7 +8,7 @@ type Page = 'landing' | 'checklist'
 function FloatingBubble() {
   const [open, setOpen] = useState(false)
   return (
-    <div style={{ position: 'fixed', bottom: 80, right: 16, zIndex: 999 }}>
+    <div style={{ position: 'fixed', bottom: 124, right: 16, zIndex: 999 }}>
       {/* Popup */}
       {open && (
         <div style={{
