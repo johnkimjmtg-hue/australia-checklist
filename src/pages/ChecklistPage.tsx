@@ -146,18 +146,12 @@ export default function ChecklistPage({ state, setState }: Props) {
         {/* Trip date input */}
         {showTripBar && (
           <div style={{ padding:'0 12px 8px', borderTop:'1px solid #f5f5f5', animation:'fadeInUp 0.2s ease' }}>
-            <div style={{ display:'flex', gap:4, alignItems:'center', margin:'8px 0 6px', width:'100%' }}>
-              <div style={{ flex:1, position:'relative', overflow:'hidden', minWidth:0 }}>
-                {!startDate && <span style={{ position:'absolute', top:'50%', left:8, transform:'translateY(-50%)', fontSize:11, color:'#bbb', pointerEvents:'none', zIndex:1 }}>출발일</span>}
-                <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-                  style={{ display:'block', width:'100%', padding:'6px 4px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:11, color: startDate ? '#333' : 'transparent', outline:'none', boxSizing:'border-box' }} />
-              </div>
-              <span style={{ color:'#ccc', fontWeight:700, flexShrink:0, fontSize:12 }}>—</span>
-              <div style={{ flex:1, position:'relative', overflow:'hidden', minWidth:0 }}>
-                {!endDate && <span style={{ position:'absolute', top:'50%', left:8, transform:'translateY(-50%)', fontSize:11, color:'#bbb', pointerEvents:'none', zIndex:1 }}>도착일</span>}
-                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-                  style={{ display:'block', width:'100%', padding:'6px 4px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:11, color: endDate ? '#333' : 'transparent', outline:'none', boxSizing:'border-box' }} />
-              </div>
+            <div style={{ display:'flex', gap:4, alignItems:'center', margin:'8px 0 6px', boxSizing:'border-box' }}>
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+                style={{ flex:'1 1 0', minWidth:0, width:0, padding:'6px 4px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:11, color:'#333', outline:'none', boxSizing:'border-box' }} />
+              <span style={{ color:'#ccc', fontWeight:700, flexShrink:0 }}>—</span>
+              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
+                style={{ flex:'1 1 0', minWidth:0, width:0, padding:'6px 4px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:11, color:'#333', outline:'none', boxSizing:'border-box' }} />
             </div>
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={handleReset}
