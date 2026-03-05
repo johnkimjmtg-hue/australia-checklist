@@ -2,22 +2,21 @@ import { AppState } from '../store/state'
 import { ITEMS } from '../data/checklist'
 
 const BG_ICONS = [
-  { icon:'🦜', top:'8%',  left:'28%',  size:56, delay:0.5 },
-  { icon:'🐨', top:'20%', left:'3%',   size:48, delay:0.4 },
+  { icon:'🐨', top:'20%', left:'3%',   size:50, delay:0.4 },
   { icon:'🦘', top:'26%', right:'4%',  size:44, delay:1.2 },
-  { icon:'🐊', top:'52%', left:'2%',   size:40, delay:0.6 },
-  { icon:'🪃', top:'57%', right:'3%',  size:46, delay:1.8 },
-  { icon:'🦎', top:'70%', left:'20%',  size:54, delay:1.0 },
-  { icon:'⭐', top:'74%', right:'4%',  size:44, delay:1.4 },
+  { icon:'🌏', top:'50%', left:'2%',   size:38, delay:0.6 },
+  { icon:'🪃', top:'55%', right:'3%',  size:46, delay:1.8 },
+  { icon:'🦘', top:'65%', left:'18%',  size:42, delay:0.4 },
+  { icon:'⭐', top:'75%', right:'5%',  size:44, delay:1.4 },
 ]
 
 const FLOATERS = [
   { label:'🦘 캥거루',    top:'5%',  left:'6%',    anim:'floatA', delay:0    },
   { label:'🏖 골드코스트', top:'8%',  right:'5%',   anim:'floatB', delay:0.9  },
-  { label:'🪃 부메랑',    top:'63%', right:'4%',   anim:'floatA', delay:1.1  },
-  { label:'🦘 울루루',    top:'76%', left:'8%',    anim:'floatB', delay:0.5  },
   { label:'🐨 코알라',    top:'30%', right:'4%',   anim:'floatB', delay:1.4  },
   { label:'🌿 멜버른',    top:'28%', left:'4%',    anim:'floatA', delay:0.8  },
+  { label:'🪃 부메랑',    top:'63%', right:'4%',   anim:'floatA', delay:1.1  },
+  { label:'🦘 울루루',    top:'76%', left:'8%',    anim:'floatB', delay:0.5  },
   { label:'🌟 시드니',    top:'80%', right:'6%',   anim:'floatB', delay:0.6  },
 ]
 
@@ -35,21 +34,22 @@ export default function LandingPage({ state, onStart }: Props) {
   return (
     <div style={{
       minHeight:'100vh',
-      background:'linear-gradient(160deg, #fff8f0 0%, #fff3e6 40%, #fef9f5 100%)',
+      background:'linear-gradient(160deg, #EEF2FF 0%, #F0F4FF 50%, #F5F8FF 100%)',
       position:'relative', overflow:'hidden',
       display:'flex', flexDirection:'column', alignItems:'center',
     }}>
-      {/* Glows */}
-      <div style={{ position:'absolute', top:-80, right:-80, width:300, height:300, borderRadius:'50%', background:'radial-gradient(circle, rgba(255,160,60,0.18) 0%, transparent 70%)', pointerEvents:'none' }}/>
-      <div style={{ position:'absolute', bottom:100, left:-60, width:240, height:240, borderRadius:'50%', background:'radial-gradient(circle, rgba(255,120,50,0.1) 0%, transparent 70%)', pointerEvents:'none' }}/>
+      {/* Glow top right */}
+      <div style={{ position:'absolute', top:-80, right:-80, width:280, height:280, borderRadius:'50%', background:'radial-gradient(circle, rgba(79,107,220,0.12) 0%, transparent 70%)', pointerEvents:'none' }}/>
+      {/* Glow bottom left */}
+      <div style={{ position:'absolute', bottom:100, left:-60, width:220, height:220, borderRadius:'50%', background:'radial-gradient(circle, rgba(48,79,180,0.08) 0%, transparent 70%)', pointerEvents:'none' }}/>
 
       {/* Background icons */}
       {BG_ICONS.map((b, i) => (
         <div key={i} style={{
           position:'absolute', top:b.top,
           left:(b as any).left, right:(b as any).right,
-          fontSize:b.size, opacity:0.1,
-          filter:'sepia(100%) saturate(300%) hue-rotate(10deg) brightness(0.65)',
+          fontSize:b.size, opacity:0.07,
+          filter:'grayscale(30%) brightness(0.5)',
           animation:`${i%2===0?'floatA':'floatB'} ${3.5+i*0.4}s ease-in-out ${b.delay}s infinite`,
           userSelect:'none', pointerEvents:'none', zIndex:0,
         } as React.CSSProperties}>{b.icon}</div>
@@ -60,12 +60,13 @@ export default function LandingPage({ state, onStart }: Props) {
         <div key={i} style={{
           position:'absolute', top:f.top,
           left:(f as any).left, right:(f as any).right,
-          background:'rgba(255,220,180,0.65)',
+          background:'rgba(255,255,255,0.75)',
           backdropFilter:'blur(8px)',
           borderRadius:40, padding:'6px 14px',
-          fontSize:12.5, fontWeight:600, color:'#c05a20',
+          fontSize:12.5, fontWeight:700, color:'#304FB4',
           whiteSpace:'nowrap',
-          boxShadow:'0 1px 8px rgba(200,80,20,0.08)',
+          border:'1px solid rgba(48,79,180,0.12)',
+          boxShadow:'0 2px 10px rgba(48,79,180,0.08)',
           animation:`${f.anim} ${2.8+i*0.3}s ease-in-out ${f.delay}s infinite`,
           zIndex:1,
         } as React.CSSProperties}>{f.label}</div>
@@ -77,29 +78,29 @@ export default function LandingPage({ state, onStart }: Props) {
         display:'flex', flexDirection:'column', alignItems:'center',
         zIndex:2, animation:'fadeInUp 0.7s ease both',
       }}>
-        {/* 호주 여행 체크리스트 알약 — 타이틀 위 */}
+        {/* 알약 */}
         <div style={{
-          background:'rgba(255,200,140,0.85)',
+          background:'rgba(255,255,255,0.85)',
           backdropFilter:'blur(8px)',
           borderRadius:40, padding:'8px 20px',
-          fontSize:13, fontWeight:700, color:'#bf5010',
+          fontSize:13, fontWeight:700, color:'#304FB4',
           marginBottom:24,
-          boxShadow:'0 2px 12px rgba(200,80,20,0.12)',
+          border:'1px solid rgba(48,79,180,0.14)',
+          boxShadow:'0 2px 12px rgba(48,79,180,0.10)',
           animation:'floatB 3.2s ease-in-out 0.4s infinite',
         }}>✈️ 호주 여행 체크리스트</div>
 
         {/* 타이틀 */}
         <h1 style={{
-          fontSize:35, fontWeight:900, letterSpacing:-2,
-          background:'linear-gradient(135deg, #e8420a 0%, #ff7b2c 35%, #ffb347 65%, #ff6b1a 100%)',
+          fontSize:35, fontWeight:900, letterSpacing:-1.5,
+          background:'linear-gradient(135deg, #304FB4 0%, #4F6BDC 50%, #304FB4 100%)',
           backgroundSize:'200% auto',
           WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
-          animation:'shimmer 3s linear infinite',
+          animation:'shimmer 4s linear infinite',
           marginBottom:10, lineHeight:1.1,
         }}>호주가자</h1>
 
-        {/* 서브타이틀 — 타이틀 아래 */}
-        <p style={{ color:'#c07040', fontSize:14, fontWeight:500, marginBottom:28, letterSpacing:0.3 }}>
+        <p style={{ color:'#6B7280', fontSize:14, fontWeight:500, marginBottom:28, letterSpacing:0.2 }}>
           호주 가기 전에 꼭 체크하자!
         </p>
       </div>
@@ -107,23 +108,25 @@ export default function LandingPage({ state, onStart }: Props) {
       {/* Boarding pass card */}
       <div style={{
         width:'calc(100% - 48px)', maxWidth:310,
-        borderRadius:18, overflow:'hidden',
-        boxShadow:'0 8px 32px rgba(200,80,20,0.18)',
+        borderRadius:20, overflow:'hidden',
+        boxShadow:'0 10px 36px rgba(48,79,180,0.16)',
         zIndex:2, animation:'fadeInUp 0.8s ease 0.15s both',
         marginBottom:100,
+        border:'1px solid rgba(48,79,180,0.10)',
       }}>
+        {/* Header band */}
         <div style={{
-          background:'linear-gradient(135deg, #e8420a 0%, #ff7b2c 55%, #ffb347 100%)',
+          background:'linear-gradient(135deg, #4F6BDC 0%, #304FB4 100%)',
           padding:'14px 18px 12px', position:'relative', overflow:'hidden',
         }}>
           <div style={{ position:'absolute', top:-20, right:-20, width:80, height:80, borderRadius:'50%', background:'rgba(255,255,255,0.08)' }}/>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
             <div>
-              <div style={{ color:'rgba(255,255,255,0.65)', fontSize:8, letterSpacing:3, fontWeight:700, marginBottom:3 }}>BOARDING PASS</div>
+              <div style={{ color:'rgba(255,255,255,0.6)', fontSize:8, letterSpacing:3, fontWeight:700, marginBottom:3 }}>BOARDING PASS</div>
               <div style={{ color:'#fff', fontSize:17, fontWeight:900, letterSpacing:0.5 }}>호주가자 🦘</div>
             </div>
             <div style={{ textAlign:'right' }}>
-              <div style={{ color:'rgba(255,255,255,0.65)', fontSize:8, letterSpacing:2, marginBottom:3 }}>DESTINATION</div>
+              <div style={{ color:'rgba(255,255,255,0.6)', fontSize:8, letterSpacing:2, marginBottom:3 }}>DESTINATION</div>
               <div style={{ color:'#fff', fontSize:20, fontWeight:900, letterSpacing:1 }}>AUS</div>
             </div>
           </div>
@@ -140,27 +143,27 @@ export default function LandingPage({ state, onStart }: Props) {
         </div>
 
         {/* Perforation */}
-        <div style={{ display:'flex', alignItems:'center', background:'#f5f0eb', padding:'0 12px', height:18 }}>
-          <div style={{ flex:1, borderTop:'2px dashed #ddd' }}/>
-          <div style={{ width:18, height:18, borderRadius:'50%', background:'#f0ede8', border:'1px solid #ddd', margin:'0 6px', flexShrink:0 }}/>
-          <div style={{ flex:1, borderTop:'2px dashed #ddd' }}/>
+        <div style={{ display:'flex', alignItems:'center', background:'#F0F4FF', padding:'0 12px', height:18 }}>
+          <div style={{ flex:1, borderTop:'2px dashed rgba(48,79,180,0.2)' }}/>
+          <div style={{ width:18, height:18, borderRadius:'50%', background:'#EEF2FF', border:'1px solid rgba(48,79,180,0.15)', margin:'0 6px', flexShrink:0 }}/>
+          <div style={{ flex:1, borderTop:'2px dashed rgba(48,79,180,0.2)' }}/>
         </div>
 
         {/* Items */}
         <div style={{ background:'#fff', padding:'12px 18px 14px' }}>
-          <div style={{ fontSize:8, color:'#ccc', letterSpacing:2.5, fontWeight:700, marginBottom:10 }}>RECEIPT TO DO [AU]</div>
+          <div style={{ fontSize:8, color:'#aaa', letterSpacing:2.5, fontWeight:700, marginBottom:10 }}>RECEIPT TO DO [AU]</div>
           {previewItems.map((item, i) => (
-            <div key={i} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:13, color:'#555', padding:'4px 0', borderBottom:'1px solid #fdf0e8' }}>
+            <div key={i} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:13, color:'#555', padding:'4px 0', borderBottom:'1px solid #EEF2FF' }}>
               <span>{item.emoji} {item.label}</span>
-              <span style={{ color:'#e8420a', fontWeight:700 }}>✓</span>
+              <span style={{ color:'#304FB4', fontWeight:700 }}>✓</span>
             </div>
           ))}
           {[1,2].map(i => (
-            <div key={i} style={{ height:11, background:'#fdf0e8', borderRadius:4, margin:'6px 0' }}/>
+            <div key={i} style={{ height:11, background:'#EEF2FF', borderRadius:4, margin:'6px 0' }}/>
           ))}
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:10, paddingTop:8, borderTop:'1px dashed #fdd8b8' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:10, paddingTop:8, borderTop:'1px dashed rgba(48,79,180,0.15)' }}>
             <span style={{ fontWeight:800, fontSize:13 }}>TOTAL</span>
-            <span style={{ color:'#e8420a', fontWeight:800, fontSize:13 }}>12/{total}건</span>
+            <span style={{ color:'#304FB4', fontWeight:800, fontSize:13 }}>12/{total}건</span>
           </div>
         </div>
       </div>
@@ -171,14 +174,10 @@ export default function LandingPage({ state, onStart }: Props) {
         width:'100%', maxWidth:430,
         padding:'8px 16px 20px', background:'transparent', zIndex:20,
       }}>
-        <button onClick={onStart} style={{
-          width:'100%', padding:'14px',
-          background:'linear-gradient(135deg, #e8420a 0%, #ff7b2c 100%)',
-          color:'#fff', border:'none', borderRadius:16,
-          fontSize:15, fontWeight:800, letterSpacing:0.5,
-          boxShadow:'0 4px 20px rgba(232,66,10,0.35)',
-        }}>보딩패스 발급하기</button>
-        <div style={{ fontSize:11, color:'#c08060', textAlign:'center', marginTop:5 }}>
+        <button onClick={onStart} className="hg-btn hg-btn--primary hg-btn--full" style={{ borderRadius:16, fontSize:15 }}>
+          보딩패스 발급하기
+        </button>
+        <div style={{ fontSize:11, color:'#9CA3AF', textAlign:'center', marginTop:5 }}>
           호주에서 꼭 해야 할 것들을 기록하세요
         </div>
       </div>
