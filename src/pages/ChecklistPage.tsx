@@ -11,6 +11,7 @@ import ReceiptModal from '../components/ReceiptModal'
 
 const CAT_ROW1 = ['hospital','food','shopping','admin']
 const CAT_ROW2 = ['people','parenting','places','schedule']
+const CAT_ROW3 = ['custom']
 
 type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker'
@@ -98,7 +99,7 @@ export default function ChecklistPage({ state, setState }: Props) {
 
         {/* Title row */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px 0' }}>
-          <span style={{ fontSize:11, color:'#8AAAC8', fontWeight:600, letterSpacing:1.5 }}>HOOJUGAJA</span>
+          <span style={{ fontSize:11, color:'#8AAAC8', fontWeight:600, letterSpacing:1.5 }}>HOJUGAJA</span>
           <span style={{ fontSize:11, color:'#8AAAC8', fontWeight:600 }}>{done}/{total}</span>
         </div>
 
@@ -168,7 +169,7 @@ export default function ChecklistPage({ state, setState }: Props) {
             )}
 
             {/* Category chips */}
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:5, padding:'6px 12px 8px' }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:5, padding:'6px 12px 4px' }}>
               {[...CAT_ROW1, ...CAT_ROW2].map(catId => {
                 const cat = CATEGORIES.find(c => c.id === catId)
                 if (!cat) return null
@@ -198,6 +199,36 @@ export default function ChecklistPage({ state, setState }: Props) {
                 )
               })}
             </div>
+            {/* 직접입력 카테고리 */}
+            <div style={{ padding:'0 12px 8px' }}>
+              {(() => {
+                const cat = CATEGORIES.find(c => c.id === 'custom')!
+                const isActive = activeCategory === 'custom'
+                const catDone  = allItems.filter(i => i.categoryId==='custom' && state.selected[i.id]).length
+                const catUnsch = allItems.filter(i => i.categoryId==='custom' && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
+                return (
+                  <button onClick={() => setState(setCategory(state, 'custom'))} style={{
+                    width:'100%', height:32, borderRadius:8, border:'1px solid',
+                    borderColor: isActive ? '#1E4D83' : 'rgba(30,77,131,0.12)',
+                    background: isActive ? '#1E4D83' : '#fff',
+                    color: isActive ? '#fff' : '#5A7090',
+                    fontSize:11, fontWeight:700, cursor:'pointer',
+                    position:'relative', transition:'all .12s',
+                    boxShadow: isActive ? '0 2px 8px rgba(30,77,131,0.2)' : 'none',
+                  }}>
+                    ✏️ {cat.label}
+                    {catDone>0 && (
+                      <span style={{
+                        position:'absolute', top:-4, right:-3,
+                        background: catUnsch>0 ? '#E67E00' : '#1E4D83',
+                        color:'#fff', borderRadius:99, fontSize:9, fontWeight:800,
+                        minWidth:14, height:14, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px',
+                      }}>{catDone}</span>
+                    )}
+                  </button>
+                )
+              })()}
+            </div>
           </div>
 
           {/* ── LIST ── */}
@@ -213,7 +244,8 @@ export default function ChecklistPage({ state, setState }: Props) {
               </span>
             </div>
 
-            {/* Custom add */}
+            {/* Custom add - 직접입력 카테고리일 때만 표시 */}
+            {activeCategory === 'custom' && (
             <div style={{ display:'flex', gap:6, padding:'0 12px 6px', alignItems:'center' }}>
               <div style={{
                 flex:1, display:'flex', alignItems:'center', gap:6,
@@ -234,6 +266,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                 border:'none', borderRadius:8, fontWeight:700, fontSize:12, cursor:'pointer',
               }}>추가</button>
             </div>
+            )}
 
             {/* Items list */}
             <div style={{ background:'#fff', borderTop:'1px solid rgba(30,77,131,0.07)', borderBottom:'1px solid rgba(30,77,131,0.07)' }}>
@@ -249,7 +282,10 @@ export default function ChecklistPage({ state, setState }: Props) {
                     minHeight:44,
                   }}>
                     {/* Checkbox */}
-                    <button onClick={() => setState(toggleItem(state, item.id))} style={{
+                    <button onClick={() => {
+                      if (!trip) { setModal('tripPicker'); return }
+                      setState(toggleItem(state, item.id))
+                    }} style={{
                       width:20, height:20, borderRadius:6, flexShrink:0,
                       border: checked ? 'none' : '1.5px solid rgba(30,77,131,0.25)',
                       background: checked ? '#1E4D83' : '#fff',
@@ -266,7 +302,10 @@ export default function ChecklistPage({ state, setState }: Props) {
 
                     <span style={{ fontSize:15, opacity: checked ? 1 : 0.4, flexShrink:0 }}>{item.emoji}</span>
 
-                    <span onClick={() => setState(toggleItem(state, item.id))} style={{
+                    <span onClick={() => {
+                      if (!trip) { setModal('tripPicker'); return }
+                      setState(toggleItem(state, item.id))
+                    }} style={{
                       flex:1, fontSize:13, fontWeight: checked ? 600 : 400,
                       color: checked ? '#1E4D83' : '#3A4A5C', cursor:'pointer',
                     }}>{item.label}</span>

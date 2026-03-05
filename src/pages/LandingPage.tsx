@@ -204,7 +204,7 @@ export default function LandingPage({ state, onStart }: Props) {
           color:'#fff', border:'none', borderRadius:14,
           fontSize:15, fontWeight:900, cursor:'pointer', letterSpacing:0.3,
           boxShadow:'0 4px 16px rgba(30,77,131,0.28)',
-        }}>출발하기 →</button>
+        }}>호주 가자~~</button>
         <p style={{ textAlign:'center', fontSize:11, color:'#8AAAC8', marginTop:7, fontWeight:700 }}>
           호주에서 꼭 해야 할 것들을 정리해보세요
         </p>
