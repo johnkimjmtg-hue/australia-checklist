@@ -200,7 +200,7 @@ export default function ChecklistPage({ state, setState }: Props) {
               })}
             </div>
             {/* 직접입력 카테고리 */}
-            <div style={{ padding:'0 12px 8px' }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:5, padding:'0 12px 8px' }}>
               {(() => {
                 const cat = CATEGORIES.find(c => c.id === 'custom')!
                 const isActive = activeCategory === 'custom'
@@ -208,7 +208,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                 const catUnsch = allItems.filter(i => i.categoryId==='custom' && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
                 return (
                   <button onClick={() => setState(setCategory(state, 'custom'))} style={{
-                    width:'100%', height:32, borderRadius:8, border:'1px solid',
+                    height:32, borderRadius:8, border:'1px solid',
                     borderColor: isActive ? '#1E4D83' : 'rgba(30,77,131,0.12)',
                     background: isActive ? '#1E4D83' : '#fff',
                     color: isActive ? '#fff' : '#5A7090',
