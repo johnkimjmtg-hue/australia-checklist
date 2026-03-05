@@ -97,36 +97,21 @@ export default function ChecklistPage({ state, setState }: Props) {
       {/* ── Top header ── */}
       <div style={{ background:'#fff', boxShadow:'0 1px 0 #eee', position:'sticky', top:0, zIndex:30 }}>
 
-        {/* Beach & nature header — no bg color, SVG split left/right, text center */}
-        <div style={{ background:'#fff', overflow:'hidden', display:'flex', alignItems:'center', height:36 }}>
-          {/* Left SVG */}
-          <svg viewBox="0 0 215 48" width="38%" height="36" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
-            <path d="M0 38 Q20 32 40 38 Q60 44 80 38 Q100 32 120 38 Q140 44 160 38 Q180 32 215 36 L215 48 L0 48 Z" fill="rgba(232,66,10,0.15)"/>
-            <path d="M0 42 Q25 36 50 42 Q75 48 100 42 Q125 36 150 42 Q175 48 215 44 L215 48 L0 48 Z" fill="rgba(232,66,10,0.08)"/>
-            <line x1="30" y1="48" x2="30" y2="18" stroke="rgba(232,66,10,0.4)" strokeWidth="2"/>
-            <path d="M30 18 Q18 10 8 14" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
-            <path d="M30 18 Q20 8 24 2" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
-            <path d="M30 18 Q42 8 50 12" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
-            <path d="M80 48 Q110 28 150 35 Q180 40 215 32 L215 48 Z" fill="rgba(232,66,10,0.1)"/>
-            <path d="M200 12 Q204 8 208 12" fill="none" stroke="rgba(232,66,10,0.3)" strokeWidth="1.2"/>
-          </svg>
-
-          {/* Center text */}
-          <div style={{ flex:1, textAlign:'center', fontSize:9, letterSpacing:4, fontWeight:700, color:'#e8420a', whiteSpace:'nowrap' }}>
-            호주가자 보딩패스
-          </div>
-
-          {/* Right SVG (mirrored) */}
-          <svg viewBox="0 0 215 48" width="38%" height="36" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet" style={{ transform:'scaleX(-1)' }}>
-            <path d="M0 38 Q20 32 40 38 Q60 44 80 38 Q100 32 120 38 Q140 44 160 38 Q180 32 215 36 L215 48 L0 48 Z" fill="rgba(232,66,10,0.15)"/>
-            <path d="M0 42 Q25 36 50 42 Q75 48 100 42 Q125 36 150 42 Q175 48 215 44 L215 48 L0 48 Z" fill="rgba(232,66,10,0.08)"/>
-            <line x1="30" y1="48" x2="30" y2="18" stroke="rgba(232,66,10,0.4)" strokeWidth="2"/>
-            <path d="M30 18 Q18 10 8 14" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
-            <path d="M30 18 Q20 8 24 2" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
-            <path d="M30 18 Q42 8 50 12" fill="none" stroke="rgba(232,66,10,0.4)" strokeWidth="1.8"/>
-            <path d="M80 48 Q110 28 150 35 Q180 40 215 32 L215 48 Z" fill="rgba(232,66,10,0.1)"/>
-            <path d="M180 38 Q183 30 187 28 Q191 26 193 28 Q195 24 197 26 Q199 22 201 24 Q202 26 201 28 Q203 28 204 32 Q203 36 201 38 Q197 40 193 38 Q189 40 185 38 Z" fill="rgba(232,66,10,0.25)"/>
-          </svg>
+        {/* Header — handwriting style text only */}
+        <div style={{
+          background:'#fff',
+          padding:'8px 0 6px',
+          textAlign:'center',
+          borderBottom:'1px solid #f0ede8',
+        }}>
+          <span style={{
+            fontFamily:"'Gaegu', cursive",
+            fontSize:17,
+            fontWeight:700,
+            letterSpacing:2,
+            color:'#e8420a',
+            opacity:0.9,
+          }}>호주가자 보딩패스</span>
         </div>
 
         {/* Counter + trip button */}
