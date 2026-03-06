@@ -442,6 +442,9 @@ function BusinessTab() {
             </div>
             <button onClick={save} disabled={saving} style={{ ...btnPrimary, marginTop:16 }}>{saving ? '저장 중...' : editTarget ? '수정 완료' : '등록하기'}</button>
           </Card>
+
+          {/* 리뷰 관리 - 수정 모드일 때만 */}
+          {editTarget && <ReviewManager businessId={editTarget.id} onRefresh={load} showToast={showToast} />}
         </div>
       ) : (
         <>
@@ -477,6 +480,64 @@ function BusinessTab() {
           )}
         </>
       )}
+    </>
+  )
+}
+
+// ════════════════════════════════════════════
+// 리뷰 관리 컴포넌트
+// ════════════════════════════════════════════
+function ReviewManager({ businessId, onRefresh, showToast }: { businessId: string; onRefresh: () => void; showToast: (msg: string) => void }) {
+  const [reviews, setReviews] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [deleteId, setDeleteId] = useState<string|null>(null)
+
+  useEffect(() => { loadReviews() }, [businessId])
+
+  async function loadReviews() {
+    setLoading(true)
+    const { data } = await supabase.from('reviews').select('*').eq('business_id', businessId).order('created_at', { ascending: false })
+    setReviews(data || [])
+    setLoading(false)
+  }
+
+  async function handleDelete(id: string) {
+    const { error } = await supabase.from('reviews').delete().eq('id', id)
+    if (!error) {
+      showToast('🗑 리뷰 삭제 완료')
+      await loadReviews()
+      onRefresh()
+    }
+    setDeleteId(null)
+  }
+
+  return (
+    <>
+      {deleteId && <Confirm msg="이 리뷰를 삭제할까요?" onOk={() => handleDelete(deleteId)} onCancel={() => setDeleteId(null)} danger />}
+      <Card>
+        <SectionTitle>⭐ 리뷰 관리 ({reviews.length})</SectionTitle>
+        {loading ? (
+          <div style={{ color:'#aaa', fontSize:13, textAlign:'center', padding:'12px 0' }}>불러오는 중...</div>
+        ) : reviews.length === 0 ? (
+          <div style={{ color:'#ccc', fontSize:13, textAlign:'center', padding:'12px 0' }}>리뷰가 없어요</div>
+        ) : (
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            {reviews.map(r => (
+              <div key={r.id} style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'10px 12px', background:'#f8fafd', borderRadius:10, border:'1px solid #eee' }}>
+                <div style={{ flex:1 }}>
+                  <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:4 }}>
+                    <span style={{ fontSize:13, fontWeight:800, color:'#0F1B2D' }}>{r.author_name}</span>
+                    <span style={{ fontSize:12, color:'#f5a623' }}>{'⭐'.repeat(r.rating)}</span>
+                    <span style={{ fontSize:11, color:'#bbb' }}>{r.created_at ? new Date(r.created_at).toLocaleDateString('ko-KR') : ''}</span>
+                  </div>
+                  <p style={{ fontSize:12, color:'#555', margin:0, lineHeight:1.6 }}>{r.content}</p>
+                </div>
+                <button onClick={() => setDeleteId(r.id)} style={{ ...btnSmDanger, flexShrink:0 }}>🗑</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
     </>
   )
 }
