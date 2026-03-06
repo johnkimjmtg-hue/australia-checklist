@@ -2,7 +2,7 @@ import { AppState } from '../store/state'
 import { ITEMS, CATEGORIES } from '../data/checklist'
 
 const BUCKET_IMG = '/bucket-logo.png'
-const LOGO_IMG = '/logo.svg'
+const LOGO_IMG = '/logo.png'
 const PLANE_IMG = '/plane.png'
 
 const CATS_6 = ['hospital','food','shopping','admin','places','schedule']
@@ -128,7 +128,7 @@ export default function LandingPage({ state, onStart }: Props) {
       {/* 메인 콘텐츠 */}
       <div style={{
         zIndex:2, display:'flex', flexDirection:'column', alignItems:'center',
-        paddingTop:'15%', paddingBottom:130, width:'100%', textAlign:'center',
+        paddingTop:'16%', paddingBottom:130, width:'100%', textAlign:'center',
       }}>
         {/* 비행기 */}
         <div style={{
