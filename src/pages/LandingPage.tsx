@@ -38,29 +38,6 @@ function Cloud({ width, opacity = 1 }: { width: number; opacity?: number }) {
   )
 }
 
-// 비행기 SVG (오른쪽 방향, 측면뷰)
-function Plane({ size = 36 }: { size?: number }) {
-  return (
-    <svg width={size} height={size * 0.6} viewBox="0 0 60 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* 동체 */}
-      <ellipse cx="30" cy="20" rx="22" ry="7" fill="#1E4D83"/>
-      {/* 기수 */}
-      <path d="M 52 20 Q 60 20 58 18 Q 56 14 50 16 Z" fill="#1E4D83"/>
-      {/* 꼬리 */}
-      <path d="M 8 20 Q 4 20 6 14 L 14 17 Z" fill="#1E4D83"/>
-      {/* 주날개 */}
-      <path d="M 28 20 L 20 4 L 38 14 Z" fill="#2a6ab5"/>
-      {/* 꼬리날개 */}
-      <path d="M 12 19 L 8 12 L 18 17 Z" fill="#2a6ab5"/>
-      {/* 창문 */}
-      <circle cx="40" cy="17" r="2.5" fill="rgba(168,200,240,0.9)"/>
-      <circle cx="33" cy="16" r="2" fill="rgba(168,200,240,0.7)"/>
-      {/* 엔진 */}
-      <ellipse cx="28" cy="24" rx="6" ry="3" fill="#15376b"/>
-    </svg>
-  )
-}
-
 type Props = { state: AppState; onStart: () => void }
 
 export default function LandingPage({ state, onStart }: Props) {
@@ -157,9 +134,8 @@ export default function LandingPage({ state, onStart }: Props) {
           position:'absolute', top:'8%', left:0,
           animation:'flyPlane 6s ease-in-out infinite',
           pointerEvents:'none', zIndex:3,
-        }}>
-          <Plane size={40}/>
-        </div>
+          fontSize:28,
+        }}>✈️</div>
 
         {/* 호주가자 로고 shimmer */}
         <div style={{ position:'relative', marginBottom:6, overflow:'hidden', borderRadius:8 }}>
@@ -251,7 +227,7 @@ export default function LandingPage({ state, onStart }: Props) {
           color:'#fff', border:'none', borderRadius:14,
           fontSize:15, fontWeight:900, cursor:'pointer', letterSpacing:0.3,
           boxShadow:'0 4px 16px rgba(30,77,131,0.28)',
-        }}>호주 가자~~</button>
+        }}>호주 여행 시작하기</button>
         <p style={{ textAlign:'center', fontSize:11, color:'#8AAAC8', marginTop:7, fontWeight:700 }}>
           호주에서 꼭 해야 할 것들을 정리해보세요
         </p>
