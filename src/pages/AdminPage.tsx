@@ -506,7 +506,7 @@ function ReviewManager({ businessId, onRefresh, showToast }: { businessId: strin
     if (!error) {
       showToast('🗑 리뷰 삭제 완료')
       setReviews(prev => prev.filter(r => r.id !== id))
-      onRefresh()
+      await onRefresh()
     } else {
       showToast('❌ 삭제 실패')
     }
