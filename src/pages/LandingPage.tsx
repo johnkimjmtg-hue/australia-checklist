@@ -38,6 +38,29 @@ function Cloud({ width, opacity = 1 }: { width: number; opacity?: number }) {
   )
 }
 
+// 비행기 SVG (오른쪽 방향, 측면뷰)
+function Plane({ size = 36 }: { size?: number }) {
+  return (
+    <svg width={size} height={size * 0.6} viewBox="0 0 60 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* 동체 */}
+      <ellipse cx="30" cy="20" rx="22" ry="7" fill="#1E4D83"/>
+      {/* 기수 */}
+      <path d="M 52 20 Q 60 20 58 18 Q 56 14 50 16 Z" fill="#1E4D83"/>
+      {/* 꼬리 */}
+      <path d="M 8 20 Q 4 20 6 14 L 14 17 Z" fill="#1E4D83"/>
+      {/* 주날개 */}
+      <path d="M 28 20 L 20 4 L 38 14 Z" fill="#2a6ab5"/>
+      {/* 꼬리날개 */}
+      <path d="M 12 19 L 8 12 L 18 17 Z" fill="#2a6ab5"/>
+      {/* 창문 */}
+      <circle cx="40" cy="17" r="2.5" fill="rgba(168,200,240,0.9)"/>
+      <circle cx="33" cy="16" r="2" fill="rgba(168,200,240,0.7)"/>
+      {/* 엔진 */}
+      <ellipse cx="28" cy="24" rx="6" ry="3" fill="#15376b"/>
+    </svg>
+  )
+}
+
 type Props = { state: AppState; onStart: () => void }
 
 export default function LandingPage({ state, onStart }: Props) {
@@ -53,6 +76,14 @@ export default function LandingPage({ state, onStart }: Props) {
     }}>
 
       <style>{`
+        @keyframes flyPlane {
+          0%   { transform: translateX(-80px) translateY(0px); opacity:0; }
+          5%   { opacity:1; }
+          30%  { transform: translateX(calc(20vw)) translateY(-12px); }
+          60%  { transform: translateX(calc(55vw)) translateY(-6px); }
+          90%  { transform: translateX(calc(90vw)) translateY(-10px); opacity:1; }
+          100% { transform: translateX(calc(110vw)) translateY(-8px); opacity:0; }
+        }
         @keyframes twinkle {
           0%,100% { opacity:0.1; transform:scale(0.8); }
           50%      { opacity:0.9; transform:scale(1.2); }
@@ -119,8 +150,17 @@ export default function LandingPage({ state, onStart }: Props) {
       {/* 메인 콘텐츠 */}
       <div style={{
         zIndex:2, display:'flex', flexDirection:'column', alignItems:'center',
-        paddingTop:'12%', paddingBottom:130, width:'100%', textAlign:'center',
+        paddingTop:'15%', paddingBottom:130, width:'100%', textAlign:'center',
       }}>
+        {/* 비행기 */}
+        <div style={{
+          position:'absolute', top:'8%', left:0,
+          animation:'flyPlane 6s ease-in-out infinite',
+          pointerEvents:'none', zIndex:3,
+        }}>
+          <Plane size={40}/>
+        </div>
+
         {/* 호주가자 로고 shimmer */}
         <div style={{ position:'relative', marginBottom:6, overflow:'hidden', borderRadius:8 }}>
           <img src={LOGO_IMG} alt="호주가자" style={{
