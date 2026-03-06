@@ -52,25 +52,22 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       paddingBottom: 40,
     }}>
 
-      {/* 헤더 */}
+      {/* 헤더 - 뒤로가기 + 검색창만 */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 10,
         background: 'rgba(238,242,250,0.95)', backdropFilter: 'blur(10px)',
-        padding: '16px 16px 12px',
+        padding: '12px 16px 10px',
         borderBottom: '1px solid rgba(200,215,240,0.4)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           <button onClick={onBack} style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            fontSize: 20, padding: 0, color: '#1E4D83',
+            fontSize: 20, padding: 0, color: '#1E4D83', flexShrink: 0,
           }}>←</button>
-          <div>
-            <div style={{ fontSize: 17, fontWeight: 900, color: '#0F1B2D' }}>업체/서비스 찾기</div>
-            <div style={{ fontSize: 11, color: '#7a8fb5', fontWeight: 600 }}>📍 Sydney 한인 업체</div>
+          <div style={{ flex: 1 }}>
+            <SearchBar value={search} onChange={setSearch} />
           </div>
         </div>
-
-        <SearchBar value={search} onChange={setSearch} />
         <CategoryFilter selected={category} onChange={setCategory} />
       </div>
 

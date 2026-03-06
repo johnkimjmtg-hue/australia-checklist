@@ -1,4 +1,4 @@
-import { Business } from '../data/businesses'
+import { Business } from '../lib/businessService'
 
 type Props = {
   business: Business
@@ -6,7 +6,12 @@ type Props = {
 }
 
 export default function BusinessCard({ business, onClick }: Props) {
-  const { name, category, description, phone, website, kakao, city, rating, reviews, isFeatured, tags } = business
+  const { name, description, phone, website, kakao, address, city, rating, reviews_count, is_featured, tags } = business
+
+  const fullAddress = [address, city].filter(Boolean).join(', ')
+  const mapsUrl = fullAddress
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
+    : null
 
   return (
     <div
@@ -15,17 +20,17 @@ export default function BusinessCard({ business, onClick }: Props) {
         background: '#fff',
         borderRadius: 16,
         padding: '16px',
-        boxShadow: isFeatured
+        boxShadow: is_featured
           ? '0 4px 20px rgba(30,77,131,0.13)'
           : '0 2px 10px rgba(30,77,131,0.07)',
-        border: isFeatured ? '1.5px solid rgba(30,77,131,0.18)' : '1px solid rgba(200,215,240,0.5)',
+        border: is_featured ? '1.5px solid rgba(30,77,131,0.18)' : '1px solid rgba(200,215,240,0.5)',
         cursor: 'pointer',
         position: 'relative',
         transition: 'transform 0.15s, box-shadow 0.15s',
       }}
     >
       {/* 추천 뱃지 */}
-      {isFeatured && (
+      {is_featured && (
         <div style={{
           position: 'absolute', top: 12, right: 12,
           background: 'linear-gradient(135deg,#3A7FCC,#1E4D83)',
@@ -34,11 +39,21 @@ export default function BusinessCard({ business, onClick }: Props) {
         }}>⭐ 추천</div>
       )}
 
-      {/* 업체명 + 위치 */}
-      <div style={{ marginBottom: 6 }}>
-        <div style={{ fontSize: 15, fontWeight: 900, color: '#0F1B2D', marginBottom: 3 }}>{name}</div>
-        <div style={{ fontSize: 12, color: '#7a8fb5', fontWeight: 600 }}>📍 {city}</div>
-      </div>
+      {/* 업체명 */}
+      <div style={{ fontSize: 15, fontWeight: 900, color: '#0F1B2D', marginBottom: 4 }}>{name}</div>
+
+      {/* 주소 - 클릭하면 구글맵 */}
+      {fullAddress && (
+        <a
+          href={mapsUrl!}
+          target="_blank"
+          rel="noreferrer"
+          onClick={e => e.stopPropagation()}
+          style={{ fontSize: 12, color: '#3a7fcc', fontWeight: 600, textDecoration: 'none', display: 'block', marginBottom: 8 }}
+        >
+          📍 {fullAddress}
+        </a>
+      )}
 
       {/* 설명 */}
       <div style={{ fontSize: 12, color: '#4a5a6a', lineHeight: 1.6, marginBottom: 10 }}>
@@ -46,23 +61,25 @@ export default function BusinessCard({ business, onClick }: Props) {
       </div>
 
       {/* 태그 */}
-      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 12 }}>
-        {tags.map(tag => (
-          <span key={tag} style={{
-            background: 'rgba(200,218,248,0.5)',
-            color: '#3a5fa5', fontSize: 10, fontWeight: 700,
-            borderRadius: 6, padding: '3px 8px',
-          }}>{tag}</span>
-        ))}
-      </div>
+      {tags && tags.length > 0 && (
+        <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 12 }}>
+          {tags.map(tag => (
+            <span key={tag} style={{
+              background: 'rgba(200,218,248,0.5)',
+              color: '#3a5fa5', fontSize: 10, fontWeight: 700,
+              borderRadius: 6, padding: '3px 8px',
+            }}>{tag}</span>
+          ))}
+        </div>
+      )}
 
       {/* 평점 */}
       <div style={{ fontSize: 12, color: '#f5a623', fontWeight: 800, marginBottom: 12 }}>
-        ⭐ {rating} <span style={{ color: '#aab', fontWeight: 600 }}>({reviews} reviews)</span>
+        ⭐ {rating} <span style={{ color: '#aab', fontWeight: 600 }}>({reviews_count} reviews)</span>
       </div>
 
       {/* 버튼 */}
-      <div style={{ display: 'flex', gap: 8 }} onClick={e => e.stopPropagation()}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }} onClick={e => e.stopPropagation()}>
         {phone && (
           <a href={`tel:${phone}`} style={btnStyle('#1E4D83', '#fff')}>📞 전화</a>
         )}
