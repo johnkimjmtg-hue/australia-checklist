@@ -383,12 +383,14 @@ function BusinessTab() {
     setSaving(true)
     const payload = { ...form, tags: form.tags.split(',').map(t=>t.trim()).filter(Boolean), rating:0, reviews_count:0 }
     if (editTarget) {
-      await updateBusiness(editTarget.id, payload)
-      showToast('✅ 수정 완료')
+      const result = await updateBusiness(editTarget.id, payload)
+      if (result) showToast('✅ 수정 완료')
+      else { showToast('❌ 수정 실패 - 콘솔 확인'); setSaving(false); return }
     } else {
       const id = 'biz-' + Date.now()
-      await createBusiness({ ...payload, id })
-      showToast('✅ 등록 완료')
+      const result = await createBusiness({ ...payload, id })
+      if (result) showToast('✅ 등록 완료')
+      else { showToast('❌ 등록 실패 - 콘솔 확인'); setSaving(false); return }
     }
     await load(); setSaving(false); setShowForm(false)
   }
