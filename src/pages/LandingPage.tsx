@@ -128,7 +128,7 @@ export default function LandingPage({ state, onStart }: Props) {
       {/* 메인 콘텐츠 */}
       <div style={{
         zIndex:2, display:'flex', flexDirection:'column', alignItems:'center',
-        paddingTop:'16%', paddingBottom:130, width:'100%', textAlign:'center',
+        paddingTop:'19%', paddingBottom:130, width:'100%', textAlign:'center',
       }}>
         {/* 비행기 */}
         <div style={{
