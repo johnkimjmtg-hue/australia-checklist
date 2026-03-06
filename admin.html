@@ -134,7 +134,7 @@
         </span>
       </div>
 
-      <div class="row" style="margin-bottom:12px">
+      <div class="row" id="item-add-row" style="margin-bottom:12px">
         <input type="text" id="new-item-label" placeholder="새 항목 이름 (예: 남산 케이블카)" />
         <input type="text" id="new-item-emoji" class="emoji-input" placeholder="🚡" maxlength="2" title="이모티콘 (비워두면 자동)" />
         <button class="btn btn-primary" onclick="addItem()">추가</button>
@@ -195,6 +195,7 @@ const DEFAULT_CATS = [
   { id:'parenting', label:'육아',      receiptLabel:'육아',      emoji:'🧸' },
   { id:'places',    label:'가볼 곳',   receiptLabel:'가볼 곳',   emoji:'🗺' },
   { id:'schedule',  label:'일정',      receiptLabel:'일정',      emoji:'📅' },
+  { id:'custom',    label:'직접입력',  receiptLabel:'직접입력',  emoji:'✏️' },
 ]
 
 const DEFAULT_ITEMS = [
@@ -442,11 +443,18 @@ function renderCatGrid() {
   grid.innerHTML = ''
   cats.forEach((cat, idx) => {
     const count = items.filter(i => i.categoryId === cat.id).length
+    const isLocked = cat.id === 'custom'
     const div = document.createElement('div')
     div.className = 'cat-item' + (cat.id === selectedCatId ? ' selected' : '')
-    div.draggable = true
+    div.draggable = !isLocked
     div.dataset.idx = idx
-    div.innerHTML = `
+    div.innerHTML = isLocked ? `
+      <span style="color:#ccc;font-size:16px;user-select:none">🔒</span>
+      <span class="cat-emoji">${cat.emoji}</span>
+      <span class="cat-label" style="color:#aaa">${cat.label}</span>
+      <span class="cat-count">${count}개</span>
+      <span style="font-size:11px;color:#bbb;padding:0 4px">고정</span>
+    ` : `
       <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
       <span class="cat-emoji" contenteditable="true" title="클릭해서 이모티콘 변경"
         onblur="updateCatEmoji('${cat.id}', this.textContent.trim())">${cat.emoji}</span>
@@ -461,8 +469,10 @@ function renderCatGrid() {
       render()
       switchTab('items')
     })
-    div.addEventListener('dragstart', () => { dragSrcIdx = idx; div.style.opacity = '0.4' })
-    div.addEventListener('dragend',   () => { div.style.opacity = '1'; render() })
+    if (!isLocked) {
+      div.addEventListener('dragstart', () => { dragSrcIdx = idx; div.style.opacity = '0.4' })
+      div.addEventListener('dragend',   () => { div.style.opacity = '1'; render() })
+    }
     div.addEventListener('dragover',  (e) => { e.preventDefault() })
     div.addEventListener('drop', (e) => {
       e.preventDefault()
@@ -489,22 +499,37 @@ function renderCatSelector() {
   const cat = cats.find(c => c.id === selectedCatId)
   document.getElementById('selected-cat-label').textContent = cat ? cat.emoji + ' ' + cat.label : '—'
   document.getElementById('item-count').textContent = items.filter(i => i.categoryId === selectedCatId).length
+  const addRow = document.getElementById('item-add-row')
+  if (addRow) addRow.style.display = selectedCatId === 'custom' ? 'none' : 'flex'
 }
 
 function renderItemList() {
   const list = document.getElementById('item-list')
+  const isLocked = selectedCatId === 'custom'
   const catItems = items.filter(i => i.categoryId === selectedCatId)
   if (!selectedCatId || catItems.length === 0) {
-    list.innerHTML = '<p class="empty">항목이 없습니다. 위에서 추가해보세요!</p>'
+    list.innerHTML = isLocked
+      ? '<p class="empty">🔒 직접입력 항목은 앱에서 사용자가 직접 추가합니다.</p>'
+      : '<p class="empty">항목이 없습니다. 위에서 추가해보세요!</p>'
     return
   }
   list.innerHTML = ''
+  if (isLocked) {
+    const notice = document.createElement('p')
+    notice.className = 'hint'
+    notice.style.marginBottom = '10px'
+    notice.textContent = '🔒 직접입력 카테고리는 수정할 수 없습니다. 앱에서 사용자가 직접 추가하는 항목입니다.'
+    list.appendChild(notice)
+  }
   catItems.forEach((item, localIdx) => {
     const globalIdx = items.findIndex(i => i.id === item.id)
     const row = document.createElement('div')
     row.className = 'item-row'
     row.id = 'item-' + item.id
-    row.innerHTML = `
+    row.innerHTML = isLocked ? `
+      <span class="item-emoji">${item.emoji}</span>
+      <span class="item-label" style="color:#aaa">${item.label}</span>
+    ` : `
       <span class="item-emoji" contenteditable="true" title="클릭해서 이모티콘 변경"
         onblur="updateItemEmoji('${item.id}', this.textContent.trim())">${item.emoji}</span>
       <span class="item-label" contenteditable="true"
