@@ -386,8 +386,8 @@ function BusinessTab() {
       await updateBusiness(editTarget.id, payload)
       showToast('✅ 수정 완료')
     } else {
-      const slug = form.name.toLowerCase().replace(/[^a-z0-9가-힣]+/g,'-').replace(/(^-|-$)/g,'') + '-' + Date.now()
-      await createBusiness({ ...payload, id: slug })
+      const id = 'biz-' + Date.now()
+      await createBusiness({ ...payload, id })
       showToast('✅ 등록 완료')
     }
     await load(); setSaving(false); setShowForm(false)
