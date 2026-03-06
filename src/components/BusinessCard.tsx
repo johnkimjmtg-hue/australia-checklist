@@ -89,7 +89,7 @@ export default function BusinessCard({ business, onClick }: Props) {
           </a>
         )}
         {website && (
-          <a href={website} target="_blank" rel="noreferrer" style={btnStyle('rgba(200,218,248,0.6)', '#1E4D83')}>
+          <a href={website.startsWith('http') ? website : `https://${website}`} target="_blank" rel="noreferrer" style={btnStyle('rgba(200,218,248,0.6)', '#1E4D83')}>
             🌐 웹사이트
           </a>
         )}
