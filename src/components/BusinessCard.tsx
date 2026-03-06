@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Business } from '../lib/businessService'
 
 type Props = {
@@ -81,7 +82,7 @@ export default function BusinessCard({ business, onClick }: Props) {
       {/* 버튼 */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }} onClick={e => e.stopPropagation()}>
         {phone && (
-          <a href={`tel:${phone}`} style={btnStyle('#1E4D83', '#fff')}>📞 전화</a>
+          <PhoneButton phone={phone} />
         )}
         {kakao && (
           <a href={`https://open.kakao.com/o/${kakao}`} target="_blank" rel="noreferrer" style={btnStyle('#FEE500', '#3C1E1E')}>
@@ -94,6 +95,35 @@ export default function BusinessCard({ business, onClick }: Props) {
           </a>
         )}
       </div>
+    </div>
+  )
+}
+
+function PhoneButton({ phone }: { phone: string }) {
+  const [showNumber, setShowNumber] = useState(false)
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
+  if (isMobile) {
+    return <a href={`tel:${phone}`} style={btnStyle('#1E4D83', '#fff')}>📞 전화</a>
+  }
+
+  return (
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+      <button
+        onClick={() => setShowNumber(v => !v)}
+        style={{ ...btnStyle('#1E4D83', '#fff'), border: 'none', cursor: 'pointer' }}
+      >📞 전화</button>
+      {showNumber && (
+        <div style={{
+          position: 'absolute', bottom: '110%', left: 0,
+          background: '#0F1B2D', color: '#fff',
+          padding: '8px 14px', borderRadius: 10,
+          fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.2)', zIndex: 50,
+        }}>
+          {phone}
+        </div>
+      )}
     </div>
   )
 }
