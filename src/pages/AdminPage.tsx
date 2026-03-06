@@ -262,10 +262,13 @@ let _mapsPromise: Promise<void> | null = null
 function loadGoogleMaps(): Promise<void> {
   if (_mapsPromise) return _mapsPromise
   _mapsPromise = new Promise((resolve, reject) => {
-    if ((window as any).google?.maps?.places?.AutocompleteSuggestion) { resolve(); return }
+    if ((window as any).google?.maps?.places) { resolve(); return }
     const s = document.createElement('script')
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_KEY}&libraries=places&loading=async&v=weekly`
-    s.onload = () => resolve()
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_KEY}&libraries=places&v=weekly`
+    s.onload = () => {
+      // 약간 딜레이 줘서 places 객체 완전히 초기화되도록
+      setTimeout(() => resolve(), 100)
+    }
     s.onerror = () => reject(new Error('Google Maps load failed'))
     document.head.appendChild(s)
   })
@@ -292,7 +295,9 @@ function AddressAutocomplete({ address, city, onSelect }: {
       setLoading(true)
       try {
         await loadGoogleMaps()
-        const { AutocompleteSuggestion } = (window as any).google.maps.places
+        const places = (window as any).google.maps.places
+        const AutocompleteSuggestion = places.AutocompleteSuggestion || places.autocomplete?.AutocompleteSuggestion
+        if (!AutocompleteSuggestion) throw new Error('AutocompleteSuggestion not available')
         const { suggestions: results } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
           input: val,
           includedRegionCodes: ['au'],
