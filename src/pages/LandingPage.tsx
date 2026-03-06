@@ -155,7 +155,7 @@ export default function LandingPage({ state, onStart }: Props) {
         </div>
 
         <p style={{ color:'#7a8fb5', fontSize:13, fontWeight:700, marginBottom:24, lineHeight:1.7 }}>
-          호주 여행 버킷리스트, 지금 바로 기록하자
+          <span style={{ color:'#1E4D83', fontWeight:900 }}>호주 여행 버킷리스트</span>, 지금 바로 기록하자
         </p>
 
         {/* 버킷 이미지 */}
