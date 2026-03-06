@@ -258,70 +258,84 @@ function autoEmoji(label: string): string {
 // ════════════════════════════════════════════
 const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY
 
+let gmapsLoaded = false
+let gmapsLoading = false
+const gmapsCallbacks: (() => void)[] = []
+
+function loadGoogleMaps(): Promise<void> {
+  return new Promise((resolve) => {
+    if (gmapsLoaded) { resolve(); return }
+    gmapsCallbacks.push(resolve)
+    if (gmapsLoading) return
+    gmapsLoading = true
+    const s = document.createElement('script')
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_KEY}&libraries=places`
+    s.async = true
+    s.onload = () => {
+      gmapsLoaded = true
+      gmapsLoading = false
+      gmapsCallbacks.forEach(cb => cb())
+      gmapsCallbacks.length = 0
+    }
+    document.head.appendChild(s)
+  })
+}
+
 function AddressAutocomplete({ address, city, onSelect }: {
   address: string
   city: string
   onSelect: (address: string, city: string) => void
 }) {
-  const [query, setQuery]         = useState(address || '')
+  const [query, setQuery]             = useState(address || '')
   const [suggestions, setSuggestions] = useState<any[]>([])
-  const [loading, setLoading]     = useState(false)
-  const [manual, setManual]       = useState(false)
-  const [manualCity, setManualCity] = useState(city || '')
+  const [loading, setLoading]         = useState(false)
+  const [manual, setManual]           = useState(false)
+  const [manualCity, setManualCity]   = useState(city || '')
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // 자동완성 검색
-  function handleInput(val: string) {
+  async function handleInput(val: string) {
     setQuery(val)
     if (debounceRef.current) clearTimeout(debounceRef.current)
     if (!val.trim() || val.length < 3) { setSuggestions([]); return }
     debounceRef.current = setTimeout(async () => {
       setLoading(true)
       try {
-        const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(val)}&components=country:au&types=address&key=${GOOGLE_KEY}`
-        // CORS 우회: Places API는 서버사이드 필요 → 대신 클라이언트 SDK 사용
-        const script = document.getElementById('gmaps-script')
-        if (!script) {
-          const s = document.createElement('script')
-          s.id = 'gmaps-script'
-          s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_KEY}&libraries=places`
-          s.async = true
-          document.head.appendChild(s)
-          await new Promise(resolve => { s.onload = resolve })
-        }
+        await loadGoogleMaps()
         const svc = new (window as any).google.maps.places.AutocompleteService()
         svc.getPlacePredictions(
           { input: val, componentRestrictions: { country: 'au' }, types: ['address'] },
           (predictions: any[], status: string) => {
-            if (status === 'OK') setSuggestions(predictions || [])
-            else setSuggestions([])
+            setSuggestions(status === 'OK' ? (predictions || []) : [])
             setLoading(false)
           }
         )
-      } catch { setLoading(false) }
-    }, 300)
+      } catch (e) {
+        console.error('Places error:', e)
+        setLoading(false)
+      }
+    }, 400)
   }
 
-  // 장소 선택 → suburb 추출
   async function handleSelect(placeId: string, description: string) {
     setSuggestions([])
-    const geocoder = new (window as any).google.maps.Geocoder()
-    geocoder.geocode({ placeId }, (results: any[], status: string) => {
-      if (status === 'OK' && results[0]) {
-        const components = results[0].address_components
-        // suburb = locality 또는 sublocality
-        const suburb = components.find((c: any) =>
-          c.types.includes('locality') || c.types.includes('sublocality_level_1')
-        )?.long_name || ''
-        // 번지수 + 도로명
-        const streetNum = components.find((c: any) => c.types.includes('street_number'))?.long_name || ''
-        const route = components.find((c: any) => c.types.includes('route'))?.long_name || ''
-        const streetAddress = [streetNum, route].filter(Boolean).join(' ')
-        setQuery(streetAddress || description)
-        setManualCity(suburb)
-        onSelect(streetAddress || description, suburb)
-      }
-    })
+    try {
+      await loadGoogleMaps()
+      const geocoder = new (window as any).google.maps.Geocoder()
+      geocoder.geocode({ placeId }, (results: any[], status: string) => {
+        if (status === 'OK' && results[0]) {
+          const components = results[0].address_components
+          const suburb = components.find((c: any) =>
+            c.types.includes('locality') || c.types.includes('sublocality_level_1')
+          )?.long_name || ''
+          const streetNum = components.find((c: any) => c.types.includes('street_number'))?.long_name || ''
+          const route     = components.find((c: any) => c.types.includes('route'))?.long_name || ''
+          const streetAddress = [streetNum, route].filter(Boolean).join(' ')
+          setQuery(streetAddress || description)
+          setManualCity(suburb)
+          onSelect(streetAddress || description, suburb)
+        }
+      })
+    } catch (e) { console.error('Geocoder error:', e) }
   }
 
   if (manual) return (
@@ -340,9 +354,9 @@ function AddressAutocomplete({ address, city, onSelect }: {
         value={query}
         onChange={e => handleInput(e.target.value)}
         style={inputStyle}
-        placeholder="주소 입력 (예: 123 George Street Chatswood)"
+        placeholder="주소 입력 (예: 123 George St Chatswood)"
       />
-      {loading && <div style={{ fontSize:11, color:'#aaa', marginTop:4 }}>검색 중...</div>}
+      {loading && <div style={{ fontSize:11, color:'#aaa', marginTop:4 }}>🔍 검색 중...</div>}
       {suggestions.length > 0 && (
         <div style={{
           position:'absolute', top:'100%', left:0, right:0, zIndex:100,
