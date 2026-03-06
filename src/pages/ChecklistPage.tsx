@@ -8,12 +8,14 @@ import {
 } from '../store/state'
 import ScheduleSheet from '../components/ScheduleSheet'
 import ReceiptModal from '../components/ReceiptModal'
+import Services from './Services'
+import BusinessDetail from './BusinessDetail'
 
 const CAT_ROW1 = ['hospital','food','shopping','admin']
 const CAT_ROW2 = ['people','parenting','places','schedule']
 const CAT_ROW3 = ['custom']
 
-type Props = { state: AppState; setState: (s: AppState) => void }
+type Props = { state: AppState; setState: (s: AppState) => void; onServices?: () => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker'
 type MainTab = 'bucketlist' | 'services'
 
@@ -26,6 +28,7 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [shakeBtn, setShakeBtn]       = useState(false)
   const [customLabel, setCustomLabel] = useState('')
   const [mainTab, setMainTab]         = useState<MainTab>('bucketlist')
+  const [selectedBusiness, setSelectedBusiness] = useState<string | null>(null)
   const [showScheduleView, setShowScheduleView] = useState(false)
   // date picker state
   const [pickerStep, setPickerStep]   = useState<'start'|'end'>('start')
@@ -122,7 +125,9 @@ export default function ChecklistPage({ state, setState }: Props) {
       </div>
 
       {mainTab === 'services' ? (
-        <EmptyServices />
+        selectedBusiness
+          ? <BusinessDetail businessId={selectedBusiness} onBack={() => setSelectedBusiness(null)} />
+          : <Services onSelectBusiness={(id) => setSelectedBusiness(id)} onBack={() => setMainTab('bucketlist')} />
       ) : (
         <>
           {/* ── SUB HEADER ── */}
@@ -146,9 +151,9 @@ export default function ChecklistPage({ state, setState }: Props) {
                 <button onClick={handleOpenTripPicker} style={{
                   height:30, padding:'0 10px', borderRadius:8,
                   border:'1px solid', cursor:'pointer',
-                  borderColor: tripLabel ? '#1E4D83' : 'rgba(30,77,131,0.2)',
-                  background: tripLabel ? '#1E4D83' : '#fff',
-                  color: tripLabel ? '#fff' : '#5A7090',
+                  borderColor: tripLabel ? '#1E4D83' : '#E67E00',
+                  background: tripLabel ? '#1E4D83' : '#E67E00',
+                  color: '#fff',
                   fontSize:11, fontWeight:700,
                   animation: tripLabel ? 'none' : 'pulse 1.4s ease-in-out infinite',
                 }}>
@@ -284,7 +289,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                   }}>
                     {/* Checkbox */}
                     <button onClick={() => {
-                      if (!trip) { setModal('noTrip'); return }
+                      if (!trip) { setModal('tripPicker'); return }
                       setState(toggleItem(state, item.id))
                     }} style={{
                       width:20, height:20, borderRadius:6, flexShrink:0,
@@ -304,7 +309,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                     <span style={{ fontSize:15, opacity: checked ? 1 : 0.4, flexShrink:0 }}>{item.emoji}</span>
 
                     <span onClick={() => {
-                      if (!trip) { setModal('noTrip'); return }
+                      if (!trip) { setModal('tripPicker'); return }
                       setState(toggleItem(state, item.id))
                     }} style={{
                       flex:1, fontSize:13, fontWeight: checked ? 600 : 400,
@@ -350,21 +355,13 @@ export default function ChecklistPage({ state, setState }: Props) {
                 ⚠️ {unscheduledCount}개 항목에 날짜를 지정해주세요
               </div>
             )}
-            <div style={{ display:'flex', gap:8 }}>
-              <button onClick={handleIssue} style={{
-                flex:1, height:48,
-                background:'linear-gradient(160deg,#3A7FCC,#1E4D83)', color:'#fff',
-                border:'none', borderRadius:12, fontSize:14, fontWeight:800, cursor:'pointer',
-                animation: shakeBtn ? 'shake 0.5s ease' : 'none',
-                boxShadow:'0 4px 16px rgba(30,77,131,0.28)',
-              }}>버킷리스트 발행하기</button>
-              <button onClick={() => setModal('confirmReset')} style={{
-                height:48, padding:'0 14px',
-                background:'#fff', color:'#5A7090',
-                border:'1px solid rgba(30,77,131,0.2)', borderRadius:12, fontSize:13, fontWeight:700, cursor:'pointer',
-                flexShrink:0,
-              }}>↻ 다시 시작하기</button>
-            </div>
+            <button onClick={handleIssue} style={{
+              width:'100%', height:48,
+              background:'linear-gradient(160deg,#3A7FCC,#1E4D83)', color:'#fff',
+              border:'none', borderRadius:12, fontSize:14, fontWeight:800, cursor:'pointer',
+              animation: shakeBtn ? 'shake 0.5s ease' : 'none',
+              boxShadow:'0 4px 16px rgba(30,77,131,0.28)',
+            }}>버킷리스트 발행하기</button>
             <div style={{ fontSize:10, color:'#8AAAC8', textAlign:'center', marginTop:5 }}>
               선택한 항목들로 버킷리스트를 만들어요
             </div>
@@ -390,7 +387,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       )}
       {modal==='noTrip' && (
         <AlertModal title="여행일정을 먼저 설정해주세요"
-          confirmLabel="날짜 입력하기" confirmFirst onConfirm={() => { setModal('none'); setTimeout(handleOpenTripPicker, 100) }} onCancel={() => setModal('none')} />
+          confirmLabel="날짜 입력하기" onConfirm={() => { setModal('none'); setTimeout(handleOpenTripPicker, 100) }} onCancel={() => setModal('none')} />
       )}
       {modal==='noDate' && (
         <AlertModal title="출발일과 도착일을 모두 선택해주세요"
@@ -633,8 +630,8 @@ function EmptyServices() {
 }
 
 /* ── Alert Modal ── */
-function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onCancel, hideCancel, confirmFirst }:
-  { title:string; message?:string; confirmLabel:string; confirmColor?:string; onConfirm:()=>void; onCancel:()=>void; hideCancel?:boolean; confirmFirst?:boolean }) {
+function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onCancel, hideCancel }:
+  { title:string; message?:string; confirmLabel:string; confirmColor?:string; onConfirm:()=>void; onCancel:()=>void; hideCancel?:boolean }) {
   return (
     <>
       <div onClick={onCancel} style={{ position:'fixed', inset:0, background:'rgba(10,20,40,0.45)', zIndex:600, animation:'fadeIn 0.2s ease' }}/>
@@ -650,19 +647,12 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
         <p style={{ fontSize:14, fontWeight:800, color:'#0F1B2D', marginBottom: message ? 8 : 20, lineHeight:1.5 }}>{title}</p>
         {message && <p style={{ fontSize:12, color:'#5A7090', marginBottom:20, lineHeight:1.6 }}>{message}</p>}
         <div style={{ display:'flex', gap:8 }}>
-          {confirmFirst && (
-            <button onClick={onConfirm} style={{ flex:2, height:42, border:'none', borderRadius:10, background: confirmColor ?? '#1E4D83', color:'#fff', fontWeight:700, fontSize:13, cursor:'pointer' }}>
-              {confirmLabel}
-            </button>
-          )}
           {!hideCancel && (
             <button onClick={onCancel} style={{ flex:1, height:42, border:'1px solid rgba(30,77,131,0.15)', borderRadius:10, background:'#fff', color:'#5A7090', fontWeight:700, fontSize:13, cursor:'pointer' }}>취소</button>
           )}
-          {!confirmFirst && (
-            <button onClick={onConfirm} style={{ flex:2, height:42, border:'none', borderRadius:10, background: confirmColor ?? '#1E4D83', color:'#fff', fontWeight:700, fontSize:13, cursor:'pointer' }}>
-              {confirmLabel}
-            </button>
-          )}
+          <button onClick={onConfirm} style={{ flex:2, height:42, border:'none', borderRadius:10, background: confirmColor ?? '#1E4D83', color:'#fff', fontWeight:700, fontSize:13, cursor:'pointer' }}>
+            {confirmLabel}
+          </button>
         </div>
       </div>
     </>
