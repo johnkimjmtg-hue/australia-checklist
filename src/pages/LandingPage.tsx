@@ -177,7 +177,7 @@ export default function LandingPage({ state, onStart }: Props) {
               background:'rgba(200,218,248,0.80)',
               border:'1px solid rgba(100,150,220,0.18)',
               borderRadius:8, padding:'5px 8px',
-              fontSize:10, fontWeight:700, color:'#3a5fa5',
+              fontSize:12, fontWeight:700, color:'#3a5fa5',
               whiteSpace:'nowrap', backdropFilter:'blur(4px)',
             }}>{cat.label}</div>
           ))}
@@ -192,8 +192,8 @@ export default function LandingPage({ state, onStart }: Props) {
           textAlign:'left',
           animation:'driftCard 8s ease-in-out 1s infinite',
         }}>
-          <div style={{ color:'#1E4D83', fontWeight:900, fontSize:11, letterSpacing:1.5, marginBottom:10, textAlign:'center' }}>
-            호주가자 버킷리스트
+          <div style={{ color:'#1E4D83', fontWeight:900, fontSize:13, letterSpacing:1.5, marginBottom:10, textAlign:'center' }}>
+            호주 버킷리스트
           </div>
           <div style={{ borderTop:'1px dashed rgba(30,77,131,0.15)', marginBottom:8 }}/>
           {FIXED_PREVIEW.map((item, i) => (
