@@ -316,23 +316,24 @@ function AddressAutocomplete({ address, city, onSelect }: {
     setSuggestions([])
     try {
       const place = suggestion.placePrediction.toPlace()
-      await place.fetchFields({ fields: ['addressComponents'] })
+      await place.fetchFields({ fields: ['addressComponents', 'formattedAddress'] })
       const components = place.addressComponents || []
-      const suburb    = components.find((c: any) => c.types.includes('locality') || c.types.includes('sublocality_level_1'))?.longText || ''
+      const suburb = components.find((c: any) => c.types.includes('locality') || c.types.includes('sublocality_level_1'))?.longText || ''
+      const state  = components.find((c: any) => c.types.includes('administrative_area_level_1'))?.shortText || ''
+      const post   = components.find((c: any) => c.types.includes('postal_code'))?.longText || ''
       const streetNum = components.find((c: any) => c.types.includes('street_number'))?.longText || ''
       const route     = components.find((c: any) => c.types.includes('route'))?.longText || ''
-      const streetAddress = [streetNum, route].filter(Boolean).join(' ')
-      const displayText = streetAddress || suggestion.placePrediction.text.text
-      setQuery(displayText)
+      const streetAddress = [streetNum, route, suburb, state, post].filter(Boolean).join(', ')
+      setQuery(streetAddress)
       setManualCity(suburb)
-      onSelect(displayText, suburb)
+      onSelect(streetAddress, suburb)
     } catch (e) { console.error('Place detail error:', e) }
   }
 
   if (manual) return (
     <div>
       <input value={query} onChange={e => { setQuery(e.target.value); onSelect(e.target.value, manualCity) }}
-        style={inputStyle} placeholder="예: 123 George Street" />
+        style={inputStyle} placeholder="예: 123 George Street, Chatswood NSW 2067" />
       <input value={manualCity} onChange={e => { setManualCity(e.target.value); onSelect(query, e.target.value) }}
         style={{ ...inputStyle, marginTop:6 }} placeholder="Suburb 예: Chatswood" />
       <button onClick={() => setManual(false)} style={{ fontSize:11, color:'#1E4D83', background:'none', border:'none', cursor:'pointer', marginTop:4, fontWeight:700 }}>🔍 자동검색으로 전환</button>
