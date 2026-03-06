@@ -2,6 +2,7 @@ import { AppState } from '../store/state'
 import { ITEMS, CATEGORIES } from '../data/checklist'
 
 const BUCKET_IMG = '/bucket-logo.png'
+const LOGO_IMG = '/logo.svg'
 
 const CATS_6 = ['hospital','food','shopping','admin','places','schedule']
 
@@ -55,6 +56,14 @@ export default function LandingPage({ state, onStart }: Props) {
         @keyframes twinkle {
           0%,100% { opacity:0.1; transform:scale(0.8); }
           50%      { opacity:0.9; transform:scale(1.2); }
+        }
+        @keyframes shimmer {
+          0%   { background-position: 200% center; }
+          100% { background-position: -200% center; }
+        }
+        @keyframes shimmerSlide {
+          0%   { transform: translateX(-100%); }
+          100% { transform: translateX(300%); }
         }
         @keyframes driftBucket {
           0%,100% { transform:translate(0px,0px); }
@@ -120,14 +129,20 @@ export default function LandingPage({ state, onStart }: Props) {
           marginBottom:12, boxShadow:'0 1px 8px rgba(100,130,200,0.10)',
         }}>✈️ 호주 여행 버킷리스트</div>
 
-        {/* 호주가자 shimmer */}
-        <h1 style={{
-          fontSize:32, fontWeight:950, letterSpacing:-1.5, margin:'0 0 6px',
-          background:'linear-gradient(90deg,#1E4D83 0%,#1E4D83 15%,#5B9BD5 35%,#A8C8F0 50%,#5B9BD5 65%,#1E4D83 85%,#1E4D83 100%)',
-          backgroundSize:'300% auto',
-          WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
-          animation:'shimmer 3s linear infinite',
-        }}>호주가자</h1>
+        {/* 호주가자 로고 shimmer */}
+        <div style={{ position:'relative', marginBottom:6, overflow:'hidden', borderRadius:8 }}>
+          <img src={LOGO_IMG} alt="호주가자" style={{
+            width:200, height:'auto', display:'block',
+            filter:'drop-shadow(0 2px 8px rgba(30,77,131,0.18))',
+          }}/>
+          {/* shimmer overlay */}
+          <div style={{
+            position:'absolute', top:0, left:0, width:'30%', height:'100%',
+            background:'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%)',
+            animation:'shimmerSlide 2.8s ease-in-out infinite',
+            pointerEvents:'none',
+          }}/>
+        </div>
 
         <p style={{ color:'#7a8fb5', fontSize:13, fontWeight:700, marginBottom:24, lineHeight:1.7 }}>
           호주 여행 버킷리스트,<br/>지금 바로 기록하자
