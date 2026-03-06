@@ -15,7 +15,7 @@ const CAT_ROW1 = ['hospital','food','shopping','admin']
 const CAT_ROW2 = ['people','parenting','places','schedule']
 const CAT_ROW3 = ['custom']
 
-type Props = { state: AppState; setState: (s: AppState) => void; onServices?: () => void }
+type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker'
 type MainTab = 'bucketlist' | 'services'
 
