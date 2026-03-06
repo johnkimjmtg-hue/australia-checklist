@@ -3,6 +3,7 @@ import { ITEMS, CATEGORIES } from '../data/checklist'
 
 const BUCKET_IMG = '/bucket-logo.png'
 const LOGO_IMG = '/logo.svg'
+const PLANE_IMG = '/plane.png'
 
 const CATS_6 = ['hospital','food','shopping','admin','places','schedule']
 
@@ -131,11 +132,12 @@ export default function LandingPage({ state, onStart }: Props) {
       }}>
         {/* 비행기 */}
         <div style={{
-          position:'absolute', top:'8%', left:0,
+          position:'absolute', top:'4%', left:0,
           animation:'flyPlane 6s ease-in-out infinite',
           pointerEvents:'none', zIndex:3,
-          fontSize:28,
-        }}>✈️</div>
+        }}>
+          <img src={PLANE_IMG} alt="비행기" style={{ width:64, height:'auto' }}/>
+        </div>
 
         {/* 호주가자 로고 shimmer */}
         <div style={{ position:'relative', marginBottom:6, overflow:'hidden', borderRadius:8 }}>
