@@ -119,16 +119,8 @@ export default function LandingPage({ state, onStart }: Props) {
       {/* 메인 콘텐츠 */}
       <div style={{
         zIndex:2, display:'flex', flexDirection:'column', alignItems:'center',
-        paddingTop:'18%', paddingBottom:130, width:'100%', textAlign:'center',
+        paddingTop:'12%', paddingBottom:130, width:'100%', textAlign:'center',
       }}>
-        {/* 뱃지 */}
-        <div style={{
-          background:'rgba(200,218,248,0.88)', backdropFilter:'blur(8px)',
-          borderRadius:40, padding:'7px 16px',
-          fontSize:12, fontWeight:700, color:'#3a5fa5',
-          marginBottom:12, boxShadow:'0 1px 8px rgba(100,130,200,0.10)',
-        }}>✈️ 호주 여행 버킷리스트</div>
-
         {/* 호주가자 로고 shimmer */}
         <div style={{ position:'relative', marginBottom:6, overflow:'hidden', borderRadius:8 }}>
           <img src={LOGO_IMG} alt="호주가자" style={{
@@ -145,7 +137,7 @@ export default function LandingPage({ state, onStart }: Props) {
         </div>
 
         <p style={{ color:'#7a8fb5', fontSize:13, fontWeight:700, marginBottom:24, lineHeight:1.7 }}>
-          호주 여행 버킷리스트,<br/>지금 바로 기록하자
+          호주 여행 버킷리스트, 지금 바로 기록하자
         </p>
 
         {/* 버킷 이미지 */}
