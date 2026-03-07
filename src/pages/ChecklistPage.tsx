@@ -386,9 +386,9 @@ export default function ChecklistPage({ state, setState }: Props) {
           {/* ── Bottom CTA ── */}
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:480, padding:'10px 20px 24px',
-            background:'rgba(241,245,249,0.95)', backdropFilter:'blur(12px)',
-            borderTop:'1px solid #E2E8F0', zIndex:20, boxSizing:'border-box',
+            width:'100%', maxWidth:480, padding:'10px 20px 28px',
+            background:'transparent',
+            zIndex:20, boxSizing:'border-box',
           }}>
             {unscheduledCount>0 && done>0 && (
               <div style={{ fontSize:11, color:'#D97706', textAlign:'center', marginBottom:6, fontWeight:700 }}>
@@ -399,19 +399,16 @@ export default function ChecklistPage({ state, setState }: Props) {
               <button onClick={handleIssue} style={{
                 flex:1, height:54,
                 background:'#003594', color:'#fff',
-                border:'none', borderRadius:6, fontSize:16, fontWeight:700, cursor:'pointer',
+                border:'none', borderRadius:8, fontSize:16, fontWeight:700, cursor:'pointer',
                 animation: shakeBtn ? 'shake 0.5s ease' : 'none',
-                boxShadow:'0 10px 15px rgba(0,0,0,0.1)',
+                boxShadow:'0 10px 15px rgba(0,0,0,0.15)',
               }}>버킷리스트 발행하기</button>
               <button onClick={() => setModal('confirmReset')} style={{
                 height:54, padding:'0 16px',
-                background:'#fff', color:'#64748B',
-                border:'1px solid #E2E8F0', borderRadius:6, fontSize:14, fontWeight:600, cursor:'pointer',
-                flexShrink:0,
+                background:'rgba(255,255,255,0.92)', color:'#64748B',
+                border:'1px solid #E2E8F0', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer',
+                flexShrink:0, backdropFilter:'blur(8px)',
               }}>↻ 초기화</button>
-            </div>
-            <div style={{ fontSize:10, color:'#8AAAC8', textAlign:'center', marginTop:5 }}>
-              선택한 항목들로 버킷리스트를 만들어요
             </div>
           </div>
         </>
