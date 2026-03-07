@@ -342,27 +342,40 @@ export default function ChecklistPage({ state, setState }: Props) {
 
           {/* ── 온보딩 CTA (일정 미설정 시) ── */}
           {!trip && (
-            <div style={{ padding:'12px 16px 0' }}>
-              <div onClick={handleOpenTripPicker} style={{
-                background:'linear-gradient(135deg, #002870, #003594)',
-                borderRadius:12, padding:'16px 20px',
-                display:'flex', alignItems:'center', gap:14,
-                cursor:'pointer', boxShadow:'0 4px 20px rgba(0,53,148,0.20)',
-              }}>
-                <div style={{
-                  width:44, height:44, borderRadius:10, flexShrink:0,
-                  background:'rgba(255,205,0,0.15)',
-                  display:'flex', alignItems:'center', justifyContent:'center',
+            <>
+              {/* 블러 오버레이 */}
+              <div style={{
+                position:'fixed', inset:0, zIndex:25,
+                background:'rgba(241,245,249,0.75)',
+                backdropFilter:'blur(6px)',
+                WebkitBackdropFilter:'blur(6px)',
+              }} />
+              {/* CTA 카드 */}
+              <div style={{ position:'fixed', left:'50%', top:'50%', transform:'translate(-50%,-50%)', zIndex:26, width:'calc(100% - 32px)', maxWidth:358 }}>
+                <div onClick={handleOpenTripPicker} style={{
+                  background:'linear-gradient(135deg, #002870, #003594)',
+                  borderRadius:16, padding:'24px 20px',
+                  display:'flex', alignItems:'center', gap:16,
+                  cursor:'pointer', boxShadow:'0 8px 32px rgba(0,53,148,0.30)',
                 }}>
-                  <Icon icon="ph:airplane-takeoff" width={24} height={24} color="#FFCD00" />
+                  <div style={{
+                    width:52, height:52, borderRadius:12, flexShrink:0,
+                    background:'rgba(255,205,0,0.15)',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                  }}>
+                    <Icon icon="ph:airplane-takeoff" width={28} height={28} color="#FFCD00" />
+                  </div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:16, fontWeight:800, color:'#fff', marginBottom:5 }}>여행 날짜를 먼저 설정하세요</div>
+                    <div style={{ fontSize:12, color:'rgba(255,255,255,0.65)', lineHeight:1.5 }}>출발일과 도착일을 입력하면<br/>항목 선택이 가능해요</div>
+                  </div>
+                  <Icon icon="ph:caret-right" width={20} height={20} color="rgba(255,255,255,0.5)" />
                 </div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontSize:15, fontWeight:800, color:'#fff', marginBottom:3 }}>여행 날짜를 먼저 설정하세요</div>
-                  <div style={{ fontSize:12, color:'rgba(255,255,255,0.65)' }}>출발일과 도착일을 입력하면 항목 선택이 가능해요</div>
+                <div style={{ textAlign:'center', marginTop:14, fontSize:12, color:'#94A3B8' }}>
+                  일정을 설정하지 않으면 항목을 선택할 수 없어요
                 </div>
-                <Icon icon="ph:caret-right" width={18} height={18} color="rgba(255,255,255,0.5)" />
               </div>
-            </div>
+            </>
           )}
 
           {/* ── LIST ── */}
