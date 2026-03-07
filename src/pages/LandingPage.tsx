@@ -250,9 +250,110 @@ function RequestForm({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ── 버킷리스트 추천 폼
+function SuggestionForm({ onClose }: { onClose: () => void }) {
+  const [suggestion, setSuggestion] = useState('')
+  const [email, setEmail]           = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [done, setDone]             = useState(false)
+  const [error, setError]           = useState('')
+
+  const inputStyle: React.CSSProperties = {
+    width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:10,
+    padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff',
+    boxSizing:'border-box', fontFamily:ff, outline:'none',
+  }
+  const taStyle: React.CSSProperties = {
+    ...inputStyle, height:110, padding:'12px', resize:'none' as any, lineHeight:1.6,
+  }
+
+  const handleSubmit = async () => {
+    if (!suggestion.trim()) { setError('추천 내용을 입력해주세요'); return }
+    setError(''); setSubmitting(true)
+    try {
+      const { supabase } = await import('../lib/supabase')
+      const { error: err } = await supabase.from('item_suggestions').insert({
+        suggestion: suggestion.trim(),
+        email:      email.trim() || null,
+      })
+      if (err) throw err
+      setDone(true)
+    } catch { setError('제출 중 오류가 발생했어요. 다시 시도해주세요.') }
+    setSubmitting(false)
+  }
+
+  if (done) return (
+    <div style={{ textAlign:'center', padding:'32px 0' }}>
+      <div style={{ fontSize:48, marginBottom:16 }}>🙏</div>
+      <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:8 }}>공유해 주셔서 감사합니다!</div>
+      <div style={{ fontSize:13, color:'#64748B', lineHeight:1.7, marginBottom:24 }}>
+        소중한 경험을 나눠주셨어요.<br/>
+        채택되면 이메일로 알려드릴게요 😊
+      </div>
+      <button onClick={onClose} style={{
+        width:'100%', height:48, background:'#003594', color:'#fff',
+        border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer',
+      }}>확인</button>
+    </div>
+  )
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+      <div style={{ background:'rgba(0,53,148,0.05)', borderRadius:10, padding:'12px 14px' }}>
+        <div style={{ fontSize:13, color:'#003594', fontWeight:700, marginBottom:4 }}>💡 이런 것들을 추천해주세요</div>
+        <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6 }}>
+          호주에서 꼭 해봐야 할 것, 먹어봐야 할 것,<br/>가봐야 할 곳, 해결해야 할 것 등 뭐든 좋아요!
+        </div>
+      </div>
+
+      <div>
+        <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>추천 내용 *</div>
+        <textarea
+          value={suggestion}
+          onChange={e => setSuggestion(e.target.value)}
+          placeholder="예) 본다이 비치에서 서핑 레슨 받기, 시드니 새해 불꽃놀이 보기..."
+          style={taStyle as any}
+        />
+      </div>
+
+      <div>
+        <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>
+          이메일 <span style={{ fontWeight:500, color:'#94A3B8' }}>(선택 · 채택 시 알림)</span>
+        </div>
+        <input
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="example@email.com"
+          type="email"
+          style={inputStyle}
+        />
+      </div>
+
+      {error && (
+        <div style={{ padding:'8px 12px', background:'rgba(239,68,68,0.08)', borderRadius:8, fontSize:12, color:'#DC2626', fontWeight:600 }}>
+          {error}
+        </div>
+      )}
+
+      <button onClick={handleSubmit} disabled={submitting} style={{
+        width:'100%', height:50, background:'#003594', color:'#fff',
+        border:'none', borderRadius:10, fontSize:15, fontWeight:800,
+        cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.7 : 1,
+        boxShadow:'0 4px 14px rgba(0,53,148,0.25)',
+        display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+        marginTop:4,
+      }}>
+        <Icon icon="ph:paper-plane-tilt" width={16} height={16} color="#FFCD00" />
+        {submitting ? '제출 중...' : '추천 제출하기'}
+      </button>
+    </div>
+  )
+}
+
 export default function LandingPage({ state, onStart, onServices }: Props) {
   const total = ITEMS.length + state.customItems.length
   const [showForm, setShowForm] = useState(false)
+  const [showSuggestion, setShowSuggestion] = useState(false)
   const [logoTap, setLogoTap] = useState(0)
   const logoTimer = { current: null as any }
 
@@ -288,7 +389,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           display:'flex', alignItems:'center', gap:5,
         }}>
           <Icon icon="ph:list-checks" width={13} height={13} color="#FFCD00" />
-          버킷리스트 만들기
+          나의 버킷리스트
         </button>
       </div>
 
@@ -389,6 +490,37 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         </div>
       </div>
 
+      {/* ── 버킷리스트 추천 섹션 ── */}
+      <div style={{ padding:'0 20px 24px' }}>
+        <div style={{
+          background:'#fff', borderRadius:16, padding:'24px 20px',
+          boxShadow:'0 2px 12px rgba(0,0,0,0.07)',
+          position:'relative', overflow:'hidden',
+        }}>
+          <div style={{ position:'absolute', top:-16, right:-16, width:80, height:80, borderRadius:'50%', background:'rgba(255,205,0,0.10)', pointerEvents:'none' }}/>
+          <div style={{ display:'flex', alignItems:'flex-start', gap:14, marginBottom:16 }}>
+            <div style={{ width:44, height:44, borderRadius:12, background:'rgba(0,53,148,0.07)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <Icon icon="ph:lightbulb" width={24} height={24} color="#003594" />
+            </div>
+            <div>
+              <div style={{ fontSize:16, fontWeight:800, color:'#1E293B', marginBottom:4 }}>버킷리스트 추천</div>
+              <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6 }}>
+                호주에서 꼭 해봐야 할 것들,<br/>여러분의 경험을 쉐어해 주세요 🦘
+              </div>
+            </div>
+          </div>
+          <button onClick={() => setShowSuggestion(true)} style={{
+            width:'100%', height:46, background:'#003594', color:'#fff',
+            border:'none', borderRadius:10, fontSize:14, fontWeight:800,
+            cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+            boxShadow:'0 4px 14px rgba(0,53,148,0.20)',
+          }}>
+            <Icon icon="ph:paper-plane-tilt" width={16} height={16} color="#FFCD00" />
+            추천하기
+          </button>
+        </div>
+      </div>
+
       {/* ── 업체 등록 신청 섹션 ── */}
       <div style={{ padding:'8px 20px 24px' }}>
         <div style={{
@@ -433,7 +565,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           boxShadow:'0 4px 20px rgba(0,53,148,0.30)',
         }}>
           <Icon icon="ph:list-checks" width={20} height={20} color="#FFCD00" />
-          버킷리스트 만들기
+          나의 버킷리스트
         </button>
         <button onClick={onServices} style={{
           width:'100%', height:54, background:'#fff', color:'#003594',
@@ -449,7 +581,31 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         </div>
       </div>
 
-      {/* ── 업체 등록 신청 모달 ── */}
+      {/* ── 버킷리스트 추천 모달 ── */}
+      {showSuggestion && (
+        <div style={{ position:'fixed', inset:0, zIndex:500 }}>
+          <div onClick={() => setShowSuggestion(false)} style={{ position:'absolute', inset:0, background:'rgba(10,20,40,0.6)' }}/>
+          <div style={{
+            position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:480,
+            background:'#F1F5F9', borderRadius:'20px 20px 0 0',
+            padding:'20px 20px 40px',
+            maxHeight:'90vh', overflowY:'auto',
+          }}>
+            <div style={{ width:36, height:4, background:'#CBD5E1', borderRadius:2, margin:'0 auto 20px' }}/>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
+              <div>
+                <div style={{ fontSize:18, fontWeight:800, color:'#1E293B' }}>버킷리스트 추천</div>
+                <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>채택되면 이메일로 알려드려요 😊</div>
+              </div>
+              <button onClick={() => setShowSuggestion(false)} style={{ background:'none', border:'none', cursor:'pointer', padding:4 }}>
+                <Icon icon="ph:x" width={20} height={20} color="#94A3B8" />
+              </button>
+            </div>
+            <SuggestionForm onClose={() => setShowSuggestion(false)} />
+          </div>
+        </div>
+      )}
       {showForm && (
         <div style={{ position:'fixed', inset:0, zIndex:500 }}>
           <div onClick={() => setShowForm(false)} style={{ position:'absolute', inset:0, background:'rgba(10,20,40,0.6)' }}/>

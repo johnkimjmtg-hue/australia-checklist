@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabase'
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'hojugaja2024'
 
 // ── 탭 타입
-type MainTab = 'business' | 'categories' | 'items' | 'export' | 'requests'
+type MainTab = 'business' | 'categories' | 'items' | 'export' | 'requests' | 'suggestions'
 
 // ── 업체 폼 초기값
 const EMPTY_FORM = {
@@ -426,11 +426,12 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
       {/* 탭 */}
       <div style={{ background:'#fff', borderBottom:'1px solid #e8e8e8', display:'flex', overflowX:'auto' }}>
         {([
-          ['business',   '🏢 업체 관리'],
-          ['requests',   '📬 등록 신청'],
-          ['categories', '📂 카테고리'],
-          ['items',      '📝 체크리스트'],
-          ['export',     '💾 코드 내보내기'],
+          ['business',    '🏢 업체 관리'],
+          ['requests',    '📬 등록 신청'],
+          ['suggestions', '💡 버킷 추천'],
+          ['categories',  '📂 카테고리'],
+          ['items',       '📝 체크리스트'],
+          ['export',      '💾 코드 내보내기'],
         ] as [MainTab, string][]).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)} style={{
             padding:'12px 18px', border:'none', background:'none', cursor:'pointer',
@@ -443,11 +444,12 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
 
       {/* 탭 콘텐츠 */}
       <div style={{ maxWidth:900, margin:'0 auto', padding:'24px 16px 80px' }}>
-        {tab==='business'   && <BusinessTab />}
-        {tab==='requests'   && <RequestsTab />}
-        {tab==='categories' && <CategoriesTab />}
-        {tab==='items'      && <ItemsTab />}
-        {tab==='export'     && <ExportTab />}
+        {tab==='business'    && <BusinessTab />}
+        {tab==='requests'    && <RequestsTab />}
+        {tab==='suggestions' && <SuggestionsTab />}
+        {tab==='categories'  && <CategoriesTab />}
+        {tab==='items'       && <ItemsTab />}
+        {tab==='export'      && <ExportTab />}
       </div>
     </div>
   )
@@ -1018,6 +1020,34 @@ function RequestsTab() {
     const { supabase } = await import('../lib/supabase')
     await supabase.from('business_requests').update({ status }).eq('id', id)
     setRequests(rs => rs.map(r => r.id === id ? { ...r, status } : r))
+
+    // 승인 시 businesses 테이블에 자동 등록
+    if (status === 'approved') {
+      const req = requests.find(r => r.id === id)
+      if (req) {
+        const suburb = req.address.split(',').slice(-2, -1)[0]?.trim() || ''
+        const { error } = await (await import('../lib/supabase')).supabase
+          .from('businesses')
+          .insert({
+            name:        req.business_name,
+            category:    req.category || 'restaurant',
+            description: req.description,
+            phone:       req.phone    || null,
+            website:     req.website  || null,
+            kakao:       req.kakao    || null,
+            address:     req.address,
+            city:        suburb,
+            tags:        req.hashtags,
+            is_featured: false,
+            is_active:   true,
+          })
+        if (error) {
+          alert(`승인됐지만 업체 등록 중 오류가 발생했어요:\n${error.message}`)
+        } else {
+          alert(`✅ "${req.business_name}" 업체가 등록됐어요!`)
+        }
+      }
+    }
   }
 
   async function deleteRequest(id: string) {
@@ -1155,6 +1185,93 @@ function Row({ label, value, link }: { label: string; value: string; link?: bool
         <a href={value} target="_blank" rel="noreferrer" style={{ fontSize:12, color:'#1E4D83', fontWeight:600, wordBreak:'break-all' }}>{value}</a>
       ) : (
         <span style={{ fontSize:12, color:'#1E293B', fontWeight:500, lineHeight:1.5, wordBreak:'break-all' }}>{value}</span>
+      )}
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════
+// TAB: 버킷리스트 추천 목록
+// ════════════════════════════════════════════
+type Suggestion = {
+  id: string
+  suggestion: string
+  email: string | null
+  status: string
+  created_at: string
+}
+
+function SuggestionsTab() {
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
+  const [loading, setLoading]         = useState(true)
+
+  useEffect(() => { loadSuggestions() }, [])
+
+  async function loadSuggestions() {
+    setLoading(true)
+    const { supabase } = await import('../lib/supabase')
+    const { data } = await supabase
+      .from('item_suggestions')
+      .select('*')
+      .order('created_at', { ascending: false })
+    setSuggestions((data as Suggestion[]) ?? [])
+    setLoading(false)
+  }
+
+  async function deleteSuggestion(id: string) {
+    if (!window.confirm('이 추천을 삭제할까요?')) return
+    const { supabase } = await import('../lib/supabase')
+    await supabase.from('item_suggestions').delete().eq('id', id)
+    setSuggestions(s => s.filter(x => x.id !== id))
+  }
+
+  return (
+    <div>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+        <div>
+          <div style={{ fontSize:18, fontWeight:900, color:'#0F1B2D' }}>버킷리스트 추천</div>
+          <div style={{ fontSize:12, color:'#94A3B8', marginTop:2 }}>검토 후 체크리스트에 직접 추가해주세요</div>
+        </div>
+        <button onClick={loadSuggestions} style={{ ...btnSmGhost }}>새로고침 ↻</button>
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign:'center', padding:'40px', color:'#94A3B8', fontSize:13 }}>불러오는 중...</div>
+      ) : suggestions.length === 0 ? (
+        <div style={{ textAlign:'center', padding:'40px', color:'#94A3B8', fontSize:13 }}>추천 내역이 없어요</div>
+      ) : (
+        <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+          {suggestions.map(s => (
+            <div key={s.id} style={{
+              background:'#fff', borderRadius:12, padding:'16px',
+              boxShadow:'0 1px 6px rgba(0,0,0,0.07)',
+            }}>
+              <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12 }}>
+                <div style={{ flex:1 }}>
+                  {/* 추천 내용 */}
+                  <div style={{ fontSize:14, fontWeight:600, color:'#1E293B', lineHeight:1.6, marginBottom:8 }}>
+                    💡 {s.suggestion}
+                  </div>
+                  <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+                    {s.email && (
+                      <div style={{ fontSize:12, color:'#64748B', display:'flex', alignItems:'center', gap:4 }}>
+                        <span style={{ color:'#94A3B8' }}>📧</span> {s.email}
+                      </div>
+                    )}
+                    <div style={{ fontSize:11, color:'#94A3B8' }}>
+                      {new Date(s.created_at).toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' })}
+                    </div>
+                  </div>
+                </div>
+                {/* 삭제 버튼 */}
+                <button onClick={() => deleteSuggestion(s.id)} style={{
+                  width:36, height:36, border:'none', borderRadius:8, flexShrink:0,
+                  background:'#FEE2E2', color:'#EF4444', fontSize:16, cursor:'pointer',
+                }}>🗑</button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )
