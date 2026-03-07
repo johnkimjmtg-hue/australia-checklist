@@ -522,12 +522,14 @@ export default function ChecklistPage({ state, setState }: Props) {
                     display:'flex', alignItems:'center', gap:12,
                     padding:'12px 14px',
                     borderRadius:10,
-                    background: needsSch ? '#fffbeb' : checked ? '#fff' : '#fff',
+                    background: checked && dayCount===0 ? '#fffbeb'
+                              : checked ? '#fff8e4'
+                              : '#fff',
                     boxShadow: checked
-                      ? '0 2px 8px rgba(0,53,148,0.09)'
+                      ? '0 2px 8px rgba(180,130,0,0.10)'
                       : '0 1px 4px rgba(0,0,0,0.05)',
                     minHeight:52, cursor:'pointer',
-                    border: needsSch ? '1px solid rgba(255,205,0,0.4)' : 'none',
+                    border: checked && dayCount===0 ? '1px solid rgba(255,205,0,0.4)' : 'none',
                     transition:'all 0.12s',
                   }}>
                     {/* Checkbox — 녹색 */}
@@ -553,7 +555,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                     <Icon
                       icon={ITEM_ICONS[item.id] ?? CAT_ICON_MAP[(item as any).categoryId] ?? 'ph:star'}
                       width={20} height={20}
-                      color={checked ? '#94A3B8' : '#CBD5E1'}
+                      color={checked ? '#78716C' : '#CBD5E1'}
                     />
 
                     <span onClick={() => {
@@ -566,7 +568,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                       lineHeight:1.4,
                     }}>{item.label}</span>
 
-                    {/* Schedule button — 녹색 */}
+                    {/* Schedule button */}
                     <button onClick={() => {
                       if (!checked) return
                       if (!trip) { setModal('noTrip'); return }
@@ -575,15 +577,13 @@ export default function ChecklistPage({ state, setState }: Props) {
                       height:28, padding:'0 10px', borderRadius:6, fontSize:11, fontWeight:700,
                       cursor: checked ? 'pointer' : 'default', flexShrink:0,
                       border: 'none',
-                      background: !checked ? '#F1F5F9'
-                                : dayCount>0 ? '#16A34A'
+                      background: !checked        ? '#F1F5F9'
+                                : dayCount>0      ? 'rgba(68,64,60,0.10)'
                                 : '#FFCD00',
-                      color: !checked ? '#CBD5E1'
-                           : dayCount>0 ? '#fff'
+                      color: !checked        ? '#CBD5E1'
+                           : dayCount>0      ? '#44403C'
                            : '#92620a',
-                      boxShadow: checked && dayCount===0 ? '0 2px 6px rgba(255,205,0,0.4)'
-                               : checked && dayCount>0  ? '0 2px 6px rgba(22,163,74,0.30)'
-                               : 'none',
+                      boxShadow: checked && dayCount===0 ? '0 2px 6px rgba(255,205,0,0.4)' : 'none',
                     }}>
                       {dayCount>0 ? `${dayCount}일 ✓` : '+일정'}
                     </button>
