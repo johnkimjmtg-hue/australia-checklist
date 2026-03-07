@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { AppState } from '../store/state'
-import { ITEMS } from '../data/checklist'
+import { ITEMS, CATEGORIES } from '../data/checklist'
 import { CATEGORIES as BCATS } from '../data/businesses'
 
 type Props = { state: AppState; onStart: () => void; onServices: () => void }
@@ -107,16 +107,11 @@ const PREVIEW_ITEMS = [
   { id:'a01', icon:'ph:identification-card', label:'비자 서류 준비', done:true },
 ]
 
-const CATS = [
-  { icon:'ph:first-aid-kit', label:'병원/뷰티' },
-  { icon:'ph:fork-knife',    label:'먹거리'    },
-  { icon:'ph:shopping-bag',  label:'쇼핑'      },
-  { icon:'ph:files',         label:'행정'      },
-  { icon:'ph:users',         label:'사람'      },
-  { icon:'ph:map-pin',       label:'가볼 곳'   },
-  { icon:'ph:calendar',      label:'일정'      },
-  { icon:'ph:baby',          label:'육아'      },
-]
+const CAT_ICON_MAP: Record<string, string> = {
+  hospital:'ph:first-aid-kit', food:'ph:fork-knife',    shopping:'ph:shopping-bag',
+  admin:'ph:files',            people:'ph:users',        parenting:'ph:baby',
+  places:'ph:map-pin',         schedule:'ph:calendar',   custom:'ph:pencil-simple',
+}
 
 function RequestForm({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState({
@@ -323,7 +318,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 
         <div style={{ animation:'fadeInUp 0.6s ease 0.2s both' }}>
           <div style={{ fontSize:14, color:'rgba(255,255,255,0.7)', lineHeight:1.7, marginBottom:32 }}>
-            {total}개 항목 · 9개 카테고리<br/>나만의 호주 버킷리스트를 만들어보세요
+            {total}개 항목 · {CATEGORIES.length}개 카테고리<br/>나만의 호주 버킷리스트를 만들어보세요
           </div>
         </div>
 
@@ -372,31 +367,21 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 
       {/* ── 카테고리 섹션 ── */}
       <div style={{ padding:'32px 20px 24px' }}>
-        <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:6 }}>9개 카테고리, {total}개 항목</div>
+        <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:6 }}>{CATEGORIES.length}개 카테고리, {total}개 항목</div>
         <div style={{ fontSize:13, color:'#64748B', marginBottom:20 }}>호주 생활에 꼭 필요한 항목들을 담았어요</div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10 }}>
-          {CATS.map(cat => (
-            <div key={cat.label} style={{
+          {CATEGORIES.map(cat => (
+            <div key={cat.id} style={{
               background:'#fff', borderRadius:12, padding:'14px 8px',
               display:'flex', flexDirection:'column', alignItems:'center', gap:8,
               boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
             }}>
               <div style={{ width:36, height:36, borderRadius:10, background:'rgba(0,53,148,0.07)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <Icon icon={cat.icon} width={20} height={20} color="#003594" />
+                <Icon icon={CAT_ICON_MAP[cat.id] ?? 'ph:star'} width={20} height={20} color="#003594" />
               </div>
               <span style={{ fontSize:11, fontWeight:700, color:'#1E293B', textAlign:'center' }}>{cat.label}</span>
             </div>
           ))}
-          <div style={{
-            background:'#fff', borderRadius:12, padding:'14px 8px',
-            display:'flex', flexDirection:'column', alignItems:'center', gap:8,
-            boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
-          }}>
-            <div style={{ width:36, height:36, borderRadius:10, background:'rgba(0,53,148,0.07)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <Icon icon="ph:pencil-simple" width={20} height={20} color="#003594" />
-            </div>
-            <span style={{ fontSize:11, fontWeight:700, color:'#1E293B', textAlign:'center' }}>직접입력</span>
-          </div>
         </div>
       </div>
 
