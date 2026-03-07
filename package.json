@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",
+    "@iconify/react": "^6.0.2",
     "@supabase/supabase-js": "^2.98.0",
     "html2canvas": "^1.4.1",
     "react": "^18.2.0",
