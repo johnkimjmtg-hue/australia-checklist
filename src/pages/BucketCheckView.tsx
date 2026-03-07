@@ -85,24 +85,29 @@ function Confetti({ trigger }: { trigger:number }) {
   )
 }
 
-/* ══ 동전 스택 ══ */
+/* ══ 동전 스택 (원형 동전) ══ */
 function CoinStack({ count, total }: { count:number; total:number }) {
-  const maxCoins = Math.min(total, 10)
+  const maxCoins = 8
   const filled   = total > 0 ? Math.round((count / total) * maxCoins) : 0
   return (
-    <div style={{ display:'flex', flexDirection:'column-reverse', alignItems:'center', gap:1, height:60, justifyContent:'flex-start' }}>
+    <div style={{ display:'flex', flexDirection:'column-reverse', alignItems:'center', gap:2, justifyContent:'flex-end', minWidth:36 }}>
       {Array.from({ length: maxCoins }, (_, i) => {
         const isGold = i < filled
         return (
           <div key={i} style={{
-            width: 28, height: 6, borderRadius: 3,
-            background: isGold ? '#FFCD00' : '#E2E8F0',
-            boxShadow: isGold ? '0 1px 3px rgba(180,130,0,0.3)' : 'none',
-            transition: `all 0.3s ease ${i * 0.05}s`,
-            transform: isGold ? 'scaleX(1)' : 'scaleX(0.85)',
+            width: 28, height: 14, borderRadius: '50%',
+            background: isGold
+              ? 'radial-gradient(ellipse at 35% 35%, #FFE566, #FFCD00 60%, #C8960C)'
+              : '#E2E8F0',
+            boxShadow: isGold ? '0 2px 4px rgba(180,130,0,0.35), inset 0 1px 2px rgba(255,255,255,0.5)' : 'none',
+            transition: `all 0.3s ease ${i * 0.06}s`,
+            animation: isGold ? `coinPop 0.3s ease ${i * 0.06}s both` : 'none',
           }}/>
         )
       })}
+      <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600, marginTop:4 }}>
+        {count}/{total}
+      </div>
     </div>
   )
 }
@@ -333,7 +338,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         }}>
           <CircleProgress pct={pct} />
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:26,fontWeight:800,color:'#1E293B',marginBottom:6,lineHeight:1.2 }}>내 호주<br/>버킷리스트</div>
+            <div style={{ fontSize:22,fontWeight:800,color:'#1E293B',marginBottom:6,lineHeight:1.2 }}>내 호주<br/>버킷리스트</div>
             <div style={{ display:'flex',alignItems:'baseline',gap:4,marginBottom:4 }}>
               <span style={{ fontSize:28,fontWeight:800,color:'#003594',lineHeight:1 }}>{achievedCount}</span>
               <span style={{ fontSize:17,fontWeight:600,color:'#64748B' }}>/{total}건 완료</span>
@@ -403,11 +408,15 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         )}
       </div>
 
-      {/* ══ 하단 버튼 — position sticky 방식으로 컨테이너 안에 고정 ══ */}
+      {/* ══ 하단 버튼 ══ */}
       <div style={{
-        position:'sticky', bottom:0,
-        width:'100%', padding:'10px 16px 28px',
-        background:'transparent', zIndex:20, boxSizing:'border-box',
+        position:'fixed', bottom:0,
+        left:'50%', transform:'translateX(-50%)',
+        width:'100%', maxWidth:480,
+        padding:'10px 16px env(safe-area-inset-bottom, 20px)',
+        paddingBottom: 'max(20px, env(safe-area-inset-bottom, 20px))',
+        background:'linear-gradient(to top, rgba(241,245,249,0.98) 70%, transparent)',
+        zIndex:20, boxSizing:'border-box',
         display:'flex', gap:8,
       }}>
         <button onClick={onShare} style={{

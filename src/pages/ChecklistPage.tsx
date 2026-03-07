@@ -386,9 +386,11 @@ export default function ChecklistPage({ state, setState }: Props) {
 
           {/* ── Bottom CTA ── */}
           <div style={{
-            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:480, padding:'10px 20px 28px',
-            background:'transparent',
+            position:'fixed', bottom:0,
+            left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:480,
+            padding:'10px 20px max(20px, env(safe-area-inset-bottom, 20px))',
+            background:'linear-gradient(to top, rgba(241,245,249,0.98) 70%, transparent)',
             zIndex:20, boxSizing:'border-box',
           }}>
             {unscheduledCount>0 && done>0 && (
