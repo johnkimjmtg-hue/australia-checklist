@@ -110,6 +110,26 @@ export default function ChecklistPage({ state, setState }: Props) {
   }
 
   const [showFireworks, setShowFireworks] = useState(false)
+  const [toast, setToast] = useState<string|null>(null)
+  const toastTimer = useRef<any>(null)
+
+  const TOASTS = [
+    '좋은 선택이에요 ✨',
+    '호주에서 꼭 해봐요 🦘',
+    '기대되는데요! 🎯',
+    '완료! 리스트에 추가됐어요 🎉',
+    '오 이거 꼭 해야해! 👍',
+    '완벽한 선택 🌟',
+    '호주 여행이 기대돼요 ✈️',
+    '좋아요, 잊지 마세요! 📌',
+  ]
+
+  const showToast = () => {
+    const msg = TOASTS[Math.floor(Math.random() * TOASTS.length)]
+    setToast(msg)
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToast(null), 2000)
+  }
 
   const playFireworksSound = () => {
     try {
@@ -248,6 +268,7 @@ export default function ChecklistPage({ state, setState }: Props) {
         @keyframes scaleIn  { from{opacity:0;transform:translate(-50%,-50%) scale(.94)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
         @keyframes shake    { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
         @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.6} }
+        @keyframes toastIn  { from{opacity:0;transform:translateX(-50%) translateY(-8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
         @keyframes fwShoot  { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(1);opacity:0} }
         @keyframes fwBurst  { 0%{transform:translate(-50%,-50%) scale(0) rotate(var(--r));opacity:1} 80%{opacity:0.8} 100%{transform:translate(var(--tx),var(--ty)) scale(1) rotate(var(--r));opacity:0} }
         .tab-btn { transition: color .15s; }
@@ -495,6 +516,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                     {/* Checkbox — 녹색 */}
                     <button onClick={() => {
                       if (!trip) { setModal('noTrip'); return }
+                      if (!checked) showToast()
                       setState(toggleItem(state, item.id))
                     }} style={{
                       width:22, height:22, borderRadius:4, flexShrink:0,
@@ -519,6 +541,7 @@ export default function ChecklistPage({ state, setState }: Props) {
 
                     <span onClick={() => {
                       if (!trip) { setModal('noTrip'); return }
+                      if (!checked) showToast()
                       setState(toggleItem(state, item.id))
                     }} style={{
                       flex:1, fontSize:15, fontWeight: checked ? 600 : 400,
@@ -590,6 +613,22 @@ export default function ChecklistPage({ state, setState }: Props) {
 
       {/* ── 폭죽 ── */}
       {showFireworks && <Fireworks />}
+
+      {/* ── 토스트 ── */}
+      {toast && (
+        <div style={{
+          position:'fixed', top:72, left:'50%', transform:'translateX(-50%)',
+          zIndex:998, pointerEvents:'none',
+          background:'rgba(15,23,42,0.88)', backdropFilter:'blur(8px)',
+          color:'#fff', fontSize:14, fontWeight:700,
+          padding:'10px 20px', borderRadius:24,
+          boxShadow:'0 4px 20px rgba(0,0,0,0.25)',
+          whiteSpace:'nowrap',
+          animation:'toastIn 0.25s ease both',
+        }}>
+          {toast}
+        </div>
+      )}
 
       {/* ── Trip date picker modal ── */}
       {modal==='tripPicker' && (
