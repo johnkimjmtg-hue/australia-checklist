@@ -109,6 +109,8 @@ export default function ChecklistPage({ state, setState }: Props) {
     setModal('tripPicker')
   }
 
+  const [showFireworks, setShowFireworks] = useState(false)
+
   const handleDateSelect = (val: string) => {
     if (pickerStep === 'start') {
       setStartDate(val)
@@ -118,6 +120,8 @@ export default function ChecklistPage({ state, setState }: Props) {
       const t = { startDate, endDate: val }
       saveTrip(t); setTrip(t)
       setModal('none')
+      setShowFireworks(true)
+      setTimeout(() => setShowFireworks(false), 2800)
     }
   }
 
@@ -192,6 +196,8 @@ export default function ChecklistPage({ state, setState }: Props) {
         @keyframes scaleIn  { from{opacity:0;transform:translate(-50%,-50%) scale(.94)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
         @keyframes shake    { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
         @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.6} }
+        @keyframes fwShoot  { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(1);opacity:0} }
+        @keyframes fwBurst  { 0%{transform:translate(-50%,-50%) scale(0) rotate(var(--r));opacity:1} 80%{opacity:0.8} 100%{transform:translate(var(--tx),var(--ty)) scale(1) rotate(var(--r));opacity:0} }
         .tab-btn { transition: color .15s; }
         .chip-btn { transition: all .12s; }
         .chip-btn:hover { border-color: #003594 !important; color: #003594 !important; }
@@ -530,6 +536,9 @@ export default function ChecklistPage({ state, setState }: Props) {
         </>
       )}
 
+      {/* ── 폭죽 ── */}
+      {showFireworks && <Fireworks />}
+
       {/* ── Trip date picker modal ── */}
       {modal==='tripPicker' && (
         <TripPickerModal
@@ -821,5 +830,88 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
         </div>
       </div>
     </>
+  )
+}
+
+/* ── 폭죽 컴포넌트 ── */
+function Fireworks() {
+  const colors = ['#FFCD00','#003594','#FF4B4B','#4ECDC4','#FF9F43','#A29BFE','#55EFC4','#FD79A8','#fff']
+  const cx = 50   // 화면 중앙 %
+  const cy = 50
+
+  // 파티클: 사방으로 퍼지는 선 + 별 조각
+  const particles = Array.from({ length: 72 }, (_, i) => {
+    const angle   = (i / 72) * 360
+    const dist    = 80 + Math.random() * 120   // px
+    const rad     = (angle * Math.PI) / 180
+    const tx      = Math.cos(rad) * dist
+    const ty      = Math.sin(rad) * dist
+    const color   = colors[Math.floor(Math.random() * colors.length)]
+    const delay   = Math.random() * 0.3
+    const dur     = 0.8 + Math.random() * 0.6
+    const size    = 4 + Math.random() * 6
+    const isRect  = i % 3 !== 0
+    return { tx, ty, color, delay, dur, size, isRect, angle }
+  })
+
+  // 2차 폭발 (약간 지연)
+  const burst2 = Array.from({ length: 48 }, (_, i) => {
+    const angle   = (i / 48) * 360 + 15
+    const dist    = 50 + Math.random() * 90
+    const rad     = (angle * Math.PI) / 180
+    const tx      = Math.cos(rad) * dist
+    const ty      = Math.sin(rad) * dist
+    const color   = colors[Math.floor(Math.random() * colors.length)]
+    const delay   = 0.35 + Math.random() * 0.25
+    const dur     = 0.7 + Math.random() * 0.5
+    const size    = 3 + Math.random() * 5
+    return { tx, ty, color, delay, dur, size }
+  })
+
+  return (
+    <div style={{ position:'fixed', inset:0, zIndex:999, pointerEvents:'none', overflow:'hidden' }}>
+      {/* 1차 폭발 */}
+      {particles.map((p, i) => (
+        <div key={i} style={{
+          position:'absolute',
+          left:`${cx}%`, top:`${cy}%`,
+          width: p.isRect ? p.size * 0.5 : p.size,
+          height: p.isRect ? p.size * 2 : p.size,
+          borderRadius: p.isRect ? 2 : '50%',
+          background: p.color,
+          // @ts-ignore
+          '--tx': `${p.tx}px`,
+          '--ty': `${p.ty}px`,
+          '--r': `${p.angle}deg`,
+          animation: `fwBurst ${p.dur}s ease-out ${p.delay}s both`,
+          boxShadow: `0 0 ${p.size}px ${p.color}`,
+        }} />
+      ))}
+      {/* 2차 폭발 */}
+      {burst2.map((p, i) => (
+        <div key={`b${i}`} style={{
+          position:'absolute',
+          left:`${cx}%`, top:`${cy}%`,
+          width: p.size, height: p.size,
+          borderRadius:'50%',
+          background: p.color,
+          // @ts-ignore
+          '--tx': `${p.tx}px`,
+          '--ty': `${p.ty}px`,
+          '--r': '0deg',
+          animation: `fwBurst ${p.dur}s ease-out ${p.delay}s both`,
+        }} />
+      ))}
+      {/* 중앙 플래시 */}
+      <div style={{
+        position:'absolute', left:`${cx}%`, top:`${cy}%`,
+        transform:'translate(-50%,-50%)',
+        width:60, height:60, borderRadius:'50%',
+        background:'radial-gradient(circle, rgba(255,205,0,0.9) 0%, transparent 70%)',
+        animation:'fwBurst 0.5s ease-out 0s both',
+        // @ts-ignore
+        '--tx':'0px', '--ty':'0px', '--r':'0deg',
+      }} />
+    </div>
   )
 }
