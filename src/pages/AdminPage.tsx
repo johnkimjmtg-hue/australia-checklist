@@ -1020,6 +1020,14 @@ function RequestsTab() {
     setRequests(rs => rs.map(r => r.id === id ? { ...r, status } : r))
   }
 
+  async function deleteRequest(id: string) {
+    if (!window.confirm('이 신청을 삭제할까요?')) return
+    const { supabase } = await import('../lib/supabase')
+    await supabase.from('business_requests').delete().eq('id', id)
+    setRequests(rs => rs.filter(r => r.id !== id))
+    if (expanded === id) setExpanded(null)
+  }
+
   const filtered = filter === 'all' ? requests : requests.filter(r => r.status === filter)
 
   const counts = {
@@ -1124,6 +1132,10 @@ function RequestsTab() {
                         ...btnSmGhost, flex:1, height:38, borderRadius:8, fontSize:13,
                       }}>대기로 되돌리기</button>
                     )}
+                    <button onClick={() => deleteRequest(req.id)} style={{
+                      width:38, height:38, border:'none', borderRadius:8,
+                      background:'#FEE2E2', color:'#EF4444', fontSize:16, cursor:'pointer', flexShrink:0,
+                    }}>🗑</button>
                   </div>
                 </div>
               )}
