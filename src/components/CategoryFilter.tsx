@@ -1,44 +1,52 @@
+import { Icon } from '@iconify/react'
 import { CATEGORIES } from '../data/businesses'
 
-type Props = {
-  selected: string
-  onChange: (id: string) => void
+type Props = { selected: string; onChange: (id: string) => void }
+
+const CAT_ICONS: Record<string, string> = {
+  all:         'ph:squares-four',
+  realestate:  'ph:house-line',
+  lawyer:      'ph:scales',
+  accounting:  'ph:receipt',
+  insurance:   'ph:shield-check',
+  immigration: 'ph:globe',
+  academy:     'ph:graduation-cap',
+  telecom:     'ph:device-mobile',
+  travel:      'ph:airplane',
+  gp:          'ph:first-aid-kit',
+  dental:      'ph:tooth',
+  oriental:    'ph:leaf',
+  pharmacy:    'ph:pill',
+  restaurant:  'ph:fork-knife',
+  cafe:        'ph:coffee',
+  mart:        'ph:shopping-cart',
+  beauty:      'ph:scissors',
+  moving:      'ph:package',
+  handyman:    'ph:wrench',
 }
 
 export default function CategoryFilter({ selected, onChange }: Props) {
   return (
-    <div style={{ padding: '8px 0 4px' }}>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 6,
-      }}>
-        {CATEGORIES.map(cat => {
-          const isActive = selected === cat.id
-          return (
-            <button
-              key={cat.id}
-              onClick={() => onChange(cat.id)}
-              style={{
-                background: isActive ? 'linear-gradient(135deg,#3A7FCC,#1E4D83)' : 'rgba(200,218,248,0.4)',
-                color: isActive ? '#fff' : '#3a5fa5',
-                border: 'none', borderRadius: 10,
-                padding: '8px 4px',
-                fontSize: 11, fontWeight: 800,
-                cursor: 'pointer',
-                display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: 3,
-                boxShadow: isActive ? '0 2px 8px rgba(30,77,131,0.20)' : 'none',
-                transition: 'all 0.15s',
-                lineHeight: 1.3,
-              }}
-            >
-              <span style={{ fontSize: 18 }}>{cat.emoji}</span>
-              <span style={{ fontSize: 10, textAlign: 'center', wordBreak: 'keep-all' }}>{cat.label}</span>
-            </button>
-          )
-        })}
-      </div>
+    <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:2 }}>
+      {CATEGORIES.map(cat => {
+        const isActive = selected === cat.id
+        return (
+          <button key={cat.id} onClick={() => onChange(cat.id)} style={{
+            display:'flex', flexDirection:'column', alignItems:'center', gap:3,
+            padding:'8px 10px', borderRadius:10, flexShrink:0,
+            background: isActive ? '#003594' : '#fff',
+            color: isActive ? '#fff' : '#64748B',
+            border: isActive ? 'none' : '1px solid #E2E8F0',
+            fontSize:10, fontWeight:700, cursor:'pointer',
+            boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.20)' : '0 1px 3px rgba(0,0,0,0.05)',
+            transition:'all 0.15s',
+          }}>
+            <Icon icon={CAT_ICONS[cat.id] ?? 'ph:star'} width={18} height={18}
+              color={isActive ? '#fff' : '#94A3B8'} />
+            <span style={{ fontSize:10, textAlign:'center', wordBreak:'keep-all', lineHeight:1.2 }}>{cat.label}</span>
+          </button>
+        )
+      })}
     </div>
   )
 }
