@@ -260,24 +260,34 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
     } catch {}
   }
 
-  const toggleAchieved = (id: string) => {
-    const wasAchieved = !!achieved[id]
-    const next = { ...achieved, [id]: !wasAchieved }
-    if (!next[id]) delete next[id]
+  const toggleAchieved = (id: string, day?: number) => {
+    const key = day !== undefined ? `${id}_${day}` : id
+    const wasAchieved = !!achieved[key]
+    const next = { ...achieved, [key]: !wasAchieved }
+    if (!next[key]) delete next[key]
     setAchieved(next)
     try { localStorage.setItem('bucket-achieved', JSON.stringify(next)) } catch {}
     if (!wasAchieved) {
-      const newCount = checkedItems.filter(i => next[i.id]).length
+      // 전체 완료 계산: 아이템별로 모든 날짜가 체크됐는지
+      const newCount = checkedItems.filter(i => {
+        const days = state.schedules[i.id] ?? []
+        if (days.length === 0) return !!next[i.id]
+        return days.every(d => !!next[`${i.id}_${d}`])
+      }).length
       const isLast = newCount === total
       if (!isLast) {
         playTing()
         setConfettiTrigger(t => t+1)
       }
-      // isLast면 useEffect의 팡파레가 처리
     }
   }
 
-  const achievedCount = checkedItems.filter(i => achieved[i.id]).length
+  const isItemFullyAchieved = (item: typeof checkedItems[0]) => {
+    const days = state.schedules[item.id] ?? []
+    if (days.length === 0) return !!achieved[item.id]
+    return days.every(d => !!achieved[`${item.id}_${d}`])
+  }
+  const achievedCount = checkedItems.filter(i => isItemFullyAchieved(i)).length
   const pct = total > 0 ? Math.round((achievedCount/total)*100) : 0
 
   // 전체 완료 감지
@@ -300,10 +310,11 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
   ]
 
   /* ══ 체크 행 ══ */
-  const CheckRow = ({ item }: { item: typeof checkedItems[0] }) => {
-    const isAchieved = !!achieved[item.id]
+  const CheckRow = ({ item, day }: { item: typeof checkedItems[0]; day?: number }) => {
+    const key = day !== undefined ? `${item.id}_${day}` : item.id
+    const isAchieved = !!achieved[key]
     return (
-      <div onClick={() => toggleAchieved(item.id)} style={{
+      <div onClick={() => toggleAchieved(item.id, day)} style={{
         display:'flex',alignItems:'center',gap:12,
         padding:'12px 16px',margin:'0 16px',borderRadius:10,
         background: isAchieved ? '#fff8e4' : '#fff',
@@ -418,7 +429,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
           if (!dayItems.length) return null
           const date     = tripDays[dayIdx]
           const dayLabel = date ? `${fmtMD(date)}(${dow(date)})` : ''
-          const dayDone  = dayItems.filter(i => achieved[i.id]).length
+          const dayDone  = dayItems.filter(i => !!achieved[`${i.id}_${dayIdx}`]).length
           return (
             <div key={dayIdx}>
               <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 16px 8px' }}>
@@ -429,7 +440,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
                 <span style={{ fontSize:12,color:'#003594',fontWeight:600 }}>{dayDone}/{dayItems.length}</span>
               </div>
               <div style={{ display:'flex',flexDirection:'column',gap:8 }}>
-                {dayItems.map(item => <CheckRow key={item.id} item={item}/>)}
+                {dayItems.map(item => <CheckRow key={`${item.id}_${dayIdx}`} item={item} day={dayIdx}/>)}
               </div>
             </div>
           )
@@ -437,7 +448,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         {(() => {
           const items = checkedItems.filter(i => !(state.schedules[i.id]?.length)).filter(filterFn)
           if (!items.length) return null
-          const doneCount = items.filter(i => achieved[i.id]).length
+          const doneCount = items.filter(i => !!achieved[i.id]).length
           return (
             <div>
               <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 16px 8px' }}>

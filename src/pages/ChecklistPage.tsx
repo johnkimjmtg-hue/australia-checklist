@@ -289,8 +289,7 @@ export default function ChecklistPage({ state, setState }: Props) {
         @keyframes fwShoot  { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(1);opacity:0} }
         @keyframes fwBurst  { 0%{transform:translate(-50%,-50%) scale(0) rotate(var(--r));opacity:1} 80%{opacity:0.8} 100%{transform:translate(var(--tx),var(--ty)) scale(1) rotate(var(--r));opacity:0} }
         .tab-btn { transition: color .15s; }
-        .chip-btn { transition: all .12s; }
-        .chip-btn:hover { border-color: #003594 !important; color: #003594 !important; }
+        .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .list-item { transition: background .1s; }
         .list-item:active { background: #F1F5F9 !important; }
       `}</style>
