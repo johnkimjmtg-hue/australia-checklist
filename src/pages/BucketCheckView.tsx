@@ -211,7 +211,6 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
   const allItems     = [...ITEMS, ...state.customItems.map(c => ({ ...c, emoji:'📝', categoryId: c.categoryId ?? 'custom' }))]
   const checkedItems = allItems.filter(i => state.selected[i.id])
   const tripDays     = getTripDays(trip)
-  const total        = checkedItems.length
 
   const byDay = new Map<number, typeof checkedItems>()
   checkedItems.forEach(item => {
@@ -221,6 +220,15 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
     })
   })
   const sortedDays = Array.from(byDay.keys()).sort((a,b)=>a-b)
+
+  // total = 날짜별 행 수 기준 (1개 아이템 4일 배정 → 4개)
+  const allRows: { id: string; day?: number }[] = []
+  checkedItems.forEach(item => {
+    const days = state.schedules[item.id] ?? []
+    if (days.length === 0) allRows.push({ id: item.id })
+    else days.forEach(d => allRows.push({ id: item.id, day: d }))
+  })
+  const total = allRows.length
 
   const [achieved, setAchieved] = useState<Record<string,boolean>>(() => {
     try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} }
@@ -242,7 +250,6 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
   const playFanfare = () => {
     try {
       const ctx = new (window.AudioContext||(window as any).webkitAudioContext)()
-      // 팡파레 음표 시퀀스: C5 E5 G5 C6
       const notes = [523, 659, 784, 1047]
       const times = [0, 0.18, 0.36, 0.54]
       notes.forEach((freq, i) => {
@@ -260,20 +267,17 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
     } catch {}
   }
 
+  const getKey = (id: string, day?: number) => day !== undefined ? `${id}_${day}` : id
+
   const toggleAchieved = (id: string, day?: number) => {
-    const key = day !== undefined ? `${id}_${day}` : id
+    const key = getKey(id, day)
     const wasAchieved = !!achieved[key]
     const next = { ...achieved, [key]: !wasAchieved }
     if (!next[key]) delete next[key]
     setAchieved(next)
     try { localStorage.setItem('bucket-achieved', JSON.stringify(next)) } catch {}
     if (!wasAchieved) {
-      // 전체 완료 계산: 아이템별로 모든 날짜가 체크됐는지
-      const newCount = checkedItems.filter(i => {
-        const days = state.schedules[i.id] ?? []
-        if (days.length === 0) return !!next[i.id]
-        return days.every(d => !!next[`${i.id}_${d}`])
-      }).length
+      const newCount = allRows.filter(r => !!next[getKey(r.id, r.day)]).length
       const isLast = newCount === total
       if (!isLast) {
         playTing()
@@ -287,7 +291,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
     if (days.length === 0) return !!achieved[item.id]
     return days.every(d => !!achieved[`${item.id}_${d}`])
   }
-  const achievedCount = checkedItems.filter(i => isItemFullyAchieved(i)).length
+  const achievedCount = allRows.filter(r => !!achieved[getKey(r.id, r.day)]).length
   const pct = total > 0 ? Math.round((achievedCount/total)*100) : 0
 
   // 전체 완료 감지
