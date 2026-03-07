@@ -118,7 +118,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
     })
   })
   const sortedDays  = Array.from(byDay.keys()).sort((a, b) => a - b)
-  const unscheduled = checkedItems.filter(i => !(state.schedules[item.id]?.length))
+  const unscheduled = checkedItems.filter(i => !(state.schedules[i.id]?.length))
 
   const [achieved, setAchieved] = useState<Record<string, boolean>>(() => {
     try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} }
