@@ -317,8 +317,12 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         </div>
 
         <div style={{ animation:'fadeInUp 0.6s ease 0.2s both' }}>
-          <div style={{ fontSize:14, color:'rgba(255,255,255,0.7)', lineHeight:1.7, marginBottom:32 }}>
+          <div style={{ fontSize:14, color:'rgba(255,255,255,0.7)', lineHeight:1.7, marginBottom:16 }}>
             {total}개 항목 · {CATEGORIES.length}개 카테고리<br/>나만의 호주 버킷리스트를 만들어보세요
+          </div>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(255,255,255,0.10)', borderRadius:20, padding:'7px 16px', marginBottom:28 }}>
+            <Icon icon="ph:device-mobile" width={14} height={14} color="#FFCD00" />
+            <span style={{ fontSize:12, color:'rgba(255,255,255,0.90)', fontWeight:600 }}>앱 설치 없이 폰으로 바로 체크해요</span>
           </div>
         </div>
 
