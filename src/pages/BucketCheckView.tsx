@@ -59,7 +59,6 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel:
 
 export default function BucketCheckView({ state, trip, setState, onEdit, onDelete, onServices }: Props) {
   const [filter, setFilter]         = useState<Filter>('all')
-  const [menuOpen, setMenuOpen]     = useState(false)
   const [showDelete, setShowDelete] = useState(false)
 
   const allItems     = [...ITEMS, ...state.customItems.map(c => ({ ...c, emoji: '📝' }))]
@@ -144,58 +143,29 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
       {/* ══ 헤더 + 탭 ══ */}
       <div style={{ background: '#fff', borderBottom: '1px solid #E2E8F0', position: 'sticky', top: 0, zIndex: 30 }}>
 
-        {/* 브랜드 행 */}
+        {/* 브랜드 행 — ChecklistPage 와 동일 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px 0' }}>
           <span style={{ fontSize: 13, color: '#003594', fontWeight: 800, letterSpacing: 2 }}>HOJUGAJA</span>
-          {/* ⋯ 드롭다운 */}
-          <div style={{ position: 'relative' }}>
-            <button onClick={() => setMenuOpen(v => !v)} style={{
-              width: 36, height: 36, borderRadius: 6, border: '1px solid #E2E8F0',
-              background: menuOpen ? '#F1F5F9' : '#fff', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 16, color: '#64748B', fontWeight: 800, letterSpacing: 1,
-            }}>···</button>
-            {menuOpen && (
-              <>
-                <div onClick={() => setMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
-                <div style={{
-                  position: 'absolute', top: 42, right: 0, zIndex: 50,
-                  background: '#fff', borderRadius: 8, border: '1px solid #E2E8F0',
-                  boxShadow: '0 10px 15px rgba(0,0,0,0.10)', minWidth: 148,
-                  overflow: 'hidden', animation: 'hg-fade 0.15s ease',
-                }}>
-                  <button className="mi" onClick={() => { setMenuOpen(false); onEdit() }} style={{
-                    width: '100%', padding: '14px 18px', border: 'none', background: '#fff',
-                    textAlign: 'left', fontSize: 14, fontWeight: 600, color: '#1E293B', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: 10,
-                  }}>✏️ 수정하기</button>
-                  <div style={{ height: 1, background: '#E2E8F0', margin: '0 12px' }} />
-                  <button className="mi" onClick={() => { setMenuOpen(false); setShowDelete(true) }} style={{
-                    width: '100%', padding: '14px 18px', border: 'none', background: '#fff',
-                    textAlign: 'left', fontSize: 14, fontWeight: 600, color: '#DC2626', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: 10,
-                  }}>🗑 삭제하기</button>
-                </div>
-              </>
-            )}
-          </div>
+          <span style={{ fontSize: 13, color: '#64748B', fontWeight: 600 }}>{achievedCount}/{total}</span>
         </div>
 
-        {/* 탭 행 */}
-        <div style={{ display: 'flex', padding: '0 20px' }}>
-          {/* 버킷리스트 탭 — 활성 */}
+        {/* 탭 행 — ChecklistPage 와 동일한 스타일 */}
+        <div style={{ display: 'flex', padding: '8px 20px 0', gap: 4 }}>
+          {/* 버킷리스트 — 활성 */}
           <div style={{
-            height: 44, display: 'flex', alignItems: 'center', paddingRight: 20,
-            fontSize: 15, fontWeight: 700, color: '#003594',
-            borderBottom: '3px solid #003594',
+            flex: 1, height: 38, borderRadius: '6px 6px 0 0',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 14, fontWeight: 700, color: '#003594',
+            background: '#EEF4FF',
+            borderBottom: '2px solid #003594',
             userSelect: 'none',
           }}>버킷리스트</div>
-          {/* 업체/서비스 탭 */}
+          {/* 업체/서비스 — 비활성 버튼 */}
           <button onClick={onServices} style={{
-            height: 44, paddingLeft: 4, paddingRight: 8,
-            border: 'none', background: 'transparent',
-            fontSize: 15, fontWeight: 500, color: '#94A3B8',
-            cursor: 'pointer', position: 'relative',
+            flex: 1, height: 38, border: 'none', borderRadius: '6px 6px 0 0',
+            background: 'transparent', borderBottom: '2px solid transparent',
+            fontSize: 14, fontWeight: 500, color: '#94A3B8',
+            cursor: 'pointer',
           }}>업체/서비스 찾기</button>
         </div>
       </div>

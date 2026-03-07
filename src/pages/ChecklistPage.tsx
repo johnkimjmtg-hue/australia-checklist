@@ -82,7 +82,8 @@ export default function ChecklistPage({ state, setState }: Props) {
     const unscheduled = checkedIds.filter(id => !(state.schedules[id]?.length))
     if (unscheduled.length > 0) { setModal('noSchedule'); return }
     const at = fmt(new Date())
-    setIssuedAt(at); setState(issueReceipt(state, at)); setShowReceipt(true)
+    setIssuedAt(at); setState(issueReceipt(state, at))
+    // ReceiptModal 안 띄움 — BucketCheckView로 자동 전환
   }
 
   const triggerShake = () => { setShakeBtn(true); setTimeout(() => setShakeBtn(false), 600) }
@@ -153,18 +154,18 @@ export default function ChecklistPage({ state, setState }: Props) {
           <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>{done}/{total}</span>
         </div>
         {/* 탭 */}
-        <div style={{ display:'flex', padding:'0 20px' }}>
+        <div style={{ display:'flex', padding:'8px 20px 0', gap:4 }}>
           {(['bucketlist','services'] as MainTab[]).map(tab => (
             <button key={tab} className="tab-btn" onClick={() => setMainTab(tab)} style={{
-              flex:1, height:44, border:'none', background:'transparent', cursor:'pointer',
-              fontSize:15, fontWeight: mainTab===tab ? 700 : 500,
+              flex:1, height:38, border:'none', cursor:'pointer',
+              borderRadius:'6px 6px 0 0',
+              fontSize:14, fontWeight: mainTab===tab ? 700 : 500,
               color: mainTab===tab ? '#003594' : '#94A3B8',
-              position:'relative', letterSpacing:-0.2,
+              background: mainTab===tab ? '#EEF4FF' : 'transparent',
+              letterSpacing:-0.2,
+              borderBottom: mainTab===tab ? '2px solid #003594' : '2px solid transparent',
             }}>
               {tab==='bucketlist' ? '버킷리스트' : '업체/서비스 찾기'}
-              {mainTab===tab && (
-                <span style={{ position:'absolute', bottom:0, left:'8%', right:'8%', height:3, background:'#003594', borderRadius:'2px 2px 0 0', display:'block' }}/>
-              )}
             </button>
           ))}
         </div>
