@@ -1,35 +1,92 @@
 import { AppState, TripInfo, getTripDays, fmtMD, dow } from '../store/state'
 import { ITEMS } from '../data/checklist'
+import { Icon } from '@iconify/react'
 
 type Props = { state: AppState; trip: TripInfo; achieved: Record<string,boolean> }
 
+/* 아이템별 단색 아이콘 — BucketCheckView와 동일 */
 const ITEM_ICONS: Record<string, string> = {
-  h01:'🦷',h02:'🦷',h03:'✨',h04:'💉',h05:'💧',h06:'👁',h07:'👓',h08:'❤️',h09:'🛡',h10:'🌿',
-  h11:'✂️',h12:'💅',h13:'👁',h14:'✏️',h15:'🧖',h16:'🛍',h17:'🧴',h18:'☀️',h19:'🎭',h20:'💧',
-  h21:'💪',h22:'🌡',h23:'💊',h24:'👓',h25:'🦴',h26:'🧴',
-  f01:'🍗',f02:'🍗',f03:'🍗',f04:'🍜',f05:'🍜',f06:'🥢',f07:'🍲',f08:'🍲',f09:'🍲',f10:'🦀',
-  f11:'🥩',f12:'🥩',f13:'🍺',f14:'🌶',f15:'🥩',f16:'🍚',f17:'🍣',f18:'🍜',f19:'🥞',f20:'🍧',
-  f21:'🍗',f22:'🍲',f23:'🥩',f24:'🍜',f25:'🏪',f26:'☕',f27:'🍢',f28:'🥩',f29:'🥞',f30:'🥟',
-  f31:'🍱',f32:'🍲',f33:'🌶',f34:'🍽',f35:'🍶',
-  s01:'🛍',s02:'✈️',s03:'🌿',s04:'🏪',s05:'🕶',s06:'👕',s07:'💍',s08:'👓',s09:'🛒',s10:'✏️',
-  s11:'💊',s12:'💊',s13:'🩹',s14:'🩹',s15:'😴',s16:'🏥',s17:'👗',s18:'🛒',s19:'🍫',s20:'📦',
-  s21:'🌿',s22:'🥬',s23:'🌿',s24:'🎁',s25:'📚',
-  a01:'🪪',a02:'📘',a03:'🏦',a04:'💛',a05:'📱',a06:'🚗',a07:'💰',a08:'📊',a09:'🛡',a10:'📄',
-  a11:'🏥',a12:'📈',a13:'🌏',a14:'📜',a15:'✅',
-  p01:'🏠',p02:'👬',p03:'👥',p04:'🏠',p05:'🎓',p06:'🏡',p07:'🙏',p08:'🍽',p09:'📸',p10:'🎁',
-  k01:'💉',k02:'🩺',k03:'🦷',k04:'🧸',k05:'👕',k06:'📚',k07:'🧷',k08:'🎠',k09:'🎡',k10:'📸',
-  g01:'🏯',g02:'🌿',g03:'🗼',g04:'🌊',g05:'🏘',g06:'🎨',g07:'🎵',g08:'🏛',g09:'📚',g10:'🏙',
-  g11:'🌋',g12:'🏖',g13:'🏺',g14:'🏘',g15:'🍂',g16:'🎤',g17:'🎮',g18:'♨️',g19:'🔐',g20:'⚾',
-  g21:'👘',g22:'🪖',
+  h01:'ph:tooth',h02:'ph:tooth',h03:'ph:sparkle',h04:'ph:syringe',h05:'ph:drop',
+  h06:'ph:eye',h07:'ph:eyeglasses',h08:'ph:heartbeat',h09:'ph:shield-check',h10:'ph:leaf',
+  h11:'ph:scissors',h12:'ph:hand',h13:'ph:eye',h14:'ph:pencil-simple',h15:'ph:person-simple',
+  h16:'ph:shopping-bag',h17:'ph:flask',h18:'ph:sun',h19:'ph:mask-happy',h20:'ph:drop-half',
+  h21:'ph:barbell',h22:'ph:thermometer-hot',h23:'ph:pill',h24:'ph:eyeglasses',h25:'ph:bone',h26:'ph:flask',
+  f01:'ph:chicken',f02:'ph:chicken',f03:'ph:chicken',f04:'ph:bowl-food',f05:'ph:bowl-food',
+  f06:'ph:fork-knife',f07:'ph:bowl-food',f08:'ph:bowl-food',f09:'ph:bowl-food',f10:'ph:fish',
+  f11:'ph:fork-knife',f12:'ph:flame',f13:'ph:beer-stein',f14:'ph:pepper',f15:'ph:flame',
+  f16:'ph:bowl-food',f17:'ph:fish',f18:'ph:bowl-food',f19:'ph:cake',f20:'ph:ice-cream',
+  f21:'ph:flame',f22:'ph:bowl-food',f23:'ph:fork-knife',f24:'ph:bowl-food',f25:'ph:storefront',
+  f26:'ph:coffee',f27:'ph:fork-knife',f28:'ph:fork-knife',f29:'ph:fork-knife',f30:'ph:fork-knife',
+  f31:'ph:sushi',f32:'ph:bowl-food',f33:'ph:pepper',f34:'ph:fork-knife',f35:'ph:wine',
+  s01:'ph:shopping-bag',s02:'ph:airplane',s03:'ph:leaf',s04:'ph:storefront',s05:'ph:sunglasses',
+  s06:'ph:t-shirt',s07:'ph:diamond',s08:'ph:eyeglasses',s09:'ph:shopping-cart',s10:'ph:pencil',
+  s11:'ph:pill',s12:'ph:pill',s13:'ph:bandaids',s14:'ph:bandaids',s15:'ph:moon',
+  s16:'ph:first-aid-kit',s17:'ph:t-shirt',s18:'ph:shopping-cart',s19:'ph:cookie',s20:'ph:package',
+  s21:'ph:leaf',s22:'ph:leaf',s23:'ph:plant',s24:'ph:gift',s25:'ph:books',
+  a01:'ph:identification-card',a02:'ph:book-open',a03:'ph:bank',a04:'ph:bank',a05:'ph:device-mobile',
+  a06:'ph:car',a07:'ph:currency-krw',a08:'ph:chart-bar',a09:'ph:shield',a10:'ph:files',
+  a11:'ph:heartbeat',a12:'ph:chart-line-up',a13:'ph:globe',a14:'ph:seal',a15:'ph:check-circle',
+  p01:'ph:house-line',p02:'ph:users-three',p03:'ph:users',p04:'ph:house',p05:'ph:graduation-cap',
+  p06:'ph:map-pin',p07:'ph:hands-praying',p08:'ph:fork-knife',p09:'ph:camera',p10:'ph:gift',
+  k01:'ph:syringe',k02:'ph:stethoscope',k03:'ph:tooth',k04:'ph:lego',k05:'ph:t-shirt',
+  k06:'ph:books',k07:'ph:baby',k08:'ph:smiley',k09:'ph:ticket',k10:'ph:camera',
+  g01:'ph:buildings',g02:'ph:tree',g03:'ph:broadcast-tower',g04:'ph:waves',g05:'ph:house',
+  g06:'ph:palette',g07:'ph:music-note',g08:'ph:building',g09:'ph:books',g10:'ph:binoculars',
+  g11:'ph:mountain',g12:'ph:umbrella-simple',g13:'ph:crown',g14:'ph:house',g15:'ph:tree-evergreen',
+  g16:'ph:microphone',g17:'ph:monitor',g18:'ph:thermometer-hot',g19:'ph:lock-key',g20:'ph:baseball',
+  g21:'ph:dress',g22:'ph:flag',
+}
+const CAT_ICONS: Record<string,string> = {
+  hospital:'ph:first-aid-kit',food:'ph:fork-knife',shopping:'ph:shopping-bag',
+  admin:'ph:files',people:'ph:users',parenting:'ph:baby',places:'ph:map-pin',
+  schedule:'ph:calendar',custom:'ph:star',
+}
+
+/* 원형 프로그레스 */
+function CircleProgress({ pct }: { pct: number }) {
+  const R = 38, C = 2 * Math.PI * R
+  const offset = C - (pct / 100) * C
+  return (
+    <div style={{ position:'relative', width:86, height:86, flexShrink:0 }}>
+      <svg width={86} height={86} viewBox="0 0 86 86" style={{ transform:'rotate(-90deg)' }}>
+        <circle cx={43} cy={43} r={R} fill="none" stroke="#F1F5F9" strokeWidth={9}/>
+        <circle cx={43} cy={43} r={R} fill="none" stroke="#FFCD00" strokeWidth={9}
+          strokeDasharray={C} strokeDashoffset={offset} strokeLinecap="round"/>
+      </svg>
+      <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center' }}>
+        <span style={{ fontSize:13,fontWeight:800,color:'#003594' }}>{pct}%</span>
+      </div>
+    </div>
+  )
+}
+
+/* 동전 스택 */
+function CoinStack({ count, total }: { count:number; total:number }) {
+  const maxCoins = 8
+  const filled   = total > 0 ? Math.round((count / total) * maxCoins) : 0
+  return (
+    <div style={{ display:'flex',flexDirection:'column-reverse',alignItems:'center',gap:2,justifyContent:'flex-end',minWidth:32 }}>
+      {Array.from({ length: maxCoins }, (_, i) => (
+        <div key={i} style={{
+          width:24, height:12, borderRadius:'50%',
+          background: i < filled
+            ? 'radial-gradient(ellipse at 35% 35%, #FFE566, #FFCD00 60%, #C8960C)'
+            : '#E2E8F0',
+          boxShadow: i < filled ? '0 2px 4px rgba(180,130,0,0.3)' : 'none',
+        }}/>
+      ))}
+      <div style={{ fontSize:9,color:'#94A3B8',fontWeight:600,marginTop:3 }}>{count}/{total}</div>
+    </div>
+  )
 }
 
 export default function BucketSharePaper({ state, trip, achieved }: Props) {
-  const allItems     = [...ITEMS, ...state.customItems.map(c => ({ ...c, emoji: '📝' }))]
-  const checkedItems = allItems.filter(i => state.selected[i.id])
-  const tripDays     = getTripDays(trip)
-  const total        = checkedItems.length
+  const allItems      = [...ITEMS, ...state.customItems.map(c => ({ ...c, categoryId: c.categoryId ?? 'custom' }))]
+  const checkedItems  = allItems.filter(i => state.selected[i.id])
+  const tripDays      = getTripDays(trip)
+  const total         = checkedItems.length
   const achievedCount = checkedItems.filter(i => achieved[i.id]).length
-  const pct          = total > 0 ? Math.round((achievedCount / total) * 100) : 0
+  const pct           = total > 0 ? Math.round((achievedCount / total) * 100) : 0
 
   const byDay = new Map<number, typeof checkedItems>()
   checkedItems.forEach(item => {
@@ -44,69 +101,73 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
   const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
   return (
-    <div id="receipt-root" style={{
-      width: 320, margin: '0 auto',
-      fontFamily: ff,
-      background: '#F1F5F9',
-      borderRadius: 14,
-      overflow: 'hidden',
-    }}>
-      {/* 헤더 */}
+    <div id="receipt-root" style={{ width:320, margin:'0 auto', fontFamily:ff, background:'#F1F5F9', borderRadius:14, overflow:'hidden' }}>
+
+      {/* ── 상단 진행 카드 (헤더 대신) ── */}
       <div style={{
-        background: 'linear-gradient(135deg, #002870, #003594)',
-        padding: '16px 18px 14px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        background:'#fff', margin:12, borderRadius:12,
+        boxShadow:'0 4px 20px rgba(0,53,148,0.10),0 1px 4px rgba(0,0,0,0.06)',
+        padding:'16px', display:'flex', alignItems:'center', gap:14,
       }}>
-        <div>
-          <div style={{ color:'rgba(255,255,255,0.55)', fontSize:8, letterSpacing:2.5, fontWeight:800, marginBottom:3 }}>BUCKET LIST</div>
-          <div style={{ color:'#fff', fontSize:20, fontWeight:900, letterSpacing:-0.5 }}>호주가자</div>
-        </div>
-        <div style={{ textAlign:'right' }}>
-          <div style={{ color:'#FFCD00', fontSize:22, fontWeight:900, lineHeight:1 }}>{pct}%</div>
-          <div style={{ color:'rgba(255,255,255,0.7)', fontSize:11, marginTop:2 }}>{achievedCount}/{total}건 완료</div>
-          <div style={{ color:'rgba(255,255,255,0.5)', fontSize:10, marginTop:2 }}>
+        <CircleProgress pct={pct} />
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:16,fontWeight:800,color:'#1E293B',marginBottom:3,lineHeight:1.2 }}>호주 버킷리스트</div>
+          <div style={{ fontSize:11,color:'#94A3B8',fontWeight:600,marginBottom:5 }}>
             {trip.startDate.slice(5).replace('-','/')} ~ {trip.endDate.slice(5).replace('-','/')}
           </div>
+          <div style={{ display:'flex',alignItems:'baseline',gap:3 }}>
+            <span style={{ fontSize:22,fontWeight:800,color:'#003594',lineHeight:1 }}>{achievedCount}</span>
+            <span style={{ fontSize:13,fontWeight:600,color:'#64748B' }}>/{total}건 완료</span>
+          </div>
         </div>
+        <CoinStack count={achievedCount} total={total} />
       </div>
 
-      {/* 리스트 */}
-      <div style={{ background:'#fff', padding:'0' }}>
+      {/* ── 리스트 ── */}
+      <div style={{ background:'#fff', margin:'0 12px', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
         {sortedDays.map(dayIdx => {
-          const items = byDay.get(dayIdx) ?? []
-          const date  = tripDays[dayIdx]
+          const items    = byDay.get(dayIdx) ?? []
+          const date     = tripDays[dayIdx]
+          const dayDone  = items.filter(i => achieved[i.id]).length
           return (
             <div key={dayIdx}>
+              {/* 날짜 헤더 */}
               <div style={{
-                display:'flex', alignItems:'center', gap:8,
-                padding:'6px 14px 4px', background:'#F8FAFD',
-                borderBottom:'1px solid rgba(30,77,131,0.06)',
+                display:'flex', alignItems:'center', justifyContent:'space-between',
+                padding:'6px 12px 4px', background:'#F8FAFD',
+                borderBottom:'1px solid #E2E8F0',
               }}>
-                <span style={{ fontSize:10, fontWeight:800, color:'#003594' }}>{dayIdx+1}일차</span>
-                {date && <span style={{ fontSize:10, color:'#AAB8CC' }}>{fmtMD(date)}({dow(date)})</span>}
-                <span style={{ marginLeft:'auto', fontSize:10, color:'#AAB8CC' }}>{items.length}건</span>
+                <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                  <span style={{ fontSize:10,fontWeight:800,color:'#003594' }}>{dayIdx+1}일차</span>
+                  {date && <span style={{ fontSize:10,color:'#94A3B8' }}>{fmtMD(date)}({dow(date)})</span>}
+                </div>
+                <span style={{ fontSize:10,color:'#003594',fontWeight:700 }}>{dayDone}/{items.length}</span>
               </div>
+              {/* 아이템 */}
               {items.map(item => {
-                const done = !!achieved[item.id]
+                const isDone = !!achieved[item.id]
+                const icon   = ITEM_ICONS[item.id] ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'
                 return (
                   <div key={item.id} style={{
-                    display:'flex', alignItems:'center', gap:8,
-                    padding:'7px 14px',
-                    background: done ? '#fff8e4' : '#fff',
-                    borderBottom:'1px solid rgba(30,77,131,0.05)',
+                    display:'flex', alignItems:'center', gap:10,
+                    padding:'8px 12px',
+                    background: isDone ? '#fff8e4' : '#fff',
+                    borderBottom:'1px solid #F1F5F9',
                   }}>
                     {/* 체크박스 */}
                     <div style={{
-                      width:16, height:16, borderRadius:3, flexShrink:0,
-                      background: done ? '#16A34A' : '#fff',
-                      border: done ? 'none' : '1.5px solid #CBD5E1',
-                      display:'flex', alignItems:'center', justifyContent:'center',
+                      width:16,height:16,borderRadius:3,flexShrink:0,
+                      background: isDone ? '#16A34A' : '#fff',
+                      border: isDone ? 'none' : '1.5px solid #CBD5E1',
+                      display:'flex',alignItems:'center',justifyContent:'center',
                     }}>
-                      {done && <span style={{ color:'#fff', fontSize:9, fontWeight:900 }}>✓</span>}
+                      {isDone && <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                     </div>
-                    <span style={{ fontSize:13, flexShrink:0 }}>{ITEM_ICONS[item.id] ?? item.emoji ?? '📌'}</span>
-                    <span style={{ fontSize:12, color: done ? '#44403C' : '#64748B', fontWeight: done ? 600 : 400, flex:1 }}>{item.label}</span>
-                    {done && <span style={{ fontSize:10, color:'#16A34A', fontWeight:700 }}>완료</span>}
+                    {/* 단색 아이콘 */}
+                    <Icon icon={icon} width={16} height={16} color={isDone ? '#78716C' : '#94A3B8'} />
+                    {/* 라벨 */}
+                    <span style={{ flex:1,fontSize:12,color:'#1E293B',fontWeight:isDone?600:400,lineHeight:1.4 }}>{item.label}</span>
+                    {isDone && <span style={{ fontSize:9,fontWeight:600,color:'#44403C',background:'rgba(68,64,60,0.10)',padding:'2px 6px',borderRadius:3,flexShrink:0 }}>완료 ✓</span>}
                   </div>
                 )
               })}
@@ -114,36 +175,38 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
           )
         })}
 
+        {/* 날짜 미지정 */}
         {unscheduled.length > 0 && (
           <div>
             <div style={{
-              display:'flex', alignItems:'center', gap:8,
-              padding:'6px 14px 4px', background:'#F8FAFD',
-              borderBottom:'1px solid rgba(30,77,131,0.06)',
+              display:'flex', alignItems:'center', justifyContent:'space-between',
+              padding:'6px 12px 4px', background:'#F8FAFD',
+              borderBottom:'1px solid #E2E8F0',
             }}>
-              <span style={{ fontSize:10, fontWeight:800, color:'#94A3B8' }}>날짜 미지정</span>
-              <span style={{ marginLeft:'auto', fontSize:10, color:'#AAB8CC' }}>{unscheduled.length}건</span>
+              <span style={{ fontSize:10,fontWeight:800,color:'#94A3B8' }}>날짜 미지정</span>
+              <span style={{ fontSize:10,color:'#94A3B8' }}>{unscheduled.filter(i=>achieved[i.id]).length}/{unscheduled.length}</span>
             </div>
             {unscheduled.map(item => {
-              const done = !!achieved[item.id]
+              const isDone = !!achieved[item.id]
+              const icon   = ITEM_ICONS[item.id] ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'
               return (
                 <div key={item.id} style={{
-                  display:'flex', alignItems:'center', gap:8,
-                  padding:'7px 14px',
-                  background: done ? '#fff8e4' : '#fff',
-                  borderBottom:'1px solid rgba(30,77,131,0.05)',
+                  display:'flex', alignItems:'center', gap:10,
+                  padding:'8px 12px',
+                  background: isDone ? '#fff8e4' : '#fff',
+                  borderBottom:'1px solid #F1F5F9',
                 }}>
                   <div style={{
-                    width:16, height:16, borderRadius:3, flexShrink:0,
-                    background: done ? '#16A34A' : '#fff',
-                    border: done ? 'none' : '1.5px solid #CBD5E1',
-                    display:'flex', alignItems:'center', justifyContent:'center',
+                    width:16,height:16,borderRadius:3,flexShrink:0,
+                    background: isDone ? '#16A34A' : '#fff',
+                    border: isDone ? 'none' : '1.5px solid #CBD5E1',
+                    display:'flex',alignItems:'center',justifyContent:'center',
                   }}>
-                    {done && <span style={{ color:'#fff', fontSize:9, fontWeight:900 }}>✓</span>}
+                    {isDone && <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   </div>
-                  <span style={{ fontSize:13, flexShrink:0 }}>{ITEM_ICONS[item.id] ?? item.emoji ?? '📌'}</span>
-                  <span style={{ fontSize:12, color: done ? '#44403C' : '#64748B', fontWeight: done ? 600 : 400, flex:1 }}>{item.label}</span>
-                  {done && <span style={{ fontSize:10, color:'#16A34A', fontWeight:700 }}>완료</span>}
+                  <Icon icon={icon} width={16} height={16} color={isDone ? '#78716C' : '#94A3B8'} />
+                  <span style={{ flex:1,fontSize:12,color:'#1E293B',fontWeight:isDone?600:400,lineHeight:1.4 }}>{item.label}</span>
+                  {isDone && <span style={{ fontSize:9,fontWeight:600,color:'#44403C',background:'rgba(68,64,60,0.10)',padding:'2px 6px',borderRadius:3,flexShrink:0 }}>완료 ✓</span>}
                 </div>
               )
             })}
@@ -151,15 +214,24 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
         )}
       </div>
 
-      {/* 푸터 */}
+      {/* ── 푸터 ── */}
       <div style={{
-        padding:'10px 14px 12px', background:'#fff',
-        borderTop:'1.5px dashed rgba(30,77,131,0.15)',
-        display:'flex', justifyContent:'space-between', alignItems:'center',
+        margin:'12px 12px 12px',
+        background:'linear-gradient(135deg, #002870, #003594)',
+        borderRadius:10,
+        padding:'12px 16px',
+        display:'flex', alignItems:'center', justifyContent:'space-between',
       }}>
-        <span style={{ fontSize:9, color:'#C0CCD8', fontWeight:600 }}>호주가자 · 여행 버킷리스트 🦘</span>
-        <span style={{ fontSize:9, color:'#C0CCD8', letterSpacing:1 }}>{state.meta.receiptCode}</span>
+        <div>
+          <div style={{ fontSize:12,fontWeight:800,color:'#fff',letterSpacing:-0.3 }}>호주가자</div>
+          <div style={{ fontSize:10,color:'rgba(255,255,255,0.7)',marginTop:2 }}>여행 버킷리스트 🦘</div>
+        </div>
+        <div style={{ textAlign:'right' }}>
+          <div style={{ fontSize:11,fontWeight:700,color:'#FFCD00' }}>www.hojugaja.com</div>
+          <div style={{ fontSize:9,color:'rgba(255,255,255,0.5)',marginTop:2 }}>나만의 버킷리스트를 만들어보세요</div>
+        </div>
       </div>
+
     </div>
   )
 }

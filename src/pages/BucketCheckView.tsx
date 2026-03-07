@@ -382,7 +382,10 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         }}>
           <CircleProgress pct={pct} />
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:22,fontWeight:800,color:'#1E293B',marginBottom:6,lineHeight:1.2 }}>호주 버킷리스트</div>
+            <div style={{ fontSize:22,fontWeight:800,color:'#1E293B',marginBottom:4,lineHeight:1.2 }}>호주 버킷리스트</div>
+            <div style={{ fontSize:12,color:'#94A3B8',fontWeight:600,marginBottom:6 }}>
+              {trip.startDate.slice(5).replace('-','/')} ~ {trip.endDate.slice(5).replace('-','/')}
+            </div>
             <div style={{ display:'flex',alignItems:'baseline',gap:4,marginBottom:4 }}>
               <span style={{ fontSize:28,fontWeight:800,color:'#003594',lineHeight:1 }}>{achievedCount}</span>
               <span style={{ fontSize:17,fontWeight:600,color:'#64748B' }}>/{total}건 완료</span>
