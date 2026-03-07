@@ -425,6 +425,28 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             <Icon icon="ph:device-mobile" width={14} height={14} color="#FFCD00" />
             <span style={{ fontSize:12, color:'rgba(255,255,255,0.90)', fontWeight:600 }}>앱 설치 없이 폰으로 바로 체크해요</span>
           </div>
+
+          {/* ── 히어로 CTA 버튼 ── */}
+          <div style={{ display:'flex', gap:10, marginBottom:28 }}>
+            <button onClick={onStart} style={{
+              flex:1, height:50, background:'#FFCD00', color:'#002870',
+              border:'none', borderRadius:12, fontSize:14, fontWeight:800,
+              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+              boxShadow:'0 4px 16px rgba(255,205,0,0.35)',
+            }}>
+              <Icon icon="ph:list-checks" width={18} height={18} color="#002870" />
+              나의 버킷리스트
+            </button>
+            <button onClick={onServices} style={{
+              flex:1, height:50, background:'rgba(255,255,255,0.15)', color:'#fff',
+              border:'1.5px solid rgba(255,255,255,0.30)', borderRadius:12, fontSize:14, fontWeight:700,
+              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+              backdropFilter:'blur(4px)',
+            }}>
+              <Icon icon="ph:buildings" width={18} height={18} color="#fff" />
+              업체/서비스
+            </button>
+          </div>
         </div>
 
         {/* 앱 미리보기 카드 */}
@@ -556,29 +578,9 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         </div>
       </div>
 
-      {/* ── 하단 CTA ── */}
-      <div style={{ padding:'8px 20px 48px', display:'flex', flexDirection:'column', gap:10 }}>
-        <button onClick={onStart} style={{
-          width:'100%', height:54, background:'#003594', color:'#fff',
-          border:'none', borderRadius:12, fontSize:16, fontWeight:800,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-          boxShadow:'0 4px 20px rgba(0,53,148,0.30)',
-        }}>
-          <Icon icon="ph:list-checks" width={20} height={20} color="#FFCD00" />
-          나의 버킷리스트
-        </button>
-        <button onClick={onServices} style={{
-          width:'100%', height:54, background:'#fff', color:'#003594',
-          border:'none', borderRadius:12, fontSize:16, fontWeight:800,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-          boxShadow:'0 2px 10px rgba(0,0,0,0.08)',
-        }}>
-          <Icon icon="ph:buildings" width={20} height={20} color="#003594" />
-          업체/서비스 찾기
-        </button>
-        <div style={{ textAlign:'center', marginTop:8 }}>
-          <span style={{ fontSize:11, color:'#94A3B8' }}>www.hojugaja.com</span>
-        </div>
+      {/* ── 푸터 ── */}
+      <div style={{ textAlign:'center', padding:'8px 20px 40px' }}>
+        <span style={{ fontSize:11, color:'#94A3B8' }}>www.hojugaja.com</span>
       </div>
 
       {/* ── 버킷리스트 추천 모달 ── */}
