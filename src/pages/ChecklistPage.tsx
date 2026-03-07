@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import { Icon } from '@iconify/react'
 import { CATEGORIES, ITEMS, CheckItem } from '../data/checklist'
 import {
   AppState, TripInfo,
@@ -9,7 +10,6 @@ import {
 } from '../store/state'
 import ScheduleSheet from '../components/ScheduleSheet'
 import ReceiptModal from '../components/ReceiptModal'
-import Services from './Services'
 import Services from './Services'
 import BucketCheckView from './BucketCheckView'
 
@@ -197,11 +197,11 @@ export default function ChecklistPage({ state, setState }: Props) {
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 20px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                 <span style={{ fontSize:14, fontWeight:700, color: done>0 ? '#003594' : '#94A3B8' }}>
-                  {done>0 ? `${done}개 선택됨` : '항목을 선택하세요'}
+                  {done>0 ? `${done}개 선택됨` : (trip ? '항목을 선택하세요' : '여행 일정을 설정하세요')}
                 </span>
                 {unscheduledCount>0 && (
-                  <span style={{ fontSize:11, color:'#D97706', fontWeight:700,
-                    background:'rgba(217,119,6,0.10)', padding:'2px 8px', borderRadius:4 }}>
+                  <span style={{ fontSize:11, color:'#92620a', fontWeight:700,
+                    background:'rgba(255,205,0,0.20)', padding:'2px 8px', borderRadius:4 }}>
                     {unscheduledCount}개 미지정
                   </span>
                 )}
@@ -214,9 +214,11 @@ export default function ChecklistPage({ state, setState }: Props) {
                   background: tripLabel ? '#003594' : '#fff',
                   color: tripLabel ? '#fff' : '#64748B',
                   fontSize:12, fontWeight:700, cursor:'pointer',
+                  display:'flex', alignItems:'center', gap:5,
                   animation: tripLabel ? 'none' : 'pulse 1.4s ease-in-out infinite',
                 }}>
-                  {tripLabel ? `📅 ${tripLabel}` : '🗓 여행일정'}
+                  <Icon icon="ph:calendar" width={13} height={13} color={tripLabel ? '#FFCD00' : '#94A3B8'} />
+                  {tripLabel ?? '여행일정'}
                 </button>
                 <button onClick={() => setShowScheduleView(v=>!v)} style={{
                   height:32, padding:'0 12px', borderRadius:6,
@@ -224,7 +226,11 @@ export default function ChecklistPage({ state, setState }: Props) {
                   background: showScheduleView ? '#003594' : '#fff',
                   color: showScheduleView ? '#fff' : '#003594',
                   fontSize:12, fontWeight:700,
-                }}>📋 일정보기</button>
+                  display:'flex', alignItems:'center', gap:5,
+                }}>
+                  <Icon icon="ph:list-checks" width={13} height={13} color={showScheduleView ? '#FFCD00' : '#003594'} />
+                  일정보기
+                </button>
               </div>
             </div>
 
@@ -254,8 +260,9 @@ export default function ChecklistPage({ state, setState }: Props) {
                     {catDone>0 && (
                       <span style={{
                         position:'absolute', top:-5, right:-4,
-                        background: catUnsch>0 ? '#D97706' : '#003594',
-                        color:'#fff', borderRadius:99, fontSize:9, fontWeight:800,
+                        background: catUnsch>0 ? '#FFCD00' : '#003594',
+                        color: catUnsch>0 ? '#92620a' : '#fff',
+                        borderRadius:99, fontSize:9, fontWeight:800,
                         minWidth:15, height:15, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px',
                       }}>{catDone}</span>
                     )}
@@ -283,8 +290,9 @@ export default function ChecklistPage({ state, setState }: Props) {
                     {catDone>0 && (
                       <span style={{
                         position:'absolute', top:-5, right:-4,
-                        background: catUnsch>0 ? '#D97706' : '#003594',
-                        color:'#fff', borderRadius:99, fontSize:9, fontWeight:800,
+                        background: catUnsch>0 ? '#FFCD00' : '#003594',
+                        color: catUnsch>0 ? '#92620a' : '#fff',
+                        borderRadius:99, fontSize:9, fontWeight:800,
                         minWidth:15, height:15, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px',
                       }}>{catDone}</span>
                     )}
@@ -297,7 +305,7 @@ export default function ChecklistPage({ state, setState }: Props) {
           {/* ── LIST ── */}
           <div style={{ flex:1, overflowY:'auto', paddingBottom:100 }}>
             {/* Section label */}
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 20px 6px' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 20px 8px' }}>
               <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
                 {CATEGORIES.find(c=>c.id===activeCategory)?.receiptLabel}
               </span>
@@ -308,13 +316,14 @@ export default function ChecklistPage({ state, setState }: Props) {
 
             {/* Custom add */}
             {activeCategory === 'custom' && (
-              <div style={{ display:'flex', gap:6, padding:'0 20px 8px', alignItems:'center' }}>
+              <div style={{ display:'flex', gap:6, padding:'0 16px 10px', alignItems:'center' }}>
                 <div style={{
                   flex:1, display:'flex', alignItems:'center', gap:8,
-                  background:'#fff', borderRadius:6, padding:'0 12px',
+                  background:'#fff', borderRadius:10, padding:'0 12px',
                   border:'1px solid #E2E8F0', height:44,
+                  boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
                 }}>
-                  <span style={{ color:'#003594', fontWeight:800, fontSize:18 }}>+</span>
+                  <Icon icon="ph:plus-circle" width={18} height={18} color="#003594" />
                   <input ref={inputRef} value={customLabel}
                     onChange={e => setCustomLabel(e.target.value)}
                     onKeyDown={e => e.key==='Enter' && handleAddCustom()}
@@ -324,23 +333,30 @@ export default function ChecklistPage({ state, setState }: Props) {
                 </div>
                 <button onClick={handleAddCustom} style={{
                   height:44, padding:'0 16px', background:'#003594', color:'#fff',
-                  border:'none', borderRadius:6, fontWeight:700, fontSize:14, cursor:'pointer',
+                  border:'none', borderRadius:10, fontWeight:700, fontSize:14, cursor:'pointer',
+                  boxShadow:'0 2px 8px rgba(0,53,148,0.25)',
                 }}>추가</button>
               </div>
             )}
 
-            {/* Items list */}
-            <div style={{ background:'#fff', borderTop:'1px solid #E2E8F0', borderBottom:'1px solid #E2E8F0', paddingBottom:110 }}>
+            {/* Items list — card style */}
+            <div style={{ display:'flex', flexDirection:'column', gap:8, padding:'0 16px 110px' }}>
               {catItems.map(item => {
                 const checked  = !!state.selected[item.id]
                 const dayCount = (state.schedules[item.id] ?? []).length
                 const needsSch = checked && dayCount===0
                 return (
-                  <div key={item.id} className="list-item" style={{
-                    display:'flex', alignItems:'center', gap:12, padding:'12px 20px',
-                    borderBottom:'1px solid #E2E8F0',
-                    background: needsSch ? 'rgba(217,119,6,0.03)' : '#fff',
-                    minHeight:52,
+                  <div key={item.id} style={{
+                    display:'flex', alignItems:'center', gap:12,
+                    padding:'12px 14px',
+                    borderRadius:10,
+                    background: needsSch ? '#fffbeb' : checked ? '#fff' : '#fff',
+                    boxShadow: checked
+                      ? '0 2px 8px rgba(0,53,148,0.09)'
+                      : '0 1px 4px rgba(0,0,0,0.05)',
+                    minHeight:52, cursor:'pointer',
+                    border: needsSch ? '1px solid rgba(255,205,0,0.4)' : 'none',
+                    transition:'all 0.12s',
                   }}>
                     {/* Checkbox */}
                     <button onClick={() => {
@@ -351,7 +367,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                       border: checked ? 'none' : '1.5px solid #CBD5E1',
                       background: checked ? '#003594' : '#fff',
                       display:'flex', alignItems:'center', justifyContent:'center',
-                      cursor:'pointer',
+                      cursor:'pointer', padding:0,
                     }}>
                       {checked && (
                         <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
@@ -360,14 +376,14 @@ export default function ChecklistPage({ state, setState }: Props) {
                       )}
                     </button>
 
-                    {/* 이모지 → 단색 텍스트 아이콘 */}
+                    {/* 이모지 */}
                     <span style={{ fontSize:18, flexShrink:0, opacity: checked ? 1 : 0.35 }}>{item.emoji}</span>
 
                     <span onClick={() => {
                       if (!trip) { setModal('noTrip'); return }
                       setState(toggleItem(state, item.id))
                     }} style={{
-                      flex:1, fontSize:16, fontWeight: checked ? 600 : 400,
+                      flex:1, fontSize:15, fontWeight: checked ? 600 : 400,
                       color: checked ? '#1E293B' : '#64748B', cursor:'pointer',
                       lineHeight:1.4,
                     }}>{item.label}</span>
@@ -378,17 +394,16 @@ export default function ChecklistPage({ state, setState }: Props) {
                       if (!trip) { setModal('noTrip'); return }
                       setSheetItem(item as CheckItem)
                     }} style={{
-                      height:28, padding:'0 10px', borderRadius:4, fontSize:11, fontWeight:700,
+                      height:28, padding:'0 10px', borderRadius:6, fontSize:11, fontWeight:700,
                       cursor: checked ? 'pointer' : 'default', flexShrink:0,
-                      border: !checked ? '1px solid #E2E8F0'
-                            : dayCount>0 ? 'none'
-                            : '1px solid #D97706',
-                      background: !checked ? 'transparent'
+                      border: 'none',
+                      background: !checked ? '#F1F5F9'
                                 : dayCount>0 ? '#003594'
-                                : '#fff',
+                                : '#FFCD00',
                       color: !checked ? '#CBD5E1'
                            : dayCount>0 ? '#fff'
-                           : '#D97706',
+                           : '#92620a',
+                      boxShadow: checked && dayCount===0 ? '0 2px 6px rgba(255,205,0,0.4)' : 'none',
                     }}>
                       {dayCount>0 ? `${dayCount}일 ✓` : '+일정'}
                     </button>
@@ -406,7 +421,8 @@ export default function ChecklistPage({ state, setState }: Props) {
             zIndex:20, boxSizing:'border-box',
           }}>
             {unscheduledCount>0 && done>0 && (
-              <div style={{ fontSize:11, color:'#D97706', textAlign:'center', marginBottom:6, fontWeight:700 }}>
+              <div style={{ fontSize:11, color:'#92620a', textAlign:'center', marginBottom:6, fontWeight:700,
+                background:'rgba(255,205,0,0.15)', borderRadius:6, padding:'5px 0' }}>
                 ⚠️ {unscheduledCount}개 항목에 날짜를 지정해주세요
               </div>
             )}
@@ -488,43 +504,41 @@ function ScheduleGrid({ state, trip, allItems }: { state: AppState; trip: TripIn
   )
 
   return (
-    <div style={{ borderTop:'1px solid rgba(30,77,131,0.08)', padding:'8px 12px 10px', background:'#F8FAFD' }}>
-      {/* Day tabs - 5 per row */}
-      <div style={{ display:'flex', gap:4, overflowX:'auto', paddingBottom:4 }}>
+    <div style={{ borderTop:'1px solid #E2E8F0', padding:'10px 16px 12px', background:'#F8FAFC' }}>
+      <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4 }}>
         {days.map((d, idx) => {
           const hasDot = allItems.some(item => state.selected[item.id] && (state.schedules[item.id] ?? []).includes(idx))
           return (
             <button key={idx} onClick={() => setActiveDayIdx(idx)} style={{
               minWidth:54, height:46, borderRadius:8, flexShrink:0,
-              border:'1px solid', cursor:'pointer',
-              borderColor: activeDayIdx===idx ? '#1E4D83' : 'rgba(30,77,131,0.12)',
-              background: activeDayIdx===idx ? '#1E4D83' : '#fff',
-              color: activeDayIdx===idx ? '#fff' : '#5A7090',
+              border:'none', cursor:'pointer',
+              background: activeDayIdx===idx ? '#003594' : '#fff',
+              color: activeDayIdx===idx ? '#fff' : '#64748B',
               fontSize:11, fontWeight:700, position:'relative', textAlign:'center',
               lineHeight:1.3, padding:'4px 2px',
+              boxShadow: activeDayIdx===idx ? '0 2px 8px rgba(0,53,148,0.20)' : '0 1px 3px rgba(0,0,0,0.06)',
             }}>
               <div>{idx+1}일차</div>
-              <div style={{ fontSize:10, opacity:0.8 }}>{fmtMD(d)}</div>
+              <div style={{ fontSize:10, opacity:0.75 }}>{fmtMD(d)}</div>
               {hasDot && (
                 <span style={{
                   position:'absolute', top:3, right:3, width:5, height:5,
-                  borderRadius:'50%', background: activeDayIdx===idx ? '#fff' : '#1E4D83',
+                  borderRadius:'50%', background: activeDayIdx===idx ? '#FFCD00' : '#003594',
                 }}/>
               )}
             </button>
           )
         })}
       </div>
-      {/* Items for selected day */}
-      <div style={{ marginTop:6, minHeight:30 }}>
+      <div style={{ marginTop:8, minHeight:30 }}>
         {dayItems.length === 0 ? (
-          <p style={{ fontSize:11, color:'#8AAAC8', textAlign:'center', padding:'6px 0' }}>각 항목의 "+일정" 버튼으로 추가하세요</p>
+          <p style={{ fontSize:11, color:'#94A3B8', textAlign:'center', padding:'6px 0' }}>항목의 "+일정" 버튼으로 추가하세요</p>
         ) : (
-          <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
             {dayItems.map(item => (
               <span key={item.id} style={{
-                background:'rgba(30,77,131,0.08)', borderRadius:6,
-                padding:'3px 8px', fontSize:11, color:'#1E4D83', fontWeight:600,
+                background:'rgba(0,53,148,0.08)', borderRadius:6,
+                padding:'3px 9px', fontSize:11, color:'#003594', fontWeight:600,
               }}>{item.emoji} {item.label}</span>
             ))}
           </div>
