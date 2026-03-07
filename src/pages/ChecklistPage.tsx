@@ -10,7 +10,7 @@ import {
 import ScheduleSheet from '../components/ScheduleSheet'
 import ReceiptModal from '../components/ReceiptModal'
 import Services from './Services'
-import BusinessDetail from './BusinessDetail'
+import Services from './Services'
 import BucketCheckView from './BucketCheckView'
 
 const CAT_ROW1 = ['hospital','food','shopping','admin']
@@ -34,7 +34,6 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [mainTab, setMainTab]         = useState<MainTab>(
     searchParams.get('tab') === 'services' ? 'services' : 'bucketlist'
   )
-  const [selectedBusiness, setSelectedBusiness] = useState<string | null>(null)
   const [showScheduleView, setShowScheduleView] = useState(false)
   const [logoTapCount, setLogoTapCount] = useState(0)
   const logoTapTimer = useRef<any>(null)
@@ -190,9 +189,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       </div>
 
       {mainTab === 'services' ? (
-        selectedBusiness
-          ? <BusinessDetail businessId={selectedBusiness} onBack={() => setSelectedBusiness(null)} />
-          : <Services onSelectBusiness={(id) => setSelectedBusiness(id)} onBack={() => setMainTab('bucketlist')} />
+        <Services onSelectBusiness={() => {}} onBack={() => setMainTab('bucketlist')} />
       ) : (
         <>
           {/* ── SUB HEADER ── */}
