@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { ITEMS, CATEGORIES } from '../data/checklist'
 import { AppState, TripInfo, getTripDays, fmtMD, dow } from '../store/state'
 import { Icon } from '@iconify/react'
+import { useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'done' | 'todo'
 type Props = {
@@ -187,11 +188,25 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=
 
 /* ══ 메인 ══ */
 export default function BucketCheckView({ state, trip, setState, onEdit, onDelete, onShare, onServices }: Props) {
+  const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const prevAchieved = useRef(0)
+  const logoTapCount = useRef(0)
+  const logoTapTimer = useRef<any>(null)
+
+  const handleLogoTap = () => {
+    const next = logoTapCount.current + 1
+    logoTapCount.current = next
+    if (logoTapTimer.current) clearTimeout(logoTapTimer.current)
+    if (next >= 5) { navigate('/admin'); logoTapCount.current = 0; return }
+    logoTapTimer.current = setTimeout(() => {
+      if (logoTapCount.current < 5) navigate('/')
+      logoTapCount.current = 0
+    }, 400)
+  }
 
   const allItems     = [...ITEMS, ...state.customItems.map(c => ({ ...c, emoji:'📝', categoryId: c.categoryId ?? 'custom' }))]
   const checkedItems = allItems.filter(i => state.selected[i.id])
@@ -252,8 +267,13 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
     setAchieved(next)
     try { localStorage.setItem('bucket-achieved', JSON.stringify(next)) } catch {}
     if (!wasAchieved) {
-      playTing()
-      setConfettiTrigger(t => t+1)
+      const newCount = checkedItems.filter(i => next[i.id]).length
+      const isLast = newCount === total
+      if (!isLast) {
+        playTing()
+        setConfettiTrigger(t => t+1)
+      }
+      // isLast면 useEffect의 팡파레가 처리
     }
   }
 
@@ -333,7 +353,9 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
       {/* ══ 헤더 + 탭 ══ */}
       <div style={{ background:'#fff',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:30 }}>
         <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px 0' }}>
-          <span style={{ fontSize:13,color:'#003594',fontWeight:800,letterSpacing:2 }}>HOJUGAJA</span>
+          <span onClick={handleLogoTap}
+            style={{ fontSize:13, color:'#003594', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
+          >HOJUGAJA</span>
           <span style={{ fontSize:13,color:'#64748B',fontWeight:600 }}>{achievedCount}/{total}</span>
         </div>
         <div style={{ display:'flex',padding:'8px 20px 0',gap:4 }}>

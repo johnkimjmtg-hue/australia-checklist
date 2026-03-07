@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { CATEGORIES, ITEMS, CheckItem } from '../data/checklist'
 import {
   AppState, TripInfo,
@@ -23,6 +23,7 @@ type MainTab = 'bucketlist' | 'services'
 
 export default function ChecklistPage({ state, setState }: Props) {
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
   const [modal, setModal]             = useState<Modal>('none')
   const [sheetItem, setSheetItem]     = useState<CheckItem|null>(null)
@@ -35,11 +36,24 @@ export default function ChecklistPage({ state, setState }: Props) {
   )
   const [selectedBusiness, setSelectedBusiness] = useState<string | null>(null)
   const [showScheduleView, setShowScheduleView] = useState(false)
+  const [logoTapCount, setLogoTapCount] = useState(0)
+  const logoTapTimer = useRef<any>(null)
   // date picker state
   const [pickerStep, setPickerStep]   = useState<'start'|'end'>('start')
   const [startDate, setStartDate]     = useState(trip?.startDate ?? '')
   const [endDate, setEndDate]         = useState(trip?.endDate ?? '')
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleLogoTap = () => {
+    const next = logoTapCount + 1
+    setLogoTapCount(next)
+    if (logoTapTimer.current) clearTimeout(logoTapTimer.current)
+    if (next >= 5) { navigate('/admin'); setLogoTapCount(0); return }
+    logoTapTimer.current = setTimeout(() => {
+      if (next < 5) navigate('/')
+      setLogoTapCount(0)
+    }, 400)
+  }
 
   const activeCategory = state.meta.activeCategory
   const allItems = [...ITEMS, ...state.customItems.map(c => ({ ...c, emoji:'📝' }))]
@@ -124,6 +138,7 @@ export default function ChecklistPage({ state, setState }: Props) {
         />
         {showReceipt && trip && (
           <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
+            achieved={(() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })()}
             onClose={() => setShowReceipt(false)} onReset={() => { setShowReceipt(false); doReset() }} />
         )}
       </>
@@ -152,7 +167,9 @@ export default function ChecklistPage({ state, setState }: Props) {
       <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:30 }}>
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
-          <span style={{ fontSize:13, color:'#003594', fontWeight:800, letterSpacing:2 }}>HOJUGAJA</span>
+          <span onClick={handleLogoTap}
+            style={{ fontSize:13, color:'#003594', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
+          >HOJUGAJA</span>
           <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>{done}/{total}</span>
         </div>
         {/* 탭 */}
@@ -457,6 +474,7 @@ export default function ChecklistPage({ state, setState }: Props) {
 
       {showReceipt && trip && (
         <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
+          achieved={(() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })()}
           onClose={() => setShowReceipt(false)} onReset={() => setModal('confirmReset')} />
       )}
     </div>
