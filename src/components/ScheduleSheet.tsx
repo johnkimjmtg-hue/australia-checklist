@@ -45,9 +45,13 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
         </div>
         <button onClick={onClose} style={{
           width:'100%', marginTop:14, height:44,
-          background:'rgba(30,77,131,0.06)', border:'none', borderRadius:10,
-          fontSize:13, fontWeight:700, color:'#5A7090', cursor:'pointer',
-        }}>닫기</button>
+          background: currentDays.length > 0 ? '#003594' : 'rgba(30,77,131,0.06)',
+          border:'none', borderRadius:10,
+          fontSize:13, fontWeight:700,
+          color: currentDays.length > 0 ? '#fff' : '#5A7090',
+          cursor:'pointer',
+          boxShadow: currentDays.length > 0 ? '0 4px 14px rgba(0,53,148,0.25)' : 'none',
+        }}>{currentDays.length > 0 ? `${currentDays.length}일 추가하기 ✓` : '닫기'}</button>
       </div>
     </>
   )
