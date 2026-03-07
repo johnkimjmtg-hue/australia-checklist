@@ -21,11 +21,13 @@ function LandingWrapper() {
   const navigate = useNavigate()
   const [state] = useState<AppState>(() => loadState())
   return (
-    <LandingPage
-      state={state}
-      onStart={() => navigate('/app')}
-      onServices={() => navigate('/app?tab=services')}
-    />
+    <div className="app-shell">
+      <LandingPage
+        state={state}
+        onStart={() => navigate('/app')}
+        onServices={() => navigate('/app?tab=services')}
+      />
+    </div>
   )
 }
 

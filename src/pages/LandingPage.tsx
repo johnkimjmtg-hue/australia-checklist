@@ -1,11 +1,103 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { AppState } from '../store/state'
 import { ITEMS } from '../data/checklist'
+import { CATEGORIES as BCATS } from '../data/businesses'
 
 type Props = { state: AppState; onStart: () => void; onServices: () => void }
 
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY
+
+let _mapsPromise: Promise<void> | null = null
+function loadGoogleMaps(): Promise<void> {
+  if (_mapsPromise) return _mapsPromise
+  _mapsPromise = new Promise((resolve, reject) => {
+    if ((window as any).google?.maps?.places) { resolve(); return }
+    const s = document.createElement('script')
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_KEY}&libraries=places&v=weekly`
+    s.onload = () => setTimeout(() => resolve(), 100)
+    s.onerror = () => reject(new Error('Google Maps load failed'))
+    document.head.appendChild(s)
+  })
+  return _mapsPromise
+}
+
+function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [suggestions, setSuggestions] = useState<any[]>([])
+  const [loading, setLoading]         = useState(false)
+  const debounceRef = useRef<any>(null)
+
+  async function handleInput(val: string) {
+    onChange(val)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (!val.trim() || val.length < 3) { setSuggestions([]); return }
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true)
+      try {
+        await loadGoogleMaps()
+        const places = (window as any).google.maps.places
+        const AutocompleteSuggestion = places.AutocompleteSuggestion || places.autocomplete?.AutocompleteSuggestion
+        if (!AutocompleteSuggestion) throw new Error('not available')
+        const { suggestions: results } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+          input: val, includedRegionCodes: ['au'],
+        })
+        setSuggestions(results || [])
+      } catch { setSuggestions([]) }
+      finally { setLoading(false) }
+    }, 400)
+  }
+
+  async function handleSelect(suggestion: any) {
+    setSuggestions([])
+    try {
+      const place = suggestion.placePrediction.toPlace()
+      await place.fetchFields({ fields: ['addressComponents', 'formattedAddress'] })
+      const c = place.addressComponents || []
+      const streetNum = c.find((x: any) => x.types.includes('street_number'))?.longText || ''
+      const route     = c.find((x: any) => x.types.includes('route'))?.longText || ''
+      const suburb    = c.find((x: any) => x.types.includes('locality') || x.types.includes('sublocality_level_1'))?.longText || ''
+      const state_    = c.find((x: any) => x.types.includes('administrative_area_level_1'))?.shortText || ''
+      const post      = c.find((x: any) => x.types.includes('postal_code'))?.longText || ''
+      onChange([streetNum, route, suburb, state_, post].filter(Boolean).join(', '))
+    } catch {}
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:10,
+    padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff',
+    boxSizing:'border-box', fontFamily:ff, outline:'none',
+  }
+
+  return (
+    <div style={{ position:'relative' }}>
+      <input value={value} onChange={e => handleInput(e.target.value)}
+        placeholder="123 George St, Sydney NSW 2000" style={inputStyle} />
+      {loading && <div style={{ fontSize:11, color:'#94A3B8', marginTop:4 }}>검색 중...</div>}
+      {suggestions.length > 0 && (
+        <div style={{
+          position:'absolute', top:'100%', left:0, right:0, zIndex:200,
+          background:'#fff', borderRadius:10, boxShadow:'0 4px 20px rgba(0,0,0,0.12)',
+          border:'1px solid #E2E8F0', overflow:'hidden', marginTop:4,
+        }}>
+          {suggestions.map((s: any, i: number) => (
+            <div key={i} onClick={() => handleSelect(s)} style={{
+              padding:'10px 14px', fontSize:13, cursor:'pointer',
+              borderBottom:'1px solid #F1F5F9', color:'#1E293B',
+              display:'flex', alignItems:'center', gap:8,
+            }}
+              onMouseEnter={e => (e.currentTarget.style.background='#F0F4FF')}
+              onMouseLeave={e => (e.currentTarget.style.background='#fff')}
+            >
+              <Icon icon="ph:map-pin-simple" width={14} height={14} color="#003594" />
+              {s.placePrediction?.text?.text || ''}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 const PREVIEW_ITEMS = [
   { id:'h01', icon:'ph:tooth',         label:'치과 스케일링',       done:true  },
@@ -26,10 +118,9 @@ const CATS = [
   { icon:'ph:baby',          label:'육아'      },
 ]
 
-// ── 업체 등록 신청 폼
 function RequestForm({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState({
-    business_name: '', address: '', description: '',
+    business_name: '', category: '', address: '', description: '',
     hashtags: '', phone: '', kakao: '', website: '',
   })
   const [submitting, setSubmitting] = useState(false)
@@ -39,9 +130,10 @@ function RequestForm({ onClose }: { onClose: () => void }) {
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
   const handleSubmit = async () => {
-    if (!form.business_name.trim() || !form.address.trim() || !form.description.trim()) {
-      setError('업체명, 주소, 설명은 필수입니다'); return
-    }
+    if (!form.business_name.trim()) { setError('업체명을 입력해주세요'); return }
+    if (!form.category)             { setError('카테고리를 선택해주세요'); return }
+    if (!form.address.trim())       { setError('주소를 입력해주세요'); return }
+    if (!form.description.trim())   { setError('업체 설명을 입력해주세요'); return }
     const tags = form.hashtags.split(/[,#\s]+/).map(t => t.trim()).filter(Boolean)
     if (tags.length < 3) { setError('해시태그를 3개 이상 입력해주세요'); return }
     setError(''); setSubmitting(true)
@@ -49,6 +141,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
       const { supabase } = await import('../lib/supabase')
       const { error: err } = await supabase.from('business_requests').insert({
         business_name: form.business_name.trim(),
+        category:      form.category,
         address:       form.address.trim(),
         description:   form.description.trim(),
         hashtags:      tags,
@@ -67,9 +160,14 @@ function RequestForm({ onClose }: { onClose: () => void }) {
     padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff',
     boxSizing:'border-box', fontFamily:ff, outline:'none',
   }
-  const taStyle: React.CSSProperties = {
-    ...inputStyle, height:80, padding:'10px 12px', resize:'none' as any,
-  }
+  const taStyle: React.CSSProperties = { ...inputStyle, height:80, padding:'10px 12px', resize:'none' as any }
+  const label = (txt: string, sub?: string) => (
+    <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>
+      {txt} {sub && <span style={{ fontWeight:500, color:'#94A3B8' }}>{sub}</span>}
+    </div>
+  )
+
+  const businessCats = BCATS.filter(c => c.id !== 'all')
 
   if (done) return (
     <div style={{ textAlign:'center', padding:'32px 0' }}>
@@ -87,43 +185,54 @@ function RequestForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div>
-      <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
         <div>
-          <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>업체명 *</div>
+          {label('업체명 *')}
           <input value={form.business_name} onChange={e => set('business_name', e.target.value)}
             placeholder="업체명을 입력하세요" style={inputStyle} />
         </div>
         <div>
-          <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>주소 (Full Address) *</div>
-          <input value={form.address} onChange={e => set('address', e.target.value)}
-            placeholder="123 George St, Sydney NSW 2000" style={inputStyle} />
+          {label('카테고리 *')}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
+            {businessCats.map(cat => (
+              <button key={cat.id} onClick={() => set('category', cat.id)} style={{
+                height:36, borderRadius:8, border:'none', cursor:'pointer',
+                background: form.category === cat.id ? '#003594' : '#fff',
+                color: form.category === cat.id ? '#fff' : '#1E293B',
+                fontSize:12, fontWeight:700,
+                boxShadow: form.category === cat.id ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
+              }}>{cat.label}</button>
+            ))}
+          </div>
         </div>
         <div>
-          <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>업체 설명 *</div>
+          {label('주소 (Full Address) *')}
+          <AddressAutocomplete value={form.address} onChange={v => set('address', v)} />
+        </div>
+        <div>
+          {label('업체 설명 *')}
           <textarea value={form.description} onChange={e => set('description', e.target.value)}
             placeholder="업체 소개를 간단히 작성해주세요" style={taStyle as any} />
         </div>
         <div>
-          <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>
-            해시태그 * <span style={{ fontWeight:500, color:'#94A3B8' }}>(3개 이상, 쉼표 또는 띄어쓰기로 구분)</span>
-          </div>
+          {label('해시태그 *', '(3개 이상, 쉼표 또는 띄어쓰기로 구분)')}
           <input value={form.hashtags} onChange={e => set('hashtags', e.target.value)}
             placeholder="한식당, 시드니, 가족식사, 주차가능" style={inputStyle} />
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
           <div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>전화번호</div>
+            {label('전화번호')}
             <input value={form.phone} onChange={e => set('phone', e.target.value)}
               placeholder="+61 2 1234 5678" style={inputStyle} />
           </div>
           <div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>카카오 오픈채팅</div>
+            {label('카카오 오픈채팅')}
             <input value={form.kakao} onChange={e => set('kakao', e.target.value)}
               placeholder="오픈채팅 링크" style={inputStyle} />
           </div>
         </div>
         <div>
-          <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>웹사이트</div>
+          {label('웹사이트')}
           <input value={form.website} onChange={e => set('website', e.target.value)}
             placeholder="https://www.example.com" style={inputStyle} />
         </div>
@@ -139,8 +248,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
         width:'100%', marginTop:16, height:50,
         background:'#003594', color:'#fff',
         border:'none', borderRadius:10, fontSize:15, fontWeight:800,
-        cursor: submitting ? 'default' : 'pointer',
-        opacity: submitting ? 0.7 : 1,
+        cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.7 : 1,
         boxShadow:'0 4px 14px rgba(0,53,148,0.25)',
       }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
     </div>
