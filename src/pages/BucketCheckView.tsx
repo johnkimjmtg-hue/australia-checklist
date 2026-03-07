@@ -171,16 +171,16 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         margin: '0 20px',
         marginBottom: isLast ? 0 : 6,
         borderRadius: 8,
-        background: isAchieved ? 'rgba(0,53,148,0.06)' : '#fff',
-        border: `1px solid ${isAchieved ? 'rgba(0,53,148,0.15)' : '#E2E8F0'}`,
+        background: isAchieved ? 'rgba(255,237,213,0.6)' : '#fff',
+        border: `1px solid ${isAchieved ? 'rgba(251,146,60,0.25)' : '#E2E8F0'}`,
         minHeight: 52, cursor: 'pointer',
         transition: 'all 0.15s ease',
       }}>
-        {/* 체크박스 */}
+        {/* 녹색 체크박스 */}
         <div style={{
           width: 24, height: 24, borderRadius: 4, flexShrink: 0,
           border: isAchieved ? 'none' : '1.5px solid #CBD5E1',
-          background: isAchieved ? '#003594' : '#fff',
+          background: isAchieved ? '#16A34A' : '#fff',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'all 0.15s',
         }}>
@@ -190,19 +190,19 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
             </svg>
           )}
         </div>
-        {/* 아이콘 — 단색 SVG */}
-        <div style={{ width: 28, height: 28, borderRadius: 6, background: isAchieved ? 'rgba(0,53,148,0.10)' : '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <CategoryIcon categoryId={item.categoryId} color={isAchieved ? '#003594' : '#94A3B8'} />
+        {/* 아이콘 */}
+        <div style={{ width: 28, height: 28, borderRadius: 6, background: isAchieved ? 'rgba(251,146,60,0.15)' : '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <CategoryIcon categoryId={item.categoryId} color={isAchieved ? '#EA580C' : '#94A3B8'} />
         </div>
         {/* 라벨 */}
         <span style={{
           flex: 1, fontSize: 15, lineHeight: 1.4,
           fontWeight: isAchieved ? 600 : 400,
-          color: isAchieved ? '#003594' : '#1E293B',
+          color: isAchieved ? '#9A3412' : '#1E293B',
         }}>{item.label}</span>
-        {/* 완료 표시 */}
+        {/* 완료 뱃지 */}
         {isAchieved && (
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#16A34A', background: 'rgba(22,163,74,0.10)', padding: '3px 8px', borderRadius: 99, flexShrink: 0 }}>완료 ✓</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#16A34A', background: 'rgba(22,163,74,0.12)', padding: '3px 8px', borderRadius: 4, flexShrink: 0 }}>완료 ✓</span>
         )}
       </div>
     )
@@ -233,8 +233,8 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
           <div style={{
             flex: 1, height: 38, borderRadius: '6px 6px 0 0',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 14, fontWeight: 700, color: '#003594',
-            background: '#EEF4FF', borderBottom: '2px solid #003594',
+            fontSize: 14, fontWeight: 700, color: '#fff',
+            background: '#003594', borderBottom: '2px solid #003594',
             userSelect: 'none',
           }}>버킷리스트</div>
           <button onClick={onServices} style={{
@@ -256,7 +256,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         }}>
           <CircleProgress pct={pct} achieved={achievedCount} total={total} />
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#64748B', marginBottom: 6, letterSpacing: 0.3 }}>내 호주 버킷리스트</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: '#1E293B', marginBottom: 6 }}>내 호주 버킷리스트</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
               <span style={{ fontSize: 28, fontWeight: 800, color: '#003594', lineHeight: 1 }}>{achievedCount}</span>
               <span style={{ fontSize: 17, fontWeight: 600, color: '#64748B' }}>/{total}건 완료</span>
@@ -268,18 +268,17 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         </div>
       </div>
 
-      {/* ══ 필터 (말풍선 느낌) ══ */}
+      {/* ══ 필터 ══ */}
       <div style={{ padding: '14px 20px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 12, color: '#94A3B8', fontWeight: 600, flexShrink: 0 }}>필터</span>
         {FILTERS.map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)} style={{
-            height: 32, padding: '0 14px', borderRadius: 99,
-            border: filter === f.key ? 'none' : '1px solid #E2E8F0',
-            background: filter === f.key ? '#003594' : '#fff',
+            height: 30, padding: '0 14px', borderRadius: 6,
+            border: `1px solid ${filter === f.key ? '#003594' : '#E2E8F0'}`,
+            background: filter === f.key ? '#003594' : 'transparent',
             color: filter === f.key ? '#fff' : '#64748B',
             fontSize: 13, fontWeight: filter === f.key ? 700 : 500,
             cursor: 'pointer', transition: 'all 0.15s',
-            boxShadow: filter === f.key ? '0 2px 8px rgba(0,53,148,0.25)' : 'none',
           }}>{f.label}</button>
         ))}
       </div>
@@ -331,23 +330,23 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         )}
       </div>
 
-      {/* ══ 하단 버튼 (투명 배경) ══ */}
+      {/* ══ 하단 버튼 ══ */}
       <div style={{
         position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-        width: '100%', maxWidth: 480, padding: '12px 20px 28px',
+        width: '100%', maxWidth: 480, padding: '10px 20px 28px',
         background: 'transparent',
         zIndex: 20, boxSizing: 'border-box',
-        display: 'flex', gap: 10,
+        display: 'flex', gap: 8,
       }}>
         <button onClick={onEdit} style={{
-          flex: 1, height: 50, borderRadius: 8,
-          border: '1px solid #E2E8F0', background: 'rgba(255,255,255,0.92)',
+          flex: 1, height: 54, borderRadius: 8,
+          border: '1px solid #E2E8F0', background: 'rgba(255,255,255,0.95)',
           fontSize: 15, fontWeight: 600, color: '#64748B', cursor: 'pointer',
           backdropFilter: 'blur(8px)',
         }}>수정하기</button>
         <button onClick={() => setShowDelete(true)} style={{
-          flex: 1, height: 50, borderRadius: 8,
-          border: '1px solid #FCA5A5', background: 'rgba(255,245,245,0.92)',
+          flex: 1, height: 54, borderRadius: 8,
+          border: '1px solid #FCA5A5', background: 'rgba(255,245,245,0.95)',
           fontSize: 15, fontWeight: 600, color: '#DC2626', cursor: 'pointer',
           backdropFilter: 'blur(8px)',
         }}>삭제하기</button>

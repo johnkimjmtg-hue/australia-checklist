@@ -96,35 +96,25 @@ export default function ChecklistPage({ state, setState }: Props) {
   const doReset = () => {
     setState(resetAll()); setTrip(null); setStartDate(''); setEndDate('')
     setShowReceipt(false); setModal('none')
+    try { localStorage.removeItem('bucket-achieved') } catch {}
   }
 
   // ── 발행된 버킷리스트 → 체크 화면 분기 ──
   const isIssued = !!state.meta.lastIssuedAt
   if (mainTab === 'bucketlist' && isIssued && trip) {
     return (
-      <>
-        <BucketCheckView
-          state={state}
-          trip={trip}
-          setState={setState}
-          onEdit={() => {
-            // 발행 취소만 — ReceiptModal 열지 않음
-            const next = { ...state, meta: { ...state.meta, lastIssuedAt: undefined } }
-            setState(next)
-            try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
-          }}
-          onDelete={() => setModal('confirmReset')}
-          onServices={() => setMainTab('services')}
-        />
-        {modal === 'confirmReset' && (
-          <AlertModal
-            title="버킷리스트를 삭제할까요?"
-            message="모든 체크 내용과 일정이 삭제됩니다."
-            confirmLabel="삭제" confirmColor="#DC2626"
-            onConfirm={doReset} onCancel={() => setModal('none')}
-          />
-        )}
-      </>
+      <BucketCheckView
+        state={state}
+        trip={trip}
+        setState={setState}
+        onEdit={() => {
+          const next = { ...state, meta: { ...state.meta, lastIssuedAt: undefined } }
+          setState(next)
+          try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
+        }}
+        onDelete={doReset}
+        onServices={() => setMainTab('services')}
+      />
     )
   }
 
@@ -160,9 +150,8 @@ export default function ChecklistPage({ state, setState }: Props) {
               flex:1, height:38, border:'none', cursor:'pointer',
               borderRadius:'6px 6px 0 0',
               fontSize:14, fontWeight: mainTab===tab ? 700 : 500,
-              color: mainTab===tab ? '#003594' : '#94A3B8',
-              background: mainTab===tab ? '#EEF4FF' : 'transparent',
-              letterSpacing:-0.2,
+              color: mainTab===tab ? '#fff' : '#94A3B8',
+              background: mainTab===tab ? '#003594' : 'transparent',
               borderBottom: mainTab===tab ? '2px solid #003594' : '2px solid transparent',
             }}>
               {tab==='bucketlist' ? '버킷리스트' : '업체/서비스 찾기'}
@@ -409,6 +398,9 @@ export default function ChecklistPage({ state, setState }: Props) {
                 border:'1px solid #E2E8F0', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer',
                 flexShrink:0, backdropFilter:'blur(8px)',
               }}>↻ 초기화</button>
+            </div>
+            <div style={{ fontSize:11, color:'#94A3B8', textAlign:'center', marginTop:6, fontWeight:500 }}>
+              선택한 항목들로 버킷리스트를 만들어요
             </div>
           </div>
         </>
