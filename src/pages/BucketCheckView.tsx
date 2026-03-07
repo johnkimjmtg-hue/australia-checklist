@@ -329,19 +329,19 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         padding:'12px 16px',
         margin:'0 16px',
         borderRadius:10,
-        background: isAchieved ? '#F6E9C3' : '#fff',
+        background: isAchieved ? '#fff8e4' : '#fff',
         border: 'none',
         boxShadow: isAchieved
-          ? '0 2px 8px rgba(180,130,0,0.12)'
+          ? '0 2px 8px rgba(180,130,0,0.10)'
           : '0 2px 8px rgba(0,0,0,0.06)',
         minHeight:52, cursor:'pointer',
         transition:'all 0.15s ease',
       }}>
-        {/* 체크박스 */}
+        {/* 녹색 체크박스 */}
         <div style={{
           width:22, height:22, borderRadius:4, flexShrink:0,
           border: isAchieved ? 'none' : '1.5px solid #CBD5E1',
-          background: isAchieved ? '#1E293B' : '#fff',
+          background: isAchieved ? '#16A34A' : '#fff',
           display:'flex', alignItems:'center', justifyContent:'center',
           transition:'all 0.15s',
         }}>
@@ -351,21 +351,21 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
             </svg>
           )}
         </div>
-        {/* 단색 아이코니파이 아이콘 (배경 없음) */}
+        {/* 단색 아이코니파이 아이콘 */}
         <ItemIcon
           itemId={item.id}
           categoryId={(item as any).categoryId ?? 'custom'}
-          color={isAchieved ? '#1E293B' : '#94A3B8'}
+          color={isAchieved ? '#78716C' : '#94A3B8'}
         />
         {/* 라벨 */}
         <span style={{
           flex:1, fontSize:15, lineHeight:1.4,
           fontWeight: isAchieved ? 600 : 400,
-          color: isAchieved ? '#1E293B' : '#1E293B',
+          color: '#1E293B',
         }}>{item.label}</span>
-        {/* 완료 뱃지 */}
+        {/* 완료 뱃지 — 연한 검정 */}
         {isAchieved && (
-          <span style={{ fontSize:11, fontWeight:700, color:'#16A34A', background:'rgba(22,163,74,0.12)', padding:'3px 8px', borderRadius:4, flexShrink:0 }}>완료 ✓</span>
+          <span style={{ fontSize:11, fontWeight:600, color:'#44403C', background:'rgba(68,64,60,0.10)', padding:'3px 8px', borderRadius:4, flexShrink:0 }}>완료 ✓</span>
         )}
       </div>
     )
@@ -442,7 +442,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
       </div>
 
       {/* ══ 리스트 ══ */}
-      <div style={{ padding:'12px 0 120px', display:'flex', flexDirection:'column', gap:16 }}>
+      <div style={{ padding:'12px 0 130px', display:'flex', flexDirection:'column', gap:16 }}>
         {sortedDays.map(dayIdx => {
           const dayItems = (byDay.get(dayIdx) ?? []).filter(filterFn)
           if (!dayItems.length) return null
@@ -495,24 +495,24 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         background:'transparent', zIndex:20, boxSizing:'border-box',
         display:'flex', gap:8,
       }}>
-        <button onClick={onEdit} style={{
-          flex:1, height:54, borderRadius:8,
-          border:'1px solid #E2E8F0', background:'rgba(255,255,255,0.95)',
-          fontSize:14, fontWeight:600, color:'#64748B', cursor:'pointer',
-          backdropFilter:'blur(8px)',
-        }}>수정하기</button>
         <button onClick={onShare} style={{
-          flex:1, height:54, borderRadius:8,
+          flex:4, height:54, borderRadius:8,
           border:'none', background:'#003594',
           fontSize:14, fontWeight:700, color:'#fff', cursor:'pointer',
           boxShadow:'0 4px 12px rgba(0,53,148,0.30)',
         }}>공유하기</button>
-        <button onClick={() => setShowDelete(true)} style={{
-          flex:1, height:54, borderRadius:8,
-          border:'1px solid #FCA5A5', background:'rgba(255,245,245,0.95)',
-          fontSize:14, fontWeight:600, color:'#DC2626', cursor:'pointer',
+        <button onClick={onEdit} style={{
+          flex:4, height:54, borderRadius:8,
+          border:'1px solid #E2E8F0', background:'rgba(255,255,255,0.95)',
+          fontSize:14, fontWeight:600, color:'#64748B', cursor:'pointer',
           backdropFilter:'blur(8px)',
-        }}>삭제하기</button>
+        }}>수정하기</button>
+        <button onClick={() => setShowDelete(true)} style={{
+          flex:2, height:54, borderRadius:8,
+          border:'1px solid #FCA5A5', background:'rgba(255,245,245,0.95)',
+          fontSize:13, fontWeight:600, color:'#DC2626', cursor:'pointer',
+          backdropFilter:'blur(8px)',
+        }}>삭제</button>
       </div>
 
       {showDelete && (

@@ -305,7 +305,7 @@ export default function ChecklistPage({ state, setState }: Props) {
             )}
 
             {/* Items list */}
-            <div style={{ background:'#fff', borderTop:'1px solid #E2E8F0', borderBottom:'1px solid #E2E8F0' }}>
+            <div style={{ background:'#fff', borderTop:'1px solid #E2E8F0', borderBottom:'1px solid #E2E8F0', paddingBottom:110 }}>
               {catItems.map(item => {
                 const checked  = !!state.selected[item.id]
                 const dayCount = (state.schedules[item.id] ?? []).length
@@ -387,17 +387,17 @@ export default function ChecklistPage({ state, setState }: Props) {
             )}
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={handleIssue} style={{
-                flex:1, height:54,
+                flex:4, height:54,
                 background:'#003594', color:'#fff',
-                border:'none', borderRadius:8, fontSize:16, fontWeight:700, cursor:'pointer',
+                border:'none', borderRadius:8, fontSize:15, fontWeight:700, cursor:'pointer',
                 animation: shakeBtn ? 'shake 0.5s ease' : 'none',
                 boxShadow:'0 10px 15px rgba(0,0,0,0.15)',
               }}>버킷리스트 발행하기</button>
               <button onClick={() => setModal('confirmReset')} style={{
-                height:54, padding:'0 16px',
+                flex:2, height:54,
                 background:'rgba(255,255,255,0.92)', color:'#64748B',
-                border:'1px solid #E2E8F0', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer',
-                flexShrink:0, backdropFilter:'blur(8px)',
+                border:'1px solid #E2E8F0', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer',
+                backdropFilter:'blur(8px)',
               }}>↻ 초기화</button>
             </div>
             <div style={{ fontSize:11, color:'#94A3B8', textAlign:'center', marginTop:6, fontWeight:500 }}>
