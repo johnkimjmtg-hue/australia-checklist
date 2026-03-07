@@ -113,6 +113,7 @@ export default function ChecklistPage({ state, setState }: Props) {
           try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
         }}
         onDelete={doReset}
+        onShare={() => { setIssuedAt(state.meta.lastIssuedAt ?? ''); setShowReceipt(true) }}
         onServices={() => setMainTab('services')}
       />
     )
