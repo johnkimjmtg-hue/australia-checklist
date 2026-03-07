@@ -103,19 +103,30 @@ export default function ChecklistPage({ state, setState }: Props) {
   const isIssued = !!state.meta.lastIssuedAt
   if (mainTab === 'bucketlist' && isIssued && trip) {
     return (
-      <BucketCheckView
-        state={state}
-        trip={trip}
-        setState={setState}
-        onEdit={() => {
-          const next = { ...state, meta: { ...state.meta, lastIssuedAt: undefined } }
-          setState(next)
-          try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
-        }}
-        onDelete={doReset}
-        onShare={() => { setIssuedAt(state.meta.lastIssuedAt ?? ''); setShowReceipt(true) }}
-        onServices={() => setMainTab('services')}
-      />
+      <>
+        <BucketCheckView
+          state={state}
+          trip={trip}
+          setState={setState}
+          onEdit={() => {
+            setShowReceipt(false)
+            const next = { ...state, meta: { ...state.meta, lastIssuedAt: undefined } }
+            setState(next)
+            try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
+          }}
+          onDelete={doReset}
+          onShare={() => {
+            const at = state.meta.lastIssuedAt ?? issuedAt
+            setIssuedAt(at)
+            setShowReceipt(true)
+          }}
+          onServices={() => setMainTab('services')}
+        />
+        {showReceipt && trip && (
+          <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
+            onClose={() => setShowReceipt(false)} onReset={() => { setShowReceipt(false); doReset() }} />
+        )}
+      </>
     )
   }
 
