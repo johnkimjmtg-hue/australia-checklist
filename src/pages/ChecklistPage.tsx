@@ -106,8 +106,14 @@ export default function ChecklistPage({ state, setState }: Props) {
           state={state}
           trip={trip}
           setState={setState}
-          onEdit={() => setState({ ...state, meta: { ...state.meta, lastIssuedAt: undefined } })}
+          onEdit={() => {
+            // 발행 취소만 — ReceiptModal 열지 않음
+            const next = { ...state, meta: { ...state.meta, lastIssuedAt: undefined } }
+            setState(next)
+            try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
+          }}
           onDelete={() => setModal('confirmReset')}
+          onServices={() => setMainTab('services')}
         />
         {modal === 'confirmReset' && (
           <AlertModal
