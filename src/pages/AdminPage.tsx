@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabase'
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'hojugaja2024'
 
 // ── 탭 타입
-type MainTab = 'business' | 'categories' | 'items' | 'export'
+type MainTab = 'business' | 'categories' | 'items' | 'export' | 'requests'
 
 // ── 업체 폼 초기값
 const EMPTY_FORM = {
@@ -427,6 +427,7 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
       <div style={{ background:'#fff', borderBottom:'1px solid #e8e8e8', display:'flex', overflowX:'auto' }}>
         {([
           ['business',   '🏢 업체 관리'],
+          ['requests',   '📬 등록 신청'],
           ['categories', '📂 카테고리'],
           ['items',      '📝 체크리스트'],
           ['export',     '💾 코드 내보내기'],
@@ -443,6 +444,7 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
       {/* 탭 콘텐츠 */}
       <div style={{ maxWidth:900, margin:'0 auto', padding:'24px 16px 80px' }}>
         {tab==='business'   && <BusinessTab />}
+        {tab==='requests'   && <RequestsTab />}
         {tab==='categories' && <CategoriesTab />}
         {tab==='items'      && <ItemsTab />}
         {tab==='export'     && <ExportTab />}
@@ -974,4 +976,174 @@ const btnSmDanger: React.CSSProperties = {
 
 const checkLabel: React.CSSProperties = {
   display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:700, color:'#1E4D83', cursor:'pointer',
+}
+
+// ════════════════════════════════════════════
+// TAB: 업체 등록 신청 목록
+// ════════════════════════════════════════════
+type RequestStatus = 'pending' | 'approved' | 'rejected'
+type BusinessRequest = {
+  id: string
+  business_name: string
+  address: string
+  description: string
+  hashtags: string[]
+  phone: string | null
+  kakao: string | null
+  website: string | null
+  status: RequestStatus
+  created_at: string
+}
+
+function RequestsTab() {
+  const [requests, setRequests] = useState<BusinessRequest[]>([])
+  const [loading, setLoading]   = useState(true)
+  const [filter, setFilter]     = useState<RequestStatus | 'all'>('all')
+  const [expanded, setExpanded] = useState<string | null>(null)
+
+  useEffect(() => { loadRequests() }, [])
+
+  async function loadRequests() {
+    setLoading(true)
+    const { supabase } = await import('../lib/supabase')
+    const { data } = await supabase
+      .from('business_requests')
+      .select('*')
+      .order('created_at', { ascending: false })
+    setRequests((data as BusinessRequest[]) ?? [])
+    setLoading(false)
+  }
+
+  async function updateStatus(id: string, status: RequestStatus) {
+    const { supabase } = await import('../lib/supabase')
+    await supabase.from('business_requests').update({ status }).eq('id', id)
+    setRequests(rs => rs.map(r => r.id === id ? { ...r, status } : r))
+  }
+
+  const filtered = filter === 'all' ? requests : requests.filter(r => r.status === filter)
+
+  const counts = {
+    all:      requests.length,
+    pending:  requests.filter(r => r.status === 'pending').length,
+    approved: requests.filter(r => r.status === 'approved').length,
+    rejected: requests.filter(r => r.status === 'rejected').length,
+  }
+
+  const statusColor: Record<RequestStatus, string> = {
+    pending:  '#FFCD00',
+    approved: '#16A34A',
+    rejected: '#EF4444',
+  }
+  const statusLabel: Record<RequestStatus, string> = {
+    pending:  '대기중',
+    approved: '승인됨',
+    rejected: '거절됨',
+  }
+
+  return (
+    <div>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+        <div style={{ fontSize:18, fontWeight:900, color:'#0F1B2D' }}>업체 등록 신청</div>
+        <button onClick={loadRequests} style={{ ...btnSmGhost }}>새로고침 ↻</button>
+      </div>
+
+      {/* 필터 탭 */}
+      <div style={{ display:'flex', gap:6, marginBottom:16 }}>
+        {(['all','pending','approved','rejected'] as const).map(s => (
+          <button key={s} onClick={() => setFilter(s)} style={{
+            height:32, padding:'0 12px', borderRadius:8, border:'none',
+            background: filter===s ? '#1E4D83' : '#fff',
+            color: filter===s ? '#fff' : '#64748B',
+            fontSize:12, fontWeight:700, cursor:'pointer',
+            boxShadow: filter===s ? '0 2px 8px rgba(30,77,131,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
+          }}>
+            {s === 'all' ? '전체' : statusLabel[s]} {counts[s] > 0 && `(${counts[s]})`}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign:'center', padding:'40px', color:'#94A3B8', fontSize:13 }}>불러오는 중...</div>
+      ) : filtered.length === 0 ? (
+        <div style={{ textAlign:'center', padding:'40px', color:'#94A3B8', fontSize:13 }}>신청 내역이 없어요</div>
+      ) : (
+        <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+          {filtered.map(req => (
+            <div key={req.id} style={{
+              background:'#fff', borderRadius:12, overflow:'hidden',
+              boxShadow:'0 1px 6px rgba(0,0,0,0.07)',
+            }}>
+              {/* 헤더 */}
+              <div
+                onClick={() => setExpanded(expanded === req.id ? null : req.id)}
+                style={{ padding:'14px 16px', cursor:'pointer', display:'flex', alignItems:'center', gap:10 }}
+              >
+                <div style={{ flex:1 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:3 }}>
+                    <span style={{ fontSize:15, fontWeight:800, color:'#1E293B' }}>{req.business_name}</span>
+                    <span style={{
+                      fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:20,
+                      background: statusColor[req.status] + '22',
+                      color: statusColor[req.status] === '#FFCD00' ? '#92620a' : statusColor[req.status],
+                    }}>{statusLabel[req.status]}</span>
+                  </div>
+                  <div style={{ fontSize:11, color:'#94A3B8' }}>
+                    {new Date(req.created_at).toLocaleDateString('ko-KR')} · {req.address}
+                  </div>
+                </div>
+                <span style={{ color:'#94A3B8', fontSize:14 }}>{expanded === req.id ? '▲' : '▼'}</span>
+              </div>
+
+              {/* 상세 */}
+              {expanded === req.id && (
+                <div style={{ borderTop:'1px solid #F1F5F9', padding:'14px 16px', background:'#FAFAFA' }}>
+                  <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:14 }}>
+                    <Row label="주소"    value={req.address} />
+                    <Row label="설명"    value={req.description} />
+                    <Row label="해시태그" value={req.hashtags.map(t => `#${t}`).join(' ')} />
+                    {req.phone   && <Row label="전화번호"   value={req.phone} />}
+                    {req.kakao   && <Row label="카카오채팅" value={req.kakao} link />}
+                    {req.website && <Row label="웹사이트"   value={req.website} link />}
+                  </div>
+                  {/* 액션 버튼 */}
+                  <div style={{ display:'flex', gap:8 }}>
+                    {req.status !== 'approved' && (
+                      <button onClick={() => updateStatus(req.id, 'approved')} style={{
+                        flex:1, height:38, border:'none', borderRadius:8,
+                        background:'#16A34A', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer',
+                      }}>✓ 승인</button>
+                    )}
+                    {req.status !== 'rejected' && (
+                      <button onClick={() => updateStatus(req.id, 'rejected')} style={{
+                        flex:1, height:38, border:'none', borderRadius:8,
+                        background:'#FEE2E2', color:'#EF4444', fontSize:13, fontWeight:700, cursor:'pointer',
+                      }}>✕ 거절</button>
+                    )}
+                    {req.status !== 'pending' && (
+                      <button onClick={() => updateStatus(req.id, 'pending')} style={{
+                        ...btnSmGhost, flex:1, height:38, borderRadius:8, fontSize:13,
+                      }}>대기로 되돌리기</button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function Row({ label, value, link }: { label: string; value: string; link?: boolean }) {
+  return (
+    <div style={{ display:'grid', gridTemplateColumns:'70px 1fr', gap:8, alignItems:'start' }}>
+      <span style={{ fontSize:11, fontWeight:700, color:'#94A3B8', paddingTop:1 }}>{label}</span>
+      {link ? (
+        <a href={value} target="_blank" rel="noreferrer" style={{ fontSize:12, color:'#1E4D83', fontWeight:600, wordBreak:'break-all' }}>{value}</a>
+      ) : (
+        <span style={{ fontSize:12, color:'#1E293B', fontWeight:500, lineHeight:1.5, wordBreak:'break-all' }}>{value}</span>
+      )}
+    </div>
+  )
 }
