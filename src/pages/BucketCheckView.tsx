@@ -224,6 +224,27 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
     } catch {}
   }
 
+  const playFanfare = () => {
+    try {
+      const ctx = new (window.AudioContext||(window as any).webkitAudioContext)()
+      // 팡파레 음표 시퀀스: C5 E5 G5 C6
+      const notes = [523, 659, 784, 1047]
+      const times = [0, 0.18, 0.36, 0.54]
+      notes.forEach((freq, i) => {
+        const osc  = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain); gain.connect(ctx.destination)
+        osc.type = 'triangle'
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + times[i])
+        gain.gain.setValueAtTime(0, ctx.currentTime + times[i])
+        gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + times[i] + 0.04)
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + times[i] + 0.35)
+        osc.start(ctx.currentTime + times[i])
+        osc.stop(ctx.currentTime + times[i] + 0.35)
+      })
+    } catch {}
+  }
+
   const toggleAchieved = (id: string) => {
     const wasAchieved = !!achieved[id]
     const next = { ...achieved, [id]: !wasAchieved }
@@ -243,6 +264,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
   useEffect(() => {
     if (total > 0 && achievedCount === total && prevAchieved.current < total) {
       setTimeout(() => {
+        playFanfare()
         setConfettiTrigger(t => t+1)
         setShowAllDone(true)
       }, 400)
@@ -338,7 +360,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
         }}>
           <CircleProgress pct={pct} />
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:22,fontWeight:800,color:'#1E293B',marginBottom:6,lineHeight:1.2 }}>내 호주<br/>버킷리스트</div>
+            <div style={{ fontSize:22,fontWeight:800,color:'#1E293B',marginBottom:6,lineHeight:1.2 }}>호주 버킷리스트</div>
             <div style={{ display:'flex',alignItems:'baseline',gap:4,marginBottom:4 }}>
               <span style={{ fontSize:28,fontWeight:800,color:'#003594',lineHeight:1 }}>{achievedCount}</span>
               <span style={{ fontSize:17,fontWeight:600,color:'#64748B' }}>/{total}건 완료</span>
@@ -412,10 +434,9 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
       <div style={{
         position:'fixed', bottom:0,
         left:'50%', transform:'translateX(-50%)',
-        width:'100%', maxWidth:480,
-        padding:'10px 16px env(safe-area-inset-bottom, 20px)',
-        paddingBottom: 'max(20px, env(safe-area-inset-bottom, 20px))',
-        background:'linear-gradient(to top, rgba(241,245,249,0.98) 70%, transparent)',
+        width:'100%', maxWidth:390,
+        padding:'8px 14px 20px',
+        background:'transparent',
         zIndex:20, boxSizing:'border-box',
         display:'flex', gap:8,
       }}>
