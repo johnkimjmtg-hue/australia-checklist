@@ -245,27 +245,26 @@ export default function ChecklistPage({ state, setState }: Props) {
               </div>
               <div style={{ display:'flex', gap:6 }}>
                 <button onClick={handleOpenTripPicker} style={{
-                  height:32, padding:'0 12px', borderRadius:6,
-                  border:'1px solid',
-                  borderColor: tripLabel ? '#003594' : '#E2E8F0',
-                  background: tripLabel ? '#003594' : '#fff',
-                  color: tripLabel ? '#fff' : '#64748B',
-                  fontSize:12, fontWeight:700, cursor:'pointer',
+                  height:34, padding:'0 14px', borderRadius:8, border:'none',
+                  background: tripLabel ? '#16A34A' : '#fff',
+                  color: tripLabel ? '#fff' : '#1E293B',
+                  fontSize:13, fontWeight:800, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:5,
-                  animation: tripLabel ? 'none' : 'pulse 1.4s ease-in-out infinite',
+                  boxShadow: tripLabel ? '0 2px 8px rgba(22,163,74,0.30)' : '0 2px 6px rgba(0,0,0,0.10)',
+                  animation: !tripLabel ? 'pulse 1.4s ease-in-out infinite' : 'none',
                 }}>
-                  <Icon icon="ph:calendar" width={13} height={13} color={tripLabel ? '#FFCD00' : '#94A3B8'} />
-                  {tripLabel ?? '여행일정'}
+                  <Icon icon="ph:airplane-takeoff" width={15} height={15} color={tripLabel ? '#fff' : '#94A3B8'} />
+                  {tripLabel ?? '여행일정 설정'}
                 </button>
                 <button onClick={() => setShowScheduleView(v=>!v)} style={{
-                  height:32, padding:'0 12px', borderRadius:6,
-                  border:'1px solid #E2E8F0', cursor:'pointer',
+                  height:34, padding:'0 14px', borderRadius:8, border:'none',
                   background: showScheduleView ? '#003594' : '#fff',
-                  color: showScheduleView ? '#fff' : '#003594',
-                  fontSize:12, fontWeight:700,
+                  color: showScheduleView ? '#fff' : '#1E293B',
+                  fontSize:13, fontWeight:800, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:5,
+                  boxShadow: showScheduleView ? '0 2px 8px rgba(0,53,148,0.25)' : '0 2px 6px rgba(0,0,0,0.10)',
                 }}>
-                  <Icon icon="ph:list-checks" width={13} height={13} color={showScheduleView ? '#FFCD00' : '#003594'} />
+                  <Icon icon="ph:list-checks" width={15} height={15} color={showScheduleView ? '#FFCD00' : '#94A3B8'} />
                   일정보기
                 </button>
               </div>
@@ -277,7 +276,7 @@ export default function ChecklistPage({ state, setState }: Props) {
             )}
 
             {/* Category chips */}
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6, padding:'8px 20px' }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6, padding:'8px 16px' }}>
               {[...CAT_ROW1, ...CAT_ROW2].map(catId => {
                 const cat = CATEGORIES.find(c => c.id === catId)
                 if (!cat) return null
@@ -286,18 +285,18 @@ export default function ChecklistPage({ state, setState }: Props) {
                 const catUnsch = allItems.filter(i => i.categoryId===catId && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
                 return (
                   <button key={catId} className="chip-btn" onClick={() => setState(setCategory(state, catId))} style={{
-                    height:34, borderRadius:4, border:'1px solid',
-                    borderColor: isActive ? '#003594' : '#E2E8F0',
+                    height:36, borderRadius:8, border:'none',
                     background: isActive ? '#003594' : '#fff',
-                    color: isActive ? '#fff' : '#64748B',
-                    fontSize:12, fontWeight: isActive ? 700 : 500,
+                    color: isActive ? '#fff' : '#1E293B',
+                    fontSize:12, fontWeight: 700,
                     cursor:'pointer', position:'relative',
+                    boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
                   }}>
                     {cat.label}
                     {catDone>0 && (
                       <span style={{
                         position:'absolute', top:-5, right:-4,
-                        background: catUnsch>0 ? '#FFCD00' : '#003594',
+                        background: catUnsch>0 ? '#FFCD00' : '#16A34A',
                         color: catUnsch>0 ? '#92620a' : '#fff',
                         borderRadius:99, fontSize:9, fontWeight:800,
                         minWidth:15, height:15, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px',
@@ -308,7 +307,7 @@ export default function ChecklistPage({ state, setState }: Props) {
               })}
             </div>
             {/* 직접입력 */}
-            <div style={{ padding:'0 20px 8px' }}>
+            <div style={{ padding:'0 16px 10px' }}>
               {(() => {
                 const cat = CATEGORIES.find(c => c.id === 'custom')!
                 const isActive = activeCategory === 'custom'
@@ -316,18 +315,20 @@ export default function ChecklistPage({ state, setState }: Props) {
                 const catUnsch = allItems.filter(i => i.categoryId==='custom' && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
                 return (
                   <button className="chip-btn" onClick={() => setState(setCategory(state, 'custom'))} style={{
-                    height:34, padding:'0 16px', borderRadius:4, border:'1px solid',
-                    borderColor: isActive ? '#003594' : '#E2E8F0',
+                    height:36, padding:'0 16px', borderRadius:8, border:'none',
                     background: isActive ? '#003594' : '#fff',
-                    color: isActive ? '#fff' : '#64748B',
-                    fontSize:12, fontWeight: isActive ? 700 : 500,
+                    color: isActive ? '#fff' : '#1E293B',
+                    fontSize:12, fontWeight:700,
                     cursor:'pointer', position:'relative',
+                    boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
+                    display:'flex', alignItems:'center', gap:5,
                   }}>
-                    ✏️ {cat.label}
+                    <Icon icon="ph:pencil-simple" width={13} height={13} color={isActive ? '#FFCD00' : '#94A3B8'} />
+                    {cat.label}
                     {catDone>0 && (
                       <span style={{
                         position:'absolute', top:-5, right:-4,
-                        background: catUnsch>0 ? '#FFCD00' : '#003594',
+                        background: catUnsch>0 ? '#FFCD00' : '#16A34A',
                         color: catUnsch>0 ? '#92620a' : '#fff',
                         borderRadius:99, fontSize:9, fontWeight:800,
                         minWidth:15, height:15, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px',
@@ -338,6 +339,31 @@ export default function ChecklistPage({ state, setState }: Props) {
               })()}
             </div>
           </div>
+
+          {/* ── 온보딩 CTA (일정 미설정 시) ── */}
+          {!trip && (
+            <div style={{ padding:'12px 16px 0' }}>
+              <div onClick={handleOpenTripPicker} style={{
+                background:'linear-gradient(135deg, #002870, #003594)',
+                borderRadius:12, padding:'16px 20px',
+                display:'flex', alignItems:'center', gap:14,
+                cursor:'pointer', boxShadow:'0 4px 20px rgba(0,53,148,0.20)',
+              }}>
+                <div style={{
+                  width:44, height:44, borderRadius:10, flexShrink:0,
+                  background:'rgba(255,205,0,0.15)',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                }}>
+                  <Icon icon="ph:airplane-takeoff" width={24} height={24} color="#FFCD00" />
+                </div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:15, fontWeight:800, color:'#fff', marginBottom:3 }}>여행 날짜를 먼저 설정하세요</div>
+                  <div style={{ fontSize:12, color:'rgba(255,255,255,0.65)' }}>출발일과 도착일을 입력하면 항목 선택이 가능해요</div>
+                </div>
+                <Icon icon="ph:caret-right" width={18} height={18} color="rgba(255,255,255,0.5)" />
+              </div>
+            </div>
+          )}
 
           {/* ── LIST ── */}
           <div style={{ flex:1, overflowY:'auto', paddingBottom:100 }}>
@@ -395,14 +421,14 @@ export default function ChecklistPage({ state, setState }: Props) {
                     border: needsSch ? '1px solid rgba(255,205,0,0.4)' : 'none',
                     transition:'all 0.12s',
                   }}>
-                    {/* Checkbox */}
+                    {/* Checkbox — 녹색 */}
                     <button onClick={() => {
                       if (!trip) { setModal('noTrip'); return }
                       setState(toggleItem(state, item.id))
                     }} style={{
                       width:22, height:22, borderRadius:4, flexShrink:0,
                       border: checked ? 'none' : '1.5px solid #CBD5E1',
-                      background: checked ? '#003594' : '#fff',
+                      background: checked ? '#16A34A' : '#fff',
                       display:'flex', alignItems:'center', justifyContent:'center',
                       cursor:'pointer', padding:0,
                     }}>
@@ -429,7 +455,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                       lineHeight:1.4,
                     }}>{item.label}</span>
 
-                    {/* Schedule button */}
+                    {/* Schedule button — 녹색 */}
                     <button onClick={() => {
                       if (!checked) return
                       if (!trip) { setModal('noTrip'); return }
@@ -439,12 +465,14 @@ export default function ChecklistPage({ state, setState }: Props) {
                       cursor: checked ? 'pointer' : 'default', flexShrink:0,
                       border: 'none',
                       background: !checked ? '#F1F5F9'
-                                : dayCount>0 ? '#003594'
+                                : dayCount>0 ? '#16A34A'
                                 : '#FFCD00',
                       color: !checked ? '#CBD5E1'
                            : dayCount>0 ? '#fff'
                            : '#92620a',
-                      boxShadow: checked && dayCount===0 ? '0 2px 6px rgba(255,205,0,0.4)' : 'none',
+                      boxShadow: checked && dayCount===0 ? '0 2px 6px rgba(255,205,0,0.4)'
+                               : checked && dayCount>0  ? '0 2px 6px rgba(22,163,74,0.30)'
+                               : 'none',
                     }}>
                       {dayCount>0 ? `${dayCount}일 ✓` : '+일정'}
                     </button>
