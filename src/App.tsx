@@ -48,7 +48,7 @@ function FloatingBubble({ onAdmin }: { onAdmin: () => void }) {
   )
 }
 
-// ── 메인 앱 (체크리스트 + 서비스)
+// ── 메인 앱
 function MainApp() {
   const navigate = useNavigate()
   const [state, setState] = useState<AppState>(() => loadState())
@@ -65,16 +65,19 @@ function MainApp() {
 function LandingWrapper() {
   const navigate = useNavigate()
   const [state] = useState<AppState>(() => loadState())
-
   return (
-    <LandingPage state={state} onStart={() => navigate('/app')} />
+    <LandingPage
+      state={state}
+      onStart={() => navigate('/app')}
+      onServices={() => navigate('/app?tab=services')}
+    />
   )
 }
 
 // ── Admin 래퍼
 function AdminWrapper() {
   const navigate = useNavigate()
-  return <AdminPage onBack={() => navigate('/app')} />
+  return <AdminPage onBack={() => navigate('/')} />
 }
 
 // ── 라우터
@@ -82,10 +85,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/"      element={<LandingWrapper />} />
-        <Route path="/app"   element={<MainApp />} />
-        <Route path="/admin" element={<AdminWrapper />} />
-        <Route path="*"      element={<LandingWrapper />} />
+        <Route path="/"         element={<LandingWrapper />} />
+        <Route path="/app"      element={<MainApp />} />
+        <Route path="/admin"    element={<AdminWrapper />} />
+        <Route path="*"         element={<LandingWrapper />} />
       </Routes>
     </BrowserRouter>
   )

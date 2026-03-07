@@ -39,9 +39,9 @@ function Cloud({ width, opacity = 1 }: { width: number; opacity?: number }) {
   )
 }
 
-type Props = { state: AppState; onStart: () => void }
+type Props = { state: AppState; onStart: () => void; onServices: () => void }
 
-export default function LandingPage({ state, onStart }: Props) {
+export default function LandingPage({ state, onStart, onServices }: Props) {
   const total = ITEMS.length + state.customItems.length
 
   return (
@@ -230,8 +230,15 @@ export default function LandingPage({ state, onStart }: Props) {
           color:'#fff', border:'none', borderRadius:14,
           fontSize:15, fontWeight:900, cursor:'pointer', letterSpacing:0.3,
           boxShadow:'0 4px 16px rgba(30,77,131,0.28)',
-        }}>호주 여행 시작하기</button>
-        <p style={{ textAlign:'center', fontSize:11, color:'#8AAAC8', marginTop:7, fontWeight:700 }}>
+          marginBottom: 10,
+        }}>✅ 버킷리스트 만들기</button>
+        <button onClick={onServices} style={{
+          width:'100%', height:52,
+          background:'#fff',
+          color:'#1E4D83', border:'2px solid #1E4D83', borderRadius:14,
+          fontSize:15, fontWeight:900, cursor:'pointer', letterSpacing:0.3,
+        }}>🏢 업체/서비스 찾기</button>
+        <p style={{ textAlign:'center', fontSize:11, color:'#8AAAC8', marginTop:8, fontWeight:700 }}>
           호주에서 꼭 해야 할 것들을 정리해보세요
         </p>
       </div>
