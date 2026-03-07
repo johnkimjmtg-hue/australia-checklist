@@ -1029,6 +1029,7 @@ function RequestsTab() {
         const { error } = await (await import('../lib/supabase')).supabase
           .from('businesses')
           .insert({
+            id:          crypto.randomUUID(),
             name:        req.business_name,
             category:    req.category || 'restaurant',
             description: req.description,
