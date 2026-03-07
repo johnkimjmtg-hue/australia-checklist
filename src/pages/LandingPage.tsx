@@ -287,13 +287,13 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         display:'flex', alignItems:'center', justifyContent:'space-between',
       }}>
         <span onClick={handleLogoTap} style={{ fontSize:13, fontWeight:800, color:'#003594', letterSpacing:2, cursor:'pointer', userSelect:'none' }}>HOJUGAJA</span>
-        <button onClick={() => setShowForm(true)} style={{
+        <button onClick={onStart} style={{
           height:32, padding:'0 14px', borderRadius:8, border:'none',
           background:'#003594', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer',
           display:'flex', alignItems:'center', gap:5,
         }}>
-          <Icon icon="ph:storefront" width={13} height={13} color="#FFCD00" />
-          업체 등록 신청
+          <Icon icon="ph:list-checks" width={13} height={13} color="#FFCD00" />
+          버킷리스트 만들기
         </button>
       </div>
 
