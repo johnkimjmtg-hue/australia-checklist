@@ -505,15 +505,9 @@ export default function ChecklistPage({ state, setState }: Props) {
                       color={checked ? '#78716C' : '#CBD5E1'}
                     />
 
-                    <span onClick={() => {
-                      if (!trip) { setModal('noTrip'); return }
-                      if (!checked) showToast()
-                      setState(toggleItem(state, item.id))
-                      // 체크된 상태에서 클릭하면 일정보기에서 해당 아이템 하이라이트
-                      if (checked && showScheduleView) setScheduleSelectedItem(item.id)
-                    }} style={{
+                    <span style={{
                       flex:1, fontSize:15, fontWeight: checked ? 600 : 400,
-                      color: checked ? '#1E293B' : '#64748B', cursor:'pointer',
+                      color: checked ? '#1E293B' : '#64748B',
                       lineHeight:1.4,
                     }}>{item.label}</span>
 
