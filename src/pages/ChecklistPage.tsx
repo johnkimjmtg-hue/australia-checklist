@@ -265,7 +265,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:30 }}>
+      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
@@ -294,8 +294,8 @@ export default function ChecklistPage({ state, setState }: Props) {
         <Services onSelectBusiness={() => {}} onBack={() => setMainTab('bucketlist')} />
       ) : (
         <>
-          {/* ── SUB HEADER ── */}
-          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:57, zIndex:29 }}>
+          {/* ── SUB HEADER (버튼들) — 스크롤 시 사라짐 ── */}
+          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 20px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                 <span style={{ fontSize:14, fontWeight:700, color: done>0 ? '#003594' : '#94A3B8' }}>
@@ -334,6 +334,10 @@ export default function ChecklistPage({ state, setState }: Props) {
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* ── STICKY: 달력 + 카테고리 칩 ── */}
+          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:29 }}>
 
             {/* Schedule grid view */}
             {showScheduleView && trip && (

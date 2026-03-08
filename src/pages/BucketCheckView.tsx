@@ -278,7 +278,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
   }, [achievedCount, total])
 
   const filterFn = (item: { id:string }) =>
-    filter==='done' ? !!achieved[item.id] : filter==='todo' ? !achieved[item.id] : true
+    filter==='done' ? isItemFullyAchieved(item) : filter==='todo' ? !isItemFullyAchieved(item) : true
 
   const FILTERS: { key:Filter; label:string }[] = [
     { key:'all', label:'전체' }, { key:'todo', label:'미완료' }, { key:'done', label:'완료' },
