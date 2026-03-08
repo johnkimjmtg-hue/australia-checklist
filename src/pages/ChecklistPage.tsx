@@ -265,7 +265,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
+      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:50 }}>
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
@@ -392,9 +392,9 @@ export default function ChecklistPage({ state, setState }: Props) {
           {/* ── 온보딩 CTA (일정 미설정 시) ── */}
           {!trip && (
             <>
-              {/* 블러 오버레이 — sticky 포함 전체 덮기 */}
+              {/* 블러 오버레이 — 헤더 아래부터 덮기 */}
               <div style={{
-                position:'fixed', inset:0, zIndex:40,
+                position:'fixed', top:100, left:0, right:0, bottom:0, zIndex:40,
                 background:'rgba(241,245,249,0.75)',
                 backdropFilter:'blur(6px)',
                 WebkitBackdropFilter:'blur(6px)',
