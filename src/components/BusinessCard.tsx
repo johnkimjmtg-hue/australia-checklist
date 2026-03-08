@@ -17,6 +17,7 @@ export default function BusinessCard({ business }: Props) {
   const [counts, setCounts]         = useState<Record<string, number> | null>(null)
   const [loading, setLoading]       = useState(false)
   const [myVote, setMyVote]         = useState<string | null>(() => getMyVote(business.id))
+  const [showResult, setShowResult] = useState(false)
   const [showPhone, setShowPhone]   = useState(false)
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
@@ -175,8 +176,17 @@ export default function BusinessCard({ business }: Props) {
             <div style={{ textAlign:'center', padding:'12px 0', color:'#94A3B8', fontSize:13 }}>불러오는 중...</div>
           ) : (
             <>
-              <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:10 }}>
-                {myVote ? `내 한줄평: ${myVote}` : '이 업체 어떠셨나요? 하나만 골라주세요!'}
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                <div style={{ fontSize:12, fontWeight:700, color:'#64748B' }}>
+                  {myVote ? `내 한줄평: ${myVote}` : '이 업체 어떠셨나요? 하나만 골라주세요!'}
+                </div>
+                {!myVote && (
+                  <button onClick={() => setShowResult(v => !v)} style={{
+                    background:'none', border:'none', cursor:'pointer',
+                    fontSize:11, fontWeight:700, color:'#94A3B8', padding:0,
+                    textDecoration:'underline',
+                  }}>{showResult ? '투표하기' : '결과 보기'}</button>
+                )}
               </div>
               {(() => {
                 const maxCount = Math.max(...VOTE_TAGS.map(t => counts?.[t] ?? 0), 1)
@@ -187,7 +197,7 @@ export default function BusinessCard({ business }: Props) {
                       const isMine = myVote === tag
                       const voted  = !!myVote
                       const pct    = Math.round((count / maxCount) * 100)
-                      return voted ? (
+                      return (myVote || showResult) ? (
                         // 투표 후 — 바 차트
                         <div key={tag}>
                           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
