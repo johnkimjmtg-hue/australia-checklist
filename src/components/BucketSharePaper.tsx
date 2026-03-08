@@ -85,21 +85,24 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
   const checkedItems  = allItems.filter(i => state.selected[i.id])
   const tripDays      = getTripDays(trip)
 
-  const isItemDone = (item: typeof checkedItems[0]) => {
+  // BucketCheckView와 동일한 row 기준
+  const getKey = (id: string, day?: number) => day !== undefined ? `${id}_${day}` : id
+  const allRows: { id: string; day?: number }[] = []
+  checkedItems.forEach(item => {
     const days = state.schedules[item.id] ?? []
-    if (days.length === 0) return !!achieved[item.id]
-    return days.every(d => !!achieved[`${item.id}_${d}`])
-  }
-
-  const total         = checkedItems.length
-  const achievedCount = checkedItems.filter(i => isItemDone(i)).length
+    if (days.length === 0) allRows.push({ id: item.id })
+    else days.forEach(d => allRows.push({ id: item.id, day: d }))
+  })
+  const total         = allRows.length
+  const achievedCount = allRows.filter(r => !!achieved[getKey(r.id, r.day)]).length
   const pct           = total > 0 ? Math.round((achievedCount / total) * 100) : 0
 
-  const byDay = new Map<number, typeof checkedItems>()
+  // 날짜별 그룹 (row 기준 — 같은 아이템도 날짜별로 각각)
+  const byDay = new Map<number, { item: typeof checkedItems[0]; day: number }[]>()
   checkedItems.forEach(item => {
     ;(state.schedules[item.id] ?? []).forEach(d => {
       if (!byDay.has(d)) byDay.set(d, [])
-      byDay.get(d)!.push(item)
+      byDay.get(d)!.push({ item, day: d })
     })
   })
   const sortedDays  = Array.from(byDay.keys()).sort((a, b) => a - b)
@@ -133,9 +136,9 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
       {/* ── 리스트 ── */}
       <div style={{ background:'#fff', margin:'0 12px', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
         {sortedDays.map(dayIdx => {
-          const items    = byDay.get(dayIdx) ?? []
-          const date     = tripDays[dayIdx]
-          const dayDone  = items.filter(i => isItemDone(i)).length
+          const rows   = byDay.get(dayIdx) ?? []
+          const date   = tripDays[dayIdx]
+          const dayDone = rows.filter(r => !!achieved[getKey(r.item.id, r.day)]).length
           return (
             <div key={dayIdx}>
               {/* 날짜 헤더 */}
@@ -148,14 +151,14 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
                   <span style={{ fontSize:10,fontWeight:800,color:'#003594' }}>{dayIdx+1}일차</span>
                   {date && <span style={{ fontSize:10,color:'#94A3B8' }}>{fmtMD(date)}({dow(date)})</span>}
                 </div>
-                <span style={{ fontSize:10,color:'#003594',fontWeight:700 }}>{dayDone}/{items.length}</span>
+                <span style={{ fontSize:10,color:'#003594',fontWeight:700 }}>{dayDone}/{rows.length}</span>
               </div>
-              {/* 아이템 */}
-              {items.map(item => {
-                const isDone = isItemDone(item)
+              {/* 아이템 — 날짜별 row 각각 */}
+              {rows.map(({ item, day }) => {
+                const isDone = !!achieved[getKey(item.id, day)]
                 const icon   = ITEM_ICONS[item.id] ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'
                 return (
-                  <div key={item.id} style={{
+                  <div key={`${item.id}_${day}`} style={{
                     display:'flex', alignItems:'center', gap:10,
                     padding:'8px 12px',
                     background: isDone ? '#fff8e4' : '#fff',
@@ -191,10 +194,10 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
               borderBottom:'1px solid #E2E8F0',
             }}>
               <span style={{ fontSize:10,fontWeight:800,color:'#94A3B8' }}>날짜 미지정</span>
-              <span style={{ fontSize:10,color:'#94A3B8' }}>{unscheduled.filter(i=>isItemDone(i)).length}/{unscheduled.length}</span>
+              <span style={{ fontSize:10,color:'#94A3B8' }}>{unscheduled.filter(i=>!!achieved[i.id]).length}/{unscheduled.length}</span>
             </div>
             {unscheduled.map(item => {
-              const isDone = isItemDone(item)
+              const isDone = !!achieved[item.id]
               const icon   = ITEM_ICONS[item.id] ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'
               return (
                 <div key={item.id} style={{
