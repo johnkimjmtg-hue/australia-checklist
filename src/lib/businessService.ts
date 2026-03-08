@@ -124,7 +124,7 @@ export async function getVoteCounts(businessId: string): Promise<Record<string, 
 export async function addVote(businessId: string, tag: string): Promise<boolean> {
   if (getMyVote(businessId)) return false
   const { error } = await supabase.from('reviews').insert({
-    business_id: businessId, author_name: '__vote__', rating: 0, content: tag,
+    business_id: businessId, author_name: '__vote__', rating: 1, content: tag,
   })
   if (error) { console.error('addVote error:', error); return false }
   saveMyVote(businessId, tag)
