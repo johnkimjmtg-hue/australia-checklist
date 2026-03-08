@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="14" fill="#003594"/>
+  
+  <!-- 체크리스트 라인들 -->
+  <!-- 1번 줄 -->
+  <rect x="22" y="16" width="26" height="4" rx="2" fill="white" opacity="0.9"/>
+  <!-- 체크박스 1 -->
+  <rect x="12" y="15" width="7" height="7" rx="2" fill="none" stroke="white" stroke-width="1.5"/>
+  <polyline points="13.5,18.5 15,20.5 18.5,16.5" stroke="#FFCD00" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 2번 줄 -->
+  <rect x="22" y="28" width="20" height="4" rx="2" fill="white" opacity="0.9"/>
+  <!-- 체크박스 2 -->
+  <rect x="12" y="27" width="7" height="7" rx="2" fill="none" stroke="white" stroke-width="1.5"/>
+  <polyline points="13.5,30.5 15,32.5 18.5,28.5" stroke="#FFCD00" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 3번 줄 -->
+  <rect x="22" y="40" width="23" height="4" rx="2" fill="white" opacity="0.6"/>
+  <!-- 체크박스 3 (미완료) -->
+  <rect x="12" y="39" width="7" height="7" rx="2" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"/>
+</svg>
