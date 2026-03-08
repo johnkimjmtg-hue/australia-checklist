@@ -9,6 +9,7 @@ type Props = {
   state:      AppState
   trip:       TripInfo
   setState:   (s: AppState) => void
+  onAchievedChange?: (achieved: Record<string,boolean>) => void
   onEdit:     () => void
   onDelete:   () => void
   onShare:    () => void
@@ -156,7 +157,7 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=
 }
 
 /* ══ 메인 ══ */
-export default function BucketCheckView({ state, trip, setState, onEdit, onDelete, onShare, onServices }: Props) {
+export default function BucketCheckView({ state, trip, setState, onAchievedChange, onEdit, onDelete, onShare, onServices }: Props) {
   const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
@@ -245,6 +246,7 @@ export default function BucketCheckView({ state, trip, setState, onEdit, onDelet
     if (!next[key]) delete next[key]
     setAchieved(next)
     try { localStorage.setItem('bucket-achieved', JSON.stringify(next)) } catch {}
+    onAchievedChange?.(next)
     if (!wasAchieved) {
       const newCount = allRows.filter(r => !!next[getKey(r.id, r.day)]).length
       const isLast = newCount === total
