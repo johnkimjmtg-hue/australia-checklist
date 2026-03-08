@@ -206,7 +206,7 @@ export default function BusinessCard({ business }: Props) {
                             <div style={{
                               height:'100%', borderRadius:4,
                               width: `${pct}%`,
-                              background: isMine ? '#FCA5A5' : '#D1FAE5',
+                              background: isMine ? '#FCA5A5' : '#FCA5A5',
                               transition:'width 0.4s ease',
                               minWidth: count > 0 ? 8 : 0,
                             }}/>
