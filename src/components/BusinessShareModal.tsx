@@ -8,7 +8,7 @@ type Props = {
   onClose: () => void
 }
 
-const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+const ff = '-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif'
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
 
 export default function BusinessShareModal({ business, counts, onClose }: Props) {
@@ -26,6 +26,8 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
   const capture = async () => {
     const el = document.getElementById('business-share-card')
     if (!el) return null
+    // 폰트 로드 대기
+    await document.fonts.ready
     // @ts-ignore
     const h2c = (await import('html2canvas')).default
     const canvas = await h2c(el, {
@@ -34,6 +36,10 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
       useCORS: true,
       allowTaint: true,
       logging: false,
+      onclone: (clonedDoc: Document) => {
+        const clonedEl = clonedDoc.getElementById('business-share-card')
+        if (clonedEl) (clonedEl as HTMLElement).style.fontFamily = ff
+      }
     })
     const blob: Blob = await new Promise(res => canvas.toBlob((b: Blob) => res(b!), 'image/png'))
     return blob
