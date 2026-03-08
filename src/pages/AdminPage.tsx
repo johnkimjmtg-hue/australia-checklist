@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Icon } from '@iconify/react'
 import { CATEGORIES } from '../data/businesses'
 import {
   Business, getBusinesses, createBusiness,
@@ -702,10 +703,12 @@ function CategoriesTab() {
       {toast && <Toast msg={toast} />}
       <Card>
         <SectionTitle>새 카테고리 추가</SectionTitle>
-        <div style={{ display:'flex', gap:8 }}>
-          <input value={newEmoji} onChange={e=>setNewEmoji(e.target.value)} placeholder="😀" maxLength={2} style={{ ...inputStyle, width:60, textAlign:'center', fontSize:20 }} />
-          <input value={newLabel} onChange={e=>setNewLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addCat()} placeholder="카테고리 이름" style={{ ...inputStyle, flex:1 }} />
-          <button onClick={addCat} style={btnPrimary}>추가</button>
+        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+          <input value={newEmoji} onChange={e=>setNewEmoji(e.target.value)} placeholder="😀" maxLength={2}
+            style={{ ...inputStyle, width:52, textAlign:'center', fontSize:20, flexShrink:0 }} />
+          <input value={newLabel} onChange={e=>setNewLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addCat()}
+            placeholder="카테고리 이름" style={{ ...inputStyle, flex:1, minWidth:0 }} />
+          <button onClick={addCat} style={{ ...btnPrimary, flexShrink:0, whiteSpace:'nowrap' }}>추가</button>
         </div>
         <p style={{ fontSize:12, color:'#aaa', marginTop:6 }}>이모티콘 비워두면 자동 선택됩니다</p>
       </Card>
