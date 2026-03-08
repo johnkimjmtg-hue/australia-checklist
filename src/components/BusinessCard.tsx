@@ -112,8 +112,13 @@ export default function BusinessCard({ business }: Props) {
           {!showVotes && topTags.length > 0 && (
             <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
               {topTags.map(([tag, count]) => (
-                <span key={tag} style={{ background:'rgba(0,53,148,0.06)', color:'#003594', fontSize:10, fontWeight:700, borderRadius:6, padding:'3px 8px', display:'flex', alignItems:'center', gap:3 }}>
-                  <Icon icon="ph:thumbs-up" width={11} height={11} color="#003594" /> {tag} {count}
+                <span key={tag} style={{
+                  background:'#FFF1F2', color:'#E11D48',
+                  fontSize:10, fontWeight:700, borderRadius:6, padding:'3px 8px',
+                  display:'flex', alignItems:'center', gap:3,
+                  border:'1px solid #FECDD3',
+                }}>
+                  <Icon icon="ph:thumbs-up" width={11} height={11} color="#E11D48" /> {tag} {count}
                 </span>
               ))}
             </div>
