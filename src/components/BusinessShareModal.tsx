@@ -147,18 +147,18 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
           {topVotes.length > 0 && (
             <div style={{ background:'#fff', borderRadius:14, padding:'14px 18px', marginBottom:8, boxShadow:'0 2px 8px rgba(0,53,148,0.07)' }}>
               <div style={{ fontSize:11, fontWeight:800, color:'#94A3B8', marginBottom:10, letterSpacing:0.5 }}>한줄평</div>
-              <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
-                {topVotes.map(([tag, count]) => (
-                  <div key={tag}>
-                    <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
-                      <span style={{ fontSize:12, fontWeight:600, color:'#334155', display:'flex', alignItems:'center', gap:5 }}>
-                        <Icon icon="ph:thumbs-up" width={12} height={12} color="#94A3B8" />{tag}
-                      </span>
-                      <span style={{ fontSize:11, fontWeight:700, color:'#94A3B8' }}>{count}</span>
-                    </div>
-                    <div style={{ height:7, borderRadius:4, background:'#F1F5F9' }}>
-                      <div style={{ height:'100%', borderRadius:4, width:`${Math.round((count/maxCount)*100)}%`, background:'#FCA5A5' }}/>
-                    </div>
+              <div style={{ display:'flex', flexDirection:'column', gap:7 }}>
+                {topVotes.map(([tag, count], i) => (
+                  <div key={tag} style={{ display:'flex', alignItems:'center', gap:10 }}>
+                    <div style={{ width:3, height:28, borderRadius:2, background: i === 0 ? '#FCA5A5' : '#E2E8F0', flexShrink:0 }}/>
+                    <Icon icon="ph:thumbs-up" width={12} height={12} color={i === 0 ? '#FCA5A5' : '#CBD5E1'} />
+                    <span style={{ fontSize:12, fontWeight: i === 0 ? 700 : 500, color: i === 0 ? '#334155' : '#64748B', flex:1 }}>{tag}</span>
+                    <span style={{
+                      fontSize:11, fontWeight:700,
+                      color: i === 0 ? '#fff' : '#94A3B8',
+                      background: i === 0 ? '#FCA5A5' : '#F1F5F9',
+                      borderRadius:10, padding:'2px 8px',
+                    }}>{count}</span>
                   </div>
                 ))}
               </div>
