@@ -336,34 +336,40 @@ export default function ChecklistPage({ state, setState }: Props) {
             )}
 
             {/* Category chips — custom 제외한 카테고리를 동적으로 4열 그리드 */}
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6, padding:'8px 16px' }}>
-              {CATEGORIES.filter(c => c.id !== 'custom').map(cat => {
-                const isActive = activeCategory === cat.id
-                const catDone  = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id]).length
-                const catUnsch = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
-                return (
-                  <button key={cat.id} className="chip-btn" onClick={() => setState(setCategory(state, cat.id))} style={{
-                    height:36, borderRadius:8, border:'none',
-                    background: isActive ? '#003594' : '#fff',
-                    color: isActive ? '#fff' : '#1E293B',
-                    fontSize:12, fontWeight: 700,
-                    cursor:'pointer', position:'relative',
-                    boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
-                  }}>
-                    {cat.label}
-                    {catDone>0 && (
-                      <span style={{
-                        position:'absolute', top:-5, right:-4,
-                        background: catUnsch>0 ? '#FFCD00' : '#16A34A',
-                        color: catUnsch>0 ? '#92620a' : '#fff',
-                        borderRadius:99, fontSize:9, fontWeight:800,
-                        minWidth:15, height:15, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px',
-                      }}>{catDone}</span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
+            {(() => {
+              const nonCustomCats = CATEGORIES.filter(c => c.id !== 'custom')
+              const cols = nonCustomCats.length <= 4 ? nonCustomCats.length : 4
+              return (
+                <div style={{ display:'grid', gridTemplateColumns:`repeat(${cols},1fr)`, gap:6, padding:'8px 16px' }}>
+                  {nonCustomCats.map(cat => {
+                    const isActive = activeCategory === cat.id
+                    const catDone  = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id]).length
+                    const catUnsch = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
+                    return (
+                      <button key={cat.id} className="chip-btn" onClick={() => setState(setCategory(state, cat.id))} style={{
+                        height:36, borderRadius:8, border:'none',
+                        background: isActive ? '#003594' : '#fff',
+                        color: isActive ? '#fff' : '#1E293B',
+                        fontSize:12, fontWeight: 700,
+                        cursor:'pointer', position:'relative',
+                        boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
+                      }}>
+                        {cat.label}
+                        {catDone>0 && (
+                          <span style={{
+                            position:'absolute', top:-5, right:-4,
+                            background: catUnsch>0 ? '#FFCD00' : '#16A34A',
+                            color: catUnsch>0 ? '#92620a' : '#fff',
+                            borderRadius:99, fontSize:9, fontWeight:800,
+                            minWidth:15, height:15, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px',
+                          }}>{catDone}</span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              )
+            })()}
             {/* 직접입력 */}
             <div style={{ padding:'0 16px 10px' }}>
               {(() => {
