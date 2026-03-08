@@ -712,6 +712,8 @@ function CategoriesTab({ cats, setCats, items, setItems }: {
   const [newLabel, setNewLabel] = useState('')
   const [toast, setToast]       = useState('')
   const [selectedId, setSelectedId] = useState(cats[0]?.id ?? '')
+  const [dragIdx, setDragIdx]   = useState<number|null>(null)
+  const [dragOverIdx, setDragOverIdx] = useState<number|null>(null)
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2000) }
 
@@ -736,6 +738,21 @@ function CategoriesTab({ cats, setCats, items, setItems }: {
     setCats(prev => prev.map(c => c.id===id ? {...c, [field]:val, ...(field==='label'?{receiptLabel:val}:{})} : c))
   }
 
+  function handleDragStart(idx: number) { setDragIdx(idx) }
+  function handleDragOver(e: React.DragEvent, idx: number) { e.preventDefault(); setDragOverIdx(idx) }
+  function handleDrop(toIdx: number) {
+    if (dragIdx === null || dragIdx === toIdx) { setDragIdx(null); setDragOverIdx(null); return }
+    setCats(prev => {
+      const next = [...prev]
+      const [moved] = next.splice(dragIdx, 1)
+      next.splice(toIdx, 0, moved)
+      return next
+    })
+    setDragIdx(null); setDragOverIdx(null)
+    showToast('순서 변경됨')
+  }
+  function handleDragEnd() { setDragIdx(null); setDragOverIdx(null) }
+
   return (
     <>
       {toast && <Toast msg={toast} />}
@@ -752,18 +769,33 @@ function CategoriesTab({ cats, setCats, items, setItems }: {
       </Card>
 
       <Card>
-        <SectionTitle>카테고리 목록 ({cats.length})</SectionTitle>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))', gap:10 }}>
-          {cats.map(cat => {
+        <SectionTitle>카테고리 목록 ({cats.length}) — 드래그로 순서 변경</SectionTitle>
+        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+          {cats.map((cat, idx) => {
             const isLocked = cat.id === 'custom'
+            const isDragging = dragIdx === idx
+            const isOver = dragOverIdx === idx
             return (
-              <div key={cat.id} onClick={() => setSelectedId(cat.id)} style={{
-                border: `1.5px solid ${selectedId===cat.id ? '#1E4D83' : '#e8e8e8'}`,
-                borderRadius:12, padding:'12px 14px',
-                background: selectedId===cat.id ? '#eef2fb' : '#fafafa',
-                display:'flex', alignItems:'center', gap:10, cursor:'pointer',
-              }}>
-                {isLocked ? <span style={{ color:'#ccc' }}>🔒</span> : null}
+              <div
+                key={cat.id}
+                draggable={!isLocked}
+                onDragStart={() => handleDragStart(idx)}
+                onDragOver={e => handleDragOver(e, idx)}
+                onDrop={() => handleDrop(idx)}
+                onDragEnd={handleDragEnd}
+                onClick={() => setSelectedId(cat.id)}
+                style={{
+                  border: isOver ? '2px dashed #1E4D83' : `1.5px solid ${selectedId===cat.id ? '#1E4D83' : '#e8e8e8'}`,
+                  borderRadius:12, padding:'12px 14px',
+                  background: isDragging ? '#e8f0fe' : selectedId===cat.id ? '#eef2fb' : '#fafafa',
+                  display:'flex', alignItems:'center', gap:10, cursor: isLocked ? 'default' : 'grab',
+                  opacity: isDragging ? 0.5 : 1,
+                  transition:'background 0.1s, opacity 0.1s',
+                }}>
+                {isLocked
+                  ? <span style={{ color:'#ccc', fontSize:16 }}>🔒</span>
+                  : <span style={{ color:'#aaa', fontSize:16, cursor:'grab', userSelect:'none' }}>⠿</span>
+                }
                 <input
                   value={cat.emoji} maxLength={2}
                   onChange={e => updateCat(cat.id, 'emoji', e.target.value)}

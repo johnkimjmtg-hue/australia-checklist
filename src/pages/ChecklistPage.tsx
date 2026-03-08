@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
 import { CATEGORIES, ITEMS, CheckItem, ITEM_ICONS } from '../data/checklist'
@@ -36,7 +36,8 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [mainTab, setMainTab]         = useState<MainTab>(
     searchParams.get('tab') === 'services' ? 'services' : 'bucketlist'
   )
-  const [showScheduleView, setShowScheduleView] = useState(false)
+  const [showScheduleView, setShowScheduleView] = useState(!!trip)
+  const [scheduleSelectedItem, setScheduleSelectedItem] = useState<string|null>(null)
   const [logoTapCount, setLogoTapCount] = useState(0)
   const logoTapTimer = useRef<any>(null)
   // date picker state
@@ -173,6 +174,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       const t = { startDate, endDate: val }
       saveTrip(t); setTrip(t)
       setModal('none')
+      setShowScheduleView(true)  // 일정 입력 시 일정보기 자동 활성화
       playFireworksSound()
       setShowFireworks(true)
       setTimeout(() => setShowFireworks(false), 2800)
@@ -332,7 +334,10 @@ export default function ChecklistPage({ state, setState }: Props) {
 
             {/* Schedule grid view */}
             {showScheduleView && trip && (
-              <ScheduleGrid state={state} trip={trip} allItems={allItems} />
+              <ScheduleGrid
+                state={state} trip={trip} allItems={allItems}
+                selectedItemId={scheduleSelectedItem}
+              />
             )}
 
             {/* Category chips — custom 포함 4열 그리드, custom 항상 마지막 */}
@@ -502,6 +507,8 @@ export default function ChecklistPage({ state, setState }: Props) {
                       if (!trip) { setModal('noTrip'); return }
                       if (!checked) showToast()
                       setState(toggleItem(state, item.id))
+                      // 체크된 상태에서 클릭하면 일정보기에서 해당 아이템 하이라이트
+                      if (checked && showScheduleView) setScheduleSelectedItem(item.id)
                     }} style={{
                       flex:1, fontSize:15, fontWeight: checked ? 600 : 400,
                       color: checked ? '#1E293B' : '#64748B', cursor:'pointer',
@@ -634,43 +641,93 @@ export default function ChecklistPage({ state, setState }: Props) {
 }
 
 /* ── Schedule Grid View ── */
-function ScheduleGrid({ state, trip, allItems }: { state: AppState; trip: TripInfo; allItems: any[] }) {
+function ScheduleGrid({ state, trip, allItems, selectedItemId }: {
+  state: AppState; trip: TripInfo; allItems: any[]; selectedItemId: string | null
+}) {
   const days = getTripDays(trip)
-  const [activeDayIdx, setActiveDayIdx] = useState(0)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
-  const dayItems = allItems.filter(item =>
-    state.selected[item.id] && (state.schedules[item.id] ?? []).includes(activeDayIdx)
+  // selectedItemId 가 바뀌면 첫 번째 할당 날짜로 스크롤
+  useEffect(() => {
+    if (!selectedItemId || !scrollRef.current) return
+    const assignedDays = state.schedules[selectedItemId] ?? []
+    if (assignedDays.length === 0) return
+    const firstDay = Math.min(...assignedDays)
+    const el = scrollRef.current.querySelector(`[data-dayidx="${firstDay}"]`) as HTMLElement | null
+    if (el) el.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' })
+  }, [selectedItemId])
+
+  // 각 날짜별 할당 수 (선택된 아이템 기준)
+  const assignedDays = selectedItemId ? (state.schedules[selectedItemId] ?? []) : []
+
+  // 날짜별 총 할당 아이템 수 (빨간 강도용)
+  const dayCount = days.map((_, idx) =>
+    allItems.filter(item => state.selected[item.id] && (state.schedules[item.id] ?? []).includes(idx)).length
   )
+  const maxCount = Math.max(1, ...dayCount)
+
+  // 빨간색 강도: 1~4단계
+  function redIntensity(count: number): string {
+    if (count === 0) return 'transparent'
+    const ratio = count / maxCount
+    if (ratio <= 0.25) return 'rgba(220,38,38,0.15)'
+    if (ratio <= 0.5)  return 'rgba(220,38,38,0.35)'
+    if (ratio <= 0.75) return 'rgba(220,38,38,0.60)'
+    return 'rgba(220,38,38,0.90)'
+  }
+
+  // 선택된 아이템이 있는 날짜의 하단 아이템 목록 — activeDayIdx 없이 selectedItem 기준
+  const [activeDayIdx, setActiveDayIdx] = useState<number|null>(null)
+
+  const dayItems = activeDayIdx !== null
+    ? allItems.filter(item => state.selected[item.id] && (state.schedules[item.id] ?? []).includes(activeDayIdx))
+    : []
 
   return (
     <div style={{ borderTop:'1px solid #E2E8F0', padding:'10px 16px 12px', background:'#F8FAFC' }}>
-      <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4 }}>
+      <div ref={scrollRef} style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4, scrollBehavior:'smooth' }}>
         {days.map((d, idx) => {
-          const hasDot = allItems.some(item => state.selected[item.id] && (state.schedules[item.id] ?? []).includes(idx))
+          const isSelected = assignedDays.includes(idx)
+          const isActive   = activeDayIdx === idx
+          const bg = dayCount[idx] > 0 ? redIntensity(dayCount[idx]) : '#fff'
+          const textColor = dayCount[idx] / maxCount > 0.6 ? '#fff' : '#1E293B'
+
           return (
-            <button key={idx} onClick={() => setActiveDayIdx(idx)} style={{
-              minWidth:54, height:46, borderRadius:8, flexShrink:0,
-              border:'none', cursor:'pointer',
-              background: activeDayIdx===idx ? '#003594' : '#fff',
-              color: activeDayIdx===idx ? '#fff' : '#64748B',
-              fontSize:11, fontWeight:700, position:'relative', textAlign:'center',
-              lineHeight:1.3, padding:'4px 2px',
-              boxShadow: activeDayIdx===idx ? '0 2px 8px rgba(0,53,148,0.20)' : '0 1px 3px rgba(0,0,0,0.06)',
-            }}>
+            <button
+              key={idx}
+              data-dayidx={idx}
+              onClick={() => setActiveDayIdx(isActive ? null : idx)}
+              style={{
+                minWidth:54, height:46, borderRadius:8, flexShrink:0,
+                border: isSelected ? '2px solid #FFCD00' : isActive ? '2px solid #003594' : '2px solid transparent',
+                cursor:'pointer',
+                background: bg,
+                color: dayCount[idx] / maxCount > 0.6 ? '#fff' : isActive ? '#003594' : '#1E293B',
+                fontSize:11, fontWeight:700, position:'relative', textAlign:'center',
+                lineHeight:1.3, padding:'4px 2px',
+                boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.20)' : '0 1px 3px rgba(0,0,0,0.06)',
+              }}>
               <div>{idx+1}일차</div>
-              <div style={{ fontSize:10, opacity:0.75 }}>{fmtMD(d)}</div>
-              {hasDot && (
+              <div style={{ fontSize:10, opacity:0.8 }}>{fmtMD(d)}</div>
+              {dayCount[idx] > 0 && (
                 <span style={{
-                  position:'absolute', top:3, right:3, width:5, height:5,
-                  borderRadius:'50%', background: activeDayIdx===idx ? '#FFCD00' : '#003594',
-                }}/>
+                  position:'absolute', top:2, right:3,
+                  fontSize:8, fontWeight:900,
+                  color: dayCount[idx] / maxCount > 0.6 ? 'rgba(255,255,255,0.85)' : '#DC2626',
+                }}>{dayCount[idx]}</span>
               )}
             </button>
           )
         })}
       </div>
+
+      {/* 선택된 날짜의 아이템 목록 */}
       <div style={{ marginTop:8, minHeight:30 }}>
-        {dayItems.length === 0 ? (
+        {activeDayIdx === null ? (
+          <p style={{ fontSize:11, color:'#94A3B8', textAlign:'center', padding:'6px 0' }}>
+            날짜를 눌러 할당된 항목을 확인하세요
+          </p>
+        ) : dayItems.length === 0 ? (
           <p style={{ fontSize:11, color:'#94A3B8', textAlign:'center', padding:'6px 0' }}>항목의 "+일정" 버튼으로 추가하세요</p>
         ) : (
           <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
