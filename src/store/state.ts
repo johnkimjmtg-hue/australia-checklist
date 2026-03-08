@@ -21,7 +21,7 @@ function sj<T>(key: string, v: T) {
 function makeDefault(): AppState {
   return {
     selected: {}, schedules: {}, customItems: [],
-    meta: { receiptCode: genCode(), activeCategory: 'hospital' },
+    meta: { receiptCode: genCode(), activeCategory: '' },
   }
 }
 
@@ -30,9 +30,9 @@ export function loadState(): AppState {
   if (!s.selected)    s.selected    = {}
   if (!s.schedules)   s.schedules   = {}
   if (!s.customItems) s.customItems = []
-  if (!s.meta)        s.meta        = { receiptCode: genCode(), activeCategory: 'hospital' }
+  if (!s.meta)        s.meta        = { receiptCode: genCode(), activeCategory: '' }
   if (!s.meta.receiptCode) s.meta.receiptCode = genCode()
-  if (!s.meta.activeCategory) s.meta.activeCategory = 'hospital'
+  if (!s.meta.activeCategory) s.meta.activeCategory = ''
   return s
 }
 

@@ -59,7 +59,9 @@ export default function ChecklistPage({ state, setState }: Props) {
     }, 400)
   }
 
-  const activeCategory = state.meta.activeCategory
+  const activeCategory = state.meta.activeCategory && CATEGORIES.some(c => c.id === state.meta.activeCategory)
+    ? state.meta.activeCategory
+    : CATEGORIES[0].id
   const allItems = [...ITEMS, ...state.customItems.map(c => ({ ...c, emoji:'📝' }))]
   const catItems = allItems.filter(i => i.categoryId === activeCategory)
   const done  = Object.keys(state.selected).length
