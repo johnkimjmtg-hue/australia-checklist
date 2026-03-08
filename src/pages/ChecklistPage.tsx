@@ -13,10 +13,6 @@ import ReceiptModal from '../components/ReceiptModal'
 import Services from './Services'
 import BucketCheckView from './BucketCheckView'
 
-const CAT_ROW1 = ['hospital','food','shopping','admin']
-const CAT_ROW2 = ['people','parenting','places','schedule']
-const CAT_ROW3 = ['custom']
-
 const CAT_ICON_MAP: Record<string,string> = {
   hospital:'ph:first-aid-kit',food:'ph:fork-knife',shopping:'ph:shopping-bag',
   admin:'ph:files',people:'ph:users',parenting:'ph:baby',places:'ph:map-pin',
@@ -339,16 +335,14 @@ export default function ChecklistPage({ state, setState }: Props) {
               <ScheduleGrid state={state} trip={trip} allItems={allItems} />
             )}
 
-            {/* Category chips */}
+            {/* Category chips — custom 제외한 카테고리를 동적으로 4열 그리드 */}
             <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6, padding:'8px 16px' }}>
-              {[...CAT_ROW1, ...CAT_ROW2].map(catId => {
-                const cat = CATEGORIES.find(c => c.id === catId)
-                if (!cat) return null
-                const isActive = activeCategory === catId
-                const catDone  = allItems.filter(i => i.categoryId===catId && state.selected[i.id]).length
-                const catUnsch = allItems.filter(i => i.categoryId===catId && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
+              {CATEGORIES.filter(c => c.id !== 'custom').map(cat => {
+                const isActive = activeCategory === cat.id
+                const catDone  = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id]).length
+                const catUnsch = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
                 return (
-                  <button key={catId} className="chip-btn" onClick={() => setState(setCategory(state, catId))} style={{
+                  <button key={cat.id} className="chip-btn" onClick={() => setState(setCategory(state, cat.id))} style={{
                     height:36, borderRadius:8, border:'none',
                     background: isActive ? '#003594' : '#fff',
                     color: isActive ? '#fff' : '#1E293B',
