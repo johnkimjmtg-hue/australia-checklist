@@ -289,21 +289,20 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
     const key = day !== undefined ? `${item.id}_${day}` : item.id
     const isAchieved = !!achieved[key]
     return (
-      <div style={{
+      <div onClick={() => toggleAchieved(item.id, day)} style={{
         display:'flex',alignItems:'center',gap:12,
         padding:'12px 16px',margin:'0 16px',borderRadius:10,
         background: isAchieved ? '#fff8e4' : '#fff',
         border:'none',
         boxShadow: isAchieved ? '0 2px 8px rgba(180,130,0,0.10)' : '0 2px 8px rgba(0,0,0,0.06)',
-        minHeight:52,transition:'all 0.15s ease',
+        minHeight:52,cursor:'pointer',transition:'all 0.15s ease',
       }}>
         {/* 녹색 체크박스 */}
-        <div onClick={() => toggleAchieved(item.id, day)} style={{
+        <div style={{
           width:22,height:22,borderRadius:4,flexShrink:0,
           border: isAchieved ? 'none' : '1.5px solid #CBD5E1',
           background: isAchieved ? '#16A34A' : '#fff',
           display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s',
-          cursor:'pointer',
         }}>
           {isAchieved && (
             <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
