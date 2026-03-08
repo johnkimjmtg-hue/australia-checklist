@@ -187,13 +187,9 @@ export default function BusinessCard({ business }: Props) {
                       const isMine = myVote === tag
                       const voted  = !!myVote
                       const pct    = Math.round((count / maxCount) * 100)
-                      return (
-                        <button key={tag} onClick={(e) => handleVote(e, tag)} disabled={voted && !isMine} style={{
-                          background:'none', border:'none', padding:0,
-                          cursor: voted ? 'default' : 'pointer',
-                          textAlign:'left', fontFamily:ff,
-                        }}>
-                          {/* 라벨 + 숫자 */}
+                      return voted ? (
+                        // 투표 후 — 바 차트
+                        <div key={tag}>
                           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
                             <span style={{ fontSize:12, fontWeight: isMine ? 800 : 500, color: isMine ? '#FCA5A5' : '#1E293B', display:'flex', alignItems:'center', gap:4 }}>
                               <Icon icon="ph:thumbs-up" width={12} height={12} color={isMine ? '#FCA5A5' : '#94A3B8'} />
@@ -201,16 +197,28 @@ export default function BusinessCard({ business }: Props) {
                             </span>
                             <span style={{ fontSize:11, fontWeight:700, color: isMine ? '#FCA5A5' : '#94A3B8' }}>{count}</span>
                           </div>
-                          {/* 바 */}
                           <div style={{ height:7, borderRadius:4, background:'#E2E8F0', overflow:'hidden' }}>
                             <div style={{
                               height:'100%', borderRadius:4,
-                              width: `${pct}%`,
-                              background: isMine ? '#FCA5A5' : '#FCA5A5',
+                              width:`${pct}%`,
+                              background:'#FCA5A5',
                               transition:'width 0.4s ease',
                               minWidth: count > 0 ? 8 : 0,
                             }}/>
                           </div>
+                        </div>
+                      ) : (
+                        // 투표 전 — 버튼
+                        <button key={tag} onClick={(e) => handleVote(e, tag)} style={{
+                          display:'flex', alignItems:'center', gap:8,
+                          padding:'10px 12px', borderRadius:9,
+                          border:'1px solid #E2E8F0',
+                          background:'#fff',
+                          cursor:'pointer', textAlign:'left', fontFamily:ff,
+                          boxShadow:'0 1px 3px rgba(0,0,0,0.05)',
+                        }}>
+                          <Icon icon="ph:thumbs-up" width={14} height={14} color="#94A3B8" />
+                          <span style={{ fontSize:13, fontWeight:500, color:'#1E293B' }}>{tag}</span>
                         </button>
                       )
                     })}
