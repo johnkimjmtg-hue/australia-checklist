@@ -10,6 +10,7 @@ export const CATEGORIES: Category[] = [
   { id: 'parenting', label: '육아',      receiptLabel: '육아',      emoji: '🧸' },
   { id: 'places',    label: '가볼 곳',   receiptLabel: '가볼 곳',   emoji: '🗺️' },
   { id: 'schedule',  label: '일정',      receiptLabel: '일정',      emoji: '📅' },
+  { id: 'custom',    label: '직접입력',  receiptLabel: '직접입력',  emoji: '✏️' },
 ]
 
 export const ITEMS: CheckItem[] = [

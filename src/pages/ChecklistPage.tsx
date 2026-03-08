@@ -373,7 +373,8 @@ export default function ChecklistPage({ state, setState }: Props) {
             {/* 직접입력 */}
             <div style={{ padding:'0 16px 10px' }}>
               {(() => {
-                const cat = CATEGORIES.find(c => c.id === 'custom')!
+                const cat = CATEGORIES.find(c => c.id === 'custom')
+                if (!cat) return null
                 const isActive = activeCategory === 'custom'
                 const catDone  = allItems.filter(i => i.categoryId==='custom' && state.selected[i.id]).length
                 const catUnsch = allItems.filter(i => i.categoryId==='custom' && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
