@@ -375,6 +375,41 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
   const [pwError, setPwError] = useState(false)
   const [tab, setTab]       = useState<MainTab>('business')
 
+  // ── 공유 checklist state (카테고리·아이템·아이콘 탭 간 공유)
+  const [sharedCats,    setSharedCats]    = useState<Cat[]>(() => JSON.parse(JSON.stringify(DEFAULT_CATS)))
+  const [sharedItems,   setSharedItems]   = useState<Item[]>(() => JSON.parse(JSON.stringify(DEFAULT_ITEMS)))
+  const [sharedIconMap, setSharedIconMap] = useState<Record<string,string>>(() => ({
+    h01:'ph:tooth',h02:'ph:tooth',h03:'ph:sparkle',h04:'ph:syringe',h05:'ph:drop',
+    h06:'ph:eye',h07:'ph:eyeglasses',h08:'ph:heartbeat',h09:'ph:shield-check',h10:'ph:leaf',
+    h11:'ph:scissors',h12:'ph:hand',h13:'ph:eye',h14:'ph:pencil-simple',h15:'ph:person-simple',
+    h16:'ph:shopping-bag',h17:'ph:flask',h18:'ph:sun',h19:'ph:mask-happy',h20:'ph:drop-half',
+    h21:'ph:barbell',h22:'ph:thermometer-hot',h23:'ph:pill',h24:'ph:eyeglasses',h25:'ph:bone',h26:'ph:flask',
+    f01:'ph:chicken',f02:'ph:chicken',f03:'ph:chicken',f04:'ph:bowl-food',f05:'ph:bowl-food',
+    f06:'ph:fork-knife',f07:'ph:bowl-food',f08:'ph:bowl-food',f09:'ph:bowl-food',f10:'ph:fish',
+    f11:'ph:fork-knife',f12:'ph:flame',f13:'ph:beer-stein',f14:'ph:pepper',f15:'ph:flame',
+    f16:'ph:bowl-food',f17:'ph:fish',f18:'ph:bowl-food',f19:'ph:cake',f20:'ph:ice-cream',
+    f21:'ph:flame',f22:'ph:bowl-food',f23:'ph:fork-knife',f24:'ph:bowl-food',f25:'ph:storefront',
+    f26:'ph:coffee',f27:'ph:fork-knife',f28:'ph:fork-knife',f29:'ph:fork-knife',f30:'ph:fork-knife',
+    f31:'ph:sushi',f32:'ph:bowl-food',f33:'ph:pepper',f34:'ph:fork-knife',f35:'ph:wine',
+    s01:'ph:shopping-bag',s02:'ph:airplane',s03:'ph:leaf',s04:'ph:storefront',s05:'ph:sunglasses',
+    s06:'ph:t-shirt',s07:'ph:diamond',s08:'ph:eyeglasses',s09:'ph:shopping-cart',s10:'ph:pencil',
+    s11:'ph:pill',s12:'ph:pill',s13:'ph:bandaids',s14:'ph:bandaids',s15:'ph:moon',
+    s16:'ph:first-aid-kit',s17:'ph:t-shirt',s18:'ph:shopping-cart',s19:'ph:cookie',s20:'ph:package',
+    s21:'ph:leaf',s22:'ph:leaf',s23:'ph:plant',s24:'ph:gift',s25:'ph:books',
+    a01:'ph:identification-card',a02:'ph:book-open',a03:'ph:bank',a04:'ph:bank',a05:'ph:device-mobile',
+    a06:'ph:car',a07:'ph:currency-krw',a08:'ph:chart-bar',a09:'ph:shield',a10:'ph:files',
+    a11:'ph:heartbeat',a12:'ph:chart-line-up',a13:'ph:globe',a14:'ph:seal',a15:'ph:check-circle',
+    p01:'ph:house-line',p02:'ph:users-three',p03:'ph:users',p04:'ph:house',p05:'ph:graduation-cap',
+    p06:'ph:map-pin',p07:'ph:hands-praying',p08:'ph:fork-knife',p09:'ph:camera',p10:'ph:gift',
+    k01:'ph:syringe',k02:'ph:stethoscope',k03:'ph:tooth',k04:'ph:lego',k05:'ph:t-shirt',
+    k06:'ph:books',k07:'ph:baby',k08:'ph:smiley',k09:'ph:ticket',k10:'ph:camera',
+    g01:'ph:buildings',g02:'ph:tree',g03:'ph:broadcast-tower',g04:'ph:waves',g05:'ph:house',
+    g06:'ph:palette',g07:'ph:music-note',g08:'ph:building',g09:'ph:books',g10:'ph:binoculars',
+    g11:'ph:mountain',g12:'ph:umbrella-simple',g13:'ph:crown',g14:'ph:house',g15:'ph:tree-evergreen',
+    g16:'ph:microphone',g17:'ph:monitor',g18:'ph:thermometer-hot',g19:'ph:lock-key',g20:'ph:baseball',
+    g21:'ph:dress',g22:'ph:flag',
+  }))
+
   function handleLogin() {
     if (pw === ADMIN_PASSWORD) { setAuthed(true); setPwError(false) }
     else { setPwError(true) }
@@ -448,9 +483,9 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
         {tab==='business'    && <BusinessTab />}
         {tab==='requests'    && <RequestsTab />}
         {tab==='suggestions' && <SuggestionsTab />}
-        {tab==='categories'  && <CategoriesTab />}
-        {tab==='items'       && <ItemsTab />}
-        {tab==='export'      && <ExportTab />}
+        {tab==='categories'  && <CategoriesTab cats={sharedCats} setCats={setSharedCats} items={sharedItems} setItems={setSharedItems} />}
+        {tab==='items'       && <ItemsTab cats={sharedCats} items={sharedItems} setItems={setSharedItems} iconMap={sharedIconMap} setIconMap={setSharedIconMap} />}
+        {tab==='export'      && <ExportTab cats={sharedCats} items={sharedItems} iconMap={sharedIconMap} />}
       </div>
     </div>
   )
@@ -669,12 +704,14 @@ function ReviewManager({ businessId, onRefresh, showToast }: { businessId: strin
 // ════════════════════════════════════════════
 // TAB 2: 카테고리 관리
 // ════════════════════════════════════════════
-function CategoriesTab() {
-  const [cats, setCats]         = useState<Cat[]>(() => JSON.parse(JSON.stringify(DEFAULT_CATS)))
+function CategoriesTab({ cats, setCats, items, setItems }: {
+  cats: Cat[]; setCats: (f: (p: Cat[]) => Cat[]) => void
+  items: Item[]; setItems: (f: (p: Item[]) => Item[]) => void
+}) {
   const [newEmoji, setNewEmoji] = useState('')
   const [newLabel, setNewLabel] = useState('')
   const [toast, setToast]       = useState('')
-  const [selectedId, setSelectedId] = useState(DEFAULT_CATS[0].id)
+  const [selectedId, setSelectedId] = useState(cats[0]?.id ?? '')
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2000) }
 
@@ -690,6 +727,7 @@ function CategoriesTab() {
   function deleteCat(id: string) {
     if (!confirm('이 카테고리와 하위 항목을 모두 삭제할까요?')) return
     setCats(prev => prev.filter(c => c.id !== id))
+    setItems(prev => prev.filter(i => i.categoryId !== id))
     showToast('삭제됨')
   }
 
@@ -836,46 +874,15 @@ function IconPicker({ value, onChange }: { value: string; onChange: (v: string) 
   )
 }
 
-function ItemsTab() {
-  const [cats]  = useState<Cat[]>(() => JSON.parse(JSON.stringify(DEFAULT_CATS)))
-  const [items, setItems] = useState<Item[]>(() => JSON.parse(JSON.stringify(DEFAULT_ITEMS)))
-  const [selCat, setSelCat] = useState(DEFAULT_CATS[0].id)
+function ItemsTab({ cats, items, setItems, iconMap, setIconMap }: {
+  cats: Cat[]
+  items: Item[]; setItems: (f: (p: Item[]) => Item[]) => void
+  iconMap: Record<string,string>; setIconMap: (f: (p: Record<string,string>) => Record<string,string>) => void
+}) {
+  const [selCat, setSelCat] = useState(cats[0]?.id ?? '')
   const [newLabel, setNewLabel] = useState('')
   const [newIcon, setNewIcon]   = useState('ph:star')
   const [toast, setToast] = useState('')
-
-  // 기존 ITEM_ICONS 맵 (체크리스트에서 가져온 것과 동일)
-  const [iconMap, setIconMap] = useState<Record<string,string>>(() => ({
-    h01:'ph:tooth',h02:'ph:tooth',h03:'ph:sparkle',h04:'ph:syringe',h05:'ph:drop',
-    h06:'ph:eye',h07:'ph:eyeglasses',h08:'ph:heartbeat',h09:'ph:shield-check',h10:'ph:leaf',
-    h11:'ph:scissors',h12:'ph:hand',h13:'ph:eye',h14:'ph:pencil-simple',h15:'ph:person-simple',
-    h16:'ph:shopping-bag',h17:'ph:flask',h18:'ph:sun',h19:'ph:mask-happy',h20:'ph:drop-half',
-    h21:'ph:barbell',h22:'ph:thermometer-hot',h23:'ph:pill',h24:'ph:eyeglasses',h25:'ph:bone',h26:'ph:flask',
-    f01:'ph:chicken',f02:'ph:chicken',f03:'ph:chicken',f04:'ph:bowl-food',f05:'ph:bowl-food',
-    f06:'ph:fork-knife',f07:'ph:bowl-food',f08:'ph:bowl-food',f09:'ph:bowl-food',f10:'ph:fish',
-    f11:'ph:fork-knife',f12:'ph:flame',f13:'ph:beer-stein',f14:'ph:pepper',f15:'ph:flame',
-    f16:'ph:bowl-food',f17:'ph:fish',f18:'ph:bowl-food',f19:'ph:cake',f20:'ph:ice-cream',
-    f21:'ph:flame',f22:'ph:bowl-food',f23:'ph:fork-knife',f24:'ph:bowl-food',f25:'ph:storefront',
-    f26:'ph:coffee',f27:'ph:fork-knife',f28:'ph:fork-knife',f29:'ph:fork-knife',f30:'ph:fork-knife',
-    f31:'ph:sushi',f32:'ph:bowl-food',f33:'ph:pepper',f34:'ph:fork-knife',f35:'ph:wine',
-    s01:'ph:shopping-bag',s02:'ph:airplane',s03:'ph:leaf',s04:'ph:storefront',s05:'ph:sunglasses',
-    s06:'ph:t-shirt',s07:'ph:diamond',s08:'ph:eyeglasses',s09:'ph:shopping-cart',s10:'ph:pencil',
-    s11:'ph:pill',s12:'ph:pill',s13:'ph:bandaids',s14:'ph:bandaids',s15:'ph:moon',
-    s16:'ph:first-aid-kit',s17:'ph:t-shirt',s18:'ph:shopping-cart',s19:'ph:cookie',s20:'ph:package',
-    s21:'ph:leaf',s22:'ph:leaf',s23:'ph:plant',s24:'ph:gift',s25:'ph:books',
-    a01:'ph:identification-card',a02:'ph:book-open',a03:'ph:bank',a04:'ph:bank',a05:'ph:device-mobile',
-    a06:'ph:car',a07:'ph:currency-krw',a08:'ph:chart-bar',a09:'ph:shield',a10:'ph:files',
-    a11:'ph:heartbeat',a12:'ph:chart-line-up',a13:'ph:globe',a14:'ph:seal',a15:'ph:check-circle',
-    p01:'ph:house-line',p02:'ph:users-three',p03:'ph:users',p04:'ph:house',p05:'ph:graduation-cap',
-    p06:'ph:map-pin',p07:'ph:hands-praying',p08:'ph:fork-knife',p09:'ph:camera',p10:'ph:gift',
-    k01:'ph:syringe',k02:'ph:stethoscope',k03:'ph:tooth',k04:'ph:lego',k05:'ph:t-shirt',
-    k06:'ph:books',k07:'ph:baby',k08:'ph:smiley',k09:'ph:ticket',k10:'ph:camera',
-    g01:'ph:buildings',g02:'ph:tree',g03:'ph:broadcast-tower',g04:'ph:waves',g05:'ph:house',
-    g06:'ph:palette',g07:'ph:music-note',g08:'ph:building',g09:'ph:books',g10:'ph:binoculars',
-    g11:'ph:mountain',g12:'ph:umbrella-simple',g13:'ph:crown',g14:'ph:house',g15:'ph:tree-evergreen',
-    g16:'ph:microphone',g17:'ph:monitor',g18:'ph:thermometer-hot',g19:'ph:lock-key',g20:'ph:baseball',
-    g21:'ph:dress',g22:'ph:flag',
-  }))
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2000) }
 
@@ -927,10 +934,7 @@ function ItemsTab() {
     setItems(allItems)
   }
 
-  // ExportTab에서 iconMap을 참조할 수 있도록 window에 저장
-  ;(window as any).__adminIconMap = iconMap
-  ;(window as any).__adminItems   = items
-  ;(window as any).__adminCats    = cats
+  // ExportTab과 state 공유 (props로 처리)
 
   return (
     <>
@@ -990,14 +994,13 @@ function ItemsTab() {
 // ════════════════════════════════════════════
 // TAB 4: 코드 내보내기
 // ════════════════════════════════════════════
-function ExportTab() {
+function ExportTab({ cats, items, iconMap }: {
+  cats: Cat[]; items: Item[]; iconMap: Record<string,string>
+}) {
   const [code, setCode]   = useState('')
   const [copied, setCopied] = useState(false)
 
   function generate() {
-    const cats  = (window as any).__adminCats  ?? JSON.parse(JSON.stringify(DEFAULT_CATS))
-    const items = (window as any).__adminItems ?? JSON.parse(JSON.stringify(DEFAULT_ITEMS))
-    const iconMap: Record<string,string> = (window as any).__adminIconMap ?? {}
     const esc = (s: string) => s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")
     let out = `export type Category = { id: string; label: string; receiptLabel: string; emoji: string }\n`
     out += `export type CheckItem = { id: string; categoryId: string; label: string; emoji: string }\n\n`
