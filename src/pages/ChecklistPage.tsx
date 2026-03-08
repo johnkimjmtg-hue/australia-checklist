@@ -265,7 +265,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:50 }}>
+      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:30 }}>
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
@@ -337,7 +337,7 @@ export default function ChecklistPage({ state, setState }: Props) {
           </div>
 
           {/* ── STICKY: 달력 + 카테고리 칩 ── */}
-          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:20 }}>
+          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:24 }}>
 
             {/* Schedule grid view */}
             {showScheduleView && trip && (
@@ -392,15 +392,15 @@ export default function ChecklistPage({ state, setState }: Props) {
           {/* ── 온보딩 CTA (일정 미설정 시) ── */}
           {!trip && (
             <>
-              {/* 블러 오버레이 — 헤더 아래부터 덮기 */}
+              {/* 블러 오버레이 */}
               <div style={{
-                position:'fixed', top:100, left:0, right:0, bottom:0, zIndex:40,
+                position:'fixed', inset:0, zIndex:25,
                 background:'rgba(241,245,249,0.75)',
                 backdropFilter:'blur(6px)',
                 WebkitBackdropFilter:'blur(6px)',
               }} />
               {/* CTA 카드 */}
-              <div style={{ position:'fixed', left:'50%', top:'50%', transform:'translate(-50%,-50%)', zIndex:41, width:'calc(100% - 32px)', maxWidth:358 }}>
+              <div style={{ position:'fixed', left:'50%', top:'50%', transform:'translate(-50%,-50%)', zIndex:26, width:'calc(100% - 32px)', maxWidth:358 }}>
                 <div onClick={handleOpenTripPicker} style={{
                   background:'linear-gradient(135deg, #002870, #003594)',
                   borderRadius:16, padding:'24px 20px',
