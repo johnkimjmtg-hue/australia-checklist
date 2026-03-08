@@ -338,7 +338,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
       <Confetti trigger={confettiTrigger} />
 
       {/* ══ 헤더 + 탭 ══ */}
-      <div style={{ background:'#fff',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:30 }}>
+      <div style={{ background:'#fff',borderBottom:'1px solid #E2E8F0' }}>
         <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
             style={{ fontSize:13, color:'#003594', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
@@ -360,8 +360,8 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
         </div>
       </div>
 
-      {/* ══ 진행 카드 ══ */}
-      <div style={{ padding:'16px 16px 0' }}>
+      {/* ══ 진행 카드 — sticky ══ */}
+      <div style={{ position:'sticky', top:0, zIndex:30, background:'#F1F5F9', padding:'16px 16px 0' }}>
         <div style={{
           background:'#fff',borderRadius:12,
           boxShadow:'0 4px 20px rgba(0,53,148,0.10),0 1px 4px rgba(0,0,0,0.06)',
