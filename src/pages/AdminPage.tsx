@@ -752,13 +752,127 @@ function CategoriesTab() {
 // ════════════════════════════════════════════
 // TAB 3: 체크리스트 항목
 // ════════════════════════════════════════════
+// 자주 쓰는 Phosphor 아이콘 목록 (카테고리별 그룹)
+const PH_ICONS = [
+  'ph:heart','ph:star','ph:check-circle','ph:map-pin','ph:calendar',
+  'ph:camera','ph:gift','ph:flag','ph:crown','ph:trophy',
+  // 의료
+  'ph:first-aid-kit','ph:stethoscope','ph:syringe','ph:pill','ph:tooth',
+  'ph:heartbeat','ph:bandaids','ph:thermometer','ph:eye','ph:eyeglasses',
+  'ph:drop','ph:flask','ph:mask-happy','ph:shield-check','ph:leaf',
+  'ph:scissors','ph:barbell','ph:sun','ph:bone','ph:sparkle',
+  // 음식
+  'ph:fork-knife','ph:bowl-food','ph:coffee','ph:beer-stein','ph:wine',
+  'ph:chicken','ph:fish','ph:cake','ph:ice-cream','ph:pepper',
+  'ph:flame','ph:storefront','ph:cookie','ph:bread',
+  // 쇼핑/생활
+  'ph:shopping-bag','ph:shopping-cart','ph:package','ph:t-shirt',
+  'ph:diamond','ph:sunglasses','ph:books','ph:plant','ph:moon',
+  // 행정/금융
+  'ph:identification-card','ph:book-open','ph:bank','ph:device-mobile',
+  'ph:car','ph:currency-krw','ph:chart-bar','ph:shield','ph:files',
+  'ph:globe','ph:seal','ph:chart-line-up',
+  // 사람/커뮤니티
+  'ph:users','ph:users-three','ph:house','ph:house-line','ph:graduation-cap',
+  'ph:hands-praying','ph:hand','ph:person-simple',
+  // 육아
+  'ph:baby','ph:lego','ph:smiley','ph:ticket',
+  // 장소/관광
+  'ph:buildings','ph:tree','ph:waves','ph:palette','ph:music-note',
+  'ph:building','ph:binoculars','ph:mountain','ph:tree-evergreen',
+  'ph:microphone','ph:monitor','ph:baseball','ph:dress',
+  // 일정
+  'ph:airplane','ph:airplane-takeoff','ph:train','ph:bus',
+  'ph:clock','ph:alarm','ph:pencil-simple','ph:note',
+]
+
+function IconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const filtered = search ? PH_ICONS.filter(i => i.includes(search)) : PH_ICONS
+  return (
+    <div style={{ position:'relative' }}>
+      <button type="button" onClick={() => setOpen(o => !o)} style={{
+        width:44, height:38, border:'1.5px solid #e0e0e0', borderRadius:9,
+        background:'#fafafa', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+      }}>
+        <Icon icon={value || 'ph:star'} width={20} height={20} color="#1E4D83" />
+      </button>
+      {open && (
+        <>
+          <div onClick={() => setOpen(false)} style={{ position:'fixed', inset:0, zIndex:700 }}/>
+          <div style={{
+            position:'absolute', top:44, left:0, zIndex:701,
+            background:'#fff', borderRadius:12, padding:12,
+            boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
+            width:260, maxHeight:300, overflowY:'auto',
+          }}>
+            <input
+              value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="아이콘 검색 (예: heart, food...)"
+              style={{ ...inputStyle, marginBottom:10, fontSize:12, padding:'6px 10px' }}
+              autoFocus
+            />
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:4 }}>
+              {filtered.map(ic => (
+                <button key={ic} type="button" onClick={() => { onChange(ic); setOpen(false); setSearch('') }}
+                  title={ic.replace('ph:','')}
+                  style={{
+                    width:32, height:32, border: value===ic ? '2px solid #1E4D83' : '1px solid #eee',
+                    borderRadius:6, background: value===ic ? '#eef2fb' : '#fafafa',
+                    cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', padding:0,
+                  }}>
+                  <Icon icon={ic} width={16} height={16} color={value===ic ? '#1E4D83' : '#555'} />
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 function ItemsTab() {
   const [cats]  = useState<Cat[]>(() => JSON.parse(JSON.stringify(DEFAULT_CATS)))
   const [items, setItems] = useState<Item[]>(() => JSON.parse(JSON.stringify(DEFAULT_ITEMS)))
   const [selCat, setSelCat] = useState(DEFAULT_CATS[0].id)
   const [newLabel, setNewLabel] = useState('')
-  const [newEmoji, setNewEmoji] = useState('')
+  const [newIcon, setNewIcon]   = useState('ph:star')
   const [toast, setToast] = useState('')
+
+  // 기존 ITEM_ICONS 맵 (체크리스트에서 가져온 것과 동일)
+  const [iconMap, setIconMap] = useState<Record<string,string>>(() => ({
+    h01:'ph:tooth',h02:'ph:tooth',h03:'ph:sparkle',h04:'ph:syringe',h05:'ph:drop',
+    h06:'ph:eye',h07:'ph:eyeglasses',h08:'ph:heartbeat',h09:'ph:shield-check',h10:'ph:leaf',
+    h11:'ph:scissors',h12:'ph:hand',h13:'ph:eye',h14:'ph:pencil-simple',h15:'ph:person-simple',
+    h16:'ph:shopping-bag',h17:'ph:flask',h18:'ph:sun',h19:'ph:mask-happy',h20:'ph:drop-half',
+    h21:'ph:barbell',h22:'ph:thermometer-hot',h23:'ph:pill',h24:'ph:eyeglasses',h25:'ph:bone',h26:'ph:flask',
+    f01:'ph:chicken',f02:'ph:chicken',f03:'ph:chicken',f04:'ph:bowl-food',f05:'ph:bowl-food',
+    f06:'ph:fork-knife',f07:'ph:bowl-food',f08:'ph:bowl-food',f09:'ph:bowl-food',f10:'ph:fish',
+    f11:'ph:fork-knife',f12:'ph:flame',f13:'ph:beer-stein',f14:'ph:pepper',f15:'ph:flame',
+    f16:'ph:bowl-food',f17:'ph:fish',f18:'ph:bowl-food',f19:'ph:cake',f20:'ph:ice-cream',
+    f21:'ph:flame',f22:'ph:bowl-food',f23:'ph:fork-knife',f24:'ph:bowl-food',f25:'ph:storefront',
+    f26:'ph:coffee',f27:'ph:fork-knife',f28:'ph:fork-knife',f29:'ph:fork-knife',f30:'ph:fork-knife',
+    f31:'ph:sushi',f32:'ph:bowl-food',f33:'ph:pepper',f34:'ph:fork-knife',f35:'ph:wine',
+    s01:'ph:shopping-bag',s02:'ph:airplane',s03:'ph:leaf',s04:'ph:storefront',s05:'ph:sunglasses',
+    s06:'ph:t-shirt',s07:'ph:diamond',s08:'ph:eyeglasses',s09:'ph:shopping-cart',s10:'ph:pencil',
+    s11:'ph:pill',s12:'ph:pill',s13:'ph:bandaids',s14:'ph:bandaids',s15:'ph:moon',
+    s16:'ph:first-aid-kit',s17:'ph:t-shirt',s18:'ph:shopping-cart',s19:'ph:cookie',s20:'ph:package',
+    s21:'ph:leaf',s22:'ph:leaf',s23:'ph:plant',s24:'ph:gift',s25:'ph:books',
+    a01:'ph:identification-card',a02:'ph:book-open',a03:'ph:bank',a04:'ph:bank',a05:'ph:device-mobile',
+    a06:'ph:car',a07:'ph:currency-krw',a08:'ph:chart-bar',a09:'ph:shield',a10:'ph:files',
+    a11:'ph:heartbeat',a12:'ph:chart-line-up',a13:'ph:globe',a14:'ph:seal',a15:'ph:check-circle',
+    p01:'ph:house-line',p02:'ph:users-three',p03:'ph:users',p04:'ph:house',p05:'ph:graduation-cap',
+    p06:'ph:map-pin',p07:'ph:hands-praying',p08:'ph:fork-knife',p09:'ph:camera',p10:'ph:gift',
+    k01:'ph:syringe',k02:'ph:stethoscope',k03:'ph:tooth',k04:'ph:lego',k05:'ph:t-shirt',
+    k06:'ph:books',k07:'ph:baby',k08:'ph:smiley',k09:'ph:ticket',k10:'ph:camera',
+    g01:'ph:buildings',g02:'ph:tree',g03:'ph:broadcast-tower',g04:'ph:waves',g05:'ph:house',
+    g06:'ph:palette',g07:'ph:music-note',g08:'ph:building',g09:'ph:books',g10:'ph:binoculars',
+    g11:'ph:mountain',g12:'ph:umbrella-simple',g13:'ph:crown',g14:'ph:house',g15:'ph:tree-evergreen',
+    g16:'ph:microphone',g17:'ph:monitor',g18:'ph:thermometer-hot',g19:'ph:lock-key',g20:'ph:baseball',
+    g21:'ph:dress',g22:'ph:flag',
+  }))
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2000) }
 
@@ -766,23 +880,36 @@ function ItemsTab() {
   const isLocked = selCat === 'custom'
   const cat = cats.find(c => c.id === selCat)
 
+  // CAT_ICON_MAP 기본 아이콘
+  const CAT_DEFAULT: Record<string,string> = {
+    hospital:'ph:first-aid-kit', food:'ph:fork-knife', shopping:'ph:shopping-bag',
+    admin:'ph:files', people:'ph:users', parenting:'ph:baby', places:'ph:map-pin',
+    schedule:'ph:calendar', custom:'ph:star',
+  }
+
   function addItem() {
     if (!newLabel.trim()) return
-    const emoji = newEmoji.trim() || autoEmoji(newLabel)
     const id = 'i_' + Date.now()
-    setItems(prev => [...prev, { id, categoryId:selCat, label:newLabel.trim(), emoji }])
-    setNewLabel(''); setNewEmoji('')
+    const icon = newIcon || CAT_DEFAULT[selCat] || 'ph:star'
+    setItems(prev => [...prev, { id, categoryId:selCat, label:newLabel.trim(), emoji:'⭐' }])
+    setIconMap(prev => ({ ...prev, [id]: icon }))
+    setNewLabel(''); setNewIcon(CAT_DEFAULT[selCat] || 'ph:star')
     showToast('항목 추가됨: ' + newLabel)
   }
 
   function deleteItem(id: string) {
     setItems(prev => prev.filter(i => i.id !== id))
+    setIconMap(prev => { const n = {...prev}; delete n[id]; return n })
     showToast('항목 삭제됨')
   }
 
   function updateItem(id: string, field: 'label'|'emoji', val: string) {
     if (!val) return
     setItems(prev => prev.map(i => i.id===id ? {...i,[field]:val} : i))
+  }
+
+  function updateIcon(id: string, icon: string) {
+    setIconMap(prev => ({ ...prev, [id]: icon }))
   }
 
   function moveItem(id: string, dir: number) {
@@ -797,6 +924,11 @@ function ItemsTab() {
     setItems(allItems)
   }
 
+  // ExportTab에서 iconMap을 참조할 수 있도록 window에 저장
+  ;(window as any).__adminIconMap = iconMap
+  ;(window as any).__adminItems   = items
+  ;(window as any).__adminCats    = cats
+
   return (
     <>
       {toast && <Toast msg={toast} />}
@@ -804,7 +936,7 @@ function ItemsTab() {
         <SectionTitle>카테고리 선택</SectionTitle>
         <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
           {cats.map(c => (
-            <button key={c.id} onClick={() => setSelCat(c.id)} style={{
+            <button key={c.id} onClick={() => { setSelCat(c.id); setNewIcon(CAT_DEFAULT[c.id] || 'ph:star') }} style={{
               padding:'6px 14px', borderRadius:8, border:'1.5px solid',
               borderColor: selCat===c.id ? '#1E4D83' : '#ddd',
               background: selCat===c.id ? '#1E4D83' : '#fff',
@@ -821,9 +953,9 @@ function ItemsTab() {
         </div>
 
         {!isLocked && (
-          <div style={{ display:'flex', gap:8, marginBottom:14 }}>
+          <div style={{ display:'flex', gap:8, marginBottom:14, alignItems:'center' }}>
+            <IconPicker value={newIcon} onChange={setNewIcon} />
             <input value={newLabel} onChange={e=>setNewLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addItem()} placeholder="새 항목 이름" style={{ ...inputStyle, flex:1 }} />
-            <input value={newEmoji} onChange={e=>setNewEmoji(e.target.value)} placeholder="🎯" maxLength={2} style={{ ...inputStyle, width:60, textAlign:'center', fontSize:18 }} />
             <button onClick={addItem} style={btnPrimary}>추가</button>
           </div>
         )}
@@ -836,7 +968,7 @@ function ItemsTab() {
           <div>
             {catItems.map((item, localIdx) => (
               <div key={item.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 0', borderBottom:'1px solid #f3f3f3' }}>
-                <input value={item.emoji} maxLength={2} onChange={e=>updateItem(item.id,'emoji',e.target.value)} style={{ width:36, textAlign:'center', fontSize:18, border:'none', background:'transparent' }} />
+                <IconPicker value={iconMap[item.id] || CAT_DEFAULT[selCat] || 'ph:star'} onChange={v => updateIcon(item.id, v)} />
                 <input value={item.label} onChange={e=>updateItem(item.id,'label',e.target.value)} style={{ flex:1, fontSize:13, border:'none', background:'transparent', color:'#444' }} />
                 <div style={{ display:'flex', gap:4 }}>
                   <button onClick={() => moveItem(item.id,-1)} disabled={localIdx===0} style={{ ...btnSmGhost, opacity:localIdx===0?0.3:1 }}>↑</button>
@@ -860,8 +992,9 @@ function ExportTab() {
   const [copied, setCopied] = useState(false)
 
   function generate() {
-    const cats  = JSON.parse(JSON.stringify(DEFAULT_CATS))
-    const items = JSON.parse(JSON.stringify(DEFAULT_ITEMS))
+    const cats  = (window as any).__adminCats  ?? JSON.parse(JSON.stringify(DEFAULT_CATS))
+    const items = (window as any).__adminItems ?? JSON.parse(JSON.stringify(DEFAULT_ITEMS))
+    const iconMap: Record<string,string> = (window as any).__adminIconMap ?? {}
     const esc = (s: string) => s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")
     let out = `export type Category = { id: string; label: string; receiptLabel: string; emoji: string }\n`
     out += `export type CheckItem = { id: string; categoryId: string; label: string; emoji: string }\n\n`
@@ -874,7 +1007,12 @@ function ExportTab() {
       if (cat && cat.id !== lastCat) { out += `\n\n  // ${cat.label}\n`; lastCat = cat.id }
       out += `  { id:'${esc(item.id)}', categoryId:'${esc(item.categoryId)}', label:'${esc(item.label)}', emoji:'${item.emoji}' },\n`
     })
-    out += `]\n`
+    out += `]\n\n`
+    // ITEM_ICONS 내보내기
+    out += `// 아이템별 Phosphor 아이콘 맵 — ChecklistPage.tsx 와 BucketCheckView.tsx 의 ITEM_ICONS 를 이 내용으로 교체하세요\n`
+    out += `export const ITEM_ICONS: Record<string, string> = {\n`
+    Object.entries(iconMap).forEach(([k, v]) => { out += `  ${k}:'${v}',\n` })
+    out += `}\n`
     setCode(out)
   }
 
@@ -890,6 +1028,7 @@ function ExportTab() {
         '"코드 생성" 버튼을 클릭하세요',
         '"전체 복사" 버튼으로 코드를 클립보드에 복사하세요',
         'src/data/checklist.ts 파일 전체 내용을 붙여넣으세요',
+        'ITEM_ICONS 부분은 ChecklistPage.tsx 와 BucketCheckView.tsx 의 ITEM_ICONS 도 교체하세요',
         'npm run build 후 배포하면 모든 사용자에게 반영됩니다',
       ].map((step, i) => (
         <div key={i} style={{ display:'flex', gap:10, alignItems:'flex-start', marginBottom:10 }}>
