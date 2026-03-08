@@ -644,28 +644,28 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 function ChatBubble() {
   const [open, setOpen] = useState(true)
   return (
-    <div style={{ position:"fixed", bottom:"20%", right:20, zIndex:300, display:"flex", flexDirection:"column", alignItems:"flex-end", gap:8 }}>
+    <div style={{ position:"fixed", bottom:"10%", right:20, zIndex:300, display:"flex", flexDirection:"column", alignItems:"flex-end", gap:8 }}>
       {open && (
         <div style={{
-          background:"linear-gradient(135deg, #001f5c, #003594)",
-          borderRadius:14, padding:"14px 16px",
-          boxShadow:"0 4px 20px rgba(0,0,0,0.25)",
+          background:"#fff", borderRadius:14, padding:"14px 16px",
+          boxShadow:"0 4px 20px rgba(0,53,148,0.15)",
           maxWidth:240, position:"relative",
           animation:"fadeInUp 0.25s ease",
+          border:"1px solid rgba(0,53,148,0.08)",
         }}>
           {/* 닫기 버튼 */}
           <button onClick={() => setOpen(false)} style={{
             position:"absolute", top:8, right:8,
             background:"none", border:"none", cursor:"pointer",
-            color:"rgba(255,255,255,0.6)", fontSize:14, lineHeight:1, padding:2,
+            color:"#94A3B8", fontSize:14, lineHeight:1, padding:2,
           }}>✕</button>
-          <div style={{ fontSize:12, fontWeight:800, color:"#FFCD00", marginBottom:6 }}>
+          <div style={{ fontSize:12, fontWeight:800, color:"#003594", marginBottom:6 }}>
             호주가자 운영자입니다.
           </div>
-          <div style={{ fontSize:12, color:"rgba(255,255,255,0.88)", lineHeight:1.6 }}>
+          <div style={{ fontSize:12, color:"#475569", lineHeight:1.6 }}>
             본 서비스는 무료로 제공되는 서비스입니다. 문의 사항이나 의견 있으시면{" "}
             <a href="https://www.threads.net/@palaslouise" target="_blank" rel="noreferrer"
-              style={{ color:"#FFCD00", fontWeight:700, textDecoration:"none" }}>
+              style={{ color:"#003594", fontWeight:700, textDecoration:"none" }}>
               @palaslouise
             </a>
             로 연락주세요.
@@ -676,18 +676,19 @@ function ChatBubble() {
             width:0, height:0,
             borderLeft:"8px solid transparent",
             borderRight:"8px solid transparent",
-            borderTop:"8px solid #003594",
+            borderTop:"8px solid #fff",
+            filter:"drop-shadow(0 2px 2px rgba(0,53,148,0.08))",
           }}/>
         </div>
       )}
       {/* 채팅 버튼 */}
       <button onClick={() => setOpen(v => !v)} style={{
         width:44, height:44, borderRadius:"50%",
-        background:"#fff",
-        border:"2px solid rgba(0,53,148,0.15)",
+        background:"#E8EDF5",
+        border:"none",
         cursor:"pointer",
         display:"flex", alignItems:"center", justifyContent:"center",
-        boxShadow:"0 4px 14px rgba(0,0,0,0.15)",
+        boxShadow:"0 2px 8px rgba(0,0,0,0.12)",
       }}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="#003594">
           <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.96 9.96 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/>
