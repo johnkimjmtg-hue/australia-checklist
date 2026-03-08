@@ -958,7 +958,7 @@ function ItemsTab() {
         {!isLocked && (
           <div style={{ display:'flex', gap:8, marginBottom:14, alignItems:'center' }}>
             <IconPicker value={newIcon} onChange={setNewIcon} />
-            <input value={newLabel} onChange={e=>setNewLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addItem()} placeholder="새 항목 이름" style={{ ...inputStyle, flex:1 }} />
+            <input value={newLabel} onChange={e=>setNewLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addItem()} placeholder="새 항목 이름" style={{ ...inputStyle, flex:1, minWidth:0 }} />
             <button onClick={addItem} style={btnPrimary}>추가</button>
           </div>
         )}
@@ -1031,7 +1031,6 @@ function ExportTab() {
         '"코드 생성" 버튼을 클릭하세요',
         '"전체 복사" 버튼으로 코드를 클립보드에 복사하세요',
         'src/data/checklist.ts 파일 전체 내용을 붙여넣으세요',
-        'ITEM_ICONS 부분은 ChecklistPage.tsx 와 BucketCheckView.tsx 의 ITEM_ICONS 도 교체하세요',
         'npm run build 후 배포하면 모든 사용자에게 반영됩니다',
       ].map((step, i) => (
         <div key={i} style={{ display:'flex', gap:10, alignItems:'flex-start', marginBottom:10 }}>
@@ -1093,19 +1092,19 @@ function Confirm({ msg, onOk, onCancel, danger }: { msg: string; onOk: ()=>void;
 
 // ── 공통 스타일
 const inputStyle: React.CSSProperties = {
-  width:'100%', padding:'9px 12px', border:'1.5px solid #e0e0e0', borderRadius:9,
+  width:'100%', minWidth:0, padding:'9px 12px', border:'1.5px solid #e0e0e0', borderRadius:9,
   fontSize:14, color:'#333', outline:'none', boxSizing:'border-box',
-  fontFamily:'inherit',
+  fontFamily:'inherit', display:'block',
 }
 
 const btnPrimary: React.CSSProperties = {
-  padding:'9px 20px', borderRadius:9, border:'none', background:'#1E4D83', color:'#fff',
-  fontSize:13, fontWeight:700, cursor:'pointer', width:'100%',
+  padding:'9px 18px', borderRadius:9, border:'none', background:'#1E4D83', color:'#fff',
+  fontSize:13, fontWeight:700, cursor:'pointer', flexShrink:0, whiteSpace:'nowrap',
 }
 
 const btnGhost: React.CSSProperties = {
   padding:'9px 16px', borderRadius:9, border:'1.5px solid #e0e0e0', background:'#fff', color:'#666',
-  fontSize:13, fontWeight:700, cursor:'pointer', width:'100%',
+  fontSize:13, fontWeight:700, cursor:'pointer', flexShrink:0, whiteSpace:'nowrap',
 }
 
 const btnSmGhost: React.CSSProperties = {
