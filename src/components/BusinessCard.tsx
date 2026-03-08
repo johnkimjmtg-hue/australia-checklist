@@ -45,9 +45,9 @@ export default function BusinessCard({ business }: Props) {
     }
   }
 
-  // 1위 태그 (카운트 있는 것만, 접혔을 때 미리보기)
+  // 상위 2개 (카운트 있는 것만, 접혔을 때 미리보기)
   const topTags = counts
-    ? Object.entries(counts).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).slice(0,1)
+    ? Object.entries(counts).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).slice(0,2)
     : []
 
   const btnBase: React.CSSProperties = {
@@ -112,7 +112,7 @@ export default function BusinessCard({ business }: Props) {
                 background:'rgba(0,53,148,0.06)', color:'#003594',
                 fontSize:10, fontWeight:700, borderRadius:6, padding:'3px 8px',
                 display:'flex', alignItems:'center', gap:3,
-              }}>👍 {tag} {count}</span>
+              }}><Icon icon="ph:thumbs-up" width={11} height={11} color="#003594" /> {tag} {count}</span>
             ))}
           </div>
         )}
@@ -193,8 +193,8 @@ export default function BusinessCard({ business }: Props) {
                       fontFamily: ff,
                       opacity: voted && !isMine ? 0.5 : 1,
                     }}>
-                      <span style={{ fontSize:13, fontWeight: isMine ? 800 : 500, color: isMine ? '#003594' : '#1E293B' }}>
-                        {isMine ? '👍 ' : ''}{tag}
+                      <span style={{ fontSize:13, fontWeight: isMine ? 800 : 500, color: isMine ? '#003594' : '#1E293B', display:'flex', alignItems:'center', gap:5 }}>
+                        <Icon icon="ph:thumbs-up" width={14} height={14} color={isMine ? '#003594' : '#64748B'} />{tag}
                       </span>
                       {count > 0 && (
                         <span style={{
