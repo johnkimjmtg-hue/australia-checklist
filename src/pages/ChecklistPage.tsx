@@ -506,14 +506,10 @@ export default function ChecklistPage({ state, setState }: Props) {
                     />
 
                     <span onClick={() => {
-                      if (!trip) { setModal('noTrip'); return }
-                      if (!checked) showToast()
-                      setState(toggleItem(state, item.id))
-                      // 체크된 상태에서 클릭하면 일정보기에서 해당 아이템 하이라이트
                       if (checked && showScheduleView) setScheduleSelectedItem(item.id)
                     }} style={{
                       flex:1, fontSize:15, fontWeight: checked ? 600 : 400,
-                      color: checked ? '#1E293B' : '#64748B', cursor:'pointer',
+                      color: checked ? '#1E293B' : '#64748B', cursor: checked && showScheduleView ? 'pointer' : 'default',
                       lineHeight:1.4,
                     }}>{item.label}</span>
 
@@ -649,15 +645,21 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId }: {
   const days = getTripDays(trip)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // selectedItemId 가 바뀌면 첫 번째 할당 날짜로 스크롤
+  // selectedItemId 또는 schedules 가 바뀌면 첫 번째 할당 날짜로 스크롤
   useEffect(() => {
     if (!selectedItemId || !scrollRef.current) return
     const assignedDays = state.schedules[selectedItemId] ?? []
     if (assignedDays.length === 0) return
     const firstDay = Math.min(...assignedDays)
     const el = scrollRef.current.querySelector(`[data-dayidx="${firstDay}"]`) as HTMLElement | null
-    if (el) el.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' })
-  }, [selectedItemId])
+    if (!el) return
+    const container = scrollRef.current
+    const containerWidth = container.offsetWidth
+    const elLeft = el.offsetLeft
+    const elWidth = el.offsetWidth
+    const targetScrollLeft = elLeft - containerWidth / 2 + elWidth / 2
+    container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' })
+  }, [selectedItemId, state.schedules])
 
   // 각 날짜별 할당 수 (선택된 아이템 기준)
   const assignedDays = selectedItemId ? (state.schedules[selectedItemId] ?? []) : []
@@ -668,14 +670,13 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId }: {
   )
   const maxCount = Math.max(1, ...dayCount)
 
-  // 빨간색 강도: 1~4단계
-  function redIntensity(count: number): string {
-    if (count === 0) return 'transparent'
-    const ratio = count / maxCount
-    if (ratio <= 0.25) return 'rgba(220,38,38,0.15)'
-    if (ratio <= 0.5)  return 'rgba(220,38,38,0.35)'
-    if (ratio <= 0.75) return 'rgba(220,38,38,0.60)'
-    return 'rgba(220,38,38,0.90)'
+  // 색상 4단계: 0=흰색, 1=연두, 2=노랑, 3=주황, 4+=빨강
+  function dayColor(count: number): string {
+    if (count <= 0) return '#ffffff'
+    if (count === 1) return '#D1FAE5'
+    if (count === 2) return '#FEF08A'
+    if (count === 3) return '#FED7AA'
+    return '#FCA5A5'
   }
 
   // 선택된 아이템이 있는 날짜의 하단 아이템 목록 — activeDayIdx 없이 selectedItem 기준
@@ -689,10 +690,8 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId }: {
     <div style={{ borderTop:'1px solid #E2E8F0', padding:'10px 16px 12px', background:'#F8FAFC' }}>
       <div ref={scrollRef} style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4, scrollBehavior:'smooth' }}>
         {days.map((d, idx) => {
-          const isSelected = assignedDays.includes(idx)
           const isActive   = activeDayIdx === idx
-          const bg = dayCount[idx] > 0 ? redIntensity(dayCount[idx]) : '#fff'
-          const textColor = dayCount[idx] / maxCount > 0.6 ? '#fff' : '#1E293B'
+          const bg = dayColor(dayCount[idx])
 
           return (
             <button
@@ -701,10 +700,10 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId }: {
               onClick={() => setActiveDayIdx(isActive ? null : idx)}
               style={{
                 minWidth:54, height:46, borderRadius:8, flexShrink:0,
-                border: isSelected ? '2px solid #FFCD00' : isActive ? '2px solid #003594' : '2px solid transparent',
+                border: isActive ? '2px solid #003594' : '2px solid transparent',
                 cursor:'pointer',
                 background: bg,
-                color: dayCount[idx] / maxCount > 0.6 ? '#fff' : isActive ? '#003594' : '#1E293B',
+                color: isActive ? '#003594' : '#1E293B',
                 fontSize:11, fontWeight:700, position:'relative', textAlign:'center',
                 lineHeight:1.3, padding:'4px 2px',
                 boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.20)' : '0 1px 3px rgba(0,0,0,0.06)',
@@ -715,7 +714,7 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId }: {
                 <span style={{
                   position:'absolute', top:2, right:3,
                   fontSize:8, fontWeight:900,
-                  color: dayCount[idx] / maxCount > 0.6 ? 'rgba(255,255,255,0.85)' : '#DC2626',
+                  color: '#44403C',
                 }}>{dayCount[idx]}</span>
               )}
             </button>
