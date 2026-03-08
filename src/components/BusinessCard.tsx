@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { Business, VOTE_TAGS, getMyVote, getVoteCounts, addVote } from '../lib/businessService'
 
@@ -20,6 +20,11 @@ export default function BusinessCard({ business }: Props) {
   const [showPhone, setShowPhone]   = useState(false)
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
+  // 카드 마운트 시 카운트 바로 로드
+  useEffect(() => {
+    getVoteCounts(business.id).then(setCounts)
+  }, [business.id])
+
   const handleToggleVotes = async () => {
     if (!showVotes && counts === null) {
       setLoading(true)
@@ -40,9 +45,9 @@ export default function BusinessCard({ business }: Props) {
     }
   }
 
-  // 상위 2개 (카운트 있는 것만, 접혔을 때 미리보기)
+  // 1위 태그 (카운트 있는 것만, 접혔을 때 미리보기)
   const topTags = counts
-    ? Object.entries(counts).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).slice(0,2)
+    ? Object.entries(counts).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).slice(0,1)
     : []
 
   const btnBase: React.CSSProperties = {
