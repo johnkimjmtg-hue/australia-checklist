@@ -366,89 +366,80 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:'#F5F8FF', fontFamily:ff, overflowX:'hidden' }}>
+    <div style={{ minHeight:'100vh', background:'#F1F5F9', fontFamily:ff, overflowX:'hidden' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
         @keyframes float    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
         @keyframes shimmer  { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
-        @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.6} }
       `}</style>
 
       {/* ── 헤더 ── */}
       <div style={{
         position:'sticky', top:0, zIndex:50,
-        background:'rgba(255,255,255,0.96)', backdropFilter:'blur(12px)',
-        borderBottom:'1px solid #F0F4FF',
-        padding:'12px 20px',
+        background:'rgba(241,245,249,0.95)', backdropFilter:'blur(10px)',
+        borderBottom:'1px solid #E2E8F0',
+        padding:'14px 20px',
         display:'flex', alignItems:'center', justifyContent:'space-between',
       }}>
-        <div onClick={handleLogoTap} style={{ cursor:'pointer', userSelect:'none' as any, display:'flex', alignItems:'center', gap:8 }}>
-          <div style={{ width:28, height:28, borderRadius:8, background:'#003594', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <span style={{ fontSize:14 }}>🦘</span>
-          </div>
-          <span style={{ fontSize:15, fontWeight:900, color:'#003594', letterSpacing:0.5 }}>호주가자</span>
-        </div>
+        <span onClick={handleLogoTap} style={{ fontSize:13, fontWeight:800, color:'#003594', letterSpacing:2, cursor:'pointer', userSelect:'none' }}>HOJUGAJA</span>
         <button onClick={onStart} style={{
-          height:34, padding:'0 16px', borderRadius:20, border:'none',
+          height:32, padding:'0 14px', borderRadius:8, border:'none',
           background:'#003594', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer',
           display:'flex', alignItems:'center', gap:5,
-          boxShadow:'0 2px 8px rgba(0,53,148,0.25)',
         }}>
           <Icon icon="ph:list-checks" width={13} height={13} color="#FFCD00" />
-          버킷리스트
+          나의 버킷리스트
         </button>
       </div>
 
       {/* ── 히어로 섹션 ── */}
       <div style={{
-        background:'linear-gradient(160deg, #001f5c 0%, #003594 55%, #1a5fb5 100%)',
-        padding:'44px 24px 52px',
+        background:'linear-gradient(160deg, #001f5c 0%, #003594 60%, #0052cc 100%)',
+        padding:'48px 24px 56px',
         textAlign:'center', position:'relative', overflow:'hidden',
       }}>
-        {/* 배경 장식 */}
-        <div style={{ position:'absolute', top:-60, right:-60, width:200, height:200, borderRadius:'50%', background:'rgba(255,205,0,0.07)', pointerEvents:'none' }}/>
+        {/* 배경 원 */}
+        <div style={{ position:'absolute', top:-60, right:-60, width:200, height:200, borderRadius:'50%', background:'rgba(255,205,0,0.06)', pointerEvents:'none' }}/>
         <div style={{ position:'absolute', bottom:-40, left:-40, width:150, height:150, borderRadius:'50%', background:'rgba(255,255,255,0.04)', pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', top:16, left:16, fontSize:44, opacity:0.07, pointerEvents:'none', transform:'rotate(-15deg)' }}>🦘</div>
-        <div style={{ position:'absolute', bottom:24, right:16, fontSize:34, opacity:0.07, pointerEvents:'none', transform:'rotate(10deg)' }}>🌏</div>
 
         <div style={{ animation:'fadeInUp 0.6s ease both' }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(255,205,0,0.18)', borderRadius:20, padding:'6px 16px', marginBottom:20, border:'1px solid rgba(255,205,0,0.25)' }}>
-            <span style={{ fontSize:12 }}>✈️</span>
-            <span style={{ fontSize:11, fontWeight:700, color:'#FFCD00', letterSpacing:0.5 }}>호주 이민·여행자를 위한</span>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(255,205,0,0.15)', borderRadius:20, padding:'5px 14px', marginBottom:20 }}>
+            <Icon icon="ph:airplane-takeoff" width={14} height={14} color="#FFCD00" />
+            <span style={{ fontSize:11, fontWeight:700, color:'#FFCD00', letterSpacing:1 }}>호주 이민·여행자를 위한</span>
           </div>
         </div>
 
         <div style={{ animation:'fadeInUp 0.6s ease 0.1s both' }}>
-          <div style={{ fontSize:30, fontWeight:900, color:'#fff', lineHeight:1.25, marginBottom:10, letterSpacing:-0.5 }}>
+          <div style={{ fontSize:32, fontWeight:900, color:'#fff', lineHeight:1.2, marginBottom:12, letterSpacing:-0.5 }}>
             호주에서 꼭 해야 할<br/>
-            <span style={{ color:'#FFCD00' }}>모든 것</span>을 담았어요 🎉
+            <span style={{ color:'#FFCD00' }}>모든 것</span>을 담았어요
           </div>
         </div>
 
         <div style={{ animation:'fadeInUp 0.6s ease 0.2s both' }}>
-          <div style={{ fontSize:14, color:'rgba(255,255,255,0.75)', lineHeight:1.8, marginBottom:14 }}>
+          <div style={{ fontSize:14, color:'rgba(255,255,255,0.7)', lineHeight:1.7, marginBottom:16 }}>
             {total}개 항목 · {CATEGORIES.length}개 카테고리<br/>나만의 호주 버킷리스트를 만들어보세요
           </div>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(255,255,255,0.12)', borderRadius:20, padding:'7px 16px', marginBottom:28, border:'1px solid rgba(255,255,255,0.15)' }}>
-            <span style={{ fontSize:12 }}>📱</span>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(255,255,255,0.10)', borderRadius:20, padding:'7px 16px', marginBottom:28 }}>
+            <Icon icon="ph:device-mobile" width={14} height={14} color="#FFCD00" />
             <span style={{ fontSize:12, color:'rgba(255,255,255,0.90)', fontWeight:600 }}>앱 설치 없이 폰으로 바로 체크해요</span>
           </div>
 
           {/* ── 히어로 CTA 버튼 ── */}
           <div style={{ display:'flex', gap:10, marginBottom:28 }}>
             <button onClick={onStart} style={{
-              flex:1, height:52, background:'#FFCD00', color:'#002870',
-              border:'none', borderRadius:14, fontSize:14, fontWeight:800,
+              flex:1, height:50, background:'#FFCD00', color:'#002870',
+              border:'none', borderRadius:12, fontSize:14, fontWeight:800,
               cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-              boxShadow:'0 6px 20px rgba(255,205,0,0.40)',
+              boxShadow:'0 4px 16px rgba(255,205,0,0.35)',
             }}>
               <Icon icon="ph:list-checks" width={18} height={18} color="#002870" />
               나의 버킷리스트
             </button>
             <button onClick={onServices} style={{
-              flex:1, height:52, background:'rgba(255,255,255,0.14)', color:'#fff',
-              border:'1.5px solid rgba(255,255,255,0.28)', borderRadius:14, fontSize:14, fontWeight:700,
+              flex:1, height:50, background:'rgba(255,255,255,0.15)', color:'#fff',
+              border:'1.5px solid rgba(255,255,255,0.30)', borderRadius:12, fontSize:14, fontWeight:700,
               cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
               backdropFilter:'blur(4px)',
             }}>
@@ -502,26 +493,20 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       </div>
 
       {/* ── 카테고리 섹션 ── */}
-      <div style={{ padding:'28px 20px 24px', background:'#F5F8FF' }}>
-        <div style={{ fontSize:18, fontWeight:900, color:'#1E293B', marginBottom:4 }}>
-          {CATEGORIES.length}개 카테고리, {total}개 항목 🗂️
-        </div>
-        <div style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.6 }}>호주 생활에 꼭 필요한 항목들을 담았어요</div>
+      <div style={{ padding:'32px 20px 24px' }}>
+        <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:6 }}>{CATEGORIES.length}개 카테고리, {total}개 항목</div>
+        <div style={{ fontSize:13, color:'#64748B', marginBottom:20 }}>호주 생활에 꼭 필요한 항목들을 담았어요</div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10 }}>
           {CATEGORIES.map(cat => (
-            <div key={cat.id} onClick={onStart} style={{
-              background:'#fff', borderRadius:14, padding:'14px 8px',
+            <div key={cat.id} style={{
+              background:'#fff', borderRadius:12, padding:'14px 8px',
               display:'flex', flexDirection:'column', alignItems:'center', gap:8,
-              boxShadow:'0 2px 10px rgba(0,0,0,0.06)',
-              cursor:'pointer', transition:'transform 0.15s',
-            }}
-              onMouseEnter={e => (e.currentTarget.style.transform='translateY(-2px)')}
-              onMouseLeave={e => (e.currentTarget.style.transform='translateY(0)')}
-            >
-              <div style={{ width:38, height:38, borderRadius:10, background:'#EEF3FF', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
+            }}>
+              <div style={{ width:36, height:36, borderRadius:10, background:'rgba(0,53,148,0.07)', display:'flex', alignItems:'center', justifyContent:'center' }}>
                 <Icon icon={CAT_ICON_MAP[cat.id] ?? 'ph:star'} width={20} height={20} color="#003594" />
               </div>
-              <span style={{ fontSize:10, fontWeight:700, color:'#334155', textAlign:'center', lineHeight:1.3 }}>{cat.label}</span>
+              <span style={{ fontSize:11, fontWeight:700, color:'#1E293B', textAlign:'center' }}>{cat.label}</span>
             </div>
           ))}
         </div>
@@ -530,26 +515,25 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {/* ── 버킷리스트 추천 섹션 ── */}
       <div style={{ padding:'0 20px 24px' }}>
         <div style={{
-          background:'#fff', borderRadius:20, padding:'24px 20px',
-          boxShadow:'0 2px 12px rgba(0,0,0,0.06)',
+          background:'#fff', borderRadius:16, padding:'24px 20px',
+          boxShadow:'0 2px 12px rgba(0,0,0,0.07)',
           position:'relative', overflow:'hidden',
-          border:'1px solid #F0F4FF',
         }}>
           <div style={{ position:'absolute', top:-16, right:-16, width:80, height:80, borderRadius:'50%', background:'rgba(255,205,0,0.10)', pointerEvents:'none' }}/>
           <div style={{ display:'flex', alignItems:'flex-start', gap:14, marginBottom:16 }}>
-            <div style={{ width:46, height:46, borderRadius:14, background:'#FFF9E6', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:22 }}>
-              💡
+            <div style={{ width:44, height:44, borderRadius:12, background:'rgba(0,53,148,0.07)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <Icon icon="ph:lightbulb" width={24} height={24} color="#003594" />
             </div>
             <div>
               <div style={{ fontSize:16, fontWeight:800, color:'#1E293B', marginBottom:4 }}>버킷리스트 추천</div>
-              <div style={{ fontSize:12, color:'#64748B', lineHeight:1.7 }}>
+              <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6 }}>
                 호주에서 꼭 해봐야 할 것들,<br/>여러분의 경험을 쉐어해 주세요 🦘
               </div>
             </div>
           </div>
           <button onClick={() => setShowSuggestion(true)} style={{
-            width:'100%', height:48, background:'#003594', color:'#fff',
-            border:'none', borderRadius:12, fontSize:14, fontWeight:800,
+            width:'100%', height:46, background:'#003594', color:'#fff',
+            border:'none', borderRadius:10, fontSize:14, fontWeight:800,
             cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
             boxShadow:'0 4px 14px rgba(0,53,148,0.20)',
           }}>
@@ -563,30 +547,29 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       <div style={{ padding:'8px 20px 24px' }}>
         <div style={{
           background:'linear-gradient(135deg, #002870, #003594)',
-          borderRadius:20, padding:'24px 20px',
+          borderRadius:16, padding:'24px 20px',
           position:'relative', overflow:'hidden',
         }}>
           <div style={{ position:'absolute', top:-20, right:-20, width:100, height:100, borderRadius:'50%', background:'rgba(255,205,0,0.08)', pointerEvents:'none' }}/>
-          <div style={{ position:'absolute', bottom:-10, left:-10, fontSize:60, opacity:0.06, pointerEvents:'none' }}>🏪</div>
           <div style={{ display:'flex', alignItems:'flex-start', gap:14, marginBottom:16 }}>
-            <div style={{ width:46, height:46, borderRadius:14, background:'rgba(255,205,0,0.18)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:22 }}>
-              🏪
+            <div style={{ width:44, height:44, borderRadius:12, background:'rgba(255,205,0,0.15)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <Icon icon="ph:storefront" width={24} height={24} color="#FFCD00" />
             </div>
             <div>
               <div style={{ fontSize:16, fontWeight:800, color:'#fff', marginBottom:4 }}>업체 등록 신청</div>
-              <div style={{ fontSize:12, color:'rgba(255,255,255,0.7)', lineHeight:1.7 }}>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.65)', lineHeight:1.6 }}>
                 호주가자에 업체를 등록하고<br/>한인 커뮤니티에 홍보하세요
               </div>
             </div>
           </div>
           <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:16 }}>
-            {['✅ 무료 등록','🎯 한인 타겟','🛠 직접 관리'].map(tag => (
-              <span key={tag} style={{ background:'rgba(255,255,255,0.13)', color:'rgba(255,255,255,0.9)', fontSize:11, fontWeight:700, borderRadius:20, padding:'4px 12px', border:'1px solid rgba(255,255,255,0.15)' }}>{tag}</span>
+            {['무료 등록','한인 타겟','직접 관리'].map(tag => (
+              <span key={tag} style={{ background:'rgba(255,255,255,0.12)', color:'rgba(255,255,255,0.85)', fontSize:11, fontWeight:700, borderRadius:20, padding:'4px 10px' }}>{tag}</span>
             ))}
           </div>
           <button onClick={() => setShowForm(true)} style={{
-            width:'100%', height:48, background:'#FFCD00', color:'#002870',
-            border:'none', borderRadius:12, fontSize:14, fontWeight:800,
+            width:'100%', height:46, background:'#FFCD00', color:'#002870',
+            border:'none', borderRadius:10, fontSize:14, fontWeight:800,
             cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
           }}>
             <Icon icon="ph:plus-circle" width={16} height={16} color="#002870" />
@@ -596,9 +579,8 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       </div>
 
       {/* ── 푸터 ── */}
-      <div style={{ textAlign:'center', padding:'16px 20px 44px', background:'#F8FAFF' }}>
-        <div style={{ fontSize:13, fontWeight:800, color:'#003594', marginBottom:4 }}>🦘 호주가자</div>
-        <div style={{ fontSize:11, color:'#94A3B8' }}>www.hojugaja.com · 무료 호주 버킷리스트</div>
+      <div style={{ textAlign:'center', padding:'8px 20px 40px' }}>
+        <span style={{ fontSize:11, color:'#94A3B8' }}>www.hojugaja.com</span>
       </div>
 
       {/* ── 버킷리스트 추천 모달 ── */}
