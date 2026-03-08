@@ -169,7 +169,6 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
           <div style={{ background:'#003594', borderRadius:14, padding:'12px 18px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
             <div>
               <div style={{ fontSize:15, fontWeight:900, color:'#FFCD00', letterSpacing:0.5 }}>호주가자</div>
-              <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginTop:2 }}>무료 호주 버킷리스트</div>
             </div>
             <div style={{ textAlign:'right' }}>
               <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>hojugaja.com</div>
