@@ -30,7 +30,8 @@ export default function BusinessCard({ business }: Props) {
     setShowVotes(v => !v)
   }
 
-  const handleVote = async (tag: string) => {
+  const handleVote = async (e: React.MouseEvent, tag: string) => {
+    e.stopPropagation()
     if (myVote) return
     const ok = await addVote(business.id, tag)
     if (ok) {
@@ -178,13 +179,14 @@ export default function BusinessCard({ business }: Props) {
                   const isMine = myVote === tag
                   const voted  = !!myVote
                   return (
-                    <button key={tag} onClick={() => handleVote(tag)} disabled={voted} style={{
+                    <button key={tag} onClick={(e) => handleVote(e, tag)} style={{
                       display:'flex', alignItems:'center', justifyContent:'space-between',
                       padding:'9px 12px', borderRadius:9,
                       border: isMine ? '1.5px solid #003594' : '1px solid #E2E8F0',
                       background: isMine ? 'rgba(0,53,148,0.07)' : '#fff',
                       cursor: voted ? 'default' : 'pointer',
                       fontFamily: ff,
+                      opacity: voted && !isMine ? 0.5 : 1,
                     }}>
                       <span style={{ fontSize:13, fontWeight: isMine ? 800 : 500, color: isMine ? '#003594' : '#1E293B' }}>
                         {isMine ? '👍 ' : ''}{tag}
