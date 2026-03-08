@@ -176,38 +176,47 @@ export default function BusinessCard({ business }: Props) {
           ) : (
             <>
               <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:10 }}>
-                {myVote ? `내 한줄평: 👍 ${myVote}` : '이 업체 어떠셨나요? 하나만 골라주세요!'}
+                {myVote ? `내 한줄평: ${myVote}` : '이 업체 어떠셨나요? 하나만 골라주세요!'}
               </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:7 }}>
-                {VOTE_TAGS.map(tag => {
-                  const count = counts?.[tag] ?? 0
-                  const isMine = myVote === tag
-                  const voted  = !!myVote
-                  return (
-                    <button key={tag} onClick={(e) => handleVote(e, tag)} style={{
-                      display:'flex', alignItems:'center', justifyContent:'space-between',
-                      padding:'9px 12px', borderRadius:9,
-                      border: isMine ? '1.5px solid #003594' : '1px solid #E2E8F0',
-                      background: isMine ? 'rgba(0,53,148,0.07)' : '#fff',
-                      cursor: voted ? 'default' : 'pointer',
-                      fontFamily: ff,
-                      opacity: voted && !isMine ? 0.5 : 1,
-                    }}>
-                      <span style={{ fontSize:13, fontWeight: isMine ? 800 : 500, color: isMine ? '#003594' : '#1E293B', display:'flex', alignItems:'center', gap:5 }}>
-                        <Icon icon="ph:thumbs-up" width={14} height={14} color={isMine ? '#003594' : '#64748B'} />{tag}
-                      </span>
-                      {count > 0 && (
-                        <span style={{
-                          fontSize:11, fontWeight:700,
-                          color: isMine ? '#003594' : '#94A3B8',
-                          background: isMine ? 'rgba(0,53,148,0.10)' : '#F1F5F9',
-                          borderRadius:10, padding:'2px 8px',
-                        }}>{count}</span>
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
+              {(() => {
+                const maxCount = Math.max(...VOTE_TAGS.map(t => counts?.[t] ?? 0), 1)
+                return (
+                  <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                    {VOTE_TAGS.map(tag => {
+                      const count  = counts?.[tag] ?? 0
+                      const isMine = myVote === tag
+                      const voted  = !!myVote
+                      const pct    = Math.round((count / maxCount) * 100)
+                      return (
+                        <button key={tag} onClick={(e) => handleVote(e, tag)} disabled={voted && !isMine} style={{
+                          background:'none', border:'none', padding:0,
+                          cursor: voted ? 'default' : 'pointer',
+                          textAlign:'left', fontFamily:ff,
+                        }}>
+                          {/* 라벨 + 숫자 */}
+                          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
+                            <span style={{ fontSize:12, fontWeight: isMine ? 800 : 500, color: isMine ? '#FCA5A5' : '#1E293B', display:'flex', alignItems:'center', gap:4 }}>
+                              <Icon icon="ph:thumbs-up" width={12} height={12} color={isMine ? '#FCA5A5' : '#94A3B8'} />
+                              {tag}
+                            </span>
+                            <span style={{ fontSize:11, fontWeight:700, color: isMine ? '#FCA5A5' : '#94A3B8' }}>{count}</span>
+                          </div>
+                          {/* 바 */}
+                          <div style={{ height:7, borderRadius:4, background:'#E2E8F0', overflow:'hidden' }}>
+                            <div style={{
+                              height:'100%', borderRadius:4,
+                              width: `${pct}%`,
+                              background: isMine ? '#FCA5A5' : '#D1FAE5',
+                              transition:'width 0.4s ease',
+                              minWidth: count > 0 ? 8 : 0,
+                            }}/>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )
+              })()}
             </>
           )}
         </div>
