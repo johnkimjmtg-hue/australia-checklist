@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import BucketSharePaper from './BucketSharePaper'
-import { downloadPng } from '../utils/capture'
+import { downloadPng, sharePng } from '../utils/capture'
 import { AppState, TripInfo } from '../store/state'
 
 type Props = {
@@ -14,68 +14,27 @@ type Props = {
 
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
 
-// 영수증 렌더 후 blob 미리 생성
-async function buildBlob(): Promise<File | null> {
-  const el = document.getElementById('receipt-root')
-  if (!el) return null
-  // @ts-ignore
-  const h2c = (await import('html2canvas')).default
-  const prev = (el as HTMLElement).style.borderRadius;
-  (el as HTMLElement).style.borderRadius = '0'
-  const canvas = await h2c(el, { scale: 2, backgroundColor: '#fff', useCORS: true });
-  (el as HTMLElement).style.borderRadius = prev
-  const blob: Blob = await new Promise(res => canvas.toBlob((b: Blob) => res(b), 'image/png'))
-  return new File([blob], 'receipt.png', { type: 'image/png' })
-}
-
 export default function ReceiptModal({ state, trip, issuedAt, achieved, onClose, onReset }: Props) {
   const [saving, setSaving]   = useState(false)
   const [sharing, setSharing] = useState(false)
-  const fileRef = useRef<File | null>(null)
-  const [ready, setReady] = useState(false)
-
-  // 영수증 렌더 후 500ms뒤 blob 미리 생성 (렌더 완료 기다림)
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      fileRef.current = await buildBlob()
-      setReady(true)
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [])
 
   async function handleSave() {
+    setSaving(true)
     if (isIOS()) {
-      // iOS: 미리 만든 file로 즉시 share → share sheet에서 "이미지 저장" 가능
-      if (!fileRef.current) {
-        // 아직 준비 안됐으면 그때 생성 (fallback)
-        setSaving(true)
-        fileRef.current = await buildBlob()
-        setSaving(false)
-      }
-      if (!fileRef.current || !navigator.share) return
-      try {
-        // 이 시점은 유저 클릭 직후 — iOS가 제스처 인식
-        await navigator.share({ files: [fileRef.current] })
-      } catch {}
+      // iOS: 매번 새로 캡처 후 share sheet → "이미지 저장"
+      const ok = await sharePng()
+      if (!ok) alert('공유가 지원되지 않는 환경입니다.')
     } else {
-      setSaving(true)
       await downloadPng()
-      setSaving(false)
     }
+    setSaving(false)
   }
 
   async function handleShare() {
     setSharing(true)
-    if (!navigator.share) {
-      alert('공유가 지원되지 않는 환경입니다.\n이미지를 저장 후 직접 공유해주세요.')
-      setSharing(false)
-      return
-    }
-    const file = fileRef.current ?? await buildBlob()
-    if (!file) { setSharing(false); return }
-    try {
-      await navigator.share({ files: [file] })
-    } catch {}
+    // 매번 새로 캡처
+    const ok = await sharePng()
+    if (!ok) alert('공유가 지원되지 않는 환경입니다.\n이미지를 저장 후 직접 공유해주세요.')
     setSharing(false)
   }
 
