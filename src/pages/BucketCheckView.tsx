@@ -277,8 +277,10 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
     prevAchieved.current = achievedCount
   }, [achievedCount, total])
 
-  const filterFn = (item: { id:string }) =>
-    filter==='done' ? isItemFullyAchieved(item) : filter==='todo' ? !isItemFullyAchieved(item) : true
+  // row 기준 필터: 날짜별로 각각 체크
+  const isRowDone = (id: string, day?: number) => !!achieved[getKey(id, day)]
+  const filterRow = (id: string, day?: number) =>
+    filter==='done' ? isRowDone(id, day) : filter==='todo' ? !isRowDone(id, day) : true
 
   const FILTERS: { key:Filter; label:string }[] = [
     { key:'all', label:'전체' }, { key:'todo', label:'미완료' }, { key:'done', label:'완료' },
@@ -401,7 +403,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
       {/* ══ 리스트 ══ */}
       <div style={{ padding:'12px 0 130px',display:'flex',flexDirection:'column',gap:16 }}>
         {sortedDays.map(dayIdx => {
-          const dayItems = (byDay.get(dayIdx) ?? []).filter(filterFn)
+          const dayItems = (byDay.get(dayIdx) ?? []).filter(item => filterRow(item.id, dayIdx))
           if (!dayItems.length) return null
           const date     = tripDays[dayIdx]
           const dayLabel = date ? `${fmtMD(date)}(${dow(date)})` : ''
@@ -422,7 +424,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
           )
         })}
         {(() => {
-          const items = checkedItems.filter(i => !(state.schedules[i.id]?.length)).filter(filterFn)
+          const items = checkedItems.filter(i => !(state.schedules[i.id]?.length)).filter(i => filterRow(i.id))
           if (!items.length) return null
           const doneCount = items.filter(i => !!achieved[i.id]).length
           return (
