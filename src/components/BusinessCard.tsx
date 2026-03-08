@@ -1,98 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { Business, VOTE_TAGS, getMyVote, getVoteCounts, addVote } from '../lib/businessService'
+import BusinessShareModal from './BusinessShareModal'
 
 type Props = { business: Business }
 
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
-
-/* ── 공유용 카드 (숨겨진 렌더링) ── */
-function ShareCard({ business, counts }: { business: Business; counts: Record<string,number> }) {
-  const { name, description, phone, website, kakao, address, city, is_featured, tags } = business
-  const fullAddress = [address, city].filter(Boolean).join(', ')
-  const maxCount = Math.max(...VOTE_TAGS.map(t => counts[t] ?? 0), 1)
-  const topVotes = VOTE_TAGS.map(t => [t, counts[t] ?? 0] as [string,number]).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1])
-
-  return (
-    <div id={`share-card-${business.id}`} style={{
-      width: 320, background:'#fff', borderRadius:16, overflow:'hidden',
-      fontFamily: ff, boxShadow:'0 8px 32px rgba(0,53,148,0.15)',
-    }}>
-      {/* 헤더 */}
-      <div style={{ background:'linear-gradient(135deg,#002870,#003594)', padding:'20px 20px 16px' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
-          <div style={{ fontSize:18, fontWeight:900, color:'#fff', flex:1 }}>{name}</div>
-          {is_featured && (
-            <div style={{ background:'#FFCD00', color:'#002870', fontSize:10, fontWeight:800, borderRadius:20, padding:'3px 10px', flexShrink:0 }}>추천</div>
-          )}
-        </div>
-        {fullAddress && (
-          <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-            <span style={{ fontSize:11, color:'rgba(255,255,255,0.7)' }}>📍 {fullAddress}</span>
-          </div>
-        )}
-        {tags && tags.length > 0 && (
-          <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginTop:8 }}>
-            {tags.map(tag => (
-              <span key={tag} style={{ background:'rgba(255,255,255,0.15)', color:'#fff', fontSize:10, fontWeight:700, borderRadius:6, padding:'2px 8px' }}>{tag}</span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 연락처 */}
-      <div style={{ padding:'14px 20px', borderBottom:'1px solid #F1F5F9' }}>
-        {description && <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6, marginBottom:10 }}>{description}</div>}
-        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-          {phone && (
-            <div style={{ display:'flex', alignItems:'center', gap:8, fontSize:12, color:'#1E293B' }}>
-              <span style={{ fontSize:14 }}>📞</span> {phone}
-            </div>
-          )}
-          {kakao && (
-            <div style={{ display:'flex', alignItems:'center', gap:8, fontSize:12, color:'#1E293B' }}>
-              <span style={{ fontSize:14 }}>💬</span> 카카오톡: {kakao}
-            </div>
-          )}
-          {website && (
-            <div style={{ display:'flex', alignItems:'center', gap:8, fontSize:12, color:'#003594' }}>
-              <span style={{ fontSize:14 }}>🌐</span> {website}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 한줄평 바 차트 */}
-      {topVotes.length > 0 && (
-        <div style={{ padding:'14px 20px', borderBottom:'1px solid #F1F5F9' }}>
-          <div style={{ fontSize:11, fontWeight:800, color:'#94A3B8', marginBottom:10, letterSpacing:0.5 }}>한줄평</div>
-          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-            {topVotes.map(([tag, count]) => (
-              <div key={tag}>
-                <div style={{ display:'flex', justifyContent:'space-between', marginBottom:3 }}>
-                  <span style={{ fontSize:11, fontWeight:600, color:'#1E293B' }}>👍 {tag}</span>
-                  <span style={{ fontSize:11, fontWeight:700, color:'#94A3B8' }}>{count}</span>
-                </div>
-                <div style={{ height:6, borderRadius:3, background:'#F1F5F9' }}>
-                  <div style={{ height:'100%', borderRadius:3, width:`${Math.round((count/maxCount)*100)}%`, background:'#FCA5A5' }}/>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 푸터 홍보 */}
-      <div style={{ background:'linear-gradient(135deg,#002870,#003594)', padding:'12px 20px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <div>
-          <div style={{ fontSize:13, fontWeight:900, color:'#FFCD00', letterSpacing:1 }}>HOJUGAJA</div>
-          <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginTop:1 }}>무료 호주 버킷리스트</div>
-        </div>
-        <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.9)' }}>hojugaja.com</div>
-      </div>
-    </div>
-  )
-}
 
 export default function BusinessCard({ business }: Props) {
   const { name, description, phone, website, kakao, address, city, is_featured, tags } = business
@@ -101,14 +14,13 @@ export default function BusinessCard({ business }: Props) {
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
     : null
 
-  const [showVotes, setShowVotes]   = useState(false)
-  const [counts, setCounts]         = useState<Record<string, number> | null>(null)
-  const [loading, setLoading]       = useState(false)
-  const [myVote, setMyVote]         = useState<string | null>(() => getMyVote(business.id))
-  const [showResult, setShowResult] = useState(true)
-  const [showPhone, setShowPhone]   = useState(false)
-  const [sharing, setSharing]       = useState(false)
-  const shareRef                    = useRef<HTMLDivElement>(null)
+  const [showVotes, setShowVotes]       = useState(false)
+  const [counts, setCounts]             = useState<Record<string, number> | null>(null)
+  const [loading, setLoading]           = useState(false)
+  const [myVote, setMyVote]             = useState<string | null>(() => getMyVote(business.id))
+  const [showResult, setShowResult]     = useState(true)
+  const [showPhone, setShowPhone]       = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
   useEffect(() => {
@@ -135,28 +47,6 @@ export default function BusinessCard({ business }: Props) {
     }
   }
 
-  const handleShare = async () => {
-    setSharing(true)
-    // 공유 카드 렌더링 대기
-    await new Promise(r => setTimeout(r, 100))
-    const el = document.getElementById(`share-card-${business.id}`)
-    if (!el) { setSharing(false); return }
-    // @ts-ignore
-    const h2c = (await import('html2canvas')).default
-    const canvas = await h2c(el, { scale: 3, backgroundColor: '#fff', useCORS: true })
-    const blob: Blob = await new Promise(res => canvas.toBlob((b: Blob) => res(b!), 'image/png'))
-    try {
-      if (navigator.share) {
-        await navigator.share({ files: [new File([blob], `${business.name}.png`, { type: 'image/png' })] })
-      } else {
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a'); a.href = url; a.download = `${business.name}.png`
-        a.click(); URL.revokeObjectURL(url)
-      }
-    } catch {}
-    setSharing(false)
-  }
-
   const topTags = counts
     ? Object.entries(counts).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).slice(0,2)
     : []
@@ -171,11 +61,12 @@ export default function BusinessCard({ business }: Props) {
 
   return (
     <>
-      {/* 공유용 카드 — 화면 밖에 숨김 */}
-      {sharing && (
-        <div style={{ position:'fixed', top:'-9999px', left:'-9999px', zIndex:-1 }} ref={shareRef}>
-          <ShareCard business={business} counts={counts ?? {}} />
-        </div>
+      {showShareModal && (
+        <BusinessShareModal
+          business={business}
+          counts={counts ?? {}}
+          onClose={() => setShowShareModal(false)}
+        />
       )}
 
       <div style={{
@@ -269,11 +160,9 @@ export default function BusinessCard({ business }: Props) {
               <Icon icon="ph:thumbs-up" width={13} height={13} color={showVotes ? '#fff' : '#64748B'} />
               한줄평{myVote ? ' ✓' : ''}
             </button>
-            {/* 공유 버튼 */}
-            <button onClick={handleShare} disabled={sharing}
-              style={{ ...btnBase, background: sharing ? '#E2E8F0' : '#fff', color:'#1E293B' }}>
-              <Icon icon="ph:share-network" width={13} height={13} color="#64748B" />
-              {sharing ? '준비 중...' : '공유'}
+            <button onClick={() => setShowShareModal(true)}
+              style={{ ...btnBase, background:'#fff', color:'#1E293B' }}>
+              <Icon icon="ph:share-network" width={13} height={13} color="#64748B" />공유
             </button>
           </div>
         </div>
@@ -306,7 +195,6 @@ export default function BusinessCard({ business }: Props) {
                       {VOTE_TAGS.map(tag => {
                         const count  = counts?.[tag] ?? 0
                         const isMine = myVote === tag
-                        const voted  = !!myVote
                         const pct    = Math.round((count / maxCount) * 100)
                         return (myVote || showResult) ? (
                           <div key={tag}>
