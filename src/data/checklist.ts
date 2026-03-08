@@ -10,6 +10,7 @@ export const CATEGORIES: Category[] = [
   { id:'parenting', label:'육아', receiptLabel:'육아', emoji:'🧸' },
   { id:'places', label:'가볼 곳', receiptLabel:'가볼 곳', emoji:'🗺' },
   { id:'custom', label:'직접입력', receiptLabel:'직접입력', emoji:'✏️' },
+  { id:'cat_1772930790490', label:'노래방', receiptLabel:'노래방', emoji:'🎤' },
 ]
 
 export const ITEMS: CheckItem[] = [
@@ -180,6 +181,11 @@ export const ITEMS: CheckItem[] = [
 
   // 먹거리
   { id:'i_1772929844325', categoryId:'food', label:'밥', emoji:'⭐' },
+
+
+  // 노래방
+  { id:'i_1772930840726', categoryId:'cat_1772930790490', label:'월요노래방', emoji:'⭐' },
+  { id:'i_1772930846510', categoryId:'cat_1772930790490', label:'화요노래방', emoji:'⭐' },
 ]
 
 // 아이템별 Phosphor 아이콘 맵 — ChecklistPage.tsx 와 BucketCheckView.tsx 의 ITEM_ICONS 를 이 내용으로 교체하세요
@@ -328,4 +334,6 @@ export const ITEM_ICONS: Record<string, string> = {
   g21:'ph:dress',
   g22:'ph:flag',
   i_1772929844325:'ph:fork-knife',
+  i_1772930840726:'ph:check-circle',
+  i_1772930846510:'ph:star',
 }
