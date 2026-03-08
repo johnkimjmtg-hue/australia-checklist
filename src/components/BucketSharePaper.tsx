@@ -84,8 +84,15 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
   const allItems      = [...ITEMS, ...state.customItems.map(c => ({ ...c, categoryId: c.categoryId ?? 'custom' }))]
   const checkedItems  = allItems.filter(i => state.selected[i.id])
   const tripDays      = getTripDays(trip)
+
+  const isItemDone = (item: typeof checkedItems[0]) => {
+    const days = state.schedules[item.id] ?? []
+    if (days.length === 0) return !!achieved[item.id]
+    return days.every(d => !!achieved[`${item.id}_${d}`])
+  }
+
   const total         = checkedItems.length
-  const achievedCount = checkedItems.filter(i => achieved[i.id]).length
+  const achievedCount = checkedItems.filter(i => isItemDone(i)).length
   const pct           = total > 0 ? Math.round((achievedCount / total) * 100) : 0
 
   const byDay = new Map<number, typeof checkedItems>()
@@ -128,7 +135,7 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
         {sortedDays.map(dayIdx => {
           const items    = byDay.get(dayIdx) ?? []
           const date     = tripDays[dayIdx]
-          const dayDone  = items.filter(i => achieved[i.id]).length
+          const dayDone  = items.filter(i => isItemDone(i)).length
           return (
             <div key={dayIdx}>
               {/* 날짜 헤더 */}
@@ -145,7 +152,7 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
               </div>
               {/* 아이템 */}
               {items.map(item => {
-                const isDone = !!achieved[item.id]
+                const isDone = isItemDone(item)
                 const icon   = ITEM_ICONS[item.id] ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'
                 return (
                   <div key={item.id} style={{
@@ -184,10 +191,10 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
               borderBottom:'1px solid #E2E8F0',
             }}>
               <span style={{ fontSize:10,fontWeight:800,color:'#94A3B8' }}>날짜 미지정</span>
-              <span style={{ fontSize:10,color:'#94A3B8' }}>{unscheduled.filter(i=>achieved[i.id]).length}/{unscheduled.length}</span>
+              <span style={{ fontSize:10,color:'#94A3B8' }}>{unscheduled.filter(i=>isItemDone(i)).length}/{unscheduled.length}</span>
             </div>
             {unscheduled.map(item => {
-              const isDone = !!achieved[item.id]
+              const isDone = isItemDone(item)
               const icon   = ITEM_ICONS[item.id] ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'
               return (
                 <div key={item.id} style={{
