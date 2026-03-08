@@ -335,25 +335,29 @@ export default function ChecklistPage({ state, setState }: Props) {
               <ScheduleGrid state={state} trip={trip} allItems={allItems} />
             )}
 
-            {/* Category chips — custom 제외한 카테고리를 동적으로 4열 그리드 */}
+            {/* Category chips — custom 포함 4열 그리드, custom 항상 마지막 */}
             {(() => {
               const nonCustomCats = CATEGORIES.filter(c => c.id !== 'custom')
-              const cols = nonCustomCats.length <= 4 ? nonCustomCats.length : 4
+              const customCat = CATEGORIES.find(c => c.id === 'custom')
+              const allCats = customCat ? [...nonCustomCats, customCat] : nonCustomCats
               return (
-                <div style={{ display:'grid', gridTemplateColumns:`repeat(${cols},1fr)`, gap:6, padding:'8px 16px' }}>
-                  {nonCustomCats.map(cat => {
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6, padding:'8px 16px 10px' }}>
+                  {allCats.map(cat => {
                     const isActive = activeCategory === cat.id
                     const catDone  = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id]).length
                     const catUnsch = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
+                    const isCustom = cat.id === 'custom'
                     return (
                       <button key={cat.id} className="chip-btn" onClick={() => setState(setCategory(state, cat.id))} style={{
                         height:36, borderRadius:8, border:'none',
                         background: isActive ? '#003594' : '#fff',
                         color: isActive ? '#fff' : '#1E293B',
-                        fontSize:12, fontWeight: 700,
+                        fontSize:12, fontWeight:700,
                         cursor:'pointer', position:'relative',
                         boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
+                        display:'flex', alignItems:'center', justifyContent:'center', gap: isCustom ? 4 : 0,
                       }}>
+                        {isCustom && <Icon icon="ph:pencil-simple" width={11} height={11} color={isActive ? '#FFCD00' : '#94A3B8'} />}
                         {cat.label}
                         {catDone>0 && (
                           <span style={{
@@ -370,39 +374,6 @@ export default function ChecklistPage({ state, setState }: Props) {
                 </div>
               )
             })()}
-            {/* 직접입력 */}
-            <div style={{ padding:'0 16px 10px' }}>
-              {(() => {
-                const cat = CATEGORIES.find(c => c.id === 'custom')
-                if (!cat) return null
-                const isActive = activeCategory === 'custom'
-                const catDone  = allItems.filter(i => i.categoryId==='custom' && state.selected[i.id]).length
-                const catUnsch = allItems.filter(i => i.categoryId==='custom' && state.selected[i.id] && !(state.schedules[i.id]?.length)).length
-                return (
-                  <button className="chip-btn" onClick={() => setState(setCategory(state, 'custom'))} style={{
-                    height:36, padding:'0 16px', borderRadius:8, border:'none',
-                    background: isActive ? '#003594' : '#fff',
-                    color: isActive ? '#fff' : '#1E293B',
-                    fontSize:12, fontWeight:700,
-                    cursor:'pointer', position:'relative',
-                    boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
-                    display:'flex', alignItems:'center', gap:5,
-                  }}>
-                    <Icon icon="ph:pencil-simple" width={13} height={13} color={isActive ? '#FFCD00' : '#94A3B8'} />
-                    {cat.label}
-                    {catDone>0 && (
-                      <span style={{
-                        position:'absolute', top:-5, right:-4,
-                        background: catUnsch>0 ? '#FFCD00' : '#16A34A',
-                        color: catUnsch>0 ? '#92620a' : '#fff',
-                        borderRadius:99, fontSize:9, fontWeight:800,
-                        minWidth:15, height:15, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px',
-                      }}>{catDone}</span>
-                    )}
-                  </button>
-                )
-              })()}
-            </div>
           </div>
 
           {/* ── 온보딩 CTA (일정 미설정 시) ── */}
