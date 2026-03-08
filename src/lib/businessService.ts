@@ -31,19 +31,33 @@ export type Review = {
 // 한줄평 태그 목록
 export const VOTE_TAGS = [
   '친절해요',
-  '한국어 돼요',
   '가격 합리적',
-  '재방문 의사 있어요',
-  '위치 좋아요',
+  '맛있어요',
+  '깨끗해요',
+  '실력이 좋아요',
+  '위치가 좋아요',
   '빠른 응답',
+  '완전 전문가',
 ]
 
 const votedKey = (businessId: string) => `voted_${businessId}`
+
 export function getMyVote(businessId: string): string | null {
-  try { return localStorage.getItem(votedKey(businessId)) } catch { return null }
+  try {
+    const v = localStorage.getItem(votedKey(businessId))
+    if (!v) return null
+    try { const p = JSON.parse(v); return Array.isArray(p) ? p[0] : p } catch { return v }
+  } catch { return null }
 }
+
 function saveMyVote(businessId: string, tag: string) {
   try { localStorage.setItem(votedKey(businessId), tag) } catch {}
+}
+
+// getMyVotes 구버전 호환용
+export function getMyVotes(businessId: string): string[] {
+  const v = getMyVote(businessId)
+  return v ? [v] : []
 }
 
 export async function getBusinesses(category?: string): Promise<Business[]> {
