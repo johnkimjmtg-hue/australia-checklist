@@ -17,7 +17,7 @@ export default function BusinessCard({ business }: Props) {
   const [counts, setCounts]         = useState<Record<string, number> | null>(null)
   const [loading, setLoading]       = useState(false)
   const [myVote, setMyVote]         = useState<string | null>(() => getMyVote(business.id))
-  const [showResult, setShowResult] = useState(false)
+  const [showResult, setShowResult] = useState(true)
   const [showPhone, setShowPhone]   = useState(false)
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
@@ -178,13 +178,16 @@ export default function BusinessCard({ business }: Props) {
             <>
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
                 <div style={{ fontSize:12, fontWeight:700, color:'#64748B' }}>
-                  {myVote ? `내 한줄평: ${myVote}` : '이 업체 어떠셨나요? 하나만 골라주세요!'}
+                  {myVote ? `내 한줄평: ${myVote}` : showResult ? '다른 분들의 한줄평이에요!' : '이 업체 어떠셨나요?'}
                 </div>
                 {!myVote && (
                   <button onClick={() => setShowResult(v => !v)} style={{
-                    background:'none', border:'none', cursor:'pointer',
-                    fontSize:11, fontWeight:700, color:'#94A3B8', padding:0,
-                    textDecoration:'underline',
+                    background: showResult ? '#003594' : 'none',
+                    border: showResult ? 'none' : '1px solid #E2E8F0',
+                    cursor:'pointer',
+                    fontSize:11, fontWeight:700,
+                    color: showResult ? '#fff' : '#64748B',
+                    padding:'4px 10px', borderRadius:6,
                   }}>{showResult ? '투표하기' : '결과 보기'}</button>
                 )}
               </div>
