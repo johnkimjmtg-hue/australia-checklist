@@ -39,6 +39,7 @@ export default function ChecklistPage({ state, setState }: Props) {
   )
   const [showScheduleView, setShowScheduleView] = useState(!!trip)
   const [scheduleSelectedItem, setScheduleSelectedItem] = useState<string|null>(null)
+  const [scrollTrigger, setScrollTrigger] = useState(0)
   const [logoTapCount, setLogoTapCount] = useState(0)
   const logoTapTimer = useRef<any>(null)
   // date picker state
@@ -339,6 +340,7 @@ export default function ChecklistPage({ state, setState }: Props) {
               <ScheduleGrid
                 state={state} trip={trip} allItems={allItems}
                 selectedItemId={scheduleSelectedItem}
+                scrollTrigger={scrollTrigger}
               />
             )}
 
@@ -625,7 +627,11 @@ export default function ChecklistPage({ state, setState }: Props) {
       {sheetItem && trip && (
         <ScheduleSheet itemLabel={sheetItem.label} trip={trip}
           currentDays={state.schedules[sheetItem.id] ?? []}
-          onSelect={days => setState(setSchedule(state, sheetItem.id, days))}
+          onSelect={days => {
+            setState(setSchedule(state, sheetItem.id, days))
+            setScheduleSelectedItem(sheetItem.id)
+            setScrollTrigger(v => v + 1)
+          }}
           onClose={() => setSheetItem(null)} />
       )}
 
@@ -639,8 +645,8 @@ export default function ChecklistPage({ state, setState }: Props) {
 }
 
 /* ── Schedule Grid View ── */
-function ScheduleGrid({ state, trip, allItems, selectedItemId }: {
-  state: AppState; trip: TripInfo; allItems: any[]; selectedItemId: string | null
+function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: {
+  state: AppState; trip: TripInfo; allItems: any[]; selectedItemId: string | null; scrollTrigger?: number
 }) {
   const days = getTripDays(trip)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -659,7 +665,7 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId }: {
     const elWidth = el.offsetWidth
     const targetScrollLeft = elLeft - containerWidth / 2 + elWidth / 2
     container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' })
-  }, [selectedItemId, state.schedules])
+  }, [selectedItemId, state.schedules, scrollTrigger])
 
   // 각 날짜별 할당 수 (선택된 아이템 기준)
   const assignedDays = selectedItemId ? (state.schedules[selectedItemId] ?? []) : []
