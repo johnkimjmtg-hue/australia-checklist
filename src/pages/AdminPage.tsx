@@ -1031,36 +1031,50 @@ function CategoriesTab({ cats, setCats, items, setItems }: {
 // ════════════════════════════════════════════
 // 자주 쓰는 Phosphor 아이콘 목록 (카테고리별 그룹)
 const PH_ICONS = [
+  // 기본
   'ph:heart','ph:star','ph:check-circle','ph:map-pin','ph:calendar',
   'ph:camera','ph:gift','ph:flag','ph:crown','ph:trophy',
-  // 의료
-  'ph:first-aid-kit','ph:stethoscope','ph:syringe','ph:pill','ph:tooth',
-  'ph:heartbeat','ph:bandaids','ph:thermometer','ph:eye','ph:eyeglasses',
-  'ph:drop','ph:flask','ph:mask-happy','ph:shield-check','ph:leaf',
-  'ph:scissors','ph:barbell','ph:sun','ph:bone','ph:sparkle',
-  // 음식
-  'ph:fork-knife','ph:bowl-food','ph:coffee','ph:beer-stein','ph:wine',
-  'ph:chicken','ph:fish','ph:cake','ph:ice-cream','ph:pepper',
-  'ph:flame','ph:storefront','ph:cookie','ph:bread',
-  // 쇼핑/생활
+  'ph:sparkle','ph:shooting-star','ph:smiley','ph:sun','ph:moon',
+  // 카페/브런치
+  'ph:coffee','ph:tea-bag','ph:croissant','ph:bread','ph:cake',
+  'ph:cookie','ph:egg','ph:drop','ph:drop-half','ph:orange',
+  'ph:leaf','ph:plant','ph:flower','ph:jar-label','ph:bottle',
+  // 음식/먹거리
+  'ph:fork-knife','ph:bowl-food','ph:beer-stein','ph:wine','ph:whiskey',
+  'ph:fish','ph:fish-simple','ph:shrimp','ph:pepper','ph:flame',
+  'ph:ice-cream','ph:donut','ph:hamburger','ph:hot-dog','ph:cheese',
+  'ph:storefront','ph:nut','ph:pie','ph:popcorn','ph:grains',
+  // 쇼핑
   'ph:shopping-bag','ph:shopping-cart','ph:package','ph:t-shirt',
-  'ph:diamond','ph:sunglasses','ph:books','ph:plant','ph:moon',
-  // 행정/금융
-  'ph:identification-card','ph:book-open','ph:bank','ph:device-mobile',
-  'ph:car','ph:currency-krw','ph:chart-bar','ph:shield','ph:files',
-  'ph:globe','ph:seal','ph:chart-line-up',
-  // 사람/커뮤니티
-  'ph:users','ph:users-three','ph:house','ph:house-line','ph:graduation-cap',
-  'ph:hands-praying','ph:hand','ph:person-simple',
-  // 육아
-  'ph:baby','ph:lego','ph:smiley','ph:ticket',
-  // 장소/관광
-  'ph:buildings','ph:tree','ph:waves','ph:palette','ph:music-note',
-  'ph:building','ph:binoculars','ph:mountain','ph:tree-evergreen',
-  'ph:microphone','ph:monitor','ph:baseball','ph:dress',
-  // 일정
-  'ph:airplane','ph:airplane-takeoff','ph:train','ph:bus',
-  'ph:clock','ph:alarm','ph:pencil-simple','ph:note',
+  'ph:diamond','ph:sunglasses','ph:boot','ph:wallet','ph:lipstick',
+  'ph:baby','ph:pill','ph:bandaids','ph:first-aid-kit',
+  // 자연/동물
+  'ph:tree','ph:tree-evergreen','ph:tree-palm','ph:mountains','ph:mountain',
+  'ph:waves','ph:island','ph:lighthouse','ph:rainbow','ph:snowflake',
+  'ph:paw-print','ph:bird','ph:butterfly','ph:horse','ph:bug',
+  'ph:leaf','ph:flower','ph:sun-horizon','ph:sunset','ph:cloud',
+  // 도시/문화
+  'ph:buildings','ph:building','ph:castle','ph:church','ph:bank',
+  'ph:palette','ph:music-note','ph:microphone','ph:film-slate','ph:ticket',
+  'ph:binoculars','ph:books','ph:graduation-cap','ph:medal','ph:dove',
+  'ph:frame-corners','ph:lightbulb','ph:clock','ph:map-trifold',
+  // 해변/물놀이
+  'ph:umbrella','ph:umbrella-simple','ph:oar','ph:boat','ph:sailboat',
+  'ph:anchor','ph:swimming-pool','ph:shell','ph:crab','ph:wave',
+  // 백패커/여행
+  'ph:airplane','ph:airplane-takeoff','ph:train','ph:train-simple',
+  'ph:bus','ph:car','ph:van','ph:jeep','ph:bicycle','ph:tent',
+  'ph:backpack','ph:map-pin','ph:compass','ph:globe','ph:bed',
+  'ph:wifi','ph:device-mobile','ph:printer','ph:paper-plane',
+  'ph:identification-card','ph:certificate','ph:hand-waving',
+  // 이색경험/활동
+  'ph:parachute','ph:balloon','ph:helicopter','ph:guitar','ph:drum',
+  'ph:shooting-star','ph:cave','ph:boomerang','ph:gas-pump',
+  'ph:horse','ph:bat','ph:owl','ph:clothes-hanger','ph:coin',
+  'ph:film-reel','ph:confetti','ph:party-popper',
+  // 기타
+  'ph:person-simple','ph:users','ph:users-three','ph:house','ph:house-line',
+  'ph:pencil-simple','ph:note','ph:alarm','ph:shield',
 ]
 
 function IconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
