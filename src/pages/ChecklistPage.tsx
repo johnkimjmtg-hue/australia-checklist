@@ -28,6 +28,7 @@ export default function ChecklistPage({ state, setState }: Props) {
   const navigate = useNavigate()
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
   const [modal, setModal]             = useState<Modal>('none')
+  const [achieved, setAchieved]       = useState<Record<string,boolean>>(() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })
   const [sheetItem, setSheetItem]     = useState<CheckItem|null>(null)
   const [showReceipt, setShowReceipt] = useState(false)
   const [issuedAt, setIssuedAt]       = useState('')
@@ -219,6 +220,7 @@ export default function ChecklistPage({ state, setState }: Props) {
           state={state}
           trip={trip}
           setState={setState}
+          onAchievedChange={(next) => setAchieved(next)}
           onEdit={() => {
             setShowReceipt(false)
             const next = { ...state, meta: { ...state.meta, lastIssuedAt: undefined } }
@@ -235,7 +237,7 @@ export default function ChecklistPage({ state, setState }: Props) {
         />
         {showReceipt && trip && (
           <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
-            achieved={(() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })()}
+            achieved={achieved}
             onClose={() => setShowReceipt(false)} onReset={() => { setShowReceipt(false); doReset() }} />
         )}
       </>
@@ -635,7 +637,7 @@ export default function ChecklistPage({ state, setState }: Props) {
 
       {showReceipt && trip && (
         <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
-          achieved={(() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })()}
+          achieved={achieved}
           onClose={() => setShowReceipt(false)} onReset={() => setModal('confirmReset')} />
       )}
     </div>
