@@ -265,7 +265,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:30 }}>
+      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
