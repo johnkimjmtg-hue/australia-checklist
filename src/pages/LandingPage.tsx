@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { AppState } from '../store/state'
 import { ITEMS, CATEGORIES } from '../data/checklist'
@@ -22,11 +22,69 @@ type Props = { state: AppState; onStart: () => void; onServices: () => void }
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY
 
+// ── 추천 버킷리스트 데이터
+const BUCKET_RECS = [
+  {
+    id: 'blackstar',
+    title: 'Black Star Pastry',
+    desc: '시드니 최고 케이크 맛집',
+    emoji: '🍰',
+    img: imgCafe,
+    pos: 'center',
+  },
+  {
+    id: 'bondi',
+    title: 'Bondi Beach',
+    desc: '시그니처 시드니 해변',
+    emoji: '🏄',
+    img: imgBeach,
+    pos: 'center 30%',
+  },
+  {
+    id: 'operahouse',
+    title: 'Sydney Opera House',
+    desc: '세계적 직접관람 추천',
+    emoji: '🎭',
+    img: imgUnique,
+    pos: 'center',
+  },
+  {
+    id: 'kbbq',
+    title: '한국 BBQ 즐기기',
+    desc: '시드니 한인타운 삼겹살',
+    emoji: '🥩',
+    img: imgFood,
+    pos: 'center',
+  },
+  {
+    id: 'kangaroo',
+    title: '캥거루 먹이주기',
+    desc: '야생동물 공원 체험',
+    emoji: '🦘',
+    img: imgNature,
+    pos: 'center',
+  },
+]
+
+// ── checklist 카테고리 → 배경 이미지 매핑
+const CAT_PHOTO_MAP: Record<string, string> = {
+  'hospital':          imgCafe,
+  'food':              imgFood,
+  'shopping':          imgShopping,
+  'admin':             imgBackpack,
+  'people':            imgSuggest,
+  'parenting':         imgNature,
+  'places':            imgBeach,
+  'cat_1772930790490': imgCity,
+  'custom':            imgUnique,
+}
+
+// ── Google Maps 로딩
 let _mapsPromise: Promise<void> | null = null
 function loadGoogleMaps(): Promise<void> {
   if (_mapsPromise) return _mapsPromise
   _mapsPromise = new Promise((resolve, reject) => {
-    if ((window as any).google?.maps?.places) { resolve(); return }
+    if ((window as any).google?.maps) { resolve(); return }
     const s = document.createElement('script')
     s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_KEY}&libraries=places&v=weekly`
     s.onload = () => setTimeout(() => resolve(), 100)
@@ -36,6 +94,7 @@ function loadGoogleMaps(): Promise<void> {
   return _mapsPromise
 }
 
+// ── 주소 자동완성
 function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [suggestions, setSuggestions] = useState<any[]>([])
   const [loading, setLoading]         = useState(false)
@@ -65,27 +124,25 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
     setSuggestions([])
     try {
       const place = suggestion.placePrediction.toPlace()
-      await place.fetchFields({ fields: ['addressComponents', 'formattedAddress'] })
+      await place.fetchFields({ fields: ['addressComponents'] })
       const c = place.addressComponents || []
-      const streetNum = c.find((x: any) => x.types.includes('street_number'))?.longText || ''
-      const route     = c.find((x: any) => x.types.includes('route'))?.longText || ''
-      const suburb    = c.find((x: any) => x.types.includes('locality') || x.types.includes('sublocality_level_1'))?.longText || ''
-      const state_    = c.find((x: any) => x.types.includes('administrative_area_level_1'))?.shortText || ''
-      const post      = c.find((x: any) => x.types.includes('postal_code'))?.longText || ''
-      onChange([streetNum, route, suburb, state_, post].filter(Boolean).join(', '))
+      const parts = ['street_number','route','locality','administrative_area_level_1','postal_code']
+        .map(t => c.find((x: any) => x.types.includes(t)))
+        .filter(Boolean)
+        .map((x: any) => x.shortText || x.longText)
+      onChange(parts.join(', '))
     } catch {}
   }
 
-  const inputStyle: React.CSSProperties = {
+  const iStyle: React.CSSProperties = {
     width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:10,
     padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff',
     boxSizing:'border-box', fontFamily:ff, outline:'none',
   }
-
   return (
     <div style={{ position:'relative' }}>
       <input value={value} onChange={e => handleInput(e.target.value)}
-        placeholder="123 George St, Sydney NSW 2000" style={inputStyle} />
+        placeholder="123 George St, Sydney NSW 2000" style={iStyle} />
       {loading && <div style={{ fontSize:11, color:'#94A3B8', marginTop:4 }}>검색 중...</div>}
       {suggestions.length > 0 && (
         <div style={{
@@ -112,28 +169,145 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
   )
 }
 
-// checklist.ts 카테고리 id → 배경 이미지 매핑
-const CAT_PHOTO_MAP: Record<string, string> = {
-  'hospital':            imgCafe,
-  'food':                imgFood,
-  'shopping':            imgShopping,
-  'admin':               imgBackpack,
-  'people':              imgSuggest,
-  'parenting':           imgNature,
-  'places':              imgBeach,
-  'cat_1772930790490':   imgCity,
-  'custom':              imgUnique,
+// ── 시드니 주요 명소 고정 지도
+const SYDNEY_SPOTS = [
+  { name: 'Sydney Opera House', emoji: '🎭', lat: -33.8568, lng: 151.2153, desc: '세계적 공연 예술 센터' },
+  { name: 'Bondi Beach',        emoji: '🏄', lat: -33.8908, lng: 151.2743, desc: '시드니 대표 해변' },
+  { name: 'Harbour Bridge',     emoji: '🌉', lat: -33.8523, lng: 151.2108, desc: '브릿지클라임 명소' },
+  { name: 'Black Star Pastry',  emoji: '🍰', lat: -33.8991, lng: 151.1731, desc: '세계 최고 케이크 맛집' },
+  { name: 'Darling Harbour',    emoji: '🎡', lat: -33.8731, lng: 151.1985, desc: '쇼핑·식사·관광' },
+  { name: 'Taronga Zoo',        emoji: '🦘', lat: -33.8433, lng: 151.2411, desc: '캥거루·코알라 만나기' },
+  { name: 'Royal Botanic Garden', emoji: '🌸', lat: -33.8642, lng: 151.2166, desc: '시드니 중심 공원' },
+  { name: 'Manly Beach',        emoji: '🌊', lat: -33.7969, lng: 151.2868, desc: '페리타고 가는 해변' },
+]
+
+function SydneyMap() {
+  const mapRef = useRef<HTMLDivElement>(null)
+  const [loaded, setLoaded] = useState(false)
+  const [selected, setSelected] = useState<number | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    async function init() {
+      try {
+        await loadGoogleMaps()
+        if (cancelled || !mapRef.current) return
+        const google = (window as any).google
+        const map = new google.maps.Map(mapRef.current, {
+          center: { lat: -33.8688, lng: 151.2093 },
+          zoom: 12,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          zoomControl: true,
+          styles: [
+            { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
+            { featureType: 'transit',      stylers: [{ visibility: 'off' }] },
+          ],
+        })
+
+        const pinSvg = (emoji: string) =>
+          'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46">
+              <ellipse cx="18" cy="43" rx="7" ry="3" fill="rgba(0,0,0,0.18)"/>
+              <path d="M18 0C10.268 0 4 6.268 4 14c0 9.6 14 30 14 30S32 23.6 32 14C32 6.268 25.732 0 18 0z" fill="#003594"/>
+              <circle cx="18" cy="14" r="10" fill="white"/>
+              <text x="18" y="19" text-anchor="middle" font-size="13">${emoji}</text>
+            </svg>
+          `)
+
+        SYDNEY_SPOTS.forEach((spot, i) => {
+          const marker = new google.maps.Marker({
+            position: { lat: spot.lat, lng: spot.lng },
+            map,
+            icon: {
+              url: pinSvg(spot.emoji),
+              scaledSize: new google.maps.Size(36, 46),
+              anchor: new google.maps.Point(18, 46),
+            },
+            title: spot.name,
+          })
+
+          const iw = new google.maps.InfoWindow({
+            content: `
+              <div style="font-family:-apple-system,sans-serif;padding:4px 2px;min-width:140px">
+                <div style="font-size:13px;font-weight:800;color:#003594;margin-bottom:3px">${spot.emoji} ${spot.name}</div>
+                <div style="font-size:11px;color:#64748B">${spot.desc}</div>
+              </div>`,
+          })
+          marker.addListener('click', () => { iw.open(map, marker); setSelected(i) })
+        })
+        if (!cancelled) setLoaded(true)
+      } catch {}
+    }
+    init()
+    return () => { cancelled = true }
+  }, [])
+
+  return (
+    <div style={{ background:'#fff', padding:'24px 20px' }}>
+      <div style={{ marginBottom:14 }}>
+        <div style={{ fontSize:18, fontWeight:900, color:'#0F172A', marginBottom:4 }}>🗺️ 시드니 버킷리스트 지도</div>
+        <div style={{ fontSize:13, color:'#64748B' }}>꼭 가봐야 할 명소를 지도에서 확인하세요</div>
+      </div>
+
+      {/* 명소 태그 가로 스크롤 */}
+      <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:12, marginBottom:12, scrollbarWidth:'none' }}>
+        {SYDNEY_SPOTS.map((s, i) => (
+          <div key={i} style={{
+            flexShrink:0, display:'flex', alignItems:'center', gap:5,
+            background: selected === i ? '#003594' : '#F0F4FF',
+            color: selected === i ? '#fff' : '#003594',
+            borderRadius:20, padding:'5px 12px', fontSize:12, fontWeight:700,
+            cursor:'pointer', transition:'all 0.2s',
+            border: selected === i ? 'none' : '1px solid rgba(0,53,148,0.12)',
+          }} onClick={() => setSelected(i)}>
+            <span>{s.emoji}</span>
+            <span style={{ whiteSpace:'nowrap' }}>{s.name}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* 지도 */}
+      <div style={{ position:'relative', borderRadius:16, overflow:'hidden', boxShadow:'0 4px 16px rgba(0,53,148,0.12)' }}>
+        <div ref={mapRef} style={{ width:'100%', height:280 }}/>
+        {!loaded && (
+          <div style={{
+            position:'absolute', inset:0,
+            background:'#F1F5F9', display:'flex', flexDirection:'column',
+            alignItems:'center', justifyContent:'center', gap:10,
+          }}>
+            <div style={{ fontSize:28, animation:'spin 1.5s linear infinite' }}>🗺️</div>
+            <div style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>지도 불러오는 중...</div>
+          </div>
+        )}
+      </div>
+
+      {/* 선택된 명소 카드 */}
+      {selected !== null && (
+        <div style={{
+          marginTop:12, padding:'12px 14px',
+          background:'rgba(0,53,148,0.05)', borderRadius:12,
+          border:'1px solid rgba(0,53,148,0.10)',
+          display:'flex', alignItems:'center', gap:10,
+        }}>
+          <span style={{ fontSize:24 }}>{SYDNEY_SPOTS[selected].emoji}</span>
+          <div>
+            <div style={{ fontSize:13, fontWeight:800, color:'#003594' }}>{SYDNEY_SPOTS[selected].name}</div>
+            <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>{SYDNEY_SPOTS[selected].desc}</div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
 
+// ── 업체 등록 폼
 function RequestForm({ onClose }: { onClose: () => void }) {
-  const [form, setForm] = useState({
-    business_name: '', category: '', address: '', description: '',
-    hashtags: '', phone: '', kakao: '', website: '',
-  })
+  const [form, setForm] = useState({ business_name:'', category:'', address:'', description:'', hashtags:'', phone:'', kakao:'', website:'' })
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
   const [error, setError] = useState('')
-
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
   const handleSubmit = async () => {
@@ -147,33 +321,19 @@ function RequestForm({ onClose }: { onClose: () => void }) {
     try {
       const { supabase } = await import('../lib/supabase')
       const { error: err } = await supabase.from('business_requests').insert({
-        business_name: form.business_name.trim(),
-        category:      form.category,
-        address:       form.address.trim(),
-        description:   form.description.trim(),
-        hashtags:      tags,
-        phone:         form.phone.trim() || null,
-        kakao:         form.kakao.trim() || null,
-        website:       form.website.trim() || null,
+        business_name: form.business_name.trim(), category: form.category,
+        address: form.address.trim(), description: form.description.trim(),
+        hashtags: tags, phone: form.phone.trim()||null, kakao: form.kakao.trim()||null, website: form.website.trim()||null,
       })
       if (err) throw err
       setDone(true)
-    } catch { setError('제출 중 오류가 발생했습니다. 다시 시도해주세요.') }
+    } catch { setError('제출 중 오류가 발생했습니다.') }
     setSubmitting(false)
   }
 
-  const inputStyle: React.CSSProperties = {
-    width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:10,
-    padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff',
-    boxSizing:'border-box', fontFamily:ff, outline:'none',
-  }
-  const taStyle: React.CSSProperties = { ...inputStyle, height:80, padding:'10px 12px', resize:'none' as any }
-  const label = (txt: string, sub?: string) => (
-    <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>
-      {txt} {sub && <span style={{ fontWeight:500, color:'#94A3B8' }}>{sub}</span>}
-    </div>
-  )
-
+  const iStyle: React.CSSProperties = { width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:10, padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff', boxSizing:'border-box', fontFamily:ff, outline:'none' }
+  const taStyle: React.CSSProperties = { ...iStyle, height:80, padding:'10px 12px', resize:'none' as any }
+  const lbl = (t: string, s?: string) => <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>{t} {s && <span style={{ fontWeight:500, color:'#94A3B8' }}>{s}</span>}</div>
   const businessCats = BCATS.filter(c => c.id !== 'all')
 
   if (done) return (
@@ -181,106 +341,81 @@ function RequestForm({ onClose }: { onClose: () => void }) {
       <div style={{ fontSize:48, marginBottom:16 }}>🎉</div>
       <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:8 }}>신청이 완료됐어요!</div>
       <div style={{ fontSize:13, color:'#64748B', lineHeight:1.6, marginBottom:24 }}>검토 후 등록해드릴게요.<br/>감사합니다 🙏</div>
-      <button onClick={onClose} style={{
-        width:'100%', height:48, background:'#003594', color:'#fff',
-        border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer',
-      }}>확인</button>
+      <button onClick={onClose} style={{ width:'100%', height:48, background:'#003594', color:'#fff', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
     </div>
   )
 
   return (
     <div>
       <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-        <div>{label('업체명 *')}<input value={form.business_name} onChange={e => set('business_name', e.target.value)} placeholder="업체명을 입력하세요" style={inputStyle} /></div>
+        <div>{lbl('업체명 *')}<input value={form.business_name} onChange={e => set('business_name', e.target.value)} placeholder="업체명을 입력하세요" style={iStyle} /></div>
         <div>
-          {label('카테고리 *')}
+          {lbl('카테고리 *')}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
             {businessCats.map(cat => (
-              <button key={cat.id} onClick={() => set('category', cat.id)} style={{
-                height:36, borderRadius:8, border:'none', cursor:'pointer',
-                background: form.category === cat.id ? '#003594' : '#fff',
-                color: form.category === cat.id ? '#fff' : '#1E293B',
-                fontSize:12, fontWeight:700,
-                boxShadow: form.category === cat.id ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
-              }}>{cat.label}</button>
+              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:8, border:'none', cursor:'pointer', background: form.category===cat.id ? '#003594' : '#fff', color: form.category===cat.id ? '#fff' : '#1E293B', fontSize:12, fontWeight:700, boxShadow: form.category===cat.id ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)' }}>{cat.label}</button>
             ))}
           </div>
         </div>
-        <div>{label('주소 (Full Address) *')}<AddressAutocomplete value={form.address} onChange={v => set('address', v)} /></div>
-        <div>{label('업체 설명 *')}<textarea value={form.description} onChange={e => set('description', e.target.value)} placeholder="업체 소개를 간단히 작성해주세요" style={taStyle as any} /></div>
-        <div>{label('해시태그 *', '(3개 이상, 쉼표 또는 띄어쓰기로 구분)')}<input value={form.hashtags} onChange={e => set('hashtags', e.target.value)} placeholder="한식당, 시드니, 가족식사, 주차가능" style={inputStyle} /></div>
+        <div>{lbl('주소 *')}<AddressAutocomplete value={form.address} onChange={v => set('address', v)} /></div>
+        <div>{lbl('업체 설명 *')}<textarea value={form.description} onChange={e => set('description', e.target.value)} placeholder="업체 소개를 간단히 작성해주세요" style={taStyle as any} /></div>
+        <div>{lbl('해시태그 *', '(3개 이상)')}<input value={form.hashtags} onChange={e => set('hashtags', e.target.value)} placeholder="한식당, 시드니, 가족식사" style={iStyle} /></div>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-          <div>{label('전화번호')}<input value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+61 2 1234 5678" style={inputStyle} /></div>
-          <div>{label('카카오 오픈채팅')}<input value={form.kakao} onChange={e => set('kakao', e.target.value)} placeholder="오픈채팅 링크" style={inputStyle} /></div>
+          <div>{lbl('전화번호')}<input value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+61 2 1234 5678" style={iStyle} /></div>
+          <div>{lbl('카카오')}<input value={form.kakao} onChange={e => set('kakao', e.target.value)} placeholder="오픈채팅 링크" style={iStyle} /></div>
         </div>
-        <div>{label('웹사이트')}<input value={form.website} onChange={e => set('website', e.target.value)} placeholder="https://www.example.com" style={inputStyle} /></div>
+        <div>{lbl('웹사이트')}<input value={form.website} onChange={e => set('website', e.target.value)} placeholder="https://..." style={iStyle} /></div>
       </div>
       {error && <div style={{ marginTop:10, padding:'8px 12px', background:'rgba(239,68,68,0.08)', borderRadius:8, fontSize:12, color:'#DC2626', fontWeight:600 }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{
-        width:'100%', marginTop:16, height:50, background:'#003594', color:'#fff',
-        border:'none', borderRadius:10, fontSize:15, fontWeight:800,
-        cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.7 : 1,
-        boxShadow:'0 4px 14px rgba(0,53,148,0.25)',
-      }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:'#003594', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)' }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
     </div>
   )
 }
 
+// ── 버킷리스트 추천 폼
 function SuggestionForm({ onClose }: { onClose: () => void }) {
   const [suggestion, setSuggestion] = useState('')
   const [email, setEmail]           = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone]             = useState(false)
   const [error, setError]           = useState('')
-
-  const inputStyle: React.CSSProperties = {
-    width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:10,
-    padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff',
-    boxSizing:'border-box', fontFamily:ff, outline:'none',
-  }
-  const taStyle: React.CSSProperties = { ...inputStyle, height:110, padding:'12px', resize:'none' as any, lineHeight:1.6 }
-
+  const iStyle: React.CSSProperties = { width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:10, padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff', boxSizing:'border-box', fontFamily:ff, outline:'none' }
+  const taStyle: React.CSSProperties = { ...iStyle, height:110, padding:'12px', resize:'none' as any, lineHeight:1.6 }
   const handleSubmit = async () => {
     if (!suggestion.trim()) { setError('추천 내용을 입력해주세요'); return }
     setError(''); setSubmitting(true)
     try {
       const { supabase } = await import('../lib/supabase')
-      const { error: err } = await supabase.from('item_suggestions').insert({ suggestion: suggestion.trim(), email: email.trim() || null })
+      const { error: err } = await supabase.from('item_suggestions').insert({ suggestion: suggestion.trim(), email: email.trim()||null })
       if (err) throw err
       setDone(true)
-    } catch { setError('제출 중 오류가 발생했어요. 다시 시도해주세요.') }
+    } catch { setError('제출 중 오류가 발생했어요.') }
     setSubmitting(false)
   }
-
   if (done) return (
     <div style={{ textAlign:'center', padding:'32px 0' }}>
       <div style={{ fontSize:48, marginBottom:16 }}>🙏</div>
-      <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:8 }}>공유해 주셔서 감사합니다!</div>
+      <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:8 }}>감사합니다!</div>
       <div style={{ fontSize:13, color:'#64748B', lineHeight:1.7, marginBottom:24 }}>소중한 경험을 나눠주셨어요.<br/>채택되면 이메일로 알려드릴게요 😊</div>
       <button onClick={onClose} style={{ width:'100%', height:48, background:'#003594', color:'#fff', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
     </div>
   )
-
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
       <div style={{ background:'rgba(0,53,148,0.05)', borderRadius:10, padding:'12px 14px' }}>
         <div style={{ fontSize:13, color:'#003594', fontWeight:700, marginBottom:4 }}>💡 이런 것들을 추천해주세요</div>
-        <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6 }}>호주에서 꼭 해봐야 할 것, 먹어봐야 할 것,<br/>가봐야 할 곳, 해결해야 할 것 등 뭐든 좋아요!</div>
+        <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6 }}>호주에서 꼭 해봐야 할 것, 먹어봐야 할 것, 가봐야 할 곳!</div>
       </div>
       <div>
         <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>추천 내용 *</div>
-        <textarea value={suggestion} onChange={e => setSuggestion(e.target.value)} placeholder="예) 본다이 비치에서 서핑 레슨 받기, 시드니 새해 불꽃놀이 보기..." style={taStyle as any} />
+        <textarea value={suggestion} onChange={e => setSuggestion(e.target.value)} placeholder="예) 본다이 비치에서 서핑 레슨 받기..." style={taStyle as any} />
       </div>
       <div>
         <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>이메일 <span style={{ fontWeight:500, color:'#94A3B8' }}>(선택 · 채택 시 알림)</span></div>
-        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="example@email.com" type="email" style={inputStyle} />
+        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="example@email.com" type="email" style={iStyle} />
       </div>
       {error && <div style={{ padding:'8px 12px', background:'rgba(239,68,68,0.08)', borderRadius:8, fontSize:12, color:'#DC2626', fontWeight:600 }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{
-        width:'100%', height:50, background:'#003594', color:'#fff', border:'none', borderRadius:10,
-        fontSize:15, fontWeight:800, cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.7 : 1,
-        boxShadow:'0 4px 14px rgba(0,53,148,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:4,
-      }}>
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', height:50, background:'#003594', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:4 }}>
         <Icon icon="ph:paper-plane-tilt" width={16} height={16} color="#FFCD00" />
         {submitting ? '제출 중...' : '추천 제출하기'}
       </button>
@@ -288,12 +423,43 @@ function SuggestionForm({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ── 말풍선
+function ChatBubble() {
+  const [open, setOpen] = useState(true)
+  return (
+    <div style={{ position:'fixed', bottom:'10%', right:20, zIndex:300, display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8 }}>
+      {open && (
+        <div style={{ background:'#fff', borderRadius:14, padding:'14px 16px', boxShadow:'0 4px 20px rgba(0,53,148,0.15)', maxWidth:240, position:'relative', animation:'fadeInUp 0.25s ease', border:'1px solid rgba(0,53,148,0.08)' }}>
+          <button onClick={() => setOpen(false)} style={{ position:'absolute', top:8, right:8, background:'none', border:'none', cursor:'pointer', color:'#94A3B8', fontSize:14, lineHeight:1, padding:2 }}>✕</button>
+          <div style={{ fontSize:12, fontWeight:800, color:'#003594', marginBottom:6 }}>호주가자 운영자입니다.</div>
+          <div style={{ fontSize:12, color:'#475569', lineHeight:1.6 }}>
+            본 서비스는 무료로 제공됩니다. 문의는{' '}
+            <a href="https://www.threads.net/@palaslouise" target="_blank" rel="noreferrer" style={{ color:'#003594', fontWeight:700, textDecoration:'none' }}>@palaslouise</a>로 연락주세요.
+          </div>
+          <div style={{ position:'absolute', bottom:-8, right:18, width:0, height:0, borderLeft:'8px solid transparent', borderRight:'8px solid transparent', borderTop:'8px solid #fff', filter:'drop-shadow(0 2px 2px rgba(0,53,148,0.08))' }}/>
+        </div>
+      )}
+      <button onClick={() => setOpen(v => !v)} style={{ width:44, height:44, borderRadius:'50%', background:'#E8EDF5', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 8px rgba(0,0,0,0.12)' }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#003594"><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.96 9.96 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+      </button>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════
+// ── 메인 컴포넌트
+// ══════════════════════════════════════════════════
 export default function LandingPage({ state, onStart, onServices }: Props) {
-  const total = ITEMS.length + state.customItems.length
+  const total    = ITEMS.length + state.customItems.length
+  const checked  = state.checked.size
+  const progress = total > 0 ? Math.round((checked / total) * 100) : 0
+
   const [showForm, setShowForm]             = useState(false)
   const [showSuggestion, setShowSuggestion] = useState(false)
   const [logoTap, setLogoTap]               = useState(0)
-  const logoTimer = { current: null as any }
+  const [sliderIdx, setSliderIdx]           = useState(0)
+  const sliderRef  = useRef<HTMLDivElement>(null)
+  const logoTimer  = useRef<any>(null)
 
   const handleLogoTap = () => {
     const next = logoTap + 1
@@ -303,6 +469,18 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
     logoTimer.current = setTimeout(() => setLogoTap(0), 2000)
   }
 
+  // 슬라이더 자동 재생
+  useEffect(() => {
+    const t = setInterval(() => setSliderIdx(i => (i + 1) % BUCKET_RECS.length), 3500)
+    return () => clearInterval(t)
+  }, [])
+
+  useEffect(() => {
+    if (!sliderRef.current) return
+    const cardW = sliderRef.current.offsetWidth * 0.72 + 12
+    sliderRef.current.scrollTo({ left: sliderIdx * cardW, behavior:'smooth' })
+  }, [sliderIdx])
+
   const displayCats = CATEGORIES.filter(c => c.id !== 'custom')
 
   return (
@@ -310,170 +488,270 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes float    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes progressFill { from{width:0%} to{width:var(--w)} }
         .cat-card:hover { transform:translateY(-3px) scale(1.01); box-shadow:0 12px 28px rgba(0,53,148,0.20) !important; }
         .cat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .cta-btn:active { transform:scale(0.97); }
+        .slider-wrap::-webkit-scrollbar { display:none; }
+        .slider-wrap { scrollbar-width:none; }
       `}</style>
 
-      {/* ── 헤더 ── */}
-      <div style={{
-        position:'sticky', top:0, zIndex:50,
-        background:'rgba(255,255,255,0.97)', backdropFilter:'blur(12px)',
-        borderBottom:'1px solid rgba(0,53,148,0.08)',
-        padding:'12px 20px',
-        display:'flex', alignItems:'center', justifyContent:'space-between',
-        boxShadow:'0 2px 12px rgba(0,53,148,0.06)',
-      }}>
-        <div onClick={handleLogoTap} style={{ cursor:'pointer', userSelect:'none' as any, display:'flex', alignItems:'center', gap:8 }}>
-          <div style={{ width:30, height:30, borderRadius:9, background:'#003594', display:'flex', alignItems:'center', justifyContent:'center', fontSize:15 }}>🦘</div>
-          <span style={{ fontSize:16, fontWeight:900, color:'#003594', letterSpacing:-0.3 }}>호주가자</span>
-        </div>
-        <div style={{ display:'flex', gap:8 }}>
-          <button onClick={onServices} style={{
-            height:34, padding:'0 14px', borderRadius:20,
-            border:'1.5px solid rgba(0,53,148,0.2)', background:'transparent',
-            color:'#003594', fontSize:12, fontWeight:700, cursor:'pointer',
-          }}>업체찾기</button>
-          <button onClick={onStart} style={{
-            height:34, padding:'0 16px', borderRadius:20, border:'none',
-            background:'#003594', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer',
-            boxShadow:'0 2px 10px rgba(0,53,148,0.30)',
-            display:'flex', alignItems:'center', gap:5,
-          }}>
-            <Icon icon="ph:list-checks" width={13} height={13} color="#FFCD00" />
-            버킷리스트
-          </button>
-        </div>
-      </div>
+      {/* ── 히어로 + 투명 헤더 ── */}
+      <div style={{ position:'relative', height:420, overflow:'hidden' }}>
 
-      {/* ── 히어로 섹션 ── */}
-      <div style={{ position:'relative', height:480, overflow:'hidden' }}>
+        {/* 배경 이미지 — 오버레이 거의 없음 */}
         <div style={{
           position:'absolute', inset:0,
           backgroundImage:`url(${imgHero})`,
           backgroundSize:'cover',
-          backgroundPosition:'center 40%',
+          backgroundPosition:'center 35%',
         }}/>
-        {/* 그라데이션 오버레이 */}
+
+        {/* 하단만 약하게 그라데이션 (텍스트 가독성) */}
         <div style={{
           position:'absolute', inset:0,
-          background:'linear-gradient(to bottom, rgba(0,20,70,0.50) 0%, rgba(0,30,90,0.40) 40%, rgba(0,20,70,0.78) 100%)',
+          background:'linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.05) 40%, rgba(0,10,40,0.65) 100%)',
         }}/>
-        {/* 히어로 텍스트 */}
+
+        {/* 투명 헤더 (히어로 위에 올림) */}
         <div style={{
-          position:'absolute', inset:0,
-          display:'flex', flexDirection:'column',
-          alignItems:'center', justifyContent:'center',
-          padding:'0 24px', textAlign:'center',
+          position:'absolute', top:0, left:0, right:0, zIndex:10,
+          padding:'14px 20px',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
         }}>
-          <div style={{ animation:'fadeInUp 0.5s ease both' }}>
-            <div style={{
-              display:'inline-flex', alignItems:'center', gap:6,
-              background:'rgba(255,205,0,0.22)', borderRadius:20,
-              padding:'6px 16px', marginBottom:16,
-              border:'1px solid rgba(255,205,0,0.38)',
-              backdropFilter:'blur(4px)',
-            }}>
-              <span style={{ fontSize:12 }}>✈️</span>
-              <span style={{ fontSize:11, fontWeight:700, color:'#FFCD00', letterSpacing:0.5 }}>호주 이민·여행자를 위한</span>
-            </div>
+          <div onClick={handleLogoTap} style={{ cursor:'pointer', userSelect:'none' as any, display:'flex', alignItems:'center', gap:7 }}>
+            <div style={{ width:28, height:28, borderRadius:8, background:'rgba(255,255,255,0.20)', backdropFilter:'blur(4px)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, border:'1.5px solid rgba(255,255,255,0.35)' }}>🦘</div>
+            <span style={{ fontSize:16, fontWeight:900, color:'#fff', letterSpacing:-0.3, textShadow:'0 1px 6px rgba(0,0,0,0.4)' }}>HOJUGAJA</span>
           </div>
-          <div style={{ animation:'fadeInUp 0.5s ease 0.1s both' }}>
-            <h1 style={{
-              fontSize:30, fontWeight:900, color:'#fff',
-              lineHeight:1.25, marginBottom:10, letterSpacing:-0.5,
-              textShadow:'0 2px 12px rgba(0,0,0,0.35)',
-              margin:'0 0 10px 0',
-            }}>
-              호주에서 꼭 해야 할<br/>
-              <span style={{ color:'#FFCD00' }}>모든 것</span>을 담았어요
-            </h1>
+          <button onClick={onStart} style={{
+            height:34, padding:'0 16px', borderRadius:20, border:'none',
+            background:'rgba(255,255,255,0.22)', backdropFilter:'blur(8px)',
+            color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer',
+            display:'flex', alignItems:'center', gap:5,
+            border:'1.5px solid rgba(255,255,255,0.40)' as any,
+            boxShadow:'0 2px 8px rgba(0,0,0,0.15)',
+          }}>
+            <Icon icon="ph:envelope-simple" width={13} height={13} color="#FFCD00" />
+            나의 버킷리스트
+          </button>
+        </div>
+
+        {/* 히어로 텍스트 — 하단 배치 */}
+        <div style={{
+          position:'absolute', bottom:0, left:0, right:0,
+          padding:'0 20px 24px',
+          animation:'fadeInUp 0.6s ease both',
+        }}>
+          {/* 뱃지 */}
+          <div style={{
+            display:'inline-flex', alignItems:'center', gap:5,
+            background:'rgba(255,255,255,0.18)', borderRadius:20,
+            padding:'5px 13px', marginBottom:10,
+            border:'1px solid rgba(255,255,255,0.32)',
+            backdropFilter:'blur(4px)',
+          }}>
+            <span style={{ fontSize:11 }}>✈️</span>
+            <span style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.95)', letterSpacing:0.8 }}>· 호주 이민·여행자를 위한 ·</span>
           </div>
-          <div style={{ animation:'fadeInUp 0.5s ease 0.2s both' }}>
-            <p style={{
-              fontSize:14, color:'rgba(255,255,255,0.85)',
-              lineHeight:1.8, marginBottom:22, margin:'0 0 22px 0',
-              textShadow:'0 1px 6px rgba(0,0,0,0.30)',
+
+          <h1 style={{
+            fontSize:28, fontWeight:900, color:'#fff',
+            lineHeight:1.25, margin:'0 0 8px 0',
+            textShadow:'0 2px 10px rgba(0,0,0,0.30)',
+            letterSpacing:-0.5,
+          }}>
+            호주에서 꼭 해야 할<br/>모든 것!
+          </h1>
+
+          <p style={{
+            fontSize:13, color:'rgba(255,255,255,0.88)',
+            margin:'0 0 18px 0', lineHeight:1.6,
+            textShadow:'0 1px 4px rgba(0,0,0,0.25)',
+          }}>
+            가고 싶은 곳, 먹고 싶은 것, 지금 체크하세요
+          </p>
+
+          {/* CTA 버튼 */}
+          <div style={{ display:'flex', gap:10 }}>
+            <button onClick={onStart} style={{
+              flex:1, height:48, background:'#FFCD00', color:'#002870',
+              border:'none', borderRadius:12, fontSize:14, fontWeight:900,
+              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+              boxShadow:'0 4px 20px rgba(255,205,0,0.50)',
             }}>
-              {total}개 항목 · {CATEGORIES.length}개 카테고리<br/>
-              나만의 호주 버킷리스트를 만들어보세요
-            </p>
-          </div>
-          <div style={{ animation:'fadeInUp 0.5s ease 0.3s both', width:'100%', maxWidth:340 }}>
-            <div style={{ display:'flex', gap:10, marginBottom:12 }}>
-              <button onClick={onStart} className="cta-btn" style={{
-                flex:1, height:52, background:'#FFCD00', color:'#002870',
-                border:'none', borderRadius:14, fontSize:14, fontWeight:900,
-                cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-                boxShadow:'0 6px 24px rgba(255,205,0,0.50)',
-              }}>
-                <Icon icon="ph:list-checks" width={18} height={18} color="#002870" />
-                버킷리스트 시작하기
-              </button>
-              <button onClick={onServices} className="cta-btn" style={{
-                flex:1, height:52, background:'rgba(255,255,255,0.18)', color:'#fff',
-                border:'1.5px solid rgba(255,255,255,0.40)', borderRadius:14, fontSize:13, fontWeight:700,
-                cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:5,
-                backdropFilter:'blur(8px)',
-              }}>
-                <Icon icon="ph:buildings" width={16} height={16} color="#fff" />
-                업체/서비스 보기
-              </button>
-            </div>
-            <div style={{
-              display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-              background:'rgba(255,255,255,0.12)', borderRadius:20, padding:'7px 16px',
-              backdropFilter:'blur(4px)', border:'1px solid rgba(255,255,255,0.15)',
+              <Icon icon="ph:list-checks" width={16} height={16} color="#002870" />
+              버킷리스트 시작하기
+            </button>
+            <button onClick={onServices} style={{
+              height:48, padding:'0 18px',
+              background:'rgba(255,255,255,0.18)', color:'#fff',
+              border:'1.5px solid rgba(255,255,255,0.38)', borderRadius:12, fontSize:12, fontWeight:700,
+              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:5,
+              backdropFilter:'blur(8px)', whiteSpace:'nowrap',
             }}>
-              <span style={{ fontSize:12 }}>📱</span>
-              <span style={{ fontSize:12, color:'rgba(255,255,255,0.92)', fontWeight:600 }}>앱 설치 없이 폰으로 바로 체크해요</span>
-            </div>
+              <Icon icon="ph:buildings" width={15} height={15} color="#fff" />
+              업체 보기
+            </button>
           </div>
         </div>
       </div>
 
-      {/* ── 카테고리 섹션 ── */}
-      <div style={{ padding:'28px 20px 24px', background:'#fff' }}>
-        <div style={{ marginBottom:18 }}>
-          <div style={{ fontSize:20, fontWeight:900, color:'#0F172A', marginBottom:4 }}>
-            {CATEGORIES.length}개 카테고리, {total}개 항목
+      {/* ── 나의 버킷리스트 진행 바 ── */}
+      <div style={{
+        background:'#fff',
+        padding:'16px 20px',
+        borderBottom:'1px solid #F1F5F9',
+      }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+            <div style={{ width:32, height:32, borderRadius:10, background:'linear-gradient(135deg, #003594, #0050CC)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <Icon icon="ph:list-checks" width={16} height={16} color="#FFCD00" />
+            </div>
+            <div>
+              <div style={{ fontSize:13, fontWeight:800, color:'#0F172A' }}>나의 버킷리스트</div>
+              <div style={{ fontSize:11, color:'#94A3B8', marginTop:1 }}>{checked}/{total} 완료 · {progress}%</div>
+            </div>
           </div>
-          <div style={{ fontSize:13, color:'#64748B', lineHeight:1.6 }}>
-            호주 생활에 꼭 필요한 모든 것을 담았어요 🦘
+          <button onClick={onStart} style={{
+            height:32, padding:'0 14px', borderRadius:20, border:'none',
+            background:'#003594', color:'#fff', fontSize:11, fontWeight:700, cursor:'pointer',
+          }}>보러가기 →</button>
+        </div>
+
+        {/* 진행 바 */}
+        <div style={{ height:10, background:'#EEF3FF', borderRadius:5, overflow:'hidden' }}>
+          <div style={{
+            height:'100%',
+            width:`${progress}%`,
+            background:'linear-gradient(90deg, #003594 0%, #0066FF 100%)',
+            borderRadius:5,
+            transition:'width 0.8s ease',
+            position:'relative',
+            minWidth: progress > 0 ? 10 : 0,
+          }}>
+            {progress > 5 && (
+              <div style={{
+                position:'absolute', right:-1, top:'50%', transform:'translateY(-50%)',
+                width:14, height:14, borderRadius:'50%',
+                background:'#fff', border:'2.5px solid #003594',
+                boxShadow:'0 0 0 3px rgba(0,53,148,0.20)',
+              }}/>
+            )}
           </div>
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:12 }}>
+
+        {progress === 0 && (
+          <div style={{ marginTop:8, fontSize:11, color:'#94A3B8', textAlign:'center' }}>
+            아직 체크한 항목이 없어요 · 시작해볼까요? 🦘
+          </div>
+        )}
+        {progress > 0 && progress < 100 && (
+          <div style={{ marginTop:8, fontSize:11, color:'#003594', fontWeight:600 }}>
+            🎯 {total - checked}개 항목이 남았어요! 계속 도전해봐요
+          </div>
+        )}
+        {progress === 100 && (
+          <div style={{ marginTop:8, fontSize:11, color:'#10B981', fontWeight:700, textAlign:'center' }}>
+            🎉 모든 항목을 완료했어요! 대단해요!
+          </div>
+        )}
+      </div>
+
+      {/* ── 추천 버킷리스트 슬라이더 ── */}
+      <div style={{ background:'#fff', padding:'24px 0 24px' }}>
+        <div style={{ padding:'0 20px', marginBottom:16, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div>
+            <div style={{ fontSize:18, fontWeight:900, color:'#0F172A' }}>추천 버킷리스트</div>
+            <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>호주에서 꼭 경험해야 할 것들</div>
+          </div>
+          <div style={{ display:'flex', gap:6 }}>
+            {BUCKET_RECS.map((_, i) => (
+              <div key={i} onClick={() => setSliderIdx(i)} style={{
+                width: i === sliderIdx ? 18 : 6,
+                height:6, borderRadius:3,
+                background: i === sliderIdx ? '#003594' : '#CBD5E1',
+                cursor:'pointer', transition:'all 0.3s ease',
+              }}/>
+            ))}
+          </div>
+        </div>
+
+        <div ref={sliderRef} className="slider-wrap" style={{
+          display:'flex', gap:12,
+          overflowX:'auto', paddingLeft:20, paddingRight:20,
+          scrollSnapType:'x mandatory',
+        }}>
+          {BUCKET_RECS.map((item, i) => (
+            <div key={item.id} onClick={onStart} style={{
+              flexShrink:0, width:'72%', borderRadius:16, overflow:'hidden',
+              position:'relative', height:190, cursor:'pointer',
+              scrollSnapAlign:'start',
+              boxShadow: i === sliderIdx ? '0 8px 28px rgba(0,53,148,0.22)' : '0 4px 16px rgba(0,53,148,0.10)',
+              transform: i === sliderIdx ? 'scale(1)' : 'scale(0.97)',
+              transition:'all 0.3s ease',
+            }}>
+              {/* 배경 이미지 */}
+              <div style={{
+                position:'absolute', inset:0,
+                backgroundImage:`url(${item.img})`,
+                backgroundSize:'cover',
+                backgroundPosition: item.pos,
+              }}/>
+              {/* 그라데이션 */}
+              <div style={{
+                position:'absolute', inset:0,
+                background:'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,10,50,0.72) 100%)',
+              }}/>
+              {/* 텍스트 */}
+              <div style={{
+                position:'absolute', bottom:0, left:0, right:0, padding:'14px 16px',
+              }}>
+                <div style={{ fontSize:20, marginBottom:4 }}>{item.emoji}</div>
+                <div style={{ fontSize:15, fontWeight:900, color:'#fff', textShadow:'0 1px 4px rgba(0,0,0,0.4)', marginBottom:4 }}>
+                  {item.title}
+                </div>
+                <div style={{ fontSize:12, color:'rgba(255,255,255,0.80)' }}>{item.desc}</div>
+                <div style={{
+                  marginTop:10, display:'inline-flex', alignItems:'center', gap:4,
+                  background:'#FFCD00', borderRadius:20, padding:'5px 12px',
+                }}>
+                  <Icon icon="ph:heart" width={12} height={12} color="#002870" />
+                  <span style={{ fontSize:11, fontWeight:800, color:'#002870' }}>버킷리스트에 추가 ›</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── 카테고리 섹션 ── */}
+      <div style={{ padding:'24px 20px 20px', background:'#F8FAFF' }}>
+        <div style={{ marginBottom:16 }}>
+          <div style={{ fontSize:18, fontWeight:900, color:'#0F172A', marginBottom:4 }}>
+            {CATEGORIES.length}개 카테고리 · {total}개 항목
+          </div>
+          <div style={{ fontSize:13, color:'#64748B' }}>
+            호주 생활에 꼭 필요한 모든 것 🦘
+          </div>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:10 }}>
           {displayCats.map(cat => {
             const photo = CAT_PHOTO_MAP[cat.id]
             return (
               <div key={cat.id} onClick={onStart} className="cat-card" style={{
-                borderRadius:16, overflow:'hidden', cursor:'pointer',
-                boxShadow:'0 4px 16px rgba(0,53,148,0.10)',
-                position:'relative', height:110,
+                borderRadius:14, overflow:'hidden', cursor:'pointer',
+                boxShadow:'0 3px 14px rgba(0,53,148,0.10)',
+                position:'relative', height:100,
               }}>
                 {photo ? (
-                  <div style={{
-                    position:'absolute', inset:0,
-                    backgroundImage:`url(${photo})`,
-                    backgroundSize:'cover', backgroundPosition:'center',
-                  }}/>
+                  <div style={{ position:'absolute', inset:0, backgroundImage:`url(${photo})`, backgroundSize:'cover', backgroundPosition:'center' }}/>
                 ) : (
                   <div style={{ position:'absolute', inset:0, background:'#EEF3FF' }}/>
                 )}
-                <div style={{
-                  position:'absolute', inset:0,
-                  background:'linear-gradient(135deg, rgba(0,20,70,0.60) 0%, rgba(0,30,100,0.28) 100%)',
-                }}/>
-                <div style={{
-                  position:'absolute', inset:0,
-                  display:'flex', flexDirection:'column',
-                  justifyContent:'flex-end', padding:'12px 14px',
-                }}>
-                  <div style={{ fontSize:18, marginBottom:2 }}>{cat.emoji}</div>
-                  <div style={{ fontSize:13, fontWeight:800, color:'#fff', textShadow:'0 1px 4px rgba(0,0,0,0.4)' }}>
-                    {cat.label}
-                  </div>
+                <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg, rgba(0,20,70,0.58) 0%, rgba(0,30,100,0.25) 100%)' }}/>
+                <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'10px 12px' }}>
+                  <div style={{ fontSize:16, marginBottom:2 }}>{cat.emoji}</div>
+                  <div style={{ fontSize:12, fontWeight:800, color:'#fff', textShadow:'0 1px 4px rgba(0,0,0,0.4)' }}>{cat.label}</div>
                 </div>
               </div>
             )
@@ -481,83 +759,46 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         </div>
       </div>
 
-      {/* ── 버킷리스트 추천 섹션 ── */}
+      {/* ── 지도 섹션 ── */}
+      <SydneyMap />
+
+      {/* ── 버킷리스트 추천 배너 ── */}
       <div style={{ padding:'16px 20px 12px', background:'#fff' }}>
-        <div style={{
-          borderRadius:20, overflow:'hidden',
-          position:'relative', height:150,
-          boxShadow:'0 4px 20px rgba(0,53,148,0.12)',
-        }}>
-          <div style={{
-            position:'absolute', inset:0,
-            backgroundImage:`url(${imgSuggest})`,
-            backgroundSize:'cover', backgroundPosition:'center top',
-          }}/>
-          <div style={{
-            position:'absolute', inset:0,
-            background:'linear-gradient(90deg, rgba(0,30,100,0.85) 0%, rgba(0,30,100,0.50) 55%, rgba(0,30,100,0.15) 100%)',
-          }}/>
-          <div style={{
-            position:'absolute', inset:0, display:'flex',
-            alignItems:'center', padding:'0 20px', gap:16,
-          }}>
+        <div style={{ borderRadius:18, overflow:'hidden', position:'relative', height:140, boxShadow:'0 4px 20px rgba(0,53,148,0.12)' }}>
+          <div style={{ position:'absolute', inset:0, backgroundImage:`url(${imgSuggest})`, backgroundSize:'cover', backgroundPosition:'center top' }}/>
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(0,30,100,0.85) 0%, rgba(0,30,100,0.50) 55%, rgba(0,30,100,0.15) 100%)' }}/>
+          <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', padding:'0 20px', gap:16 }}>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:16, fontWeight:900, color:'#fff', marginBottom:4, textShadow:'0 1px 6px rgba(0,0,0,0.3)' }}>버킷리스트 추천</div>
-              <div style={{ fontSize:12, color:'rgba(255,255,255,0.82)', lineHeight:1.6 }}>호주에서 꼭 해봐야 할 것들<br/>경험을 쉐어해 주세요 🦘</div>
+              <div style={{ fontSize:15, fontWeight:900, color:'#fff', marginBottom:4 }}>버킷리스트 추천</div>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.82)', lineHeight:1.6 }}>경험을 쉐어해 주세요 🦘</div>
             </div>
-            <button onClick={() => setShowSuggestion(true)} style={{
-              flexShrink:0, height:42, padding:'0 18px',
-              background:'#FFCD00', color:'#002870',
-              border:'none', borderRadius:12, fontSize:13, fontWeight:800,
-              cursor:'pointer', whiteSpace:'nowrap',
-              boxShadow:'0 4px 14px rgba(255,205,0,0.4)',
-            }}>추천하기</button>
+            <button onClick={() => setShowSuggestion(true)} style={{ flexShrink:0, height:40, padding:'0 16px', background:'#FFCD00', color:'#002870', border:'none', borderRadius:12, fontSize:13, fontWeight:800, cursor:'pointer', whiteSpace:'nowrap', boxShadow:'0 4px 14px rgba(255,205,0,0.4)' }}>추천하기</button>
           </div>
         </div>
       </div>
 
-      {/* ── 업체 등록 신청 섹션 ── */}
+      {/* ── 업체 등록 배너 ── */}
       <div style={{ padding:'12px 20px 32px', background:'#fff' }}>
-        <div style={{
-          borderRadius:20, overflow:'hidden',
-          position:'relative', height:150,
-          boxShadow:'0 4px 20px rgba(0,53,148,0.12)',
-        }}>
-          <div style={{
-            position:'absolute', inset:0,
-            backgroundImage:`url(${imgBusiness})`,
-            backgroundSize:'cover', backgroundPosition:'center',
-          }}/>
-          <div style={{
-            position:'absolute', inset:0,
-            background:'linear-gradient(90deg, rgba(0,20,80,0.90) 0%, rgba(0,20,80,0.58) 55%, rgba(0,20,80,0.15) 100%)',
-          }}/>
-          <div style={{
-            position:'absolute', inset:0, display:'flex',
-            alignItems:'center', padding:'0 20px', gap:16,
-          }}>
+        <div style={{ borderRadius:18, overflow:'hidden', position:'relative', height:140, boxShadow:'0 4px 20px rgba(0,53,148,0.12)' }}>
+          <div style={{ position:'absolute', inset:0, backgroundImage:`url(${imgBusiness})`, backgroundSize:'cover', backgroundPosition:'center' }}/>
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(0,20,80,0.90) 0%, rgba(0,20,80,0.58) 55%, rgba(0,20,80,0.15) 100%)' }}/>
+          <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', padding:'0 20px', gap:16 }}>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:16, fontWeight:900, color:'#fff', marginBottom:4, textShadow:'0 1px 6px rgba(0,0,0,0.3)' }}>업체 등록 신청</div>
-              <div style={{ fontSize:12, color:'rgba(255,255,255,0.82)', lineHeight:1.6 }}>호주가자에 업체를 등록하고<br/>한인 커뮤니티에 홍보하세요</div>
-              <div style={{ display:'flex', gap:5, marginTop:7 }}>
+              <div style={{ fontSize:15, fontWeight:900, color:'#fff', marginBottom:4 }}>업체 등록 신청</div>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.82)', lineHeight:1.6 }}>한인 커뮤니티에 홍보하세요</div>
+              <div style={{ display:'flex', gap:5, marginTop:6 }}>
                 {['무료','한인타겟','직접관리'].map(t => (
                   <span key={t} style={{ background:'rgba(255,205,0,0.22)', color:'#FFCD00', fontSize:10, fontWeight:700, borderRadius:20, padding:'2px 8px', border:'1px solid rgba(255,205,0,0.30)' }}>{t}</span>
                 ))}
               </div>
             </div>
-            <button onClick={() => setShowForm(true)} style={{
-              flexShrink:0, height:42, padding:'0 18px',
-              background:'#FFCD00', color:'#002870',
-              border:'none', borderRadius:12, fontSize:13, fontWeight:800,
-              cursor:'pointer', whiteSpace:'nowrap',
-              boxShadow:'0 4px 14px rgba(255,205,0,0.4)',
-            }}>신청하기</button>
+            <button onClick={() => setShowForm(true)} style={{ flexShrink:0, height:40, padding:'0 16px', background:'#FFCD00', color:'#002870', border:'none', borderRadius:12, fontSize:13, fontWeight:800, cursor:'pointer', whiteSpace:'nowrap', boxShadow:'0 4px 14px rgba(255,205,0,0.4)' }}>신청하기</button>
           </div>
         </div>
       </div>
 
       {/* ── 푸터 ── */}
-      <div style={{ background:'#001f5c', padding:'20px 20px 36px', textAlign:'center' }}>
+      <div style={{ background:'#001f5c', padding:'20px 20px 40px', textAlign:'center' }}>
         <div style={{ fontSize:14, fontWeight:900, color:'#FFCD00', marginBottom:4 }}>🦘 호주가자</div>
         <div style={{ fontSize:11, color:'rgba(255,255,255,0.45)' }}>www.hojugaja.com · 무료 호주 버킷리스트</div>
       </div>
@@ -566,12 +807,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {showSuggestion && (
         <div style={{ position:'fixed', inset:0, zIndex:500 }}>
           <div onClick={() => setShowSuggestion(false)} style={{ position:'absolute', inset:0, background:'rgba(10,20,40,0.6)' }}/>
-          <div style={{
-            position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:480, background:'#F1F5F9',
-            borderRadius:'20px 20px 0 0', padding:'20px 20px 40px',
-            maxHeight:'90vh', overflowY:'auto',
-          }}>
+          <div style={{ position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:480, background:'#F1F5F9', borderRadius:'20px 20px 0 0', padding:'20px 20px 40px', maxHeight:'90vh', overflowY:'auto' }}>
             <div style={{ width:36, height:4, background:'#CBD5E1', borderRadius:2, margin:'0 auto 20px' }}/>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
               <div>
@@ -591,12 +827,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {showForm && (
         <div style={{ position:'fixed', inset:0, zIndex:500 }}>
           <div onClick={() => setShowForm(false)} style={{ position:'absolute', inset:0, background:'rgba(10,20,40,0.6)' }}/>
-          <div style={{
-            position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:480, background:'#F1F5F9',
-            borderRadius:'20px 20px 0 0', padding:'20px 20px 40px',
-            maxHeight:'90vh', overflowY:'auto',
-          }}>
+          <div style={{ position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:480, background:'#F1F5F9', borderRadius:'20px 20px 0 0', padding:'20px 20px 40px', maxHeight:'90vh', overflowY:'auto' }}>
             <div style={{ width:36, height:4, background:'#CBD5E1', borderRadius:2, margin:'0 auto 20px' }}/>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
               <div>
@@ -612,36 +843,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         </div>
       )}
 
-      {/* ── 말풍선 ── */}
       <ChatBubble />
-    </div>
-  )
-}
-
-function ChatBubble() {
-  const [open, setOpen] = useState(true)
-  return (
-    <div style={{ position:'fixed', bottom:'10%', right:20, zIndex:300, display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8 }}>
-      {open && (
-        <div style={{
-          background:'#fff', borderRadius:14, padding:'14px 16px',
-          boxShadow:'0 4px 20px rgba(0,53,148,0.15)',
-          maxWidth:240, position:'relative',
-          animation:'fadeInUp 0.25s ease',
-          border:'1px solid rgba(0,53,148,0.08)',
-        }}>
-          <button onClick={() => setOpen(false)} style={{ position:'absolute', top:8, right:8, background:'none', border:'none', cursor:'pointer', color:'#94A3B8', fontSize:14, lineHeight:1, padding:2 }}>✕</button>
-          <div style={{ fontSize:12, fontWeight:800, color:'#003594', marginBottom:6 }}>호주가자 운영자입니다.</div>
-          <div style={{ fontSize:12, color:'#475569', lineHeight:1.6 }}>
-            본 서비스는 무료로 제공되는 서비스입니다. 문의 사항이나 의견 있으시면{' '}
-            <a href="https://www.threads.net/@palaslouise" target="_blank" rel="noreferrer" style={{ color:'#003594', fontWeight:700, textDecoration:'none' }}>@palaslouise</a>로 연락주세요.
-          </div>
-          <div style={{ position:'absolute', bottom:-8, right:18, width:0, height:0, borderLeft:'8px solid transparent', borderRight:'8px solid transparent', borderTop:'8px solid #fff', filter:'drop-shadow(0 2px 2px rgba(0,53,148,0.08))' }}/>
-        </div>
-      )}
-      <button onClick={() => setOpen(v => !v)} style={{ width:44, height:44, borderRadius:'50%', background:'#E8EDF5', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 8px rgba(0,0,0,0.12)' }}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="#003594"><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.96 9.96 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
-      </button>
     </div>
   )
 }
