@@ -341,13 +341,39 @@ function SydneyMap() {
         // 이름 풍선 InfoWindow (하나만 재사용)
         const infoWindow = new google.maps.InfoWindow({
           disableAutoPan: true,
-          pixelOffset: new google.maps.Size(0, -4),
+          pixelOffset: new google.maps.Size(0, -8),
         })
+
+        // Google InfoWindow 기본 스타일 제거용 CSS
+        const style = document.createElement('style')
+        style.textContent = `
+          .gm-style .gm-style-iw-c {
+            padding: 0 !important;
+            border-radius: 10px !important;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
+            background: #1E293B !important;
+          }
+          .gm-style .gm-style-iw-d {
+            overflow: hidden !important;
+            padding: 0 !important;
+          }
+          .gm-style .gm-style-iw-t::after {
+            background: #1E293B !important;
+            box-shadow: none !important;
+          }
+          .gm-style .gm-style-iw-tc::after {
+            background: #1E293B !important;
+          }
+          .gm-style-iw-chr {
+            display: none !important;
+          }
+        `
+        document.head.appendChild(style)
 
         const showInfo = (marker: any, spot: any) => {
           infoWindow.setContent(`
-            <div style="font-family:'Pretendard',sans-serif;font-size:12px;font-weight:700;color:#1E293B;
-                        padding:4px 2px;white-space:nowrap;line-height:1.3;">
+            <div style="font-family:'Pretendard',sans-serif;font-size:12px;font-weight:700;
+                        color:#fff;padding:7px 12px;white-space:nowrap;">
               ${spot.name}
             </div>
           `)
