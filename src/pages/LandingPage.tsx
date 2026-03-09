@@ -565,7 +565,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 
         {/* 메인 타이틀 */}
         <div style={{
-          position:'absolute', top:'40%', left:0, right:0,
+          position:'absolute', top:'36%', left:0, right:0,
           textAlign:'center', zIndex:10,
           padding:'0 16px',
           color:'#fff',
@@ -587,7 +587,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 
         {/* 서브 문구 */}
         <div style={{
-          position:'absolute', top:'64%', left:0, right:0,
+          position:'absolute', top:'60%', left:0, right:0,
           textAlign:'center', zIndex:10,
         }}>
           <p style={{
