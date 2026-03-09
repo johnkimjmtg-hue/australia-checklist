@@ -310,7 +310,7 @@ export default function ChecklistPage({ state, setState }: Props) {
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
           <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
-            {mainTab === 'services' ? `전체 업체 ${bizCount}개` : `${total}개 버킷리스트`}
+            {mainTab === 'services' ? `${bizCount}개 업체` : `${total}개 버킷리스트`}
           </span>
         </div>
         {/* 탭 */}
