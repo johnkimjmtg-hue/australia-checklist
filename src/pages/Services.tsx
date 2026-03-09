@@ -69,7 +69,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const isFiltered  = isSearch || isCatFilter
 
   return (
-    <div style={{ minHeight:'100vh', background:'#F1F5F9', fontFamily:ff, paddingBottom:40 }}>
+    <div style={{ minHeight:'100vh', background:'#E8EDF3', fontFamily:ff, paddingBottom:40 }}>
 
       {/* ── 스티키 헤더 ── */}
       <div style={{

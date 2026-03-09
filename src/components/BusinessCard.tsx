@@ -65,17 +65,19 @@ export default function BusinessCard({ business }: Props) {
       )}
 
       <div style={{
-        background:'#fff', borderRadius:12,
+        background:'#fff', borderRadius:14,
         boxShadow: is_featured
-          ? '0 4px 20px rgba(27,110,243,0.10),0 1px 4px rgba(0,0,0,0.06)'
-          : '0 2px 8px rgba(0,0,0,0.06)',
+          ? '0 4px 20px rgba(27,110,243,0.13),0 1px 4px rgba(0,0,0,0.07)'
+          : '0 4px 16px rgba(0,0,0,0.10)',
         overflow:'hidden',
+        border: is_featured ? '1.5px solid rgba(27,110,243,0.18)' : '1px solid #E2E8F0',
+        borderLeft: is_featured ? '4px solid #1B6EF3' : '1px solid #E2E8F0',
       }}>
         <div style={{ padding:'16px' }}>
 
           {/* 업체명 + 북마크 + 추천 뱃지 */}
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
-            <div style={{ fontSize:16, fontWeight:800, color:'#1E293B', flex:1, paddingRight:8 }}>{name}</div>
+            <div style={{ fontSize:17, fontWeight:800, color:'#0F172A', flex:1, paddingRight:8 }}>{name}</div>
             <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
               {is_featured && (
                 <div style={{ background:'#1B6EF3', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'3px 10px' }}>추천</div>
