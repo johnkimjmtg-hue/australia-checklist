@@ -450,8 +450,8 @@ function ChatBubble() {
 // ── 메인 컴포넌트
 // ══════════════════════════════════════════════════
 export default function LandingPage({ state, onStart, onServices }: Props) {
-  const total    = ITEMS.length + state.customItems.length
-  const checked  = state.checked.size
+  const total    = ITEMS.length + (state.customItems?.length ?? 0)
+  const checked  = state.checked?.size ?? 0
   const progress = total > 0 ? Math.round((checked / total) * 100) : 0
 
   const [showForm, setShowForm]             = useState(false)
