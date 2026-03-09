@@ -151,10 +151,19 @@ export default function BusinessCard({ business }: Props) {
                 <div ref={popRef} style={{
                   position:'absolute', top:'110%', right:0, zIndex:100,
                   background:'#fff', borderRadius:14, padding:'14px',
-                  boxShadow:'0 8px 32px rgba(0,0,0,0.15)', minWidth:200,
+                  boxShadow:'0 8px 32px rgba(0,0,0,0.15)', minWidth:210,
                   border:'1px solid #F1F5F9',
                 }}>
-                  <div style={{ fontSize:12, fontWeight:800, color:'#94A3B8', marginBottom:10, letterSpacing:0.5 }}>폴더에 저장</div>
+                  {/* 팝업 헤더 */}
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                    <span style={{ fontSize:12, fontWeight:800, color:'#94A3B8', letterSpacing:0.5 }}>폴더에 저장</span>
+                    <button onClick={() => { setShowFolderPop(false); setNewFolderMode(false); setNewFolderName('') }} style={{
+                      background:'#F1F5F9', border:'none', cursor:'pointer', borderRadius:6,
+                      width:24, height:24, display:'flex', alignItems:'center', justifyContent:'center',
+                    }}>
+                      <Icon icon="ph:x" width={13} height={13} color="#64748B" />
+                    </button>
+                  </div>
                   <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
                     {folders.map(folder => {
                       const isIn = myFolders.includes(folder.id)
@@ -206,6 +215,12 @@ export default function BusinessCard({ business }: Props) {
                       </div>
                     )}
                   </div>
+                  {/* 완료 버튼 */}
+                  <button onClick={() => { setShowFolderPop(false); setNewFolderMode(false); setNewFolderName('') }} style={{
+                    width:'100%', marginTop:10, height:36, border:'none', borderRadius:9,
+                    background:'#DC2626', color:'#fff', fontSize:13, fontWeight:700,
+                    cursor:'pointer', fontFamily:ff,
+                  }}>완료</button>
                 </div>
               )}
             </div>
