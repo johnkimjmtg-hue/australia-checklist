@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { Business, VOTE_TAGS, getMyVote, getVoteCounts, addVote } from '../lib/businessService'
+import { isBookmarked, toggleBookmark } from '../lib/businessBookmarks'
 import BusinessShareModal from './BusinessShareModal'
 
 type Props = { business: Business }
@@ -14,13 +15,14 @@ export default function BusinessCard({ business }: Props) {
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
     : null
 
-  const [showVotes, setShowVotes]       = useState(false)
-  const [counts, setCounts]             = useState<Record<string, number> | null>(null)
-  const [loading, setLoading]           = useState(false)
-  const [myVote, setMyVote]             = useState<string | null>(() => getMyVote(business.id))
-  const [showResult, setShowResult]     = useState(true)
-  const [showPhone, setShowPhone]       = useState(false)
+  const [showVotes, setShowVotes]           = useState(false)
+  const [counts, setCounts]                 = useState<Record<string, number> | null>(null)
+  const [loading, setLoading]               = useState(false)
+  const [myVote, setMyVote]                 = useState<string | null>(() => getMyVote(business.id))
+  const [showResult, setShowResult]         = useState(true)
+  const [showPhone, setShowPhone]           = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
+  const [bookmarked, setBookmarked]         = useState(() => isBookmarked(business.id))
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
   useEffect(() => {
@@ -72,18 +74,30 @@ export default function BusinessCard({ business }: Props) {
       <div style={{
         background:'#fff', borderRadius:12,
         boxShadow: is_featured
-          ? '0 4px 20px rgba(0,53,148,0.10),0 1px 4px rgba(0,0,0,0.06)'
+          ? '0 4px 20px rgba(27,110,243,0.10),0 1px 4px rgba(0,0,0,0.06)'
           : '0 2px 8px rgba(0,0,0,0.06)',
         overflow:'hidden',
       }}>
         <div style={{ padding:'16px' }}>
 
-          {/* 업체명 + 추천 뱃지 */}
+          {/* 업체명 + 북마크 + 추천 뱃지 */}
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
             <div style={{ fontSize:16, fontWeight:800, color:'#1E293B', flex:1, paddingRight:8 }}>{name}</div>
-            {is_featured && (
-              <div style={{ background:'#003594', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'3px 10px', flexShrink:0 }}>추천</div>
-            )}
+            <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
+              {is_featured && (
+                <div style={{ background:'#1B6EF3', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'3px 10px' }}>추천</div>
+              )}
+              <button onClick={() => setBookmarked(toggleBookmark(business.id))} style={{
+                background:'none', border:'none', cursor:'pointer', padding:2,
+                display:'flex', alignItems:'center', justifyContent:'center',
+              }}>
+                <Icon
+                  icon={bookmarked ? 'ph:bookmark-simple-fill' : 'ph:bookmark-simple'}
+                  width={20} height={20}
+                  color={bookmarked ? '#1B6EF3' : '#CBD5E1'}
+                />
+              </button>
+            </div>
           </div>
 
           {/* 주소 */}
@@ -103,7 +117,7 @@ export default function BusinessCard({ business }: Props) {
           {tags && tags.length > 0 && (
             <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
               {tags.map(tag => (
-                <span key={tag} style={{ background:'rgba(0,53,148,0.07)', color:'#003594', fontSize:10, fontWeight:700, borderRadius:6, padding:'3px 8px' }}>{tag}</span>
+                <span key={tag} style={{ background:'rgba(27,110,243,0.07)', color:'#1B6EF3', fontSize:10, fontWeight:700, borderRadius:6, padding:'3px 8px' }}>{tag}</span>
               ))}
             </div>
           )}
@@ -161,7 +175,7 @@ export default function BusinessCard({ business }: Props) {
               </a>
             )}
             <button onClick={handleToggleVotes}
-              style={{ ...btnBase, background: showVotes ? '#003594' : '#fff', color: showVotes ? '#fff' : '#1E293B' }}>
+              style={{ ...btnBase, background: showVotes ? '#1B6EF3' : '#fff', color: showVotes ? '#fff' : '#1E293B' }}>
               <Icon icon="ph:thumbs-up" width={13} height={13} color={showVotes ? '#fff' : '#64748B'} />
               한줄평{myVote ? ' ✓' : ''}
             </button>
@@ -185,7 +199,7 @@ export default function BusinessCard({ business }: Props) {
                   </div>
                   {!myVote && (
                     <button onClick={() => setShowResult(v => !v)} style={{
-                      background: showResult ? '#003594' : 'none',
+                      background: showResult ? '#1B6EF3' : 'none',
                       border: showResult ? 'none' : '1px solid #E2E8F0',
                       cursor:'pointer', fontSize:11, fontWeight:700,
                       color: showResult ? '#fff' : '#64748B',
