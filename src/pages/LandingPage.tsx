@@ -263,8 +263,9 @@ const SYDNEY_SPOTS = [
 const SPOT_CATS = ['전체', '명소', '카페', '디저트', '레스토랑']
 
 function SydneyMap() {
-  const mapRef     = useRef<HTMLDivElement>(null)
-  const markersRef = useRef<any[]>([])
+  const mapRef         = useRef<HTMLDivElement>(null)
+  const mapInstanceRef = useRef<any>(null)
+  const markersRef     = useRef<any[]>([])
   const [loaded, setLoaded]       = useState(false)
   const [selected, setSelected]   = useState<number | null>(null)
   const [catFilter, setCatFilter] = useState('전체')
@@ -282,6 +283,16 @@ function SydneyMap() {
     })
     setSelected(null)
   }, [catFilter])
+
+  // 태그 클릭 → 지도 panTo
+  const handleSpotClick = (filteredIdx: number) => {
+    setSelected(filteredIdx)
+    const spot = filteredSpots[filteredIdx]
+    const map = mapInstanceRef.current
+    if (!map) return
+    map.panTo({ lat: spot.lat, lng: spot.lng })
+    if (map.getZoom() < 14) map.setZoom(14)
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -302,6 +313,7 @@ function SydneyMap() {
             { featureType: 'transit',      stylers: [{ visibility: 'off' }] },
           ],
         })
+        mapInstanceRef.current = map
 
         const pinColor = (cat: string) => {
           if (cat === '명소')    return '#1B6EF3'
@@ -332,7 +344,11 @@ function SydneyMap() {
             },
             title: spot.name,
           })
-          marker.addListener('click', () => setSelected(i))
+          marker.addListener('click', () => {
+            setSelected(i)
+            map.panTo({ lat: spot.lat, lng: spot.lng })
+            if (map.getZoom() < 14) map.setZoom(14)
+          })
           markersRef.current.push(marker)
         })
         if (!cancelled) setLoaded(true)
@@ -376,16 +392,17 @@ function SydneyMap() {
         ))}
       </div>
 
-      {/* 명소 태그 — 텍스트만 가로 스크롤 */}
+      {/* 명소 태그 — 아이콘+텍스트 가로 스크롤 */}
       <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:10, marginBottom:10, scrollbarWidth:'none' }}>
         {filteredSpots.map((s, i) => (
-          <div key={i} onClick={() => setSelected(i)} style={{
+          <div key={i} onClick={() => handleSpotClick(i)} style={{
             flexShrink:0, display:'flex', alignItems:'center', gap:4,
             padding:'4px 10px', borderRadius:20, cursor:'pointer', transition:'all 0.15s',
             background: selected === i ? '#1E293B' : 'transparent',
             color: selected === i ? '#fff' : '#94A3B8',
             fontSize:11, fontWeight:600,
           }}>
+            <Icon icon={s.icon} width={12} height={12} color={selected === i ? '#fff' : '#94A3B8'} />
             <span style={{ whiteSpace:'nowrap' }}>{s.name}</span>
           </div>
         ))}
@@ -405,22 +422,6 @@ function SydneyMap() {
           </div>
         )}
       </div>
-
-      {/* 선택된 명소 카드 */}
-      {selected !== null && (
-        <div style={{
-          marginTop:12, padding:'12px 14px',
-          background:`rgba(27,110,243,0.05)`, borderRadius:12,
-          border:`1px solid rgba(27,110,243,0.10)`,
-          display:'flex', alignItems:'center', gap:10,
-        }}>
-          <Icon icon={filteredSpots[selected].icon} width={24} height={24} color={BLUE} />
-          <div>
-            <div style={{ fontSize:13, fontWeight:800, color:BLUE }}>{filteredSpots[selected].name}</div>
-            <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>{filteredSpots[selected].desc}</div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
@@ -577,7 +578,21 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
   const total    = ITEMS.length + (state.customItems?.length ?? 0)
   const checked  = state.checked?.size ?? 0
   const progress = total > 0 ? Math.round((checked / total) * 100) : 0
-  const bizCount = BUSINESSES.length
+  const [bizCount, setBizCount] = useState(BUSINESSES.length)
+
+  useEffect(() => {
+    async function fetchBizCount() {
+      try {
+        const { supabase } = await import('../lib/supabase')
+        const { count } = await supabase
+          .from('businesses')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true)
+        if (count !== null) setBizCount(count)
+      } catch {}
+    }
+    fetchBizCount()
+  }, [])
 
   const [showForm, setShowForm]             = useState(false)
   const [showSuggestion, setShowSuggestion] = useState(false)
