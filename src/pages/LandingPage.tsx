@@ -362,30 +362,30 @@ function SydneyMap() {
       </div>
 
       {/* 카테고리 필터 */}
-      <div style={{ display:'flex', gap:5, overflowX:'auto', paddingBottom:8, marginBottom:10, scrollbarWidth:'none' }}>
+      <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:8, marginBottom:10, scrollbarWidth:'none' }}>
         {SPOT_CATS.map(cat => (
           <button key={cat} onClick={() => { setCatFilter(cat); setSelected(null) }} style={{
-            flexShrink:0, height:26, padding:'0 10px',
-            background: catFilter === cat ? BLUE : '#F0F4FF',
-            color: catFilter === cat ? '#fff' : BLUE,
-            border: catFilter === cat ? 'none' : `1px solid rgba(27,110,243,0.15)`,
-            borderRadius:12, fontSize:11, fontWeight:700, cursor:'pointer',
+            flexShrink:0, height:28, padding:'0 12px',
+            background: catFilter === cat ? '#1E293B' : '#fff',
+            color: catFilter === cat ? '#fff' : '#64748B',
+            border: 'none',
+            borderRadius:12, fontSize:12, fontWeight:700, cursor:'pointer',
+            boxShadow: catFilter === cat ? '0 2px 8px rgba(0,0,0,0.18)' : '0 1px 4px rgba(0,0,0,0.10)',
+            transition:'all 0.15s',
           }}>{cat}</button>
         ))}
       </div>
 
-      {/* 명소 태그 가로 스크롤 */}
-      <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:12, marginBottom:12, scrollbarWidth:'none' }}>
+      {/* 명소 태그 — 텍스트만 가로 스크롤 */}
+      <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:10, marginBottom:10, scrollbarWidth:'none' }}>
         {filteredSpots.map((s, i) => (
-          <div key={i} style={{
-            flexShrink:0, display:'flex', alignItems:'center', gap:5,
-            background: selected === i ? BLUE : '#F0F4FF',
-            color: selected === i ? '#fff' : BLUE,
-            borderRadius:20, padding:'5px 12px', fontSize:12, fontWeight:700,
-            cursor:'pointer', transition:'all 0.2s',
-            border: selected === i ? 'none' : `1px solid rgba(27,110,243,0.15)`,
-          }} onClick={() => setSelected(i)}>
-            <Icon icon={s.icon} width={13} height={13} color={selected === i ? '#fff' : BLUE} />
+          <div key={i} onClick={() => setSelected(i)} style={{
+            flexShrink:0, display:'flex', alignItems:'center', gap:4,
+            padding:'4px 10px', borderRadius:20, cursor:'pointer', transition:'all 0.15s',
+            background: selected === i ? '#1E293B' : 'transparent',
+            color: selected === i ? '#fff' : '#94A3B8',
+            fontSize:11, fontWeight:600,
+          }}>
             <span style={{ whiteSpace:'nowrap' }}>{s.name}</span>
           </div>
         ))}
