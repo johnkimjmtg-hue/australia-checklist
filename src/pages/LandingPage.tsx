@@ -628,6 +628,7 @@ function ChatBubble() {
 export default function LandingPage({ state, onStart, onServices }: Props) {
   const navigate = useNavigate()
   // BucketCheckView와 완전히 동일한 방식 (1아이템 N일 배정 → N개로 카운트)
+  const totalItems   = ITEMS.length  // 히어로 섹션용 전체 버킷리스트 개수
   const allItems     = [...ITEMS, ...(state.customItems ?? []).map((c: any) => ({ ...c, emoji:'📝' }))]
   const checkedItems = allItems.filter((i: any) => state.selected?.[i.id])
   const allRows      = (() => {
@@ -752,7 +753,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           }}>
             <div style={{ display:'flex', alignItems:'center', gap:4 }}>
               <Icon icon="ph:list-checks" width={12} height={12} color={GOLD} />
-              <span style={{ fontSize:11, fontWeight:700, color:'#fff' }}>{total}개 버킷리스트</span>
+              <span style={{ fontSize:11, fontWeight:700, color:'#fff' }}>{totalItems}개 버킷리스트</span>
             </div>
             <div style={{ width:1, background:'rgba(255,255,255,0.30)' }}/>
             <div style={{ display:'flex', alignItems:'center', gap:4 }}>
