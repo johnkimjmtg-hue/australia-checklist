@@ -93,7 +93,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       <div style={{
         position:'sticky', top:0, zIndex:10,
         background:'rgba(232,237,243,0.97)', backdropFilter:'blur(10px)',
-        padding:'12px 16px 10px',
+        padding:'12px 16px 12px',
         borderBottom:'1.5px solid #D1D9E3',
         boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
       }}>
@@ -124,7 +124,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         </div>
 
         {/* 카테고리 필터 — 개수 뱃지 포함, 많은 순 정렬 */}
-        <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:2 }}>
+        <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4, paddingTop:6 }}>
           {sortedCategories.map(cat => {
             const isActive = category === cat.id
             const count = catCounts[cat.id] || 0
@@ -135,7 +135,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 style={{
                   position:'relative',
                   display:'flex', flexDirection:'column', alignItems:'center', gap:3,
-                  padding:'8px 10px', borderRadius:10, flexShrink:0,
+                  width:58, padding:'8px 4px', borderRadius:10, flexShrink:0,
                   background: isActive ? '#1B6EF3' : '#fff',
                   color: isActive ? '#fff' : '#64748B',
                   border: isActive ? 'none' : '1.5px solid #D1D9E3',
