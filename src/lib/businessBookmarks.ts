@@ -13,6 +13,7 @@ export function toggleBookmark(id: string): boolean {
   const list = getBookmarks()
   const next = list.includes(id) ? list.filter(x => x !== id) : [...list, id]
   try { localStorage.setItem(KEY, JSON.stringify(next)) } catch {}
+  try { window.dispatchEvent(new CustomEvent('bookmark-change', { detail: { id, bookmarked: next.includes(id), count: next.length } })) } catch {}
   return next.includes(id)
 }
 

@@ -47,6 +47,21 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     })
   }, [])
 
+  // 북마크 변경 이벤트 실시간 감지
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { count } = (e as CustomEvent).detail
+      setBookmarkCount(count)
+      // 북마크 탭이면 목록도 즉시 갱신
+      if (serviceTab === 'bookmarks') {
+        const ids = getBookmarks()
+        setBookmarked(allBusinesses.filter(b => ids.includes(b.id)))
+      }
+    }
+    window.addEventListener('bookmark-change', handler)
+    return () => window.removeEventListener('bookmark-change', handler)
+  }, [serviceTab, allBusinesses])
+
   // 북마크 탭 진입 시 로드
   useEffect(() => {
     if (serviceTab !== 'bookmarks') return
@@ -123,7 +138,8 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               display:'flex', alignItems:'center', gap:5,
             }}>
               <Icon icon={tab === 'all' ? 'ph:list-bullets' : 'ph:bookmark-simple-fill'}
-                width={13} height={13} color={serviceTab === tab ? '#fff' : '#94A3B8'} />
+                width={13} height={13}
+                color={tab === 'bookmarks' && serviceTab !== tab ? '#DC2626' : serviceTab === tab ? '#fff' : '#94A3B8'} />
               {tab === 'all' ? '전체 업체' : `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}`}
             </button>
           ))}
