@@ -16,6 +16,7 @@ import imgCity     from '../assets/landing/city-culture.png'
 import imgBeach    from '../assets/landing/beach.png'
 import imgBackpack from '../assets/landing/backpacker.png'
 import imgUnique   from '../assets/landing/unique-bridgeclimb.png'
+import imgStars    from '../assets/landing/bluemountains-stars.png'
 import imgSuggest  from '../assets/landing/suggest-cafe.png'
 import imgBusiness from '../assets/landing/business-storefront.png'
 
@@ -84,6 +85,15 @@ const BUCKET_RECS = [
     img: imgNature,
     pos: 'center',
     itemId: 'g25',
+    catId: 'places',
+  },
+  {
+    id: 'bluemountains',
+    title: '블루마운틴 별보기',
+    desc: '은하수 아래 쓰리시스터즈 감상',
+    img: imgStars,
+    pos: 'center 40%',
+    itemId: 'g26',
     catId: 'places',
   },
 ]
