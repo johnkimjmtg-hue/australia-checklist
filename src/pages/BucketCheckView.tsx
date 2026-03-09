@@ -13,39 +13,7 @@ type Props = {
   onEdit:     () => void
   onDelete:   () => void
   onShare:    () => void
-  onServices: (bizCategory?: string) => void
-}
-
-// 버킷리스트 카테고리 → 업체 카테고리 매핑
-const BIZ_CAT_MAP: Record<string, string> = {
-  hospital:  'dental',      // 병원/뷰티 → 치과 (기본, 아이템별로 세분화)
-  food:      'restaurant',  // 먹거리 → 식당
-  shopping:  'mart',        // 쇼핑 → 한국마트
-  admin:     'immigration', // 행정 → 이민/유학
-  people:    'all',         // 사람
-  parenting: 'academy',     // 육아 → 학원
-  places:    'travel',      // 가볼 곳 → 여행사
-  custom:    'all',
-}
-
-// 아이템별 더 정확한 업체 카테고리
-const ITEM_BIZ_MAP: Record<string, string> = {
-  h01: 'dental', h02: 'dental',           // 치과
-  h03: 'beauty', h04: 'beauty',           // 피부과/보톡스 → 미용
-  h10: 'oriental',                         // 한의원
-  h11: 'beauty', h12: 'beauty', h13: 'beauty', h14: 'beauty', // 미용/네일
-  h15: 'beauty',                           // 마사지
-  h23: 'pharmacy',                         // 약국
-  h06: 'gp', h07: 'gp', h08: 'gp', h25: 'gp', // 병원(GP)
-  h09: 'insurance',                        // 보험
-  f26: 'cafe',                             // 감성 카페
-  // food 항목들 → restaurant
-  ...Object.fromEntries(
-    ['f01','f02','f03','f04','f05','f06','f07','f08','f09','f10',
-     'f11','f12','f13','f14','f15','f16','f17','f18','f19','f20',
-     'f21','f22','f23','f24','f25','f27','f28','f29','f30','f31','f32','f33']
-    .map(id => [id, 'restaurant'])
-  ),
+  onServices: () => void
 }
 
 /* ══ 아이템별 아이코니파이 단색 아이콘 매핑 ══ */
@@ -322,8 +290,6 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
   const CheckRow = ({ item, day }: { item: typeof checkedItems[0]; day?: number }) => {
     const key = day !== undefined ? `${item.id}_${day}` : item.id
     const isAchieved = !!achieved[key]
-    const catId = (item as any).categoryId ?? 'custom'
-    const bizCat = ITEM_BIZ_MAP[item.id] ?? BIZ_CAT_MAP[catId] ?? 'all'
     return (
       <div style={{
         display:'flex',alignItems:'center',gap:12,
@@ -347,22 +313,11 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
             </svg>
           )}
         </div>
-        <ItemIcon itemId={item.id} categoryId={catId} color={isAchieved ? '#78716C' : '#94A3B8'} />
+        <ItemIcon itemId={item.id} categoryId={(item as any).categoryId ?? 'custom'} color={isAchieved ? '#78716C' : '#94A3B8'} />
         <span style={{ flex:1,fontSize:15,lineHeight:1.4,fontWeight:isAchieved?600:400,color:'#1E293B' }}>{item.label}</span>
-        {isAchieved
-          ? <span style={{ fontSize:11,fontWeight:600,color:'#44403C',background:'rgba(68,64,60,0.10)',padding:'3px 8px',borderRadius:4,flexShrink:0 }}>완료 ✓</span>
-          : bizCat !== 'all' && (
-            <button onClick={() => onServices(bizCat)} style={{
-              flexShrink:0, background:'rgba(27,110,243,0.08)', border:'none',
-              borderRadius:6, padding:'4px 8px', cursor:'pointer',
-              display:'flex', alignItems:'center', gap:3,
-              fontSize:10, fontWeight:700, color:'#1B6EF3',
-            }}>
-              <Icon icon="ph:storefront" width={11} height={11} color="#1B6EF3" />
-              업체
-            </button>
-          )
-        }
+        {isAchieved && (
+          <span style={{ fontSize:11,fontWeight:600,color:'#44403C',background:'rgba(68,64,60,0.10)',padding:'3px 8px',borderRadius:4,flexShrink:0 }}>완료 ✓</span>
+        )}
       </div>
     )
   }
