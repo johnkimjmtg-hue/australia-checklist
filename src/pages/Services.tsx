@@ -184,7 +184,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 style={{
                   position:'relative',
                   display:'flex', flexDirection:'column', alignItems:'center', gap:3,
-                  width:58, padding:'8px 4px', borderRadius:10, flexShrink:0,
+                  width:64, padding:'8px 4px', borderRadius:10, flexShrink:0,
                   background: isActive ? '#1B6EF3' : '#fff',
                   color: isActive ? '#fff' : '#64748B',
                   border: isActive ? 'none' : '1.5px solid #D1D9E3',
@@ -208,7 +208,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 )}
                 <Icon icon={CAT_ICONS[cat.id] ?? 'ph:star'} width={18} height={18}
                   color={isActive ? '#fff' : '#94A3B8'} />
-                <span style={{ fontSize:10, textAlign:'center', wordBreak:'keep-all', lineHeight:1.2 }}>
+                <span style={{ fontSize:10, textAlign:'center', wordBreak:'keep-all', lineHeight:1.3, whiteSpace:'pre-wrap' }}>
                   {cat.label}
                 </span>
               </button>
