@@ -70,8 +70,8 @@ export default function BusinessCard({ business }: Props) {
           ? '0 4px 20px rgba(27,110,243,0.13),0 1px 4px rgba(0,0,0,0.07)'
           : '0 4px 16px rgba(0,0,0,0.10)',
         overflow:'hidden',
-        border: is_featured ? '1.5px solid rgba(27,110,243,0.18)' : '1px solid #E2E8F0',
-        borderLeft: is_featured ? '4px solid #1B6EF3' : '1px solid #E2E8F0',
+        border:'1px solid #E2E8F0',
+        borderLeft: is_featured ? '4px solid #1B6EF3' : '4px solid #CBD5E1',
       }}>
         <div style={{ padding:'16px' }}>
 

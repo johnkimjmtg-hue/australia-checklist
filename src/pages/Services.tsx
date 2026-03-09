@@ -74,9 +74,10 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       {/* ── 스티키 헤더 ── */}
       <div style={{
         position:'sticky', top:0, zIndex:10,
-        background:'rgba(241,245,249,0.97)', backdropFilter:'blur(10px)',
+        background:'rgba(232,237,243,0.97)', backdropFilter:'blur(10px)',
         padding:'12px 16px 10px',
-        borderBottom:'1px solid #E2E8F0',
+        borderBottom:'1.5px solid #D1D9E3',
+        boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
       }}>
 
         {/* 전체/북마크 탭 */}
@@ -108,9 +109,9 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           <>
             <div style={{
               display:'flex', alignItems:'center', gap:8,
-              background:'#fff', borderRadius:10, padding:'0 12px',
-              border:'1px solid #E2E8F0', height:40,
-              boxShadow:'0 1px 4px rgba(0,0,0,0.05)',
+              background:'#fff', borderRadius:12, padding:'0 12px',
+              border:'1.5px solid #D1D9E3', height:42,
+              boxShadow:'0 2px 8px rgba(0,0,0,0.08)',
               marginBottom:10,
             }}>
               <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
