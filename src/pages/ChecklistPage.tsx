@@ -23,7 +23,7 @@ type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker'
 type MainTab = 'bucketlist' | 'services'
 
-export default function ChecklistPage({ state, setState }: Props) {
+export default function ChecklistPage({ state, setState, onLanding }: Props & { onLanding?: () => void }) {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
@@ -272,7 +272,7 @@ export default function ChecklistPage({ state, setState }: Props) {
             setShowReceipt(true)
           }}
           onServices={() => setMainTab('services')}
-          onLanding={() => setMainTab('landing')}
+          onLanding={() => onLanding?.()}
         />
         {showReceipt && trip && (
           <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}

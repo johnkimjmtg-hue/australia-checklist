@@ -7,11 +7,12 @@ import AdminPage from './pages/AdminPage'
 
 // ── 메인 앱
 function MainApp() {
+  const navigate = useNavigate()
   const [state, setState] = useState<AppState>(() => loadState())
 
   return (
     <div className="app-shell">
-      <ChecklistPage state={state} setState={setState} />
+      <ChecklistPage state={state} setState={setState} onLanding={() => navigate('/')} />
     </div>
   )
 }
