@@ -11,9 +11,7 @@ export interface Folder {
 }
 
 export const DEFAULT_FOLDERS: Folder[] = [
-  { id: 'frequent',    name: '자주 가는 곳',   emoji: '⭐', createdAt: 0 },
-  { id: 'wishlist',    name: '가보고 싶은 곳', emoji: '🗺️', createdAt: 0 },
-  { id: 'recommended', name: '추천받은 곳',     emoji: '👍', createdAt: 0 },
+  { id: 'wishlist', name: '가보고 싶은 곳', emoji: '🗺️', createdAt: 0 },
 ]
 
 // ── 폴더 ──
