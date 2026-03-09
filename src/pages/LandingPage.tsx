@@ -6,7 +6,7 @@ import { ITEMS, CATEGORIES } from '../data/checklist'
 import { CATEGORIES as BCATS, BUSINESSES } from '../data/businesses'
 
 // ── 이미지 import (src/assets/landing/ 폴더에 넣어주세요)
-import imgHero     from '../assets/landing/hero-clean.png'
+import imgHero     from '../assets/landing/hero.png'
 import imgCafe     from '../assets/landing/cafe-brunch.png'
 import imgFood     from '../assets/landing/food-korean-bbq.png'
 import imgShopping from '../assets/landing/shopping.png'
