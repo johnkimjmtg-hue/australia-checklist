@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { Business, VOTE_TAGS, getMyVote, getVoteCounts, addVote } from '../lib/businessService'
-import BusinessShareModal from './BusinessShareModal'
 import { isBookmarked, toggleBookmark } from '../lib/businessBookmarks'
+import BusinessShareModal from './BusinessShareModal'
 
 type Props = { business: Business }
 
@@ -15,25 +15,22 @@ export default function BusinessCard({ business }: Props) {
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
     : null
 
-  const [showVotes, setShowVotes]       = useState(false)
-  const [counts, setCounts]             = useState<Record<string, number> | null>(null)
-  const [loading, setLoading]           = useState(false)
-  const [myVote, setMyVote]             = useState<string | null>(() => getMyVote(business.id))
-  const [showResult, setShowResult]     = useState(true)
-  const [showPhone, setShowPhone]       = useState(false)
+  const [showVotes, setShowVotes]           = useState(false)
+  const [counts, setCounts]                 = useState<Record<string, number> | null>(null)
+  const [loading, setLoading]               = useState(false)
+  const [myVote, setMyVote]                 = useState<string | null>(() => getMyVote(business.id))
+  const [showResult, setShowResult]         = useState(true)
+  const [showPhone, setShowPhone]           = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
   const [bookmarked, setBookmarked]         = useState(() => isBookmarked(business.id))
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
-  useEffect(() => {
-    getVoteCounts(business.id).then(setCounts)
-  }, [business.id])
+  useEffect(() => { getVoteCounts(business.id).then(setCounts) }, [business.id])
 
   const handleToggleVotes = async () => {
     if (!showVotes && counts === null) {
       setLoading(true)
-      const data = await getVoteCounts(business.id)
-      setCounts(data)
+      setCounts(await getVoteCounts(business.id))
       setLoading(false)
     }
     setShowVotes(v => !v)
@@ -55,81 +52,73 @@ export default function BusinessCard({ business }: Props) {
 
   const btnBase: React.CSSProperties = {
     display:'flex', alignItems:'center', justifyContent:'center', gap:5,
-    height:34, padding:'0 12px', borderRadius:8,
+    height:36, padding:'0 14px', borderRadius:8,
     fontSize:12, fontWeight:700, cursor:'pointer',
-    border:'none', whiteSpace:'nowrap', fontFamily:ff,
-    boxShadow:'0 2px 6px rgba(0,0,0,0.09)',
+    border:'1.5px solid #D1D9E3', whiteSpace:'nowrap', fontFamily:ff,
+    boxShadow:'0 2px 6px rgba(0,0,0,0.08)',
+    color:'#1E293B', background:'#fff',
   }
 
   return (
     <>
       {showShareModal && (
-        <BusinessShareModal
-          business={business}
-          counts={counts ?? {}}
-          onClose={() => setShowShareModal(false)}
-        />
+        <BusinessShareModal business={business} counts={counts ?? {}} onClose={() => setShowShareModal(false)} />
       )}
 
       <div style={{
-        background:'#fff', borderRadius:12,
+        background:'#fff', borderRadius:14,
         boxShadow: is_featured
-          ? '0 4px 20px rgba(0,53,148,0.10),0 1px 4px rgba(0,0,0,0.06)'
-          : '0 2px 8px rgba(0,0,0,0.06)',
+          ? '0 4px 20px rgba(27,110,243,0.13),0 1px 4px rgba(0,0,0,0.07)'
+          : '0 4px 16px rgba(0,0,0,0.10)',
         overflow:'hidden',
+        border:'1px solid #E2E8F0',
+        borderLeft: is_featured ? '4px solid #1B6EF3' : '4px solid #CBD5E1',
       }}>
         <div style={{ padding:'16px' }}>
 
-          {/* 업체명 + 추천 뱃지 + 북마크 */}
+          {/* 업체명 + 북마크 + 추천 뱃지 */}
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
-            <div style={{ fontSize:16, fontWeight:800, color:'#1E293B', flex:1, paddingRight:8 }}>{name}</div>
+            <div style={{ fontSize:17, fontWeight:800, color:'#0F172A', flex:1, paddingRight:8 }}>{name}</div>
             <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
               {is_featured && (
-                <div style={{ background:'#003594', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'3px 10px' }}>추천</div>
+                <div style={{ background:'#1B6EF3', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'3px 10px' }}>추천</div>
               )}
-              <button onClick={e => { e.stopPropagation(); setBookmarked(toggleBookmark(business.id)) }} style={{
-                background:'none', border:'none', cursor:'pointer', padding:2,
+              <button onClick={() => setBookmarked(toggleBookmark(business.id))} style={{
+                background: bookmarked ? 'rgba(220,38,38,0.08)' : 'none',
+                border:'none', cursor:'pointer', padding:'4px 6px', borderRadius:8,
                 display:'flex', alignItems:'center', justifyContent:'center',
               }}>
-                <Icon
-                  icon={bookmarked ? 'ph:bookmark-simple-fill' : 'ph:bookmark-simple'}
-                  width={20} height={20}
-                  color={bookmarked ? '#DC2626' : '#CBD5E1'}
-                />
+                <Icon icon={bookmarked ? 'ph:bookmark-simple-fill' : 'ph:bookmark-simple'}
+                  width={20} height={20} color={bookmarked ? '#DC2626' : '#CBD5E1'} />
               </button>
             </div>
           </div>
 
-          {/* 주소 */}
           {fullAddress && (
             <div style={{ display:'flex', alignItems:'center', gap:4, marginBottom:8 }}>
-              <Icon icon="ph:map-pin-simple" width={13} height={13} color="#94A3B8" />
-              <span style={{ fontSize:12, color:'#64748B' }}>{fullAddress}</span>
+              <Icon icon="ph:map-pin-simple" width={13} height={13} color="#64748B" />
+              <span style={{ fontSize:12, color:'#475569', fontWeight:500 }}>{fullAddress}</span>
             </div>
           )}
 
-          {/* 설명 */}
           {description && (
-            <div style={{ fontSize:13, color:'#64748B', lineHeight:1.6, marginBottom:10 }}>{description}</div>
+            <div style={{ fontSize:13, color:'#334155', lineHeight:1.6, marginBottom:10 }}>{description}</div>
           )}
 
-          {/* 서비스 태그 */}
           {tags && tags.length > 0 && (
             <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
               {tags.map(tag => (
-                <span key={tag} style={{ background:'rgba(0,53,148,0.07)', color:'#003594', fontSize:10, fontWeight:700, borderRadius:6, padding:'3px 8px' }}>{tag}</span>
+                <span key={tag} style={{ background:'#EFF6FF', color:'#1B6EF3', fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:'1px solid #BFDBFE' }}>{tag}</span>
               ))}
             </div>
           )}
 
-          {/* 한줄평 미리보기 */}
           {!showVotes && topTags.length > 0 && (
             <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
               {topTags.map(([tag, count]) => (
                 <span key={tag} style={{
-                  background:'#FFF1F2', color:'#E11D48',
-                  fontSize:10, fontWeight:700, borderRadius:6, padding:'3px 8px',
-                  display:'flex', alignItems:'center', gap:3,
+                  background:'#FFF1F2', color:'#E11D48', fontSize:10, fontWeight:700,
+                  borderRadius:6, padding:'3px 8px', display:'flex', alignItems:'center', gap:3,
                   border:'1px solid #FECDD3',
                 }}>
                   <Icon icon="ph:thumbs-up" width={11} height={11} color="#E11D48" /> {tag} {count}
@@ -138,17 +127,16 @@ export default function BusinessCard({ business }: Props) {
             </div>
           )}
 
-          {/* 버튼 행 */}
           <div style={{ display:'flex', gap:7, flexWrap:'wrap' }}>
             {phone && (
               isMobile ? (
-                <a href={`tel:${phone}`} style={{ ...btnBase, background:'#fff', color:'#1E293B', textDecoration:'none' }}>
-                  <Icon icon="ph:phone" width={13} height={13} color="#64748B" />전화
+                <a href={`tel:${phone}`} style={{ ...btnBase, textDecoration:'none' }}>
+                  <Icon icon="ph:phone" width={13} height={13} color="#475569" />전화
                 </a>
               ) : (
                 <div style={{ position:'relative' }}>
-                  <button onClick={() => setShowPhone(v => !v)} style={{ ...btnBase, background:'#fff', color:'#1E293B' }}>
-                    <Icon icon="ph:phone" width={13} height={13} color="#64748B" />전화
+                  <button onClick={() => setShowPhone(v => !v)} style={{ ...btnBase }}>
+                    <Icon icon="ph:phone" width={13} height={13} color="#475569" />전화
                   </button>
                   {showPhone && (
                     <div style={{ position:'absolute', bottom:'110%', left:0, background:'#1E293B', color:'#fff', padding:'8px 14px', borderRadius:10, fontSize:13, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', zIndex:50 }}>{phone}</div>
@@ -158,37 +146,35 @@ export default function BusinessCard({ business }: Props) {
             )}
             {kakao && (
               <a href={`https://open.kakao.com/o/${kakao}`} target="_blank" rel="noreferrer"
-                style={{ ...btnBase, background:'#FEE500', color:'#3C1E1E', textDecoration:'none' }}>
+                style={{ ...btnBase, background:'#FEE500', color:'#3C1E1E', border:'1.5px solid #F0D800', textDecoration:'none' }}>
                 <Icon icon="ph:chat-circle" width={13} height={13} color="#3C1E1E" />카톡
               </a>
             )}
             {website && (
               <a href={website.startsWith('http') ? website : `https://${website}`} target="_blank" rel="noreferrer"
-                style={{ ...btnBase, background:'#fff', color:'#1E293B', textDecoration:'none' }}>
-                <Icon icon="ph:globe" width={13} height={13} color="#64748B" />웹사이트
+                style={{ ...btnBase, textDecoration:'none' }}>
+                <Icon icon="ph:globe" width={13} height={13} color="#475569" />웹사이트
               </a>
             )}
             {mapsUrl && (
               <a href={mapsUrl} target="_blank" rel="noreferrer"
-                style={{ ...btnBase, background:'#fff', color:'#1E293B', textDecoration:'none' }}>
-                <Icon icon="ph:navigation-arrow" width={13} height={13} color="#64748B" />경로
+                style={{ ...btnBase, textDecoration:'none' }}>
+                <Icon icon="ph:navigation-arrow" width={13} height={13} color="#475569" />경로
               </a>
             )}
             <button onClick={handleToggleVotes}
-              style={{ ...btnBase, background: showVotes ? '#003594' : '#fff', color: showVotes ? '#fff' : '#1E293B' }}>
-              <Icon icon="ph:thumbs-up" width={13} height={13} color={showVotes ? '#fff' : '#64748B'} />
+              style={{ ...btnBase, background: showVotes ? '#1B6EF3' : '#fff', color: showVotes ? '#fff' : '#1E293B', border: showVotes ? 'none' : '1.5px solid #D1D9E3' }}>
+              <Icon icon="ph:thumbs-up" width={13} height={13} color={showVotes ? '#fff' : '#475569'} />
               한줄평{myVote ? ' ✓' : ''}
             </button>
-            <button onClick={() => setShowShareModal(true)}
-              style={{ ...btnBase, background:'#fff', color:'#1E293B' }}>
-              <Icon icon="ph:share-network" width={13} height={13} color="#64748B" />공유
+            <button onClick={() => setShowShareModal(true)} style={{ ...btnBase }}>
+              <Icon icon="ph:share-network" width={13} height={13} color="#475569" />공유
             </button>
           </div>
         </div>
 
-        {/* ── 한줄평 패널 ── */}
         {showVotes && (
-          <div style={{ borderTop:'1px solid #F1F5F9', background:'#F8FAFC', padding:'14px 16px' }}>
+          <div style={{ borderTop:'1.5px solid #D1D9E3', background:'#F1F5F9', padding:'14px 16px' }}>
             {loading ? (
               <div style={{ textAlign:'center', padding:'12px 0', color:'#94A3B8', fontSize:13 }}>불러오는 중...</div>
             ) : (
@@ -199,7 +185,7 @@ export default function BusinessCard({ business }: Props) {
                   </div>
                   {!myVote && (
                     <button onClick={() => setShowResult(v => !v)} style={{
-                      background: showResult ? '#003594' : 'none',
+                      background: showResult ? '#1B6EF3' : 'none',
                       border: showResult ? 'none' : '1px solid #E2E8F0',
                       cursor:'pointer', fontSize:11, fontWeight:700,
                       color: showResult ? '#fff' : '#64748B',
@@ -229,8 +215,7 @@ export default function BusinessCard({ business }: Props) {
                           </div>
                         ) : (
                           <button key={tag} onClick={(e) => handleVote(e, tag)} style={{
-                            display:'flex', alignItems:'center', gap:8,
-                            padding:'10px 12px', borderRadius:9,
+                            display:'flex', alignItems:'center', gap:8, padding:'10px 12px', borderRadius:9,
                             border:'1px solid #E2E8F0', background:'#fff',
                             cursor:'pointer', textAlign:'left', fontFamily:ff,
                             boxShadow:'0 1px 3px rgba(0,0,0,0.05)',
