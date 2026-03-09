@@ -263,14 +263,25 @@ const SYDNEY_SPOTS = [
 const SPOT_CATS = ['전체', '명소', '카페', '디저트', '레스토랑']
 
 function SydneyMap() {
-  const mapRef = useRef<HTMLDivElement>(null)
-  const [loaded, setLoaded] = useState(false)
-  const [selected, setSelected] = useState<number | null>(null)
+  const mapRef     = useRef<HTMLDivElement>(null)
+  const markersRef = useRef<any[]>([])
+  const [loaded, setLoaded]       = useState(false)
+  const [selected, setSelected]   = useState<number | null>(null)
   const [catFilter, setCatFilter] = useState('전체')
 
   const filteredSpots = catFilter === '전체'
     ? SYDNEY_SPOTS
     : SYDNEY_SPOTS.filter(s => s.cat === catFilter)
+
+  // 필터 변경 시 마커 show/hide
+  useEffect(() => {
+    markersRef.current.forEach((marker, i) => {
+      const spot = SYDNEY_SPOTS[i]
+      const visible = catFilter === '전체' || spot.cat === catFilter
+      marker.setVisible(visible)
+    })
+    setSelected(null)
+  }, [catFilter])
 
   useEffect(() => {
     let cancelled = false
@@ -322,6 +333,7 @@ function SydneyMap() {
             title: spot.name,
           })
           marker.addListener('click', () => setSelected(i))
+          markersRef.current.push(marker)
         })
         if (!cancelled) setLoaded(true)
       } catch {}
