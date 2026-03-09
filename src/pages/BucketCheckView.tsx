@@ -13,6 +13,7 @@ type Props = {
   onEdit:     () => void
   onDelete:   () => void
   onShare:    () => void
+  onLanding:  () => void
   onServices: () => void
 }
 
@@ -34,7 +35,7 @@ function Confetti({ trigger }: { trigger:number }) {
   useEffect(() => {
     if (trigger === 0 || trigger === prev.current) return
     prev.current = trigger
-    const colors = ['#FFCD00','#1B6EF3','#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7']
+    const colors = ['#FFCD00','#003594','#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7']
     setParticles(Array.from({ length: 40 }, (_, i) => ({
       id: Date.now()+i, x: Math.random()*100,
       color: colors[Math.floor(Math.random()*colors.length)],
@@ -96,7 +97,7 @@ function CircleProgress({ pct }: { pct:number }) {
         />
       </svg>
       <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center' }}>
-        <span style={{ fontSize:15,fontWeight:800,color:'#1B6EF3' }}>{pct}%</span>
+        <span style={{ fontSize:15,fontWeight:800,color:'#003594' }}>{pct}%</span>
       </div>
     </div>
   )
@@ -114,7 +115,7 @@ function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>v
         zIndex:701,textAlign:'center',boxShadow:'0 24px 48px rgba(0,0,0,0.20)',
       }}>
         <div style={{ fontSize:52,marginBottom:8 }}>🎉</div>
-        <div style={{ fontSize:22,fontWeight:800,color:'#1B6EF3',marginBottom:8 }}>축하합니다!</div>
+        <div style={{ fontSize:22,fontWeight:800,color:'#003594',marginBottom:8 }}>축하합니다!</div>
         <div style={{ fontSize:15,color:'#64748B',lineHeight:1.6,marginBottom:24 }}>
           모든 리스트를 완료했습니다.<br/>
           <span style={{ fontWeight:700,color:'#FFCD00',fontSize:17 }}>{total}개</span>를 모두 달성했어요 🥳
@@ -126,7 +127,7 @@ function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>v
           }}>닫기</button>
           <button onClick={onReset} style={{
             flex:2,height:48,borderRadius:8,border:'none',
-            background:'#1B6EF3',color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer',
+            background:'#003594',color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer',
           }}>다시 시작하기</button>
         </div>
       </div>
@@ -157,7 +158,7 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=
 }
 
 /* ══ 메인 ══ */
-export default function BucketCheckView({ state, trip, setState, onAchievedChange, onEdit, onDelete, onShare, onServices }: Props) {
+export default function BucketCheckView({ state, trip, setState, onAchievedChange, onEdit, onDelete, onShare, onServices, onLanding }: Props) {
   const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
@@ -293,13 +294,13 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
     return (
       <div style={{
         display:'flex',alignItems:'center',gap:12,
-        padding:'12px 16px',margin:'0 16px',borderRadius:12,
+        padding:'12px 16px',margin:'0 16px',borderRadius:10,
         background: isAchieved ? '#fff8e4' : '#fff',
-        border:'1px solid #E2E8F0',
-        borderLeft: isAchieved ? '4px solid #16A34A' : '4px solid #CBD5E1',
-        boxShadow: isAchieved ? '0 4px 12px rgba(180,130,0,0.10)' : '0 4px 16px rgba(0,0,0,0.08)',
+        border:'none',
+        boxShadow: isAchieved ? '0 2px 8px rgba(180,130,0,0.10)' : '0 2px 8px rgba(0,0,0,0.06)',
         minHeight:52,transition:'all 0.15s ease',
       }}>
+        {/* 녹색 체크박스 */}
         <div onClick={() => toggleAchieved(item.id, day)} style={{
           width:22,height:22,borderRadius:4,flexShrink:0,
           border: isAchieved ? 'none' : '1.5px solid #CBD5E1',
@@ -323,7 +324,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
   }
 
   return (
-    <div style={{ minHeight:'100vh',background:'#E8EDF3',fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif' }}>
+    <div style={{ minHeight:'100vh',background:'#F1F5F9',fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes confettiFall {
@@ -340,10 +341,10 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
       <Confetti trigger={confettiTrigger} />
 
       {/* ══ 헤더 + 탭 ══ */}
-      <div style={{ background:'rgba(232,237,243,0.97)',borderBottom:'1.5px solid #D1D9E3', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
+      <div style={{ background:'#fff',borderBottom:'1px solid #E2E8F0' }}>
         <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
-            style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
+            style={{ fontSize:13, color:'#003594', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
           <span style={{ fontSize:13,color:'#64748B',fontWeight:600 }}>{achievedCount}/{total}</span>
         </div>
@@ -352,7 +353,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
             flex:1,height:38,borderRadius:'6px 6px 0 0',
             display:'flex',alignItems:'center',justifyContent:'center',
             fontSize:14,fontWeight:700,color:'#fff',
-            background:'#1B6EF3',borderBottom:'2px solid #1B6EF3',userSelect:'none',
+            background:'#003594',borderBottom:'2px solid #003594',userSelect:'none',
           }}>버킷리스트</div>
           <button onClick={onServices} style={{
             flex:1,height:38,border:'none',borderRadius:'6px 6px 0 0',
@@ -363,10 +364,10 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
       </div>
 
       {/* ══ 진행 카드 — sticky ══ */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background:'#E8EDF3', padding:'16px 16px 0' }}>
+      <div style={{ position:'sticky', top:0, zIndex:30, background:'#F1F5F9', padding:'16px 16px 0' }}>
         <div style={{
           background:'#fff',borderRadius:12,
-          boxShadow:'0 4px 20px rgba(27,110,243,0.10),0 1px 4px rgba(0,0,0,0.06)',
+          boxShadow:'0 4px 20px rgba(0,53,148,0.10),0 1px 4px rgba(0,0,0,0.06)',
           padding:'20px',display:'flex',alignItems:'center',gap:20,
         }}>
           <CircleProgress pct={pct} />
@@ -376,7 +377,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
               {trip.startDate.slice(5).replace('-','/')} ~ {trip.endDate.slice(5).replace('-','/')}
             </div>
             <div style={{ display:'flex',alignItems:'baseline',gap:4,marginBottom:4 }}>
-              <span style={{ fontSize:28,fontWeight:800,color:'#1B6EF3',lineHeight:1 }}>{achievedCount}</span>
+              <span style={{ fontSize:28,fontWeight:800,color:'#003594',lineHeight:1 }}>{achievedCount}</span>
               <span style={{ fontSize:17,fontWeight:600,color:'#64748B' }}>/{total}건 완료</span>
             </div>
             <div style={{ fontSize:13,color:'#94A3B8',lineHeight:1.5 }}>나만의 버킷리스트 꼭 완료하세요.</div>
@@ -392,8 +393,8 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
         {FILTERS.map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)} style={{
             height:30,padding:'0 14px',borderRadius:6,
-            border:`1px solid ${filter===f.key ? '#1B6EF3' : '#E2E8F0'}`,
-            background: filter===f.key ? '#1B6EF3' : 'transparent',
+            border:`1px solid ${filter===f.key ? '#003594' : '#E2E8F0'}`,
+            background: filter===f.key ? '#003594' : 'transparent',
             color: filter===f.key ? '#fff' : '#64748B',
             fontSize:13,fontWeight:filter===f.key?700:500,cursor:'pointer',transition:'all 0.15s',
           }}>{f.label}</button>
@@ -415,7 +416,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
                   <span style={{ fontSize:14,fontWeight:700,color:'#1E293B' }}>{dayIdx+1}일차</span>
                   <span style={{ fontSize:12,color:'#64748B' }}>{dayLabel}</span>
                 </div>
-                <span style={{ fontSize:12,color:'#1B6EF3',fontWeight:600 }}>{dayDone}/{dayItems.length}</span>
+                <span style={{ fontSize:12,color:'#003594',fontWeight:600 }}>{dayDone}/{dayItems.length}</span>
               </div>
               <div style={{ display:'flex',flexDirection:'column',gap:8 }}>
                 {dayItems.map(item => <CheckRow key={`${item.id}_${dayIdx}`} item={item} day={dayIdx}/>)}
@@ -454,22 +455,79 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
         zIndex:20, boxSizing:'border-box',
         display:'flex', gap:8,
       }}>
-        <button onClick={onShare} style={{
-          flex:4,height:54,borderRadius:8,border:'none',background:'#1B6EF3',
-          fontSize:14,fontWeight:700,color:'#fff',cursor:'pointer',
-          boxShadow:'0 4px 12px rgba(27,110,243,0.30)',
-        }}>공유하기</button>
-        <button onClick={onEdit} style={{
-          flex:4,height:54,borderRadius:8,
-          border:'1px solid #E2E8F0',background:'rgba(255,255,255,0.95)',
-          fontSize:14,fontWeight:600,color:'#64748B',cursor:'pointer',
-        }}>수정하기</button>
-        <button onClick={() => setShowDelete(true)} style={{
-          flex:2,height:54,borderRadius:8,
-          border:'1px solid #FCA5A5',background:'rgba(255,245,245,0.95)',
-          fontSize:13,fontWeight:600,color:'#DC2626',cursor:'pointer',
-        }}>삭제</button>
+        {/* 저장하고 나가기 */}
+        <button onClick={onLanding} style={{
+          flex:1, height:54, borderRadius:12, border:'none',
+          background:'linear-gradient(135deg,#003594,#1B6EF3)',
+          fontSize:15, fontWeight:800, color:'#fff', cursor:'pointer',
+          boxShadow:'0 4px 16px rgba(0,53,148,0.35)',
+          display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+        }}>
+          <Icon icon="ph:check-circle" width={18} height={18} color="#FFCD00" />
+          저장하고 나가기
+        </button>
+        {/* 더보기 버튼 */}
+        <button onClick={() => setShowMoreMenu(true)} style={{
+          width:54, height:54, borderRadius:12, flexShrink:0,
+          border:'1.5px solid #D1D9E3', background:'rgba(255,255,255,0.95)',
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+          boxShadow:'0 2px 8px rgba(0,0,0,0.08)',
+        }}>
+          <Icon icon="ph:dots-three-vertical" width={20} height={20} color="#64748B" />
+        </button>
       </div>
+
+      {/* ══ 더보기 모달 ══ */}
+      {showMoreMenu && (
+        <div style={{
+          position:'fixed', inset:0, zIndex:100,
+          background:'rgba(0,0,0,0.45)', backdropFilter:'blur(2px)',
+          display:'flex', alignItems:'flex-end', justifyContent:'center',
+        }} onClick={() => setShowMoreMenu(false)}>
+          <div style={{
+            width:'100%', maxWidth:390,
+            background:'#fff', borderRadius:'20px 20px 0 0',
+            padding:'20px 16px 36px',
+            boxShadow:'0 -4px 24px rgba(0,0,0,0.15)',
+          }} onClick={e => e.stopPropagation()}>
+            {/* 핸들 */}
+            <div style={{ width:40, height:4, borderRadius:2, background:'#E2E8F0', margin:'0 auto 20px' }} />
+            <div style={{ fontSize:14, fontWeight:800, color:'#94A3B8', marginBottom:14, letterSpacing:0.5 }}>더보기</div>
+            {/* 공유하기 */}
+            <button onClick={() => { setShowMoreMenu(false); onShare() }} style={{
+              width:'100%', height:54, borderRadius:12, border:'none',
+              background:'#003594', color:'#fff',
+              fontSize:15, fontWeight:700, cursor:'pointer',
+              display:'flex', alignItems:'center', gap:10, padding:'0 18px',
+              marginBottom:10,
+            }}>
+              <Icon icon="ph:share-network" width={18} height={18} color="#FFCD00" />
+              공유하기
+            </button>
+            {/* 수정하기 */}
+            <button onClick={() => { setShowMoreMenu(false); onEdit() }} style={{
+              width:'100%', height:54, borderRadius:12,
+              border:'1.5px solid #D1D9E3', background:'#F8FAFC', color:'#1E293B',
+              fontSize:15, fontWeight:700, cursor:'pointer',
+              display:'flex', alignItems:'center', gap:10, padding:'0 18px',
+              marginBottom:10,
+            }}>
+              <Icon icon="ph:pencil-simple" width={18} height={18} color="#64748B" />
+              수정하기
+            </button>
+            {/* 삭제하기 */}
+            <button onClick={() => { setShowMoreMenu(false); setShowDelete(true) }} style={{
+              width:'100%', height:54, borderRadius:12,
+              border:'1.5px solid #FECDD3', background:'#FFF5F5', color:'#DC2626',
+              fontSize:15, fontWeight:700, cursor:'pointer',
+              display:'flex', alignItems:'center', gap:10, padding:'0 18px',
+            }}>
+              <Icon icon="ph:trash" width={18} height={18} color="#DC2626" />
+              삭제하기
+            </button>
+          </div>
+        </div>
+      )}
 
       {showDelete && (
         <DeleteModal
