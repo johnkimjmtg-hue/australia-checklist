@@ -166,13 +166,14 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
           )}
 
           {/* 홍보 카드 */}
-          <div style={{ background:'#1B6EF3', borderRadius:14, padding:'12px 18px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div style={{ background:'linear-gradient(135deg, #1B6EF3, #1565C0)', borderRadius:14, padding:'12px 18px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
             <div>
-              <div style={{ fontSize:15, fontWeight:900, color:'#FFCD00', letterSpacing:0.5 }}>호주가자</div>
+              <div style={{ fontSize:12, fontWeight:800, color:'#fff', letterSpacing:-0.3 }}>호주가자</div>
+              <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginTop:2 }}>여행 버킷리스트 🦘</div>
             </div>
             <div style={{ textAlign:'right' }}>
-              <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>hojugaja.com</div>
-              <div style={{ fontSize:10, color:'rgba(255,255,255,0.6)', marginTop:2 }}>나만의 버킷리스트를 만들어보세요</div>
+              <div style={{ fontSize:11, fontWeight:700, color:'#FFCD00' }}>www.hojugaja.com</div>
+              <div style={{ fontSize:9, color:'rgba(255,255,255,0.5)', marginTop:2 }}>나만의 버킷리스트를 만들어보세요</div>
             </div>
           </div>
 
