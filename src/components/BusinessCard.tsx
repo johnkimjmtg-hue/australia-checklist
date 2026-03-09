@@ -52,10 +52,11 @@ export default function BusinessCard({ business }: Props) {
 
   const btnBase: React.CSSProperties = {
     display:'flex', alignItems:'center', justifyContent:'center', gap:5,
-    height:34, padding:'0 12px', borderRadius:8,
+    height:36, padding:'0 14px', borderRadius:8,
     fontSize:12, fontWeight:700, cursor:'pointer',
-    border:'none', whiteSpace:'nowrap', fontFamily:ff,
-    boxShadow:'0 2px 6px rgba(0,0,0,0.09)',
+    border:'1.5px solid #D1D9E3', whiteSpace:'nowrap', fontFamily:ff,
+    boxShadow:'0 2px 6px rgba(0,0,0,0.08)',
+    color:'#1E293B', background:'#fff',
   }
 
   return (
@@ -95,19 +96,19 @@ export default function BusinessCard({ business }: Props) {
 
           {fullAddress && (
             <div style={{ display:'flex', alignItems:'center', gap:4, marginBottom:8 }}>
-              <Icon icon="ph:map-pin-simple" width={13} height={13} color="#94A3B8" />
-              <span style={{ fontSize:12, color:'#64748B' }}>{fullAddress}</span>
+              <Icon icon="ph:map-pin-simple" width={13} height={13} color="#64748B" />
+              <span style={{ fontSize:12, color:'#475569', fontWeight:500 }}>{fullAddress}</span>
             </div>
           )}
 
           {description && (
-            <div style={{ fontSize:13, color:'#64748B', lineHeight:1.6, marginBottom:10 }}>{description}</div>
+            <div style={{ fontSize:13, color:'#334155', lineHeight:1.6, marginBottom:10 }}>{description}</div>
           )}
 
           {tags && tags.length > 0 && (
             <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
               {tags.map(tag => (
-                <span key={tag} style={{ background:'rgba(27,110,243,0.07)', color:'#1B6EF3', fontSize:10, fontWeight:700, borderRadius:6, padding:'3px 8px' }}>{tag}</span>
+                <span key={tag} style={{ background:'#EFF6FF', color:'#1B6EF3', fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:'1px solid #BFDBFE' }}>{tag}</span>
               ))}
             </div>
           )}
@@ -129,13 +130,13 @@ export default function BusinessCard({ business }: Props) {
           <div style={{ display:'flex', gap:7, flexWrap:'wrap' }}>
             {phone && (
               isMobile ? (
-                <a href={`tel:${phone}`} style={{ ...btnBase, background:'#fff', color:'#1E293B', textDecoration:'none' }}>
-                  <Icon icon="ph:phone" width={13} height={13} color="#64748B" />전화
+                <a href={`tel:${phone}`} style={{ ...btnBase, textDecoration:'none' }}>
+                  <Icon icon="ph:phone" width={13} height={13} color="#475569" />전화
                 </a>
               ) : (
                 <div style={{ position:'relative' }}>
-                  <button onClick={() => setShowPhone(v => !v)} style={{ ...btnBase, background:'#fff', color:'#1E293B' }}>
-                    <Icon icon="ph:phone" width={13} height={13} color="#64748B" />전화
+                  <button onClick={() => setShowPhone(v => !v)} style={{ ...btnBase }}>
+                    <Icon icon="ph:phone" width={13} height={13} color="#475569" />전화
                   </button>
                   {showPhone && (
                     <div style={{ position:'absolute', bottom:'110%', left:0, background:'#1E293B', color:'#fff', padding:'8px 14px', borderRadius:10, fontSize:13, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', zIndex:50 }}>{phone}</div>
@@ -145,36 +146,35 @@ export default function BusinessCard({ business }: Props) {
             )}
             {kakao && (
               <a href={`https://open.kakao.com/o/${kakao}`} target="_blank" rel="noreferrer"
-                style={{ ...btnBase, background:'#FEE500', color:'#3C1E1E', textDecoration:'none' }}>
+                style={{ ...btnBase, background:'#FEE500', color:'#3C1E1E', border:'1.5px solid #F0D800', textDecoration:'none' }}>
                 <Icon icon="ph:chat-circle" width={13} height={13} color="#3C1E1E" />카톡
               </a>
             )}
             {website && (
               <a href={website.startsWith('http') ? website : `https://${website}`} target="_blank" rel="noreferrer"
-                style={{ ...btnBase, background:'#fff', color:'#1E293B', textDecoration:'none' }}>
-                <Icon icon="ph:globe" width={13} height={13} color="#64748B" />웹사이트
+                style={{ ...btnBase, textDecoration:'none' }}>
+                <Icon icon="ph:globe" width={13} height={13} color="#475569" />웹사이트
               </a>
             )}
             {mapsUrl && (
               <a href={mapsUrl} target="_blank" rel="noreferrer"
-                style={{ ...btnBase, background:'#fff', color:'#1E293B', textDecoration:'none' }}>
-                <Icon icon="ph:navigation-arrow" width={13} height={13} color="#64748B" />경로
+                style={{ ...btnBase, textDecoration:'none' }}>
+                <Icon icon="ph:navigation-arrow" width={13} height={13} color="#475569" />경로
               </a>
             )}
             <button onClick={handleToggleVotes}
-              style={{ ...btnBase, background: showVotes ? '#1B6EF3' : '#fff', color: showVotes ? '#fff' : '#1E293B' }}>
-              <Icon icon="ph:thumbs-up" width={13} height={13} color={showVotes ? '#fff' : '#64748B'} />
+              style={{ ...btnBase, background: showVotes ? '#1B6EF3' : '#fff', color: showVotes ? '#fff' : '#1E293B', border: showVotes ? 'none' : '1.5px solid #D1D9E3' }}>
+              <Icon icon="ph:thumbs-up" width={13} height={13} color={showVotes ? '#fff' : '#475569'} />
               한줄평{myVote ? ' ✓' : ''}
             </button>
-            <button onClick={() => setShowShareModal(true)}
-              style={{ ...btnBase, background:'#fff', color:'#1E293B' }}>
-              <Icon icon="ph:share-network" width={13} height={13} color="#64748B" />공유
+            <button onClick={() => setShowShareModal(true)} style={{ ...btnBase }}>
+              <Icon icon="ph:share-network" width={13} height={13} color="#475569" />공유
             </button>
           </div>
         </div>
 
         {showVotes && (
-          <div style={{ borderTop:'1px solid #F1F5F9', background:'#F8FAFC', padding:'14px 16px' }}>
+          <div style={{ borderTop:'1.5px solid #D1D9E3', background:'#F1F5F9', padding:'14px 16px' }}>
             {loading ? (
               <div style={{ textAlign:'center', padding:'12px 0', color:'#94A3B8', fontSize:13 }}>불러오는 중...</div>
             ) : (
