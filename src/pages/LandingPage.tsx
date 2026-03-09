@@ -571,17 +571,16 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           padding:'0 16px',
         }}>
           <div style={{
-            fontFamily:'"Gaegu", "Pretendard", sans-serif',
             color:'#fff',
             lineHeight:1.15,
             textShadow:'0 2px 12px rgba(0,0,20,0.30)',
           }}>
             {/* 첫 줄 — 작게 */}
-            <div style={{ fontSize:32, fontWeight:700, letterSpacing:-0.5 }}>
+            <div style={{ fontSize:30, fontWeight:800, letterSpacing:-0.5 }}>
               호주에서 꼭 해야 할
             </div>
             {/* 둘째 줄 — 크게 */}
-            <div style={{ fontSize:48, fontWeight:900, letterSpacing:-1, marginTop:2 }}>
+            <div style={{ fontSize:50, fontWeight:900, letterSpacing:-1, marginTop:2 }}>
               모든 것!
             </div>
           </div>
