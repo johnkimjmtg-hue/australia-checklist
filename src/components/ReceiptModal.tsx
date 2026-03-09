@@ -39,8 +39,8 @@ export default function ReceiptModal({ state, trip, issuedAt, achieved, onClose,
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:390, padding:'10px 14px 26px',
-        background:'rgba(244,247,251,0.97)', backdropFilter:'blur(12px)',
-        borderTop:'1px solid rgba(27,110,243,0.08)',
+        background:'rgba(232,237,243,0.97)', backdropFilter:'blur(12px)',
+        borderTop:'1.5px solid #D1D9E3', boxShadow:'0 -4px 16px rgba(0,0,0,0.08)',
         display:'flex', gap:8, zIndex:2,
       }}>
         <button onClick={async () => {
@@ -53,9 +53,10 @@ export default function ReceiptModal({ state, trip, issuedAt, achieved, onClose,
           }
           setSaving(false)
         }} disabled={saving} style={{
-          flex:1, height:46, borderRadius:10, cursor:'pointer',
-          border:'1px solid rgba(27,110,243,0.15)', background:'#fff',
+          flex:1, height:46, borderRadius:12, cursor:'pointer',
+          border:'1.5px solid #D1D9E3', background:'#fff',
           fontWeight:700, fontSize:13, color:'#1B6EF3',
+          boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
         }}>{saving ? '저장 중...' : '이미지 저장'}</button>
         <button onClick={async () => {
           setSharing(true)
@@ -63,10 +64,10 @@ export default function ReceiptModal({ state, trip, issuedAt, achieved, onClose,
           if (!ok) alert('공유가 지원되지 않는 환경입니다.\n이미지를 저장 후 직접 공유해주세요.')
           setSharing(false)
         }} disabled={sharing} style={{
-          flex:1, height:46, borderRadius:10, cursor:'pointer',
+          flex:1, height:46, borderRadius:12, cursor:'pointer',
           border:'none', background:'linear-gradient(160deg,#4B8EF5,#1B6EF3)',
           fontWeight:700, fontSize:13, color:'#fff',
-          boxShadow:'0 4px 14px rgba(27,110,243,0.28)',
+          boxShadow:'0 4px 14px rgba(27,110,243,0.35)',
         }}>{sharing ? '공유 중...' : '공유하기'}</button>
       </div>
     </div>

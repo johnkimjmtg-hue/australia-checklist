@@ -26,7 +26,7 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
     // @ts-ignore
     const h2c = (await import('html2canvas')).default
     const canvas = await h2c(el, {
-      scale: 3, backgroundColor: '#F1F5F9',
+      scale: 3, backgroundColor: '#E8EDF3',
       useCORS: true, allowTaint: true, logging: false,
       onclone: (clonedDoc: Document) => {
         const clonedEl = clonedDoc.getElementById('business-share-card')
@@ -79,15 +79,15 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
 
         {/* ── 공유 카드 ── */}
         <div id="business-share-card" style={{
-          width:320, background:'#F1F5F9', padding:'12px',
+          width:320, background:'#E8EDF3', padding:'12px',
           borderRadius:20, fontFamily:ff,
         }}>
 
           {/* 업체 정보 카드 */}
-          <div style={{ background:'#fff', borderRadius:14, overflow:'hidden', marginBottom:8, boxShadow:'0 2px 8px rgba(27,110,243,0.07)' }}>
+          <div style={{ background:'#fff', borderRadius:14, overflow:'hidden', marginBottom:8, boxShadow:'0 4px 16px rgba(0,0,0,0.10)', border:'1px solid #E2E8F0', borderLeft:'4px solid #1B6EF3' }}>
 
             {/* 업체명 헤더 */}
-            <div style={{ padding:'18px 18px 14px', borderBottom:'1px solid #F1F5F9' }}>
+            <div style={{ padding:'18px 18px 14px', borderBottom:'1.5px solid #F1F5F9' }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom: fullAddress ? 6 : 0 }}>
                 <div style={{ fontSize:20, fontWeight:900, color:'#0F172A', flex:1, lineHeight:1.2 }}>{name}</div>
                 {is_featured && (
@@ -117,7 +117,7 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
               <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                 {phone && (
                   <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ width:26, height:26, borderRadius:7, background:'#F1F5F9', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <div style={{ width:26, height:26, borderRadius:7, background:'#E8EDF3', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                       <Icon icon="ph:phone" width={13} height={13} color="#64748B" />
                     </div>
                     <span style={{ fontSize:13, color:'#1E293B', fontWeight:600 }}>{phone}</span>
@@ -125,7 +125,7 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
                 )}
                 {kakao && (
                   <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ width:26, height:26, borderRadius:7, background:'#F1F5F9', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <div style={{ width:26, height:26, borderRadius:7, background:'#E8EDF3', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                       <Icon icon="ph:chat-circle" width={13} height={13} color="#64748B" />
                     </div>
                     <span style={{ fontSize:13, color:'#1E293B', fontWeight:600 }}>카카오톡: {kakao}</span>
@@ -133,7 +133,7 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
                 )}
                 {website && (
                   <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ width:26, height:26, borderRadius:7, background:'#F1F5F9', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <div style={{ width:26, height:26, borderRadius:7, background:'#E8EDF3', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                       <Icon icon="ph:globe" width={13} height={13} color="#64748B" />
                     </div>
                     <span style={{ fontSize:13, color:'#1B6EF3', fontWeight:600 }}>{website}</span>
@@ -145,7 +145,7 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
 
           {/* 한줄평 카드 */}
           {topVotes.length > 0 && (
-            <div style={{ background:'#fff', borderRadius:14, padding:'14px 18px', marginBottom:8, boxShadow:'0 2px 8px rgba(27,110,243,0.07)' }}>
+            <div style={{ background:'#fff', borderRadius:14, padding:'14px 18px', marginBottom:8, boxShadow:'0 4px 16px rgba(0,0,0,0.10)', border:'1px solid #E2E8F0' }}>
               <div style={{ fontSize:11, fontWeight:800, color:'#94A3B8', marginBottom:10, letterSpacing:0.5 }}>한줄평</div>
               <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
                 {topVotes.map(([tag, count]) => (
@@ -156,7 +156,7 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
                       </span>
                       <span style={{ fontSize:11, fontWeight:700, color:'#94A3B8' }}>{count}</span>
                     </div>
-                    <div style={{ height:7, borderRadius:4, background:'#F1F5F9' }}>
+                    <div style={{ height:7, borderRadius:4, background:'#E2E8F0' }}>
                       <div style={{ height:'100%', borderRadius:4, width:`${Math.round((count/maxCount)*100)}%`, background:'#FCA5A5' }}/>
                     </div>
                   </div>
@@ -184,20 +184,21 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:390, padding:'10px 14px 26px',
-        background:'rgba(244,247,251,0.97)', backdropFilter:'blur(12px)',
-        borderTop:'1px solid rgba(27,110,243,0.08)',
+        background:'rgba(232,237,243,0.97)', backdropFilter:'blur(12px)',
+        borderTop:'1.5px solid #D1D9E3', boxShadow:'0 -4px 16px rgba(0,0,0,0.08)',
         display:'flex', gap:8, zIndex:2,
       }}>
         <button onClick={handleSave} disabled={saving || sharing} style={{
-          flex:1, height:46, borderRadius:10, cursor:'pointer',
-          border:'1px solid rgba(27,110,243,0.15)', background:'#fff',
+          flex:1, height:46, borderRadius:12, cursor:'pointer',
+          border:'1.5px solid #D1D9E3', background:'#fff',
           fontWeight:700, fontSize:13, color:'#1B6EF3', fontFamily:ff,
+          boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
         }}>{saving ? '저장 중...' : '이미지 저장'}</button>
         <button onClick={handleShare} disabled={saving || sharing} style={{
-          flex:1, height:46, borderRadius:10, cursor:'pointer',
+          flex:1, height:46, borderRadius:12, cursor:'pointer',
           border:'none', background:'linear-gradient(160deg,#4B8EF5,#1B6EF3)',
           fontWeight:700, fontSize:13, color:'#fff', fontFamily:ff,
-          boxShadow:'0 4px 14px rgba(27,110,243,0.28)',
+          boxShadow:'0 4px 14px rgba(27,110,243,0.35)',
         }}>{sharing ? '공유 중...' : '공유하기'}</button>
       </div>
     </div>
