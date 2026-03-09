@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { CATEGORIES } from '../data/businesses'
 import { Business, getBusinesses, getFeaturedBusinesses, searchBusinesses } from '../lib/businessService'
-import { getBookmarks } from '../lib/businessBookmarks'
+import { getBookmarks, getFolders, getBookmarksByFolder, Folder } from '../lib/businessBookmarks'
 import BusinessCard from '../components/BusinessCard'
 import CategoryFilter from '../components/CategoryFilter'
 
@@ -17,7 +17,8 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const [category, setCategory]       = useState('all')
   const [businesses, setBusinesses]   = useState<Business[]>([])
   const [featured, setFeatured]       = useState<Business[]>([])
-  const [bookmarked, setBookmarked]   = useState<Business[]>([])
+  const [allBizMap, setAllBizMap]     = useState<Record<string, Business>>({})
+  const [folders, setFolders]         = useState<Folder[]>(() => getFolders())
   const [loading, setLoading]         = useState(true)
   const [showAll, setShowAll]         = useState(false)
   const [bookmarkCount, setBookmarkCount] = useState(() => getBookmarks().length)
@@ -50,15 +51,16 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     return () => clearTimeout(t)
   }, [search, category])
 
-  // 북마크 탭 진입 또는 변경 시 북마크된 업체 로드
+  // 북마크 탭 진입 또는 변경 시 전체 업체 맵 로드
   useEffect(() => {
     if (serviceTab !== 'bookmarks') return
     const load = () => {
-      const ids = getBookmarks()
-      setBookmarkCount(ids.length)
-      if (ids.length === 0) { setBookmarked([]); return }
+      setBookmarkCount(getBookmarks().length)
+      setFolders(getFolders())
       getBusinesses('all').then(all => {
-        setBookmarked(all.filter(b => ids.includes(b.id)))
+        const map: Record<string, Business> = {}
+        all.forEach(b => { map[b.id] = b })
+        setAllBizMap(map)
       })
     }
     load()
@@ -140,18 +142,31 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         {/* ── 북마크 탭 ── */}
         {serviceTab === 'bookmarks' && (
           <>
-            {bookmarked.length === 0 ? (
-              <div style={{ textAlign:'center', padding:'64px 0', color:'#94A3B8' }}>
+            {bookmarkCount === 0 ? (
+              <div style={{ textAlign:'center', padding:'64px 0' }}>
                 <Icon icon="ph:bookmark-simple" width={48} height={48} color="#CBD5E1" />
                 <div style={{ marginTop:14, fontSize:15, fontWeight:700, color:'#64748B' }}>저장된 업체가 없어요</div>
-                <div style={{ marginTop:6, fontSize:13, color:'#94A3B8' }}>업체 카드의 북마크 버튼을 눌러 저장하세요</div>
+                <div style={{ marginTop:6, fontSize:13, color:'#94A3B8' }}>업체 카드의 🔖 버튼을 눌러 폴더에 저장하세요</div>
               </div>
             ) : (
               <>
-                <SectionLabel icon="ph:bookmark-simple-fill" label={`내 북마크 (${bookmarked.length})`} color="#1B6EF3" />
-                <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                  {bookmarked.map(b => <BusinessCard key={b.id} business={b} />)}
-                </div>
+                {folders.map(folder => {
+                  const ids = getBookmarksByFolder(folder.id)
+                  const bizList = ids.map(id => allBizMap[id]).filter(Boolean) as Business[]
+                  if (bizList.length === 0) return null
+                  return (
+                    <div key={folder.id} style={{ marginBottom:24 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:10 }}>
+                        <span style={{ fontSize:16 }}>{folder.emoji}</span>
+                        <span style={{ fontSize:14, fontWeight:800, color:'#1E293B' }}>{folder.name}</span>
+                        <span style={{ fontSize:12, fontWeight:600, color:'#94A3B8' }}>({bizList.length})</span>
+                      </div>
+                      <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                        {bizList.map(b => <BusinessCard key={b.id} business={b} />)}
+                      </div>
+                    </div>
+                  )
+                })}
               </>
             )}
           </>
