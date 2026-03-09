@@ -203,20 +203,74 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
 
 // ── 시드니 주요 명소 고정 지도
 const SYDNEY_SPOTS = [
-  { name: 'Sydney Opera House', icon: 'ph:music-notes',   lat: -33.8568, lng: 151.2153, desc: '세계적 공연 예술 센터' },
-  { name: 'Bondi Beach',        icon: 'ph:waves',         lat: -33.8908, lng: 151.2743, desc: '시드니 대표 해변' },
-  { name: 'Harbour Bridge',     icon: 'ph:bridge',        lat: -33.8523, lng: 151.2108, desc: '브릿지클라임 명소' },
-  { name: 'Black Star Pastry',  icon: 'ph:cake',          lat: -33.8991, lng: 151.1731, desc: '세계 최고 케이크 맛집' },
-  { name: 'Darling Harbour',    icon: 'ph:anchor',        lat: -33.8731, lng: 151.1985, desc: '쇼핑·식사·관광' },
-  { name: 'Taronga Zoo',        icon: 'ph:paw-print',     lat: -33.8433, lng: 151.2411, desc: '캥거루·코알라 만나기' },
-  { name: 'Royal Botanic Garden', icon: 'ph:tree',        lat: -33.8642, lng: 151.2166, desc: '시드니 중심 공원' },
-  { name: 'Manly Beach',        icon: 'ph:sun-horizon',   lat: -33.7969, lng: 151.2868, desc: '페리타고 가는 해변' },
+  // 명소
+  { name: 'Sydney Opera House',    icon: 'ph:music-notes',  cat: '명소', lat: -33.8568, lng: 151.2153, desc: '세계적 공연 예술 센터' },
+  { name: 'Bondi Beach',           icon: 'ph:waves',        cat: '명소', lat: -33.8908, lng: 151.2743, desc: '시드니 대표 해변' },
+  { name: 'Harbour Bridge',        icon: 'ph:bridge',       cat: '명소', lat: -33.8523, lng: 151.2108, desc: '브릿지클라임 명소' },
+  { name: 'Darling Harbour',       icon: 'ph:anchor',       cat: '명소', lat: -33.8731, lng: 151.1985, desc: '쇼핑·식사·관광' },
+  { name: 'Taronga Zoo',           icon: 'ph:paw-print',    cat: '명소', lat: -33.8433, lng: 151.2411, desc: '캥거루·코알라 만나기' },
+  { name: 'Royal Botanic Garden',  icon: 'ph:tree',         cat: '명소', lat: -33.8642, lng: 151.2166, desc: '시드니 중심 공원' },
+  { name: 'Manly Beach',           icon: 'ph:sun-horizon',  cat: '명소', lat: -33.7969, lng: 151.2868, desc: '페리타고 가는 해변' },
+  // 브런치·카페
+  { name: 'bills Darlinghurst',    icon: 'ph:coffee',       cat: '카페', lat: -33.8783, lng: 151.2167, desc: '리코타 핫케이크 원조' },
+  { name: 'bills Bondi Beach',     icon: 'ph:coffee',       cat: '카페', lat: -33.8927, lng: 151.2693, desc: '본다이 브런치 명소' },
+  { name: 'bills Surry Hills',     icon: 'ph:coffee',       cat: '카페', lat: -33.8856, lng: 151.2118, desc: '서리힐즈 빌즈 지점' },
+  { name: 'The Grounds of Alexandria', icon: 'ph:flower',   cat: '카페', lat: -33.9098, lng: 151.1930, desc: 'SNS 인생샷 카페' },
+  { name: 'The Potting Shed',      icon: 'ph:flower',       cat: '카페', lat: -33.9100, lng: 151.1935, desc: 'Grounds 내 브런치' },
+  { name: 'Single O Surry Hills',  icon: 'ph:coffee',       cat: '카페', lat: -33.8841, lng: 151.2094, desc: '시드니 스페셜티 커피 대표' },
+  { name: 'Artificer Coffee',      icon: 'ph:coffee',       cat: '카페', lat: -33.8857, lng: 151.2100, desc: '커피 마니아 성지' },
+  { name: 'Room Ten',              icon: 'ph:coffee',       cat: '카페', lat: -33.8718, lng: 151.2228, desc: '포츠포인트 로컬 카페' },
+  { name: 'AP Bakery',             icon: 'ph:bread',        cat: '카페', lat: -33.8790, lng: 151.2158, desc: '루프탑 감성 베이커리' },
+  { name: 'Toby\'s Estate',        icon: 'ph:coffee',       cat: '카페', lat: -33.8867, lng: 151.1952, desc: '로스터리 카페' },
+  { name: 'Paramount Coffee Project', icon: 'ph:coffee',    cat: '카페', lat: -33.8840, lng: 151.2105, desc: '서리힐즈 브런치·커피' },
+  { name: 'Reuben Hills',          icon: 'ph:coffee',       cat: '카페', lat: -33.8845, lng: 151.2108, desc: '서리힐즈 인기 카페' },
+  { name: 'Edition Roasters',      icon: 'ph:coffee',       cat: '카페', lat: -33.8769, lng: 151.2010, desc: '수플레 팬케이크·말차 카페' },
+  { name: 'Campos Coffee',         icon: 'ph:coffee',       cat: '카페', lat: -33.8997, lng: 151.1782, desc: '호주 대표 커피 브랜드' },
+  { name: 'Mecca Alexandria',      icon: 'ph:coffee',       cat: '카페', lat: -33.9109, lng: 151.1943, desc: '세련된 로스터리' },
+  { name: 'Celsius Coffee Co.',    icon: 'ph:coffee',       cat: '카페', lat: -33.8386, lng: 151.2103, desc: '부두 위 하버뷰 카페' },
+  { name: 'Devon Cafe',            icon: 'ph:coffee',       cat: '카페', lat: -33.8840, lng: 151.2110, desc: '퓨전 브런치 카페' },
+  { name: 'Speedos Cafe',          icon: 'ph:coffee',       cat: '카페', lat: -33.8955, lng: 151.2769, desc: '본다이 해변 컬러풀 브런치' },
+  // 베이커리·디저트
+  { name: 'Black Star Pastry',     icon: 'ph:cake',         cat: '디저트', lat: -33.8991, lng: 151.1731, desc: '수박 케이크로 유명한 베이커리' },
+  { name: 'Lune Croissanterie',    icon: 'ph:bread',        cat: '디저트', lat: -33.9125, lng: 151.1990, desc: '크루아상 성지' },
+  { name: 'Bourke St Bakery',      icon: 'ph:bread',        cat: '디저트', lat: -33.8882, lng: 151.2112, desc: '사워도우·소시지롤 명소' },
+  { name: 'Flour and Stone',       icon: 'ph:cake',         cat: '디저트', lat: -33.8703, lng: 151.2196, desc: '레몬 드리즐 케이크' },
+  { name: 'KOI Dessert Bar',       icon: 'ph:cake',         cat: '디저트', lat: -33.8920, lng: 151.1958, desc: 'SNS 인기 디저트 바' },
+  { name: 'Gelato Messina',        icon: 'ph:ice-cream',    cat: '디저트', lat: -33.8781, lng: 151.2159, desc: '호주 대표 젤라토' },
+  { name: 'Butter Surry Hills',    icon: 'ph:cookie',       cat: '디저트', lat: -33.8855, lng: 151.2095, desc: '도넛·치킨 스트리트 감성' },
+  // 레스토랑
+  { name: 'Cafe Sydney',           icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8614, lng: 151.2099, desc: '시드니 하버뷰 다이닝' },
+  { name: 'Opera Bar',             icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8573, lng: 151.2152, desc: '오페라하우스·하버브리지 뷰' },
+  { name: 'Quay',                  icon: 'ph:star',         cat: '레스토랑', lat: -33.8598, lng: 151.2067, desc: '시드니 최고급 파인다이닝' },
+  { name: 'Bennelong',             icon: 'ph:star',         cat: '레스토랑', lat: -33.8571, lng: 151.2151, desc: '오페라하우스 내 레스토랑' },
+  { name: 'Mr. Wong',              icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8653, lng: 151.2082, desc: '시드니 대표 딤섬·중식' },
+  { name: 'Restaurant Hubert',     icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8648, lng: 151.2090, desc: '지하 프렌치 브라세리' },
+  { name: 'Chin Chin Sydney',      icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8838, lng: 151.2103, desc: '아시안 퓨전 핫플' },
+  { name: 'Totti\'s Bondi',        icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8939, lng: 151.2714, desc: '본다이 이탈리안' },
+  { name: 'Fratelli Paradiso',     icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8719, lng: 151.2228, desc: '포츠포인트 이탈리안' },
+  { name: 'Sean\'s Panorama',      icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8950, lng: 151.2769, desc: '본다이 씨뷰 레스토랑' },
+  { name: 'Harry\'s Cafe de Wheels', icon: 'ph:fork-knife', cat: '레스토랑', lat: -33.8699, lng: 151.2192, desc: '타이거 파이 시드니 명물' },
+  { name: 'Sydney Fish Market',    icon: 'ph:fish',         cat: '레스토랑', lat: -33.8742, lng: 151.1969, desc: '굴·해산물 명소' },
+  { name: 'Doyle\'s on the Beach', icon: 'ph:fish',         cat: '레스토랑', lat: -33.8469, lng: 151.2823, desc: '왓슨스베이 해산물' },
+  { name: 'Watsons Bay Hotel',     icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8468, lng: 151.2818, desc: '선셋 바·레스토랑' },
+  { name: 'The Boathouse Palm Beach', icon: 'ph:fork-knife',cat: '레스토랑', lat: -33.5999, lng: 151.3237, desc: '팜비치 오션뷰 카페' },
+  { name: 'The Boathouse Balmoral', icon: 'ph:fork-knife',  cat: '레스토랑', lat: -33.8265, lng: 151.2523, desc: '발모럴 비치 카페' },
+  { name: 'Mary\'s Newtown',       icon: 'ph:hamburger',    cat: '레스토랑', lat: -33.8990, lng: 151.1784, desc: '시드니 버거 성지' },
+  { name: 'Mamak Haymarket',       icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8789, lng: 151.2041, desc: '로티카나이 말레이시안' },
+  { name: 'Chaco Ramen',           icon: 'ph:fork-knife',   cat: '레스토랑', lat: -33.8785, lng: 151.2161, desc: '줄 서는 라멘집' },
 ]
+
+const SPOT_CATS = ['전체', '명소', '카페', '디저트', '레스토랑']
 
 function SydneyMap() {
   const mapRef = useRef<HTMLDivElement>(null)
   const [loaded, setLoaded] = useState(false)
   const [selected, setSelected] = useState<number | null>(null)
+  const [catFilter, setCatFilter] = useState('전체')
+
+  const filteredSpots = catFilter === '전체'
+    ? SYDNEY_SPOTS
+    : SYDNEY_SPOTS.filter(s => s.cat === catFilter)
 
   useEffect(() => {
     let cancelled = false
@@ -238,13 +292,21 @@ function SydneyMap() {
           ],
         })
 
-        const pinSvg = (_icon: string) =>
+        const pinColor = (cat: string) => {
+          if (cat === '명소')    return '#1B6EF3'
+          if (cat === '카페')    return '#10B981'
+          if (cat === '디저트')  return '#F97316'
+          if (cat === '레스토랑') return '#EF4444'
+          return '#FFB800'
+        }
+
+        const pinSvg = (cat: string) =>
           'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
-              <ellipse cx="16" cy="39" rx="6" ry="2.5" fill="rgba(0,0,0,0.18)"/>
-              <path d="M16 0C9.373 0 4 5.373 4 12c0 8.8 12 26 12 26S28 20.8 28 12C28 5.373 22.627 0 16 0z" fill="#FFB800"/>
-              <circle cx="16" cy="12" r="6" fill="#fff"/>
-              <circle cx="16" cy="12" r="3" fill="#FFB800"/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
+              <ellipse cx="14" cy="34" rx="5" ry="2" fill="rgba(0,0,0,0.18)"/>
+              <path d="M14 0C8.477 0 4 4.477 4 10c0 7.7 10 24 10 24S24 17.7 24 10C24 4.477 19.523 0 14 0z" fill="${pinColor(cat)}"/>
+              <circle cx="14" cy="10" r="5" fill="#fff"/>
+              <circle cx="14" cy="10" r="2.5" fill="${pinColor(cat)}"/>
             </svg>
           `)
 
@@ -253,9 +315,9 @@ function SydneyMap() {
             position: { lat: spot.lat, lng: spot.lng },
             map,
             icon: {
-              url: pinSvg(spot.icon),
-              scaledSize: new google.maps.Size(36, 46),
-              anchor: new google.maps.Point(18, 46),
+              url: pinSvg(spot.cat),
+              scaledSize: new google.maps.Size(28, 36),
+              anchor: new google.maps.Point(14, 36),
             },
             title: spot.name,
           })
@@ -270,7 +332,7 @@ function SydneyMap() {
 
   return (
     <div style={{ background:'#fff', padding:'24px 20px' }}>
-      <div style={{ marginBottom:14 }}>
+      <div style={{ marginBottom:12 }}>
         <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
           <Icon icon="ph:map-pin" width={20} height={20} color={BLUE} />
           <div style={{ fontSize:18, fontWeight:900, color:'#0F172A' }}>시드니 버킷리스트 지도</div>
@@ -278,9 +340,32 @@ function SydneyMap() {
         <div style={{ fontSize:13, color:'#64748B' }}>꼭 가봐야 할 명소를 지도에서 확인하세요</div>
       </div>
 
+      {/* 카테고리 필터 */}
+      <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:8, marginBottom:10, scrollbarWidth:'none' }}>
+        {SPOT_CATS.map(cat => (
+          <button key={cat} onClick={() => { setCatFilter(cat); setSelected(null) }} style={{
+            flexShrink:0, height:30, padding:'0 12px',
+            background: catFilter === cat ? BLUE : '#F0F4FF',
+            color: catFilter === cat ? '#fff' : BLUE,
+            border: catFilter === cat ? 'none' : `1px solid rgba(27,110,243,0.15)`,
+            borderRadius:12, fontSize:12, fontWeight:700, cursor:'pointer',
+          }}>{cat}</button>
+        ))}
+      </div>
+
+      {/* 색상 범례 */}
+      <div style={{ display:'flex', gap:12, marginBottom:10, flexWrap:'wrap' as any }}>
+        {[['명소','#1B6EF3'],['카페','#10B981'],['디저트','#F97316'],['레스토랑','#EF4444']].map(([label, color]) => (
+          <div key={label} style={{ display:'flex', alignItems:'center', gap:4 }}>
+            <div style={{ width:8, height:8, borderRadius:'50%', background:color }}/>
+            <span style={{ fontSize:11, color:'#64748B', fontWeight:600 }}>{label}</span>
+          </div>
+        ))}
+      </div>
+
       {/* 명소 태그 가로 스크롤 */}
       <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:12, marginBottom:12, scrollbarWidth:'none' }}>
-        {SYDNEY_SPOTS.map((s, i) => (
+        {filteredSpots.map((s, i) => (
           <div key={i} style={{
             flexShrink:0, display:'flex', alignItems:'center', gap:5,
             background: selected === i ? BLUE : '#F0F4FF',
@@ -297,7 +382,7 @@ function SydneyMap() {
 
       {/* 지도 */}
       <div style={{ position:'relative', borderRadius:16, overflow:'hidden', boxShadow:'0 4px 16px rgba(0,53,148,0.12)' }}>
-        <div ref={mapRef} style={{ width:'100%', height:280 }}/>
+        <div ref={mapRef} style={{ width:'100%', height:300 }}/>
         {!loaded && (
           <div style={{
             position:'absolute', inset:0,
@@ -318,10 +403,10 @@ function SydneyMap() {
           border:`1px solid rgba(27,110,243,0.10)`,
           display:'flex', alignItems:'center', gap:10,
         }}>
-          <Icon icon={SYDNEY_SPOTS[selected].icon} width={24} height={24} color={BLUE} />
+          <Icon icon={filteredSpots[selected].icon} width={24} height={24} color={BLUE} />
           <div>
-            <div style={{ fontSize:13, fontWeight:800, color:BLUE }}>{SYDNEY_SPOTS[selected].name}</div>
-            <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>{SYDNEY_SPOTS[selected].desc}</div>
+            <div style={{ fontSize:13, fontWeight:800, color:BLUE }}>{filteredSpots[selected].name}</div>
+            <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>{filteredSpots[selected].desc}</div>
           </div>
         </div>
       )}
