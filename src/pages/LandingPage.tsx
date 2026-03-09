@@ -343,35 +343,34 @@ function SydneyMap() {
   }, [])
 
   return (
-    <div style={{ background:'#fff', padding:'24px 20px' }}>
-      <div style={{ marginBottom:12 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
-          <Icon icon="ph:map-pin" width={20} height={20} color={BLUE} />
-          <div style={{ fontSize:18, fontWeight:900, color:'#0F172A' }}>시드니 버킷리스트 지도</div>
+    <div style={{ background:'#fff', padding:'20px 20px 24px' }}>
+
+      {/* 제목 + 범례 한 줄 */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+          <Icon icon="ph:map-pin" width={18} height={18} color={BLUE} />
+          <span style={{ fontSize:16, fontWeight:900, color:'#0F172A' }}>시드니 버킷리스트 지도</span>
         </div>
-        <div style={{ fontSize:13, color:'#64748B' }}>꼭 가봐야 할 명소를 지도에서 확인하세요</div>
+        <div style={{ display:'flex', gap:8 }}>
+          {[['명소','#1B6EF3'],['카페','#10B981'],['디저트','#F97316'],['레스토랑','#EF4444']].map(([label, color]) => (
+            <div key={label} style={{ display:'flex', alignItems:'center', gap:3 }}>
+              <div style={{ width:7, height:7, borderRadius:'50%', background:color }}/>
+              <span style={{ fontSize:10, color:'#64748B', fontWeight:600 }}>{label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* 카테고리 필터 */}
-      <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:8, marginBottom:10, scrollbarWidth:'none' }}>
+      <div style={{ display:'flex', gap:5, overflowX:'auto', paddingBottom:8, marginBottom:10, scrollbarWidth:'none' }}>
         {SPOT_CATS.map(cat => (
           <button key={cat} onClick={() => { setCatFilter(cat); setSelected(null) }} style={{
-            flexShrink:0, height:30, padding:'0 12px',
+            flexShrink:0, height:26, padding:'0 10px',
             background: catFilter === cat ? BLUE : '#F0F4FF',
             color: catFilter === cat ? '#fff' : BLUE,
             border: catFilter === cat ? 'none' : `1px solid rgba(27,110,243,0.15)`,
-            borderRadius:12, fontSize:12, fontWeight:700, cursor:'pointer',
+            borderRadius:12, fontSize:11, fontWeight:700, cursor:'pointer',
           }}>{cat}</button>
-        ))}
-      </div>
-
-      {/* 색상 범례 */}
-      <div style={{ display:'flex', gap:12, marginBottom:10, flexWrap:'wrap' as any }}>
-        {[['명소','#1B6EF3'],['카페','#10B981'],['디저트','#F97316'],['레스토랑','#EF4444']].map(([label, color]) => (
-          <div key={label} style={{ display:'flex', alignItems:'center', gap:4 }}>
-            <div style={{ width:8, height:8, borderRadius:'50%', background:color }}/>
-            <span style={{ fontSize:11, color:'#64748B', fontWeight:600 }}>{label}</span>
-          </div>
         ))}
       </div>
 
