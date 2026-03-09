@@ -350,19 +350,19 @@ function SydneyMap() {
           .gm-style .gm-style-iw-c {
             padding: 0 !important;
             border-radius: 10px !important;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
-            background: #1E293B !important;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12) !important;
+            background: #F1F5F9 !important;
           }
           .gm-style .gm-style-iw-d {
             overflow: hidden !important;
             padding: 0 !important;
           }
           .gm-style .gm-style-iw-t::after {
-            background: #1E293B !important;
+            background: #F1F5F9 !important;
             box-shadow: none !important;
           }
           .gm-style .gm-style-iw-tc::after {
-            background: #1E293B !important;
+            background: #F1F5F9 !important;
           }
           .gm-style-iw-chr {
             display: none !important;
@@ -373,7 +373,7 @@ function SydneyMap() {
         const showInfo = (marker: any, spot: any) => {
           infoWindow.setContent(`
             <div style="font-family:'Pretendard',sans-serif;font-size:12px;font-weight:700;
-                        color:#fff;padding:7px 12px;white-space:nowrap;">
+                        color:#1E293B;padding:7px 12px;white-space:nowrap;">
               ${spot.name}
             </div>
           `)
