@@ -292,7 +292,7 @@ export default function ChecklistPage({ state, setState }: Props) {
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
-            style={{ fontSize:13, color:'#003594', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
+            style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
           <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>{done}/{total}</span>
         </div>
@@ -304,8 +304,8 @@ export default function ChecklistPage({ state, setState }: Props) {
               borderRadius:'6px 6px 0 0',
               fontSize:14, fontWeight: mainTab===tab ? 700 : 500,
               color: mainTab===tab ? '#fff' : '#94A3B8',
-              background: mainTab===tab ? '#003594' : 'transparent',
-              borderBottom: mainTab===tab ? '2px solid #003594' : '2px solid transparent',
+              background: mainTab===tab ? '#1B6EF3' : 'transparent',
+              borderBottom: mainTab===tab ? '2px solid #1B6EF3' : '2px solid transparent',
             }}>
               {tab==='bucketlist' ? '버킷리스트' : '업체/서비스 찾기'}
             </button>
@@ -321,7 +321,7 @@ export default function ChecklistPage({ state, setState }: Props) {
           <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 20px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                <span style={{ fontSize:14, fontWeight:700, color: done>0 ? '#003594' : '#94A3B8' }}>
+                <span style={{ fontSize:14, fontWeight:700, color: done>0 ? '#1B6EF3' : '#94A3B8' }}>
                   {done>0 ? `${done}개 선택됨` : (trip ? '항목을 선택하세요' : '여행 일정을 설정하세요')}
                 </span>
                 {unscheduledCount>0 && (
@@ -346,11 +346,11 @@ export default function ChecklistPage({ state, setState }: Props) {
                 </button>
                 <button onClick={() => setShowScheduleView(v=>!v)} style={{
                   height:34, padding:'0 14px', borderRadius:8, border:'none',
-                  background: showScheduleView ? '#003594' : '#fff',
+                  background: showScheduleView ? '#1B6EF3' : '#fff',
                   color: showScheduleView ? '#fff' : '#1E293B',
                   fontSize:13, fontWeight:800, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:5,
-                  boxShadow: showScheduleView ? '0 2px 8px rgba(0,53,148,0.25)' : '0 2px 6px rgba(0,0,0,0.10)',
+                  boxShadow: showScheduleView ? '0 2px 8px rgba(27,110,243,0.25)' : '0 2px 6px rgba(0,0,0,0.10)',
                 }}>
                   <Icon icon="ph:list-checks" width={15} height={15} color={showScheduleView ? '#FFCD00' : '#94A3B8'} />
                   일정보기
@@ -386,11 +386,11 @@ export default function ChecklistPage({ state, setState }: Props) {
                     return (
                       <button key={cat.id} className="chip-btn" onClick={() => setState(setCategory(state, cat.id))} style={{
                         height:36, borderRadius:8, border:'none',
-                        background: isActive ? '#003594' : '#fff',
+                        background: isActive ? '#1B6EF3' : '#fff',
                         color: isActive ? '#fff' : '#1E293B',
                         fontSize:12, fontWeight:700,
                         cursor:'pointer', position:'relative',
-                        boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
+                        boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
                         display:'flex', alignItems:'center', justifyContent:'center', gap: isCustom ? 4 : 0,
                       }}>
                         {isCustom && <Icon icon="ph:pencil-simple" width={11} height={11} color={isActive ? '#FFCD00' : '#94A3B8'} />}
@@ -419,7 +419,7 @@ export default function ChecklistPage({ state, setState }: Props) {
               <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
                 {CATEGORIES.find(c=>c.id===activeCategory)?.receiptLabel}
               </span>
-              <span style={{ fontSize:13, color:'#003594', fontWeight:700 }}>
+              <span style={{ fontSize:13, color:'#1B6EF3', fontWeight:700 }}>
                 {catItems.filter(i=>state.selected[i.id]).length}/{catItems.length}
               </span>
             </div>
@@ -433,7 +433,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                   border:'1px solid #E2E8F0', height:44,
                   boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
                 }}>
-                  <Icon icon="ph:plus-circle" width={18} height={18} color="#003594" />
+                  <Icon icon="ph:plus-circle" width={18} height={18} color="#1B6EF3" />
                   <input ref={inputRef} value={customLabel}
                     onChange={e => setCustomLabel(e.target.value)}
                     onKeyDown={e => e.key==='Enter' && handleAddCustom()}
@@ -442,9 +442,9 @@ export default function ChecklistPage({ state, setState }: Props) {
                   />
                 </div>
                 <button onClick={handleAddCustom} style={{
-                  height:44, padding:'0 16px', background:'#003594', color:'#fff',
+                  height:44, padding:'0 16px', background:'#1B6EF3', color:'#fff',
                   border:'none', borderRadius:10, fontWeight:700, fontSize:14, cursor:'pointer',
-                  boxShadow:'0 2px 8px rgba(0,53,148,0.25)',
+                  boxShadow:'0 2px 8px rgba(27,110,243,0.25)',
                 }}>추가</button>
               </div>
             )}
@@ -548,7 +548,7 @@ export default function ChecklistPage({ state, setState }: Props) {
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={handleIssue} style={{
                 flex:4, height:54,
-                background:'#003594', color:'#fff',
+                background:'#1B6EF3', color:'#fff',
                 border:'none', borderRadius:8, fontSize:15, fontWeight:700, cursor:'pointer',
                 animation: shakeBtn ? 'shake 0.5s ease' : 'none',
                 boxShadow:'0 10px 15px rgba(0,0,0,0.15)',
@@ -698,13 +698,13 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: 
               onClick={() => setActiveDayIdx(isActive ? null : idx)}
               style={{
                 minWidth:54, height:46, borderRadius:8, flexShrink:0,
-                border: isActive ? '2px solid #003594' : '2px solid transparent',
+                border: isActive ? '2px solid #1B6EF3' : '2px solid transparent',
                 cursor:'pointer',
                 background: bg,
-                color: isActive ? '#003594' : '#1E293B',
+                color: isActive ? '#1B6EF3' : '#1E293B',
                 fontSize:11, fontWeight:700, position:'relative', textAlign:'center',
                 lineHeight:1.3, padding:'4px 2px',
-                boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.20)' : '0 1px 3px rgba(0,0,0,0.06)',
+                boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.20)' : '0 1px 3px rgba(0,0,0,0.06)',
               }}>
               <div>{idx+1}일차</div>
               <div style={{ fontSize:10, opacity:0.8 }}>{fmtMD(d)}</div>
@@ -732,8 +732,8 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: 
           <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
             {dayItems.map(item => (
               <span key={item.id} style={{
-                background:'rgba(0,53,148,0.08)', borderRadius:6,
-                padding:'3px 9px', fontSize:11, color:'#003594', fontWeight:600,
+                background:'rgba(27,110,243,0.08)', borderRadius:6,
+                padding:'3px 9px', fontSize:11, color:'#1B6EF3', fontWeight:600,
               }}>{item.label}</span>
             ))}
           </div>
@@ -781,14 +781,14 @@ function MiniCalendar({ year, month, selected, minDate, onSelect }: {
           return (
             <div key={idx} onClick={() => !isDisabled && onSelect(dateStr)} style={{
               textAlign: 'center', padding: '6px 0', borderRadius: 8, cursor: isDisabled ? 'default' : 'pointer',
-              background: isSelected ? '#003594' : 'transparent',
+              background: isSelected ? '#1B6EF3' : 'transparent',
               color: isDisabled ? '#C8D4E4'
                 : isSelected ? '#fff'
                 : dayOfWeek === 0 ? '#E05050'
                 : dayOfWeek === 6 ? '#4477CC'
                 : '#2A3A4C',
               fontSize: 13, fontWeight: isSelected || isToday ? 800 : 500,
-              border: isToday && !isSelected ? '1.5px solid #003594' : '1.5px solid transparent',
+              border: isToday && !isSelected ? '1.5px solid #1B6EF3' : '1.5px solid transparent',
               boxSizing: 'border-box',
             }}>{day}</div>
           )
@@ -835,7 +835,7 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
           <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600, letterSpacing: 1, marginBottom: 4 }}>
             {isStart ? 'STEP 1 / 2' : 'STEP 2 / 2'}
           </div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#003594' }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#1B6EF3' }}>
             {isStart ? '✈️ 출발일을 선택해주세요' : '🏠 도착일을 선택해주세요'}
           </div>
           {!isStart && startDate && (
@@ -847,12 +847,12 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <button onClick={prevMonth} style={{
             width: 32, height: 32, borderRadius: 6, border: '1px solid #E2E8F0',
-            background: '#F1F5F9', cursor: 'pointer', fontSize: 14, color: '#003594', fontWeight: 800,
+            background: '#F1F5F9', cursor: 'pointer', fontSize: 14, color: '#1B6EF3', fontWeight: 800,
           }}>‹</button>
           <div style={{ fontSize: 14, fontWeight: 700, color: '#1E293B' }}>{year}년 {month}월</div>
           <button onClick={nextMonth} style={{
             width: 32, height: 32, borderRadius: 6, border: '1px solid #E2E8F0',
-            background: '#F1F5F9', cursor: 'pointer', fontSize: 14, color: '#003594', fontWeight: 800,
+            background: '#F1F5F9', cursor: 'pointer', fontSize: 14, color: '#1B6EF3', fontWeight: 800,
           }}>›</button>
         </div>
 
@@ -866,17 +866,17 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
         {/* 선택된 날짜 표시 */}
         <div style={{
           marginTop: 12, padding: '10px 14px', borderRadius: 8,
-          background: selected ? 'rgba(0,53,148,0.06)' : '#F1F5F9',
+          background: selected ? 'rgba(27,110,243,0.06)' : '#F1F5F9',
           textAlign: 'center', fontSize: 14, fontWeight: 600,
-          color: selected ? '#003594' : '#94A3B8',
-          border: selected ? '1px solid rgba(0,53,148,0.15)' : '1px solid transparent',
+          color: selected ? '#1B6EF3' : '#94A3B8',
+          border: selected ? '1px solid rgba(27,110,243,0.15)' : '1px solid transparent',
         }}>
           {selected ? `📅 ${selected}` : '날짜를 선택해주세요'}
         </div>
 
         <button onClick={() => selected && onSelect(selected)} style={{
           width: '100%', height: 54, borderRadius: 6, border: 'none', cursor: selected ? 'pointer' : 'default',
-          background: selected ? '#003594' : '#E2E8F0',
+          background: selected ? '#1B6EF3' : '#E2E8F0',
           color: selected ? '#fff' : '#94A3B8', fontSize: 15, fontWeight: 700,
           marginTop: 10, marginBottom: 4,
           boxShadow: selected ? '0 10px 15px rgba(0,0,0,0.10)' : 'none',
@@ -919,7 +919,7 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
         {message && <p style={{ fontSize:14, color:'#64748B', marginBottom:20, lineHeight:1.6 }}>{message}</p>}
         <div style={{ display:'flex', gap:8 }}>
           {confirmFirst && (
-            <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:6, background: confirmColor ?? '#003594', color:'#fff', fontWeight:700, fontSize:15, cursor:'pointer' }}>
+            <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:6, background: confirmColor ?? '#1B6EF3', color:'#fff', fontWeight:700, fontSize:15, cursor:'pointer' }}>
               {confirmLabel}
             </button>
           )}
@@ -927,7 +927,7 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
             <button onClick={onCancel} style={{ flex:1, height:48, border:'1px solid #E2E8F0', borderRadius:6, background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer' }}>취소</button>
           )}
           {!confirmFirst && (
-            <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:6, background: confirmColor ?? '#003594', color:'#fff', fontWeight:700, fontSize:15, cursor:'pointer' }}>
+            <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:6, background: confirmColor ?? '#1B6EF3', color:'#fff', fontWeight:700, fontSize:15, cursor:'pointer' }}>
               {confirmLabel}
             </button>
           )}
@@ -939,7 +939,7 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
 
 /* ── 폭죽 컴포넌트 ── */
 function Fireworks() {
-  const colors = ['#FFCD00','#003594','#FF4B4B','#4ECDC4','#FF9F43','#A29BFE','#55EFC4','#FD79A8','#fff']
+  const colors = ['#FFCD00','#1B6EF3','#FF4B4B','#4ECDC4','#FF9F43','#A29BFE','#55EFC4','#FD79A8','#fff']
   const cx = 50   // 화면 중앙 %
   const cy = 50
 
