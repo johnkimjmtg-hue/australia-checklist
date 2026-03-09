@@ -54,7 +54,7 @@ function CircleProgress({ pct }: { pct: number }) {
           strokeDasharray={C} strokeDashoffset={offset} strokeLinecap="round"/>
       </svg>
       <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center' }}>
-        <span style={{ fontSize:13,fontWeight:800,color:'#003594' }}>{pct}%</span>
+        <span style={{ fontSize:13,fontWeight:800,color:'#1B6EF3' }}>{pct}%</span>
       </div>
     </div>
   )
@@ -116,7 +116,7 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
       {/* ── 상단 진행 카드 (헤더 대신) ── */}
       <div style={{
         background:'#fff', margin:12, borderRadius:12,
-        boxShadow:'0 4px 20px rgba(0,53,148,0.10),0 1px 4px rgba(0,0,0,0.06)',
+        boxShadow:'0 4px 20px rgba(27,110,243,0.10),0 1px 4px rgba(0,0,0,0.06)',
         padding:'16px', display:'flex', alignItems:'center', gap:14,
       }}>
         <CircleProgress pct={pct} />
@@ -126,7 +126,7 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
             {trip.startDate.slice(5).replace('-','/')} ~ {trip.endDate.slice(5).replace('-','/')}
           </div>
           <div style={{ display:'flex',alignItems:'baseline',gap:3 }}>
-            <span style={{ fontSize:22,fontWeight:800,color:'#003594',lineHeight:1 }}>{achievedCount}</span>
+            <span style={{ fontSize:22,fontWeight:800,color:'#1B6EF3',lineHeight:1 }}>{achievedCount}</span>
             <span style={{ fontSize:13,fontWeight:600,color:'#64748B' }}>/{total}건 완료</span>
           </div>
         </div>
@@ -148,10 +148,10 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
                 borderBottom:'1px solid #E2E8F0',
               }}>
                 <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                  <span style={{ fontSize:10,fontWeight:800,color:'#003594' }}>{dayIdx+1}일차</span>
+                  <span style={{ fontSize:10,fontWeight:800,color:'#1B6EF3' }}>{dayIdx+1}일차</span>
                   {date && <span style={{ fontSize:10,color:'#94A3B8' }}>{fmtMD(date)}({dow(date)})</span>}
                 </div>
-                <span style={{ fontSize:10,color:'#003594',fontWeight:700 }}>{dayDone}/{rows.length}</span>
+                <span style={{ fontSize:10,color:'#1B6EF3',fontWeight:700 }}>{dayDone}/{rows.length}</span>
               </div>
               {/* 아이템 — 날짜별 row 각각 */}
               {rows.map(({ item, day }) => {
@@ -227,7 +227,7 @@ export default function BucketSharePaper({ state, trip, achieved }: Props) {
       {/* ── 푸터 ── */}
       <div style={{
         margin:'12px 12px 12px',
-        background:'linear-gradient(135deg, #002870, #003594)',
+        background:'linear-gradient(135deg, #1B6EF3, #1B6EF3)',
         borderRadius:10,
         padding:'12px 16px',
         display:'flex', alignItems:'center', justifyContent:'space-between',

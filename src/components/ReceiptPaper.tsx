@@ -30,13 +30,13 @@ export default function ReceiptPaper({ state, trip, issuedAt }: Props) {
       fontFamily: ff,
       background: '#fff',
       borderRadius: 14,
-      border: '1px solid rgba(30,77,131,0.12)',
+      border: '1px solid rgba(27,110,243,0.12)',
       overflow: 'hidden',
     }}>
 
       {/* ── 헤더: 로고 + 여행기간 한 줄 ── */}
       <div style={{
-        background: 'linear-gradient(135deg, #1a3d6e, #1E4D83)',
+        background: 'linear-gradient(135deg, #1B6EF3, #1B6EF3)',
         padding: '14px 16px 12px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
@@ -70,9 +70,9 @@ export default function ReceiptPaper({ state, trip, issuedAt }: Props) {
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '7px 14px 4px',
                   background: '#F8FAFD',
-                  borderBottom: '1px solid rgba(30,77,131,0.06)',
+                  borderBottom: '1px solid rgba(27,110,243,0.06)',
                 }}>
-                  <span style={{ fontSize: 10, fontWeight: 800, color: '#1E4D83' }}>{dayIdx+1}일차</span>
+                  <span style={{ fontSize: 10, fontWeight: 800, color: '#1B6EF3' }}>{dayIdx+1}일차</span>
                   <span style={{ fontSize: 10, color: '#AAB8CC', fontWeight: 500 }}>{fmtMD(date)} ({dow(date)})</span>
                   <span style={{ marginLeft: 'auto', fontSize: 10, color: '#AAB8CC' }}>{items.length}건</span>
                 </div>
@@ -81,11 +81,11 @@ export default function ReceiptPaper({ state, trip, issuedAt }: Props) {
                   <div key={item.id} style={{
                     display: 'flex', alignItems: 'center', gap: 8,
                     padding: '6px 14px',
-                    borderBottom: '1px solid rgba(30,77,131,0.05)',
+                    borderBottom: '1px solid rgba(27,110,243,0.05)',
                   }}>
                     <span style={{ fontSize: 13, flexShrink: 0 }}>{item.emoji}</span>
                     <span style={{ fontSize: 12, color: '#1C2E45', fontWeight: 500, flex: 1 }}>{item.label}</span>
-                    <span style={{ fontSize: 10, color: '#1E4D83', fontWeight: 800 }}>✓</span>
+                    <span style={{ fontSize: 10, color: '#1B6EF3', fontWeight: 800 }}>✓</span>
                   </div>
                 ))}
               </div>
@@ -98,7 +98,7 @@ export default function ReceiptPaper({ state, trip, issuedAt }: Props) {
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '7px 14px 4px',
                   background: '#F8FAFD',
-                  borderBottom: '1px solid rgba(30,77,131,0.06)',
+                  borderBottom: '1px solid rgba(27,110,243,0.06)',
                 }}>
                   <span style={{ fontSize: 10, fontWeight: 800, color: '#AAB8CC' }}>날짜 미지정</span>
                   <span style={{ marginLeft: 'auto', fontSize: 10, color: '#AAB8CC' }}>{unscheduled.length}건</span>
@@ -107,7 +107,7 @@ export default function ReceiptPaper({ state, trip, issuedAt }: Props) {
                   <div key={item.id} style={{
                     display: 'flex', alignItems: 'center', gap: 8,
                     padding: '6px 14px',
-                    borderBottom: '1px solid rgba(30,77,131,0.05)',
+                    borderBottom: '1px solid rgba(27,110,243,0.05)',
                   }}>
                     <span style={{ fontSize: 13, flexShrink: 0 }}>{item.emoji}</span>
                     <span style={{ fontSize: 12, color: '#AAB8CC', flex: 1 }}>{item.label}</span>
@@ -122,12 +122,12 @@ export default function ReceiptPaper({ state, trip, issuedAt }: Props) {
         {/* ── 합계 + 등급 ── */}
         <div style={{
           padding: '10px 14px',
-          borderTop: '1.5px dashed rgba(30,77,131,0.15)',
+          borderTop: '1.5px dashed rgba(27,110,243,0.15)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <div>
             <span style={{ fontSize: 11, fontWeight: 900, color: '#0F1B2D', letterSpacing: 0.5 }}>TOTAL </span>
-            <span style={{ fontSize: 11, color: '#1E4D83', fontWeight: 800 }}>{done}/{total}건</span>
+            <span style={{ fontSize: 11, color: '#1B6EF3', fontWeight: 800 }}>{done}/{total}건</span>
           </div>
           <div style={{ textAlign: 'right' }}>
             <span style={{ fontSize: 11, color: getGradeColor(grade), fontWeight: 900 }}>{grade} CLASS</span>
@@ -138,7 +138,7 @@ export default function ReceiptPaper({ state, trip, issuedAt }: Props) {
         {/* ── 푸터 ── */}
         <div style={{
           padding: '8px 14px 12px',
-          borderTop: '1px solid rgba(30,77,131,0.07)',
+          borderTop: '1px solid rgba(27,110,243,0.07)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <span style={{ fontSize: 9, color: '#C0CCD8', fontWeight: 600 }}>호주가자 · 여행 버킷리스트 🦘</span>
@@ -148,12 +148,12 @@ export default function ReceiptPaper({ state, trip, issuedAt }: Props) {
         {/* ── 바코드 ── */}
         <div style={{
           padding: '10px 14px 14px',
-          borderTop: '1px dashed rgba(30,77,131,0.10)',
+          borderTop: '1px dashed rgba(27,110,243,0.10)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
         }}>
           <svg width="240" height="40" viewBox="0 0 240 40" xmlns="http://www.w3.org/2000/svg">
             {[2,6,9,13,16,19,23,27,30,33,37,40,44,47,51,54,57,61,65,68,72,75,78,82,85,89,92,95,99,102,106,109,112,116,119,122,126,130,133,136,140,143,147,150,153,157,160,163,167,170,174,177,180,184,187,191,194,197,201,204,208,211,214,218,221,225,228,231,235,238].map((x, i) => (
-              <rect key={i} x={x} y={0} width={i % 5 === 0 ? 3 : i % 3 === 0 ? 2 : 1} height={i % 7 === 0 ? 40 : 32} fill="rgba(30,77,131,0.25)" />
+              <rect key={i} x={x} y={0} width={i % 5 === 0 ? 3 : i % 3 === 0 ? 2 : 1} height={i % 7 === 0 ? 40 : 32} fill="rgba(27,110,243,0.25)" />
             ))}
           </svg>
           <span style={{ fontSize: 8, color: '#C0CCD8', letterSpacing: 2, fontWeight: 600 }}>

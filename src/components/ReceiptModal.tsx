@@ -28,7 +28,7 @@ export default function ReceiptModal({ state, trip, issuedAt, achieved, onClose,
           background:'rgba(255,255,255,0.9)', border:'none',
           fontSize:16, color:'#5A7090', marginBottom:10, cursor:'pointer',
           display:'flex', alignItems:'center', justifyContent:'center',
-          boxShadow:'0 2px 8px rgba(30,77,131,0.12)',
+          boxShadow:'0 2px 8px rgba(27,110,243,0.12)',
         }}>✕</button>
         <div style={{ animation:'fadeInUp 0.3s ease' }}>
           <BucketSharePaper state={state} trip={trip} achieved={achieved} />
@@ -40,7 +40,7 @@ export default function ReceiptModal({ state, trip, issuedAt, achieved, onClose,
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:390, padding:'10px 14px 26px',
         background:'rgba(244,247,251,0.97)', backdropFilter:'blur(12px)',
-        borderTop:'1px solid rgba(30,77,131,0.08)',
+        borderTop:'1px solid rgba(27,110,243,0.08)',
         display:'flex', gap:8, zIndex:2,
       }}>
         <button onClick={async () => {
@@ -54,8 +54,8 @@ export default function ReceiptModal({ state, trip, issuedAt, achieved, onClose,
           setSaving(false)
         }} disabled={saving} style={{
           flex:1, height:46, borderRadius:10, cursor:'pointer',
-          border:'1px solid rgba(30,77,131,0.15)', background:'#fff',
-          fontWeight:700, fontSize:13, color:'#1E4D83',
+          border:'1px solid rgba(27,110,243,0.15)', background:'#fff',
+          fontWeight:700, fontSize:13, color:'#1B6EF3',
         }}>{saving ? '저장 중...' : '이미지 저장'}</button>
         <button onClick={async () => {
           setSharing(true)
@@ -64,9 +64,9 @@ export default function ReceiptModal({ state, trip, issuedAt, achieved, onClose,
           setSharing(false)
         }} disabled={sharing} style={{
           flex:1, height:46, borderRadius:10, cursor:'pointer',
-          border:'none', background:'linear-gradient(160deg,#3A7FCC,#1E4D83)',
+          border:'none', background:'linear-gradient(160deg,#4B8EF5,#1B6EF3)',
           fontWeight:700, fontSize:13, color:'#fff',
-          boxShadow:'0 4px 14px rgba(30,77,131,0.28)',
+          boxShadow:'0 4px 14px rgba(27,110,243,0.28)',
         }}>{sharing ? '공유 중...' : '공유하기'}</button>
       </div>
     </div>

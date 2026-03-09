@@ -84,14 +84,14 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
         }}>
 
           {/* 업체 정보 카드 */}
-          <div style={{ background:'#fff', borderRadius:14, overflow:'hidden', marginBottom:8, boxShadow:'0 2px 8px rgba(0,53,148,0.07)' }}>
+          <div style={{ background:'#fff', borderRadius:14, overflow:'hidden', marginBottom:8, boxShadow:'0 2px 8px rgba(27,110,243,0.07)' }}>
 
             {/* 업체명 헤더 */}
             <div style={{ padding:'18px 18px 14px', borderBottom:'1px solid #F1F5F9' }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom: fullAddress ? 6 : 0 }}>
                 <div style={{ fontSize:20, fontWeight:900, color:'#0F172A', flex:1, lineHeight:1.2 }}>{name}</div>
                 {is_featured && (
-                  <div style={{ background:'#003594', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'4px 10px', flexShrink:0, marginLeft:8, marginTop:2 }}>추천</div>
+                  <div style={{ background:'#1B6EF3', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'4px 10px', flexShrink:0, marginLeft:8, marginTop:2 }}>추천</div>
                 )}
               </div>
               {fullAddress && (
@@ -103,7 +103,7 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
               {tags && tags.length > 0 && (
                 <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
                   {tags.map(tag => (
-                    <span key={tag} style={{ background:'#EFF6FF', color:'#003594', fontSize:10, fontWeight:700, borderRadius:6, padding:'3px 8px' }}>{tag}</span>
+                    <span key={tag} style={{ background:'#EFF6FF', color:'#1B6EF3', fontSize:10, fontWeight:700, borderRadius:6, padding:'3px 8px' }}>{tag}</span>
                   ))}
                 </div>
               )}
@@ -136,7 +136,7 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
                     <div style={{ width:26, height:26, borderRadius:7, background:'#F1F5F9', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                       <Icon icon="ph:globe" width={13} height={13} color="#64748B" />
                     </div>
-                    <span style={{ fontSize:13, color:'#003594', fontWeight:600 }}>{website}</span>
+                    <span style={{ fontSize:13, color:'#1B6EF3', fontWeight:600 }}>{website}</span>
                   </div>
                 )}
               </div>
@@ -145,7 +145,7 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
 
           {/* 한줄평 카드 */}
           {topVotes.length > 0 && (
-            <div style={{ background:'#fff', borderRadius:14, padding:'14px 18px', marginBottom:8, boxShadow:'0 2px 8px rgba(0,53,148,0.07)' }}>
+            <div style={{ background:'#fff', borderRadius:14, padding:'14px 18px', marginBottom:8, boxShadow:'0 2px 8px rgba(27,110,243,0.07)' }}>
               <div style={{ fontSize:11, fontWeight:800, color:'#94A3B8', marginBottom:10, letterSpacing:0.5 }}>한줄평</div>
               <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
                 {topVotes.map(([tag, count]) => (
@@ -166,7 +166,7 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
           )}
 
           {/* 홍보 카드 */}
-          <div style={{ background:'#003594', borderRadius:14, padding:'12px 18px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div style={{ background:'#1B6EF3', borderRadius:14, padding:'12px 18px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
             <div>
               <div style={{ fontSize:15, fontWeight:900, color:'#FFCD00', letterSpacing:0.5 }}>호주가자</div>
             </div>
@@ -184,19 +184,19 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:390, padding:'10px 14px 26px',
         background:'rgba(244,247,251,0.97)', backdropFilter:'blur(12px)',
-        borderTop:'1px solid rgba(30,77,131,0.08)',
+        borderTop:'1px solid rgba(27,110,243,0.08)',
         display:'flex', gap:8, zIndex:2,
       }}>
         <button onClick={handleSave} disabled={saving || sharing} style={{
           flex:1, height:46, borderRadius:10, cursor:'pointer',
-          border:'1px solid rgba(30,77,131,0.15)', background:'#fff',
-          fontWeight:700, fontSize:13, color:'#1E4D83', fontFamily:ff,
+          border:'1px solid rgba(27,110,243,0.15)', background:'#fff',
+          fontWeight:700, fontSize:13, color:'#1B6EF3', fontFamily:ff,
         }}>{saving ? '저장 중...' : '이미지 저장'}</button>
         <button onClick={handleShare} disabled={saving || sharing} style={{
           flex:1, height:46, borderRadius:10, cursor:'pointer',
-          border:'none', background:'linear-gradient(160deg,#3A7FCC,#1E4D83)',
+          border:'none', background:'linear-gradient(160deg,#4B8EF5,#1B6EF3)',
           fontWeight:700, fontSize:13, color:'#fff', fontFamily:ff,
-          boxShadow:'0 4px 14px rgba(30,77,131,0.28)',
+          boxShadow:'0 4px 14px rgba(27,110,243,0.28)',
         }}>{sharing ? '공유 중...' : '공유하기'}</button>
       </div>
     </div>
