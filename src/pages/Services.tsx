@@ -1,11 +1,13 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { CATEGORIES } from '../data/businesses'
 import { Business, getBusinesses, searchBusinesses } from '../lib/businessService'
+import { getBookmarks } from '../lib/businessBookmarks'
 import BusinessCard from '../components/BusinessCard'
 import CategoryFilter from '../components/CategoryFilter'
 
 type Props = { onSelectBusiness: (id: string) => void; onBack: () => void }
+type ServiceTab = 'all' | 'bookmarks'
 
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
@@ -27,11 +29,14 @@ function pickRandom<T>(list: T[], n: number): T[] {
 }
 
 export default function Services({ onSelectBusiness, onBack }: Props) {
+  const [serviceTab, setServiceTab]   = useState<ServiceTab>('all')
   const [search, setSearch]         = useState('')
   const [category, setCategory]     = useState('all')
   const [allBusinesses, setAllBusinesses] = useState<Business[]>([])
   const [loading, setLoading]       = useState(true)
   const [showAll, setShowAll]       = useState(false)
+  const [bookmarked, setBookmarked] = useState<Business[]>([])
+  const [bookmarkCount, setBookmarkCount] = useState(() => getBookmarks().length)
 
   // 전체 데이터 최초 1회 로드
   useEffect(() => {
@@ -41,6 +46,15 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       setLoading(false)
     })
   }, [])
+
+  // 북마크 탭 진입 시 로드
+  useEffect(() => {
+    if (serviceTab !== 'bookmarks') return
+    const ids = getBookmarks()
+    setBookmarkCount(ids.length)
+    if (ids.length === 0) { setBookmarked([]); return }
+    setBookmarked(allBusinesses.filter(b => ids.includes(b.id)))
+  }, [serviceTab, allBusinesses])
 
   // 카테고리별 업체 수 계산
   const catCounts = useMemo(() => {
@@ -97,7 +111,26 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         borderBottom:'1.5px solid #D1D9E3',
         boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
       }}>
-        {/* 검색창 */}
+        {/* 전체/북마크 탭 */}
+        <div style={{ display:'flex', gap:6, marginBottom:10 }}>
+          {(['all', 'bookmarks'] as ServiceTab[]).map(tab => (
+            <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
+              height:32, padding:'0 14px', borderRadius:10, border:'none',
+              cursor:'pointer', fontSize:13, fontWeight:700,
+              background: serviceTab === tab ? '#1B6EF3' : '#fff',
+              color: serviceTab === tab ? '#fff' : '#64748B',
+              boxShadow: serviceTab === tab ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
+              display:'flex', alignItems:'center', gap:5,
+            }}>
+              <Icon icon={tab === 'all' ? 'ph:list-bullets' : 'ph:bookmark-simple-fill'}
+                width={13} height={13} color={serviceTab === tab ? '#fff' : '#94A3B8'} />
+              {tab === 'all' ? '전체 업체' : `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}`}
+            </button>
+          ))}
+        </div>
+
+        {/* 검색창 — 전체 탭만 */}
+        {serviceTab === 'all' && (<>
         <div style={{
           display:'flex', alignItems:'center', gap:8,
           background:'#fff', borderRadius:12, padding:'0 12px',
@@ -123,7 +156,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           )}
         </div>
 
-        {/* 카테고리 필터 — 개수 뱃지 포함, 많은 순 정렬 */}
+        {/* 카테고리 필터 — 개수 뱃지 포함, 많은 순 정렬 — 전체 탭만 */}
         <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4, paddingTop:6 }}>
           {sortedCategories.map(cat => {
             const isActive = category === cat.id
@@ -166,13 +199,32 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             )
           })}
         </div>
+        </>)}
       </div>
 
       {/* ── 콘텐츠 ── */}
       <div style={{ padding:'16px 16px 0' }}>
 
+        {/* 북마크 탭 */}
+        {serviceTab === 'bookmarks' && (
+          bookmarked.length === 0 ? (
+            <div style={{ textAlign:'center', padding:'64px 0' }}>
+              <Icon icon="ph:bookmark-simple" width={48} height={48} color="#CBD5E1" />
+              <div style={{ marginTop:14, fontSize:15, fontWeight:700, color:'#64748B' }}>저장된 업체가 없어요</div>
+              <div style={{ marginTop:6, fontSize:13, color:'#94A3B8' }}>업체 카드의 북마크 버튼을 눌러 저장하세요</div>
+            </div>
+          ) : (
+            <>
+              <SectionLabel icon="ph:bookmark-simple-fill" label={`내 북마크 (${bookmarked.length})`} color="#1B6EF3" />
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                {sortByName(bookmarked).map(b => <BusinessCard key={b.id} business={b} />)}
+              </div>
+            </>
+          )
+        )}
+
         {/* 검색 결과 */}
-        {isSearch && (
+        {serviceTab === 'all' && isSearch && (
           <>
             <SectionLabel icon="ph:magnifying-glass" label={`검색 결과 (${sorted.length})`} color="#64748B" />
             {loading ? <LoadingState /> : sorted.length === 0 ? <EmptyState /> : (
@@ -183,8 +235,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           </>
         )}
 
-        {/* 카테고리 필터 결과 */}
-        {!isSearch && isCatFilter && (
+        {serviceTab === 'all' && !isSearch && isCatFilter && (
           <>
             <SectionLabel icon="ph:list-bullets"
               label={`${CATEGORIES.find(c=>c.id===category)?.label ?? ''} (${sorted.length})`}
@@ -197,8 +248,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           </>
         )}
 
-        {/* 전체 보기 */}
-        {!isFiltered && (
+        {serviceTab === 'all' && !isFiltered && (
           <>
             {/* 랜덤 10개 */}
             {!showAll && (
