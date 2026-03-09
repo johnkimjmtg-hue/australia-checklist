@@ -94,7 +94,7 @@ export default function BusinessCard({ business }: Props) {
                 <Icon
                   icon={bookmarked ? 'ph:bookmark-simple-fill' : 'ph:bookmark-simple'}
                   width={20} height={20}
-                  color={bookmarked ? '#1B6EF3' : '#CBD5E1'}
+                  color={bookmarked ? '#DC2626' : '#CBD5E1'}
                 />
               </button>
             </div>

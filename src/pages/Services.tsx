@@ -71,20 +71,26 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
 
         {/* 전체/북마크 탭 */}
         <div style={{ display:'flex', gap:6, marginBottom:10 }}>
-          {(['all','bookmarks'] as ServiceTab[]).map(tab => (
-            <button key={tab} onClick={() => setServiceTab(tab)} style={{
-              height:32, padding:'0 14px', borderRadius:10, border:'none',
-              cursor:'pointer', fontSize:13, fontWeight:700,
-              background: serviceTab === tab ? '#1B6EF3' : '#fff',
-              color: serviceTab === tab ? '#fff' : '#64748B',
-              boxShadow: serviceTab === tab ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
-              display:'flex', alignItems:'center', gap:5,
-            }}>
-              <Icon icon={tab === 'all' ? 'ph:list-bullets' : 'ph:bookmark-simple-fill'}
-                width={13} height={13} color={serviceTab === tab ? '#fff' : '#94A3B8'} />
-              {tab === 'all' ? '전체 업체' : `내 북마크 ${bookmarkCount > 0 ? `(${bookmarkCount})` : ''}`}
-            </button>
-          ))}
+          {(['all','bookmarks'] as ServiceTab[]).map(tab => {
+            const isBookmarkTab = tab === 'bookmarks'
+            const isActive = serviceTab === tab
+            const activeColor = isBookmarkTab ? '#DC2626' : '#1B6EF3'
+            const activeShadow = isBookmarkTab ? '0 2px 8px rgba(220,38,38,0.25)' : '0 2px 8px rgba(27,110,243,0.25)'
+            return (
+              <button key={tab} onClick={() => setServiceTab(tab)} style={{
+                height:32, padding:'0 14px', borderRadius:10, border:'none',
+                cursor:'pointer', fontSize:13, fontWeight:700,
+                background: isActive ? activeColor : '#fff',
+                color: isActive ? '#fff' : '#64748B',
+                boxShadow: isActive ? activeShadow : '0 1px 3px rgba(0,0,0,0.07)',
+                display:'flex', alignItems:'center', gap:5,
+              }}>
+                <Icon icon={isBookmarkTab ? 'ph:bookmark-simple-fill' : 'ph:list-bullets'}
+                  width={13} height={13} color={isActive ? '#fff' : (isBookmarkTab ? '#DC2626' : '#94A3B8')} />
+                {tab === 'all' ? '전체 업체' : `내 북마크 ${bookmarkCount > 0 ? `(${bookmarkCount})` : ''}`}
+              </button>
+            )
+          })}
         </div>
 
         {/* 전체 탭에서만 검색창 + 카테고리 필터 */}
