@@ -1,10 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { Business, VOTE_TAGS, getMyVote, getVoteCounts, addVote } from '../lib/businessService'
-import {
-  isBookmarked, getBookmarkFolders, toggleBookmarkFolder,
-  getFolders, addFolder, Folder
-} from '../lib/businessBookmarks'
+import { isBookmarked, toggleBookmark } from '../lib/businessBookmarks'
 import BusinessShareModal from './BusinessShareModal'
 
 type Props = { business: Business }
@@ -26,55 +23,11 @@ export default function BusinessCard({ business }: Props) {
   const [showPhone, setShowPhone]           = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
   const [bookmarked, setBookmarked]         = useState(() => isBookmarked(business.id))
-  const [myFolders, setMyFolders]           = useState<string[]>(() => getBookmarkFolders(business.id))
-  const [showFolderPop, setShowFolderPop]   = useState(false)
-  const [folders, setFolders]               = useState<Folder[]>(() => getFolders())
-  const [newFolderMode, setNewFolderMode]   = useState(false)
-  const [newFolderName, setNewFolderName]   = useState('')
-  const popRef = useRef<HTMLDivElement>(null)
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
   useEffect(() => {
     getVoteCounts(business.id).then(setCounts)
   }, [business.id])
-
-  // 팝업 바깥 클릭 시 닫기
-  useEffect(() => {
-    if (!showFolderPop) return
-    const handler = (e: MouseEvent) => {
-      if (popRef.current && !popRef.current.contains(e.target as Node)) {
-        setShowFolderPop(false)
-        setNewFolderMode(false)
-        setNewFolderName('')
-      }
-    }
-    setTimeout(() => document.addEventListener('mousedown', handler), 0)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [showFolderPop])
-
-  const handleBookmarkClick = () => {
-    setFolders(getFolders())
-    setShowFolderPop(v => !v)
-  }
-
-  const handleFolderToggle = (folderId: string) => {
-    toggleBookmarkFolder(business.id, folderId)
-    const next = getBookmarkFolders(business.id)
-    setMyFolders(next)
-    setBookmarked(next.length > 0)
-  }
-
-  const handleAddFolder = () => {
-    if (!newFolderName.trim()) return
-    const folder = addFolder(newFolderName.trim())
-    toggleBookmarkFolder(business.id, folder.id)
-    const next = getBookmarkFolders(business.id)
-    setMyFolders(next)
-    setBookmarked(true)
-    setFolders(getFolders())
-    setNewFolderName('')
-    setNewFolderMode(false)
-  }
 
   const handleToggleVotes = async () => {
     if (!showVotes && counts === null) {
@@ -130,11 +83,11 @@ export default function BusinessCard({ business }: Props) {
           {/* 업체명 + 북마크 + 추천 뱃지 */}
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
             <div style={{ fontSize:16, fontWeight:800, color:'#1E293B', flex:1, paddingRight:8 }}>{name}</div>
-            <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0, position:'relative' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
               {is_featured && (
                 <div style={{ background:'#1B6EF3', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'3px 10px' }}>추천</div>
               )}
-              <button onClick={handleBookmarkClick} style={{
+              <button onClick={() => setBookmarked(toggleBookmark(business.id))} style={{
                 background: bookmarked ? 'rgba(220,38,38,0.08)' : 'none',
                 border:'none', cursor:'pointer', padding:'4px 6px', borderRadius:8,
                 display:'flex', alignItems:'center', justifyContent:'center',
@@ -145,105 +98,8 @@ export default function BusinessCard({ business }: Props) {
                   color={bookmarked ? '#DC2626' : '#CBD5E1'}
                 />
               </button>
-
-              {/* 폴더 선택 팝업 */}
-              {showFolderPop && (
-                <div ref={popRef} style={{
-                  position:'absolute', top:'110%', right:0, zIndex:100,
-                  background:'#fff', borderRadius:14, padding:'14px',
-                  boxShadow:'0 8px 32px rgba(0,0,0,0.15)', minWidth:210,
-                  border:'1px solid #F1F5F9',
-                }}>
-                  {/* 팝업 헤더 */}
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
-                    <span style={{ fontSize:12, fontWeight:800, color:'#94A3B8', letterSpacing:0.5 }}>폴더에 저장</span>
-                    <button onClick={() => { setShowFolderPop(false); setNewFolderMode(false); setNewFolderName('') }} style={{
-                      background:'#F1F5F9', border:'none', cursor:'pointer', borderRadius:6,
-                      width:24, height:24, display:'flex', alignItems:'center', justifyContent:'center',
-                    }}>
-                      <Icon icon="ph:x" width={13} height={13} color="#64748B" />
-                    </button>
-                  </div>
-                  <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-                    {folders.map(folder => {
-                      const isIn = myFolders.includes(folder.id)
-                      return (
-                        <button key={folder.id} onClick={() => handleFolderToggle(folder.id)} style={{
-                          display:'flex', alignItems:'center', justifyContent:'space-between',
-                          padding:'8px 10px', borderRadius:9, border:'none', cursor:'pointer',
-                          background: isIn ? 'rgba(220,38,38,0.07)' : '#F8FAFC',
-                          fontFamily:ff,
-                        }}>
-                          <span style={{ fontSize:13, fontWeight:600, color: isIn ? '#DC2626' : '#1E293B' }}>
-                            {folder.emoji} {folder.name}
-                          </span>
-                          {isIn && <Icon icon="ph:check" width={14} height={14} color="#DC2626" />}
-                        </button>
-                      )
-                    })}
-                  </div>
-
-                  {/* 새 폴더 추가 */}
-                  <div style={{ marginTop:10, borderTop:'1px solid #F1F5F9', paddingTop:10 }}>
-                    {!newFolderMode ? (
-                      <button onClick={() => setNewFolderMode(true)} style={{
-                        width:'100%', padding:'7px 0', border:'1px dashed #CBD5E1',
-                        borderRadius:8, background:'none', cursor:'pointer',
-                        fontSize:12, fontWeight:700, color:'#94A3B8', fontFamily:ff,
-                        display:'flex', alignItems:'center', justifyContent:'center', gap:5,
-                      }}>
-                        <Icon icon="ph:plus" width={13} height={13} color="#94A3B8" />
-                        새 폴더 만들기
-                      </button>
-                    ) : (
-                      <div style={{ display:'flex', gap:6 }}>
-                        <input
-                          autoFocus
-                          value={newFolderName}
-                          onChange={e => setNewFolderName(e.target.value)}
-                          onKeyDown={e => { if (e.key === 'Enter') handleAddFolder(); if (e.key === 'Escape') { setNewFolderMode(false); setNewFolderName('') } }}
-                          placeholder="폴더 이름..."
-                          style={{
-                            flex:1, border:'1px solid #E2E8F0', borderRadius:8, padding:'6px 10px',
-                            fontSize:13, outline:'none', fontFamily:ff, color:'#1E293B',
-                          }}
-                        />
-                        <button onClick={handleAddFolder} style={{
-                          background:'#DC2626', border:'none', borderRadius:8, padding:'6px 10px',
-                          cursor:'pointer', color:'#fff', fontSize:12, fontWeight:700, fontFamily:ff,
-                        }}>추가</button>
-                      </div>
-                    )}
-                  </div>
-                  {/* 완료 버튼 */}
-                  <button onClick={() => { setShowFolderPop(false); setNewFolderMode(false); setNewFolderName('') }} style={{
-                    width:'100%', marginTop:10, height:36, border:'none', borderRadius:9,
-                    background:'#DC2626', color:'#fff', fontSize:13, fontWeight:700,
-                    cursor:'pointer', fontFamily:ff,
-                  }}>완료</button>
-                </div>
-              )}
             </div>
           </div>
-
-          {/* 내 폴더 태그 표시 */}
-          {myFolders.length > 0 && (
-            <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:8 }}>
-              {myFolders.map(fid => {
-                const f = folders.find(x => x.id === fid)
-                if (!f) return null
-                return (
-                  <span key={fid} style={{
-                    background:'rgba(220,38,38,0.08)', color:'#DC2626',
-                    fontSize:10, fontWeight:700, borderRadius:20, padding:'2px 8px',
-                    display:'flex', alignItems:'center', gap:3,
-                  }}>
-                    {f.emoji} {f.name}
-                  </span>
-                )
-              })}
-            </div>
-          )}
 
           {/* 주소 */}
           {fullAddress && (

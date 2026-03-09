@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { CATEGORIES } from '../data/businesses'
 import { Business, getBusinesses, getFeaturedBusinesses, searchBusinesses } from '../lib/businessService'
-import { getBookmarks, getFolders, getBookmarksByFolder, Folder } from '../lib/businessBookmarks'
+import { getBookmarks } from '../lib/businessBookmarks'
 import BusinessCard from '../components/BusinessCard'
 import CategoryFilter from '../components/CategoryFilter'
 
@@ -12,16 +12,14 @@ type ServiceTab = 'all' | 'bookmarks'
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
 export default function Services({ onSelectBusiness, onBack }: Props) {
-  const [serviceTab, setServiceTab]   = useState<ServiceTab>('all')
-  const [search, setSearch]           = useState('')
-  const [category, setCategory]       = useState('all')
-  const [businesses, setBusinesses]   = useState<Business[]>([])
-  const [featured, setFeatured]       = useState<Business[]>([])
-  const [allBizMap, setAllBizMap]     = useState<Record<string, Business>>({})
-  const [folders, setFolders]         = useState<Folder[]>(() => getFolders())
-  const [selectedFolder, setSelectedFolder] = useState<string>('all')
-  const [loading, setLoading]         = useState(true)
-  const [showAll, setShowAll]         = useState(false)
+  const [serviceTab, setServiceTab]       = useState<ServiceTab>('all')
+  const [search, setSearch]               = useState('')
+  const [category, setCategory]           = useState('all')
+  const [businesses, setBusinesses]       = useState<Business[]>([])
+  const [featured, setFeatured]           = useState<Business[]>([])
+  const [bookmarked, setBookmarked]       = useState<Business[]>([])
+  const [loading, setLoading]             = useState(true)
+  const [showAll, setShowAll]             = useState(false)
   const [bookmarkCount, setBookmarkCount] = useState(() => getBookmarks().length)
 
   // 북마크 변경 시 카운트 즉시 업데이트
@@ -52,17 +50,14 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     return () => clearTimeout(t)
   }, [search, category])
 
-  // 북마크 탭 진입 또는 변경 시 전체 업체 맵 로드
+  // 북마크 탭 진입 또는 변경 시 북마크된 업체 로드
   useEffect(() => {
     if (serviceTab !== 'bookmarks') return
     const load = () => {
-      setBookmarkCount(getBookmarks().length)
-      setFolders(getFolders())
-      getBusinesses('all').then(all => {
-        const map: Record<string, Business> = {}
-        all.forEach(b => { map[b.id] = b })
-        setAllBizMap(map)
-      })
+      const ids = getBookmarks()
+      setBookmarkCount(ids.length)
+      if (ids.length === 0) { setBookmarked([]); return }
+      getBusinesses('all').then(all => setBookmarked(all.filter(b => ids.includes(b.id))))
     }
     load()
     window.addEventListener('bookmark-changed', load)
@@ -147,63 +142,14 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               <div style={{ textAlign:'center', padding:'64px 0' }}>
                 <Icon icon="ph:bookmark-simple" width={48} height={48} color="#CBD5E1" />
                 <div style={{ marginTop:14, fontSize:15, fontWeight:700, color:'#64748B' }}>저장된 업체가 없어요</div>
-                <div style={{ marginTop:6, fontSize:13, color:'#94A3B8' }}>업체 카드의 🔖 버튼을 눌러 폴더에 저장하세요</div>
+                <div style={{ marginTop:6, fontSize:13, color:'#94A3B8' }}>업체 카드의 🔖 버튼을 눌러 저장하세요</div>
               </div>
             ) : (
               <>
-                {/* 폴더 필터 칩 */}
-                <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:12, marginBottom:4 }}>
-                  <button onClick={() => setSelectedFolder('all')} style={{
-                    flexShrink:0, height:30, padding:'0 12px', borderRadius:20, border:'none',
-                    cursor:'pointer', fontSize:12, fontWeight:700,
-                    background: selectedFolder === 'all' ? '#DC2626' : '#fff',
-                    color: selectedFolder === 'all' ? '#fff' : '#64748B',
-                    boxShadow: selectedFolder === 'all' ? '0 2px 8px rgba(220,38,38,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
-                  }}>전체</button>
-                  {folders.map(folder => {
-                    const count = getBookmarksByFolder(folder.id).length
-                    if (count === 0) return null
-                    const isActive = selectedFolder === folder.id
-                    return (
-                      <button key={folder.id} onClick={() => setSelectedFolder(folder.id)} style={{
-                        flexShrink:0, height:30, padding:'0 12px', borderRadius:20, border:'none',
-                        cursor:'pointer', fontSize:12, fontWeight:700,
-                        background: isActive ? '#DC2626' : '#fff',
-                        color: isActive ? '#fff' : '#64748B',
-                        boxShadow: isActive ? '0 2px 8px rgba(220,38,38,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
-                        display:'flex', alignItems:'center', gap:4,
-                      }}>
-                        {folder.emoji} {folder.name} <span style={{ opacity:0.7 }}>({count})</span>
-                      </button>
-                    )
-                  })}
+                <SectionLabel icon="ph:bookmark-simple-fill" label={`내 북마크 (${bookmarkCount})`} color="#DC2626" />
+                <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                  {bookmarked.map(b => <BusinessCard key={b.id} business={b} />)}
                 </div>
-
-                {/* 선택된 폴더 업체 목록 */}
-                {(() => {
-                  const foldersToShow = selectedFolder === 'all'
-                    ? folders.filter(f => getBookmarksByFolder(f.id).length > 0)
-                    : folders.filter(f => f.id === selectedFolder)
-                  return foldersToShow.map(folder => {
-                    const ids = getBookmarksByFolder(folder.id)
-                    const bizList = ids.map(id => allBizMap[id]).filter(Boolean) as Business[]
-                    if (bizList.length === 0) return null
-                    return (
-                      <div key={folder.id} style={{ marginBottom:24 }}>
-                        {selectedFolder === 'all' && (
-                          <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:10 }}>
-                            <span style={{ fontSize:16 }}>{folder.emoji}</span>
-                            <span style={{ fontSize:14, fontWeight:800, color:'#1E293B' }}>{folder.name}</span>
-                            <span style={{ fontSize:12, fontWeight:600, color:'#94A3B8' }}>({bizList.length})</span>
-                          </div>
-                        )}
-                        <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                          {bizList.map(b => <BusinessCard key={b.id} business={b} />)}
-                        </div>
-                      </div>
-                    )
-                  })
-                })()}
               </>
             )}
           </>
