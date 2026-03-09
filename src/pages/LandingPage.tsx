@@ -565,7 +565,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 
         {/* 메인 타이틀 */}
         <div style={{
-          position:'absolute', top:'33%', left:0, right:0,
+          position:'absolute', top:'40%', left:0, right:0,
           textAlign:'center', zIndex:10,
           padding:'0 16px',
           color:'#fff',
@@ -579,15 +579,15 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             <span style={{ fontSize:44 }}>꼭</span>
             <span style={{ fontSize:28, fontWeight:700 }}> 해야 할</span>
           </div>
-          {/* 모든 것! */}
-          <div style={{ fontSize:56, fontWeight:900, marginTop:4, letterSpacing:-1 }}>
+          {/* 모든 것! — 호주/꼭 과 같은 크기 */}
+          <div style={{ fontSize:44, fontWeight:900, marginTop:4 }}>
             모든 것!
           </div>
         </div>
 
         {/* 서브 문구 */}
         <div style={{
-          position:'absolute', top:'57%', left:0, right:0,
+          position:'absolute', top:'64%', left:0, right:0,
           textAlign:'center', zIndex:10,
         }}>
           <p style={{
