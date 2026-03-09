@@ -839,7 +839,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
                   transform: isActive ? 'scale(1)' : 'scale(0.97)',
                   transition:'all 0.3s ease',
                 }}
-                  onClick={() => navigate(`/?cat=${item.catId}&item=${item.itemId}`)}
+                  onClick={() => navigate(`/app?cat=${item.catId}&item=${item.itemId}`)}
                 >
                   <div style={{
                     width:'100%', height:140,
