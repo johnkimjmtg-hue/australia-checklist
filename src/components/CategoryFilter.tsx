@@ -34,11 +34,11 @@ export default function CategoryFilter({ selected, onChange }: Props) {
           <button key={cat.id} onClick={() => onChange(cat.id)} style={{
             display:'flex', flexDirection:'column', alignItems:'center', gap:3,
             padding:'8px 10px', borderRadius:10, flexShrink:0,
-            background: isActive ? '#003594' : '#fff',
+            background: isActive ? '#1B6EF3' : '#fff',
             color: isActive ? '#fff' : '#64748B',
             border: isActive ? 'none' : '1px solid #E2E8F0',
             fontSize:10, fontWeight:700, cursor:'pointer',
-            boxShadow: isActive ? '0 2px 8px rgba(0,53,148,0.20)' : '0 1px 3px rgba(0,0,0,0.05)',
+            boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.20)' : '0 1px 3px rgba(0,0,0,0.05)',
             transition:'all 0.15s',
           }}>
             <Icon icon={CAT_ICONS[cat.id] ?? 'ph:star'} width={18} height={18}
