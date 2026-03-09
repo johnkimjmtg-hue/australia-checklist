@@ -627,12 +627,22 @@ function ChatBubble() {
 // ══════════════════════════════════════════════════
 export default function LandingPage({ state, onStart, onServices }: Props) {
   const navigate = useNavigate()
-  // BucketCheckView와 동일한 방식
+  // BucketCheckView와 완전히 동일한 방식 (1아이템 N일 배정 → N개로 카운트)
   const allItems     = [...ITEMS, ...(state.customItems ?? []).map((c: any) => ({ ...c, emoji:'📝' }))]
   const checkedItems = allItems.filter((i: any) => state.selected?.[i.id])
-  const total        = checkedItems.length
+  const allRows      = (() => {
+    const rows: { id: string; day?: number }[] = []
+    checkedItems.forEach((item: any) => {
+      const days = state.schedules?.[item.id] ?? []
+      if (days.length === 0) rows.push({ id: item.id })
+      else days.forEach((d: number) => rows.push({ id: item.id, day: d }))
+    })
+    return rows
+  })()
+  const getKey       = (id: string, day?: number) => day !== undefined ? `${id}_${day}` : id
+  const total        = allRows.length
   const achieved     = (() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })()
-  const checked      = Object.keys(achieved).filter(id => achieved[id]).length
+  const checked      = allRows.filter(r => !!achieved[getKey(r.id, r.day)]).length
   const progress     = total > 0 ? Math.round((checked / total) * 100) : 0
   const [bizCount, setBizCount] = useState(BUSINESSES.length)
 
