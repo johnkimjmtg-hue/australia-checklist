@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { AppState } from '../store/state'
 import { ITEMS, CATEGORIES } from '../data/checklist'
-import { CATEGORIES as BCATS } from '../data/businesses'
+import { CATEGORIES as BCATS, BUSINESSES } from '../data/businesses'
 
 // ── 이미지 import (src/assets/landing/ 폴더에 넣어주세요)
 import imgHero     from '../assets/landing/hero.png'
@@ -17,7 +17,7 @@ import imgUnique   from '../assets/landing/unique-bridgeclimb.png'
 import imgSuggest  from '../assets/landing/suggest-cafe.png'
 import imgBusiness from '../assets/landing/business-storefront.png'
 
-type Props = { state: AppState; onStart: () => void; onServices: () => void }
+type Props = { state: AppState; onStart: () => void; onServices: () => void; onGoToItem?: (catId: string, itemId: string) => void }
 
 const ff   = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 const BLUE = '#1B6EF3'   // 밝은 파란 (브랜드 컬러)
@@ -37,47 +37,52 @@ const CAT_ICON_MAP: Record<string, string> = {
   'custom':            'ph:pencil-simple',
 }
 
-// ── 추천 버킷리스트 데이터
+// ── 추천 버킷리스트 데이터 (itemId: 클릭 시 이동할 checklist 항목 id, catId: 카테고리)
 const BUCKET_RECS = [
   {
     id: 'blackstar',
     title: 'Black Star Pastry',
-    desc: '시드니 최고 케이크 맛집',
-    emoji: '🍰',
+    desc: '시드니에서 수박 케이크 먹기',
     img: imgCafe,
     pos: 'center',
+    itemId: 'f36',
+    catId: 'food',
   },
   {
     id: 'bondi',
     title: 'Bondi Beach',
-    desc: '시그니처 시드니 해변',
-    emoji: '🏄',
+    desc: '시드니 대표 해변 즐기기',
     img: imgBeach,
     pos: 'center 30%',
+    itemId: 'g24',
+    catId: 'places',
   },
   {
-    id: 'operahouse',
-    title: 'Sydney Opera House',
-    desc: '세계적 직접관람 추천',
-    emoji: '🎭',
+    id: 'bridgeclimb',
+    title: '하버 브릿지 클라이밍',
+    desc: '시드니 전경을 발밑에 두기',
     img: imgUnique,
     pos: 'center',
+    itemId: 'g23',
+    catId: 'places',
   },
   {
-    id: 'kbbq',
-    title: '한국 BBQ 즐기기',
-    desc: '시드니 한인타운 삼겹살',
-    emoji: '🥩',
+    id: 'bbq',
+    title: '공원 BBQ 파티',
+    desc: '호주식 바베큐 파티 즐기기',
     img: imgFood,
     pos: 'center',
+    itemId: 'f37',
+    catId: 'food',
   },
   {
     id: 'kangaroo',
     title: '캥거루 먹이주기',
     desc: '야생동물 공원 체험',
-    emoji: '🦘',
     img: imgNature,
     pos: 'center',
+    itemId: 'g25',
+    catId: 'places',
   },
 ]
 
@@ -242,15 +247,7 @@ function SydneyMap() {
             },
             title: spot.name,
           })
-
-          const iw = new google.maps.InfoWindow({
-            content: `
-              <div style="font-family:-apple-system,sans-serif;padding:4px 2px;min-width:140px">
-                <div style="font-size:13px;font-weight:800;color:#1B6EF3;margin-bottom:3px">${spot.emoji} ${spot.name}</div>
-                <div style="font-size:11px;color:#64748B">${spot.desc}</div>
-              </div>`,
-          })
-          marker.addListener('click', () => { iw.open(map, marker); setSelected(i) })
+          marker.addListener('click', () => setSelected(i))
         })
         if (!cancelled) setLoaded(true)
       } catch {}
@@ -464,10 +461,11 @@ function ChatBubble() {
 // ══════════════════════════════════════════════════
 // ── 메인 컴포넌트
 // ══════════════════════════════════════════════════
-export default function LandingPage({ state, onStart, onServices }: Props) {
+export default function LandingPage({ state, onStart, onServices, onGoToItem }: Props) {
   const total    = ITEMS.length + (state.customItems?.length ?? 0)
   const checked  = state.checked?.size ?? 0
   const progress = total > 0 ? Math.round((checked / total) * 100) : 0
+  const bizCount = BUSINESSES.length
 
   const [showForm, setShowForm]             = useState(false)
   const [showSuggestion, setShowSuggestion] = useState(false)
@@ -537,15 +535,24 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           <div onClick={handleLogoTap} style={{ cursor:'pointer', userSelect:'none' as any }}>
             <span style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:-0.5, textShadow:'0 1px 8px rgba(0,0,0,0.35)' }}>호주가자</span>
           </div>
-          <button onClick={onStart} style={{
-            height:34, padding:'0 14px', borderRadius:20, border:'none',
-            background:BLUE, color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer',
-            display:'flex', alignItems:'center', gap:5,
-            boxShadow:'0 2px 10px rgba(0,0,0,0.25)',
-          }}>
-            <Icon icon="ph:list-checks" width={13} height={13} color={GOLD} />
-            나의 버킷리스트
-          </button>
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:2 }}>
+            <div style={{
+              display:'flex', gap:8,
+              background:'rgba(255,255,255,0.18)', backdropFilter:'blur(8px)',
+              border:'1px solid rgba(255,255,255,0.30)',
+              borderRadius:12, padding:'6px 12px',
+            }}>
+              <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                <Icon icon="ph:list-checks" width={12} height={12} color={GOLD} />
+                <span style={{ fontSize:11, fontWeight:700, color:'#fff' }}>{total}개 버킷리스트</span>
+              </div>
+              <div style={{ width:1, background:'rgba(255,255,255,0.30)' }}/>
+              <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                <Icon icon="ph:storefront" width={12} height={12} color={GOLD} />
+                <span style={{ fontSize:11, fontWeight:700, color:'#fff' }}>{bizCount}개 업체</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* 히어로 텍스트 — 하단 배치 */}
@@ -592,76 +599,76 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
               boxShadow:`0 4px 20px rgba(255,184,0,0.50)`,
             }}>
               <Icon icon="ph:list-checks" width={16} height={16} color="#002870" />
-              버킷리스트 시작하기
-            </button>
-            <button onClick={onServices} style={{
-              height:48, padding:'0 18px',
-              background:'rgba(255,255,255,0.18)', color:'#fff',
-              border:'1.5px solid rgba(255,255,255,0.38)', borderRadius:12, fontSize:12, fontWeight:700,
-              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:5,
-              backdropFilter:'blur(8px)', whiteSpace:'nowrap',
-            }}>
-              <Icon icon="ph:buildings" width={15} height={15} color="#fff" />
-              업체 보기
+              나의 버킷리스트
             </button>
           </div>
         </div>
       </div>
 
-      {/* ── 나의 버킷리스트 진행 바 ── */}
-      <div style={{ background:'#fff', padding:'16px 20px', borderBottom:'1px solid #F1F5F9' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <div style={{ width:32, height:32, borderRadius:10, background:BLUE, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <Icon icon="ph:list-checks" width={16} height={16} color={GOLD} />
-            </div>
-            <div>
-              <div style={{ fontSize:13, fontWeight:800, color:'#0F172A' }}>나의 버킷리스트</div>
-              <div style={{ fontSize:11, color:'#94A3B8', marginTop:1 }}>{checked}/{total} 완료 · {progress}%</div>
+      {/* ── 나의 버킷리스트 진행 카드 ── */}
+      <div style={{ background:'#fff', padding:'20px', borderBottom:'1px solid #F1F5F9' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+          {/* 도넛 그래프 */}
+          <div style={{ flexShrink:0, position:'relative', width:80, height:80 }}>
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              {/* 배경 원 */}
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#EEF3FF" strokeWidth="8"/>
+              {/* 진행 원 */}
+              <circle cx="40" cy="40" r="32" fill="none"
+                stroke={progress === 100 ? '#10B981' : BLUE}
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 32}`}
+                strokeDashoffset={`${2 * Math.PI * 32 * (1 - progress / 100)}`}
+                transform="rotate(-90 40 40)"
+                style={{ transition:'stroke-dashoffset 1s ease' }}
+              />
+            </svg>
+            <div style={{
+              position:'absolute', inset:0,
+              display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+            }}>
+              <span style={{ fontSize:16, fontWeight:900, color: progress === 100 ? '#10B981' : BLUE, lineHeight:1 }}>{progress}%</span>
             </div>
           </div>
-          <button onClick={onStart} style={{
-            height:32, padding:'0 14px', borderRadius:20, border:'none',
-            background:BLUE, color:'#fff', fontSize:11, fontWeight:700, cursor:'pointer',
-          }}>보러가기 →</button>
-        </div>
-        <div style={{ height:10, background:'#EEF3FF', borderRadius:5, overflow:'hidden' }}>
-          <div style={{
-            height:'100%', width:`${progress}%`,
-            background:`linear-gradient(90deg, ${BLUE} 0%, #5B9EFF 100%)`,
-            borderRadius:5, transition:'width 0.8s ease', position:'relative',
-            minWidth: progress > 0 ? 10 : 0,
-          }}>
-            {progress > 5 && (
-              <div style={{ position:'absolute', right:-1, top:'50%', transform:'translateY(-50%)', width:14, height:14, borderRadius:'50%', background:'#fff', border:`2.5px solid ${BLUE}`, boxShadow:`0 0 0 3px rgba(27,110,243,0.20)` }}/>
+
+          {/* 텍스트 */}
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:15, fontWeight:900, color:'#0F172A', marginBottom:4 }}>나의 버킷리스트</div>
+            <div style={{ fontSize:13, color:'#64748B', marginBottom:12 }}>
+              <span style={{ fontWeight:800, color: progress === 100 ? '#10B981' : BLUE }}>{checked}개</span> 완료 · 총 {total}개
+            </div>
+            {progress === 0 && (
+              <div style={{ fontSize:12, color:'#94A3B8' }}>아직 체크한 항목이 없어요. 시작해볼까요?</div>
             )}
+            {progress > 0 && progress < 100 && (
+              <div style={{ fontSize:12, color:BLUE, fontWeight:600 }}>{total - checked}개 항목이 남았어요!</div>
+            )}
+            {progress === 100 && (
+              <div style={{ fontSize:12, color:'#10B981', fontWeight:700 }}>모든 항목을 완료했어요!</div>
+            )}
+            <button onClick={onStart} style={{
+              marginTop:10, height:34, padding:'0 16px',
+              background:BLUE, color:'#fff', border:'none', borderRadius:20,
+              fontSize:12, fontWeight:700, cursor:'pointer',
+              display:'flex', alignItems:'center', gap:5,
+              boxShadow:`0 2px 8px rgba(27,110,243,0.25)`,
+            }}>
+              <Icon icon="ph:list-checks" width={13} height={13} color={GOLD} />
+              나의 리스트 보러가기
+            </button>
           </div>
         </div>
-        {progress === 0 && (
-          <div style={{ marginTop:8, fontSize:11, color:'#94A3B8', textAlign:'center' }}>
-            아직 체크한 항목이 없어요 · 시작해볼까요?
-          </div>
-        )}
-        {progress > 0 && progress < 100 && (
-          <div style={{ marginTop:8, fontSize:11, color:BLUE, fontWeight:600 }}>
-            {total - checked}개 항목이 남았어요! 계속 도전해봐요
-          </div>
-        )}
-        {progress === 100 && (
-          <div style={{ marginTop:8, fontSize:11, color:'#10B981', fontWeight:700, textAlign:'center' }}>
-            모든 항목을 완료했어요! 대단해요!
-          </div>
-        )}
       </div>
 
       {/* ── 추천 버킷리스트 슬라이더 ── */}
-      <div style={{ background:'#fff', padding:'24px 0 24px' }}>
+      <div style={{ background:'#fff', padding:'24px 0 28px' }}>
         <div style={{ padding:'0 20px', marginBottom:16, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
             <div style={{ fontSize:18, fontWeight:900, color:'#0F172A' }}>추천 버킷리스트</div>
             <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>호주에서 꼭 경험해야 할 것들</div>
           </div>
-          <div style={{ display:'flex', gap:6 }}>
+          <div style={{ display:'flex', gap:5 }}>
             {BUCKET_RECS.map((_, i) => (
               <div key={i} onClick={() => setSliderIdx(i)} style={{
                 width: i === sliderIdx ? 18 : 6, height:6, borderRadius:3,
@@ -671,28 +678,46 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             ))}
           </div>
         </div>
+
         <div ref={sliderRef} className="slider-wrap" style={{
           display:'flex', gap:12,
           overflowX:'auto', paddingLeft:20, paddingRight:20,
           scrollSnapType:'x mandatory',
         }}>
           {BUCKET_RECS.map((item, i) => (
-            <div key={item.id} onClick={onStart} style={{
-              flexShrink:0, width:'72%', borderRadius:16, overflow:'hidden',
-              position:'relative', height:190, cursor:'pointer',
+            <div key={item.id} style={{
+              flexShrink:0, width:'68%', borderRadius:16, overflow:'hidden',
+              background:'#fff', cursor:'pointer',
               scrollSnapAlign:'start',
-              boxShadow: i === sliderIdx ? `0 8px 28px rgba(27,110,243,0.22)` : '0 4px 16px rgba(0,0,0,0.10)',
+              boxShadow: i === sliderIdx
+                ? `0 8px 28px rgba(27,110,243,0.18)`
+                : '0 2px 12px rgba(0,0,0,0.08)',
+              border: i === sliderIdx ? `1.5px solid rgba(27,110,243,0.15)` : '1.5px solid #F1F5F9',
               transform: i === sliderIdx ? 'scale(1)' : 'scale(0.97)',
               transition:'all 0.3s ease',
-            }}>
-              <div style={{ position:'absolute', inset:0, backgroundImage:`url(${item.img})`, backgroundSize:'cover', backgroundPosition: item.pos }}/>
-              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,10,50,0.72) 100%)' }}/>
-              <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'14px 16px' }}>
-                <div style={{ fontSize:15, fontWeight:900, color:'#fff', textShadow:'0 1px 4px rgba(0,0,0,0.4)', marginBottom:4 }}>
+            }}
+              onClick={() => {
+                if (onGoToItem) onGoToItem(item.catId, item.itemId)
+                else onStart()
+              }}
+            >
+              {/* 이미지 — 오버레이 없이 깨끗하게 */}
+              <div style={{
+                width:'100%', height:140,
+                backgroundImage:`url(${item.img})`,
+                backgroundSize:'cover',
+                backgroundPosition: item.pos,
+              }}/>
+              {/* 흰 배경 텍스트 영역 */}
+              <div style={{ padding:'12px 14px 14px' }}>
+                <div style={{ fontSize:14, fontWeight:900, color:'#0F172A', marginBottom:3 }}>
                   {item.title}
                 </div>
-                <div style={{ fontSize:12, color:'rgba(255,255,255,0.80)', marginBottom:10 }}>{item.desc}</div>
-                <div style={{ display:'inline-flex', alignItems:'center', gap:4, background:GOLD, borderRadius:20, padding:'5px 12px' }}>
+                <div style={{ fontSize:12, color:'#64748B', marginBottom:12, lineHeight:1.5 }}>{item.desc}</div>
+                <div style={{
+                  display:'inline-flex', alignItems:'center', gap:5,
+                  background:GOLD, borderRadius:20, padding:'6px 14px',
+                }}>
                   <Icon icon="ph:heart" width={12} height={12} color="#002870" />
                   <span style={{ fontSize:11, fontWeight:800, color:'#002870' }}>버킷리스트에 추가 ›</span>
                 </div>
