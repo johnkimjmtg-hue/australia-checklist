@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Icon } from '@iconify/react'
+import { useNavigate } from 'react-router-dom'
 import { AppState } from '../store/state'
 import { ITEMS, CATEGORIES } from '../data/checklist'
 import { CATEGORIES as BCATS, BUSINESSES } from '../data/businesses'
@@ -17,7 +18,7 @@ import imgUnique   from '../assets/landing/unique-bridgeclimb.png'
 import imgSuggest  from '../assets/landing/suggest-cafe.png'
 import imgBusiness from '../assets/landing/business-storefront.png'
 
-type Props = { state: AppState; onStart: () => void; onServices: () => void; onGoToItem?: (catId: string, itemId: string) => void }
+type Props = { state: AppState; onStart: () => void; onServices: () => void }
 
 const ff   = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 const BLUE = '#1B6EF3'   // 밝은 파란 (브랜드 컬러)
@@ -461,7 +462,8 @@ function ChatBubble() {
 // ══════════════════════════════════════════════════
 // ── 메인 컴포넌트
 // ══════════════════════════════════════════════════
-export default function LandingPage({ state, onStart, onServices, onGoToItem }: Props) {
+export default function LandingPage({ state, onStart, onServices }: Props) {
+  const navigate = useNavigate()
   const total    = ITEMS.length + (state.customItems?.length ?? 0)
   const checked  = state.checked?.size ?? 0
   const progress = total > 0 ? Math.round((checked / total) * 100) : 0
@@ -510,96 +512,86 @@ export default function LandingPage({ state, onStart, onServices, onGoToItem }: 
       `}</style>
 
       {/* ── 히어로 + 투명 헤더 ── */}
-      <div style={{ position:'relative', height:420, overflow:'hidden' }}>
+      <div style={{ position:'relative', overflow:'hidden' }}>
 
-        {/* 배경 이미지 — 오버레이 거의 없음 */}
+        {/* 배경 이미지 — 이미지 자체에 텍스트 포함 */}
+        <img
+          src={imgHero}
+          alt="호주에서 꼭 해야 할 모든 것"
+          style={{ width:'100%', display:'block', objectFit:'cover' }}
+        />
+
+        {/* 하단 그라데이션 — 버튼 가독성 */}
         <div style={{
-          position:'absolute', inset:0,
-          backgroundImage:`url(${imgHero})`,
-          backgroundSize:'cover',
-          backgroundPosition:'center 35%',
+          position:'absolute', bottom:0, left:0, right:0, height:160,
+          background:'linear-gradient(to bottom, transparent 0%, rgba(0,10,40,0.72) 100%)',
+          pointerEvents:'none',
         }}/>
 
-        {/* 하단만 약하게 그라데이션 (텍스트 가독성) */}
-        <div style={{
-          position:'absolute', inset:0,
-          background:'linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.05) 40%, rgba(0,10,40,0.65) 100%)',
-        }}/>
-
-        {/* 투명 헤더 (히어로 위에 올림) */}
+        {/* 투명 헤더 */}
         <div style={{
           position:'absolute', top:0, left:0, right:0, zIndex:10,
           padding:'14px 20px',
           display:'flex', alignItems:'center', justifyContent:'space-between',
         }}>
           <div onClick={handleLogoTap} style={{ cursor:'pointer', userSelect:'none' as any }}>
-            <span style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:-0.5, textShadow:'0 1px 8px rgba(0,0,0,0.35)' }}>호주가자</span>
+            <span style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:-0.5, textShadow:'0 1px 8px rgba(0,0,0,0.40)' }}>호주가자</span>
           </div>
-          <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:2 }}>
-            <div style={{
-              display:'flex', gap:8,
-              background:'rgba(255,255,255,0.18)', backdropFilter:'blur(8px)',
-              border:'1px solid rgba(255,255,255,0.30)',
-              borderRadius:12, padding:'6px 12px',
-            }}>
-              <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                <Icon icon="ph:list-checks" width={12} height={12} color={GOLD} />
-                <span style={{ fontSize:11, fontWeight:700, color:'#fff' }}>{total}개 버킷리스트</span>
-              </div>
-              <div style={{ width:1, background:'rgba(255,255,255,0.30)' }}/>
-              <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                <Icon icon="ph:storefront" width={12} height={12} color={GOLD} />
-                <span style={{ fontSize:11, fontWeight:700, color:'#fff' }}>{bizCount}개 업체</span>
-              </div>
+          <div style={{
+            display:'flex', gap:8,
+            background:'rgba(0,0,0,0.28)', backdropFilter:'blur(8px)',
+            border:'1px solid rgba(255,255,255,0.22)',
+            borderRadius:12, padding:'6px 12px',
+          }}>
+            <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+              <Icon icon="ph:list-checks" width={12} height={12} color={GOLD} />
+              <span style={{ fontSize:11, fontWeight:700, color:'#fff' }}>{total}개 버킷리스트</span>
+            </div>
+            <div style={{ width:1, background:'rgba(255,255,255,0.30)' }}/>
+            <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+              <Icon icon="ph:storefront" width={12} height={12} color={GOLD} />
+              <span style={{ fontSize:11, fontWeight:700, color:'#fff' }}>{bizCount}개 업체</span>
             </div>
           </div>
         </div>
 
-        {/* 히어로 텍스트 — 하단 배치 */}
+        {/* 하단 — 문구 + 버튼 */}
         <div style={{
           position:'absolute', bottom:0, left:0, right:0,
           padding:'0 20px 24px',
-          animation:'fadeInUp 0.6s ease both',
+          display:'flex', flexDirection:'column', alignItems:'center', gap:14,
+          zIndex:10,
         }}>
-          {/* 뱃지 */}
-          <div style={{
-            display:'inline-flex', alignItems:'center', gap:5,
-            background:'rgba(255,255,255,0.18)', borderRadius:20,
-            padding:'5px 13px', marginBottom:10,
-            border:'1px solid rgba(255,255,255,0.32)',
-            backdropFilter:'blur(4px)',
-          }}>
-            <Icon icon="ph:airplane-takeoff" width={13} height={13} color="rgba(255,255,255,0.95)" />
-            <span style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.95)', letterSpacing:0.8 }}>· 호주 이민·여행자를 위한 ·</span>
-          </div>
-
-          <h1 style={{
-            fontSize:28, fontWeight:900, color:'#fff',
-            lineHeight:1.25, margin:'0 0 8px 0',
-            textShadow:'0 2px 10px rgba(0,0,0,0.30)',
-            letterSpacing:-0.5,
-          }}>
-            호주에서 꼭 해야 할<br/>모든 것!
-          </h1>
-
+          {/* 서브 문구 */}
           <p style={{
-            fontSize:13, color:'rgba(255,255,255,0.88)',
-            margin:'0 0 18px 0', lineHeight:1.6,
-            textShadow:'0 1px 4px rgba(0,0,0,0.25)',
+            fontSize:13, color:'rgba(255,255,255,0.90)',
+            margin:0, textAlign:'center', lineHeight:1.6,
+            textShadow:'0 1px 6px rgba(0,0,0,0.40)',
           }}>
             가고 싶은 곳, 먹고 싶은 것, 지금 체크하세요
           </p>
 
-          {/* CTA 버튼 */}
-          <div style={{ display:'flex', gap:10 }}>
+          {/* CTA 버튼 두 개 */}
+          <div style={{ display:'flex', gap:10, width:'100%' }}>
             <button onClick={onStart} style={{
-              flex:1, height:48, background:GOLD, color:'#002870',
-              border:'none', borderRadius:12, fontSize:14, fontWeight:900,
+              flex:2, height:50, background:GOLD, color:'#002870',
+              border:'none', borderRadius:14, fontSize:14, fontWeight:900,
               cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
               boxShadow:`0 4px 20px rgba(255,184,0,0.50)`,
             }}>
               <Icon icon="ph:list-checks" width={16} height={16} color="#002870" />
               나의 버킷리스트
+            </button>
+            <button onClick={onServices} style={{
+              flex:1, height:50,
+              background:'rgba(255,255,255,0.18)', color:'#fff',
+              border:'1.5px solid rgba(255,255,255,0.40)', borderRadius:14,
+              fontSize:13, fontWeight:700, cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center', gap:5,
+              backdropFilter:'blur(8px)', whiteSpace:'nowrap' as any,
+            }}>
+              <Icon icon="ph:buildings" width={14} height={14} color="#fff" />
+              업체/서비스
             </button>
           </div>
         </div>
@@ -696,10 +688,7 @@ export default function LandingPage({ state, onStart, onServices, onGoToItem }: 
               transform: i === sliderIdx ? 'scale(1)' : 'scale(0.97)',
               transition:'all 0.3s ease',
             }}
-              onClick={() => {
-                if (onGoToItem) onGoToItem(item.catId, item.itemId)
-                else onStart()
-              }}
+              onClick={() => navigate(`/?cat=${item.catId}&item=${item.itemId}`)}
             >
               {/* 이미지 — 오버레이 없이 깨끗하게 */}
               <div style={{
