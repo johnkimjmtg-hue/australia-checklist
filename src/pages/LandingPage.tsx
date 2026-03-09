@@ -19,8 +19,23 @@ import imgBusiness from '../assets/landing/business-storefront.png'
 
 type Props = { state: AppState; onStart: () => void; onServices: () => void }
 
-const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+const ff   = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+const BLUE = '#1B6EF3'   // 밝은 파란 (브랜드 컬러)
+const GOLD = '#FFB800'   // 노란 (액센트)
 const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY
+
+// 카테고리 id → Phosphor 아이콘 (단색)
+const CAT_ICON_MAP: Record<string, string> = {
+  'hospital':          'ph:heart-pulse',
+  'food':              'ph:fork-knife',
+  'shopping':          'ph:shopping-bag',
+  'admin':             'ph:file-text',
+  'people':            'ph:users',
+  'parenting':         'ph:baby',
+  'places':            'ph:map-pin',
+  'cat_1772930790490': 'ph:microphone-stage',
+  'custom':            'ph:pencil-simple',
+}
 
 // ── 추천 버킷리스트 데이터
 const BUCKET_RECS = [
@@ -231,7 +246,7 @@ function SydneyMap() {
           const iw = new google.maps.InfoWindow({
             content: `
               <div style="font-family:-apple-system,sans-serif;padding:4px 2px;min-width:140px">
-                <div style="font-size:13px;font-weight:800;color:#003594;margin-bottom:3px">${spot.emoji} ${spot.name}</div>
+                <div style="font-size:13px;font-weight:800;color:#1B6EF3;margin-bottom:3px">${spot.emoji} ${spot.name}</div>
                 <div style="font-size:11px;color:#64748B">${spot.desc}</div>
               </div>`,
           })
@@ -256,11 +271,11 @@ function SydneyMap() {
         {SYDNEY_SPOTS.map((s, i) => (
           <div key={i} style={{
             flexShrink:0, display:'flex', alignItems:'center', gap:5,
-            background: selected === i ? '#003594' : '#F0F4FF',
-            color: selected === i ? '#fff' : '#003594',
+            background: selected === i ? BLUE : '#F0F4FF',
+            color: selected === i ? '#fff' : BLUE,
             borderRadius:20, padding:'5px 12px', fontSize:12, fontWeight:700,
             cursor:'pointer', transition:'all 0.2s',
-            border: selected === i ? 'none' : '1px solid rgba(0,53,148,0.12)',
+            border: selected === i ? 'none' : `1px solid rgba(27,110,243,0.15)`,
           }} onClick={() => setSelected(i)}>
             <span>{s.emoji}</span>
             <span style={{ whiteSpace:'nowrap' }}>{s.name}</span>
@@ -287,13 +302,13 @@ function SydneyMap() {
       {selected !== null && (
         <div style={{
           marginTop:12, padding:'12px 14px',
-          background:'rgba(0,53,148,0.05)', borderRadius:12,
-          border:'1px solid rgba(0,53,148,0.10)',
+          background:`rgba(27,110,243,0.05)`, borderRadius:12,
+          border:`1px solid rgba(27,110,243,0.10)`,
           display:'flex', alignItems:'center', gap:10,
         }}>
           <span style={{ fontSize:24 }}>{SYDNEY_SPOTS[selected].emoji}</span>
           <div>
-            <div style={{ fontSize:13, fontWeight:800, color:'#003594' }}>{SYDNEY_SPOTS[selected].name}</div>
+            <div style={{ fontSize:13, fontWeight:800, color:BLUE }}>{SYDNEY_SPOTS[selected].name}</div>
             <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>{SYDNEY_SPOTS[selected].desc}</div>
           </div>
         </div>
@@ -519,19 +534,16 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           padding:'14px 20px',
           display:'flex', alignItems:'center', justifyContent:'space-between',
         }}>
-          <div onClick={handleLogoTap} style={{ cursor:'pointer', userSelect:'none' as any, display:'flex', alignItems:'center', gap:7 }}>
-            <div style={{ width:28, height:28, borderRadius:8, background:'rgba(255,255,255,0.20)', backdropFilter:'blur(4px)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, border:'1.5px solid rgba(255,255,255,0.35)' }}>🦘</div>
-            <span style={{ fontSize:16, fontWeight:900, color:'#fff', letterSpacing:-0.3, textShadow:'0 1px 6px rgba(0,0,0,0.4)' }}>HOJUGAJA</span>
+          <div onClick={handleLogoTap} style={{ cursor:'pointer', userSelect:'none' as any }}>
+            <span style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:-0.5, textShadow:'0 1px 8px rgba(0,0,0,0.35)' }}>호주가자</span>
           </div>
           <button onClick={onStart} style={{
-            height:34, padding:'0 16px', borderRadius:20, border:'none',
-            background:'rgba(255,255,255,0.22)', backdropFilter:'blur(8px)',
-            color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer',
+            height:34, padding:'0 14px', borderRadius:20, border:'none',
+            background:BLUE, color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer',
             display:'flex', alignItems:'center', gap:5,
-            border:'1.5px solid rgba(255,255,255,0.40)' as any,
-            boxShadow:'0 2px 8px rgba(0,0,0,0.15)',
+            boxShadow:'0 2px 10px rgba(0,0,0,0.25)',
           }}>
-            <Icon icon="ph:envelope-simple" width={13} height={13} color="#FFCD00" />
+            <Icon icon="ph:list-checks" width={13} height={13} color={GOLD} />
             나의 버킷리스트
           </button>
         </div>
@@ -550,7 +562,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             border:'1px solid rgba(255,255,255,0.32)',
             backdropFilter:'blur(4px)',
           }}>
-            <span style={{ fontSize:11 }}>✈️</span>
+            <Icon icon="ph:airplane-takeoff" width={13} height={13} color="rgba(255,255,255,0.95)" />
             <span style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.95)', letterSpacing:0.8 }}>· 호주 이민·여행자를 위한 ·</span>
           </div>
 
@@ -574,10 +586,10 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           {/* CTA 버튼 */}
           <div style={{ display:'flex', gap:10 }}>
             <button onClick={onStart} style={{
-              flex:1, height:48, background:'#FFCD00', color:'#002870',
+              flex:1, height:48, background:GOLD, color:'#002870',
               border:'none', borderRadius:12, fontSize:14, fontWeight:900,
               cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-              boxShadow:'0 4px 20px rgba(255,205,0,0.50)',
+              boxShadow:`0 4px 20px rgba(255,184,0,0.50)`,
             }}>
               <Icon icon="ph:list-checks" width={16} height={16} color="#002870" />
               버킷리스트 시작하기
@@ -597,15 +609,11 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       </div>
 
       {/* ── 나의 버킷리스트 진행 바 ── */}
-      <div style={{
-        background:'#fff',
-        padding:'16px 20px',
-        borderBottom:'1px solid #F1F5F9',
-      }}>
+      <div style={{ background:'#fff', padding:'16px 20px', borderBottom:'1px solid #F1F5F9' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <div style={{ width:32, height:32, borderRadius:10, background:'linear-gradient(135deg, #003594, #0050CC)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <Icon icon="ph:list-checks" width={16} height={16} color="#FFCD00" />
+            <div style={{ width:32, height:32, borderRadius:10, background:BLUE, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <Icon icon="ph:list-checks" width={16} height={16} color={GOLD} />
             </div>
             <div>
               <div style={{ fontSize:13, fontWeight:800, color:'#0F172A' }}>나의 버킷리스트</div>
@@ -614,45 +622,34 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           </div>
           <button onClick={onStart} style={{
             height:32, padding:'0 14px', borderRadius:20, border:'none',
-            background:'#003594', color:'#fff', fontSize:11, fontWeight:700, cursor:'pointer',
+            background:BLUE, color:'#fff', fontSize:11, fontWeight:700, cursor:'pointer',
           }}>보러가기 →</button>
         </div>
-
-        {/* 진행 바 */}
         <div style={{ height:10, background:'#EEF3FF', borderRadius:5, overflow:'hidden' }}>
           <div style={{
-            height:'100%',
-            width:`${progress}%`,
-            background:'linear-gradient(90deg, #003594 0%, #0066FF 100%)',
-            borderRadius:5,
-            transition:'width 0.8s ease',
-            position:'relative',
+            height:'100%', width:`${progress}%`,
+            background:`linear-gradient(90deg, ${BLUE} 0%, #5B9EFF 100%)`,
+            borderRadius:5, transition:'width 0.8s ease', position:'relative',
             minWidth: progress > 0 ? 10 : 0,
           }}>
             {progress > 5 && (
-              <div style={{
-                position:'absolute', right:-1, top:'50%', transform:'translateY(-50%)',
-                width:14, height:14, borderRadius:'50%',
-                background:'#fff', border:'2.5px solid #003594',
-                boxShadow:'0 0 0 3px rgba(0,53,148,0.20)',
-              }}/>
+              <div style={{ position:'absolute', right:-1, top:'50%', transform:'translateY(-50%)', width:14, height:14, borderRadius:'50%', background:'#fff', border:`2.5px solid ${BLUE}`, boxShadow:`0 0 0 3px rgba(27,110,243,0.20)` }}/>
             )}
           </div>
         </div>
-
         {progress === 0 && (
           <div style={{ marginTop:8, fontSize:11, color:'#94A3B8', textAlign:'center' }}>
-            아직 체크한 항목이 없어요 · 시작해볼까요? 🦘
+            아직 체크한 항목이 없어요 · 시작해볼까요?
           </div>
         )}
         {progress > 0 && progress < 100 && (
-          <div style={{ marginTop:8, fontSize:11, color:'#003594', fontWeight:600 }}>
-            🎯 {total - checked}개 항목이 남았어요! 계속 도전해봐요
+          <div style={{ marginTop:8, fontSize:11, color:BLUE, fontWeight:600 }}>
+            {total - checked}개 항목이 남았어요! 계속 도전해봐요
           </div>
         )}
         {progress === 100 && (
           <div style={{ marginTop:8, fontSize:11, color:'#10B981', fontWeight:700, textAlign:'center' }}>
-            🎉 모든 항목을 완료했어요! 대단해요!
+            모든 항목을 완료했어요! 대단해요!
           </div>
         )}
       </div>
@@ -667,15 +664,13 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           <div style={{ display:'flex', gap:6 }}>
             {BUCKET_RECS.map((_, i) => (
               <div key={i} onClick={() => setSliderIdx(i)} style={{
-                width: i === sliderIdx ? 18 : 6,
-                height:6, borderRadius:3,
-                background: i === sliderIdx ? '#003594' : '#CBD5E1',
+                width: i === sliderIdx ? 18 : 6, height:6, borderRadius:3,
+                background: i === sliderIdx ? BLUE : '#CBD5E1',
                 cursor:'pointer', transition:'all 0.3s ease',
               }}/>
             ))}
           </div>
         </div>
-
         <div ref={sliderRef} className="slider-wrap" style={{
           display:'flex', gap:12,
           overflowX:'auto', paddingLeft:20, paddingRight:20,
@@ -686,35 +681,18 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
               flexShrink:0, width:'72%', borderRadius:16, overflow:'hidden',
               position:'relative', height:190, cursor:'pointer',
               scrollSnapAlign:'start',
-              boxShadow: i === sliderIdx ? '0 8px 28px rgba(0,53,148,0.22)' : '0 4px 16px rgba(0,53,148,0.10)',
+              boxShadow: i === sliderIdx ? `0 8px 28px rgba(27,110,243,0.22)` : '0 4px 16px rgba(0,0,0,0.10)',
               transform: i === sliderIdx ? 'scale(1)' : 'scale(0.97)',
               transition:'all 0.3s ease',
             }}>
-              {/* 배경 이미지 */}
-              <div style={{
-                position:'absolute', inset:0,
-                backgroundImage:`url(${item.img})`,
-                backgroundSize:'cover',
-                backgroundPosition: item.pos,
-              }}/>
-              {/* 그라데이션 */}
-              <div style={{
-                position:'absolute', inset:0,
-                background:'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,10,50,0.72) 100%)',
-              }}/>
-              {/* 텍스트 */}
-              <div style={{
-                position:'absolute', bottom:0, left:0, right:0, padding:'14px 16px',
-              }}>
-                <div style={{ fontSize:20, marginBottom:4 }}>{item.emoji}</div>
+              <div style={{ position:'absolute', inset:0, backgroundImage:`url(${item.img})`, backgroundSize:'cover', backgroundPosition: item.pos }}/>
+              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,10,50,0.72) 100%)' }}/>
+              <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'14px 16px' }}>
                 <div style={{ fontSize:15, fontWeight:900, color:'#fff', textShadow:'0 1px 4px rgba(0,0,0,0.4)', marginBottom:4 }}>
                   {item.title}
                 </div>
-                <div style={{ fontSize:12, color:'rgba(255,255,255,0.80)' }}>{item.desc}</div>
-                <div style={{
-                  marginTop:10, display:'inline-flex', alignItems:'center', gap:4,
-                  background:'#FFCD00', borderRadius:20, padding:'5px 12px',
-                }}>
+                <div style={{ fontSize:12, color:'rgba(255,255,255,0.80)', marginBottom:10 }}>{item.desc}</div>
+                <div style={{ display:'inline-flex', alignItems:'center', gap:4, background:GOLD, borderRadius:20, padding:'5px 12px' }}>
                   <Icon icon="ph:heart" width={12} height={12} color="#002870" />
                   <span style={{ fontSize:11, fontWeight:800, color:'#002870' }}>버킷리스트에 추가 ›</span>
                 </div>
@@ -731,16 +709,17 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             {CATEGORIES.length}개 카테고리 · {total}개 항목
           </div>
           <div style={{ fontSize:13, color:'#64748B' }}>
-            호주 생활에 꼭 필요한 모든 것 🦘
+            호주 생활에 꼭 필요한 모든 것
           </div>
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:10 }}>
           {displayCats.map(cat => {
-            const photo = CAT_PHOTO_MAP[cat.id]
+            const photo    = CAT_PHOTO_MAP[cat.id]
+            const iconName = CAT_ICON_MAP[cat.id] || 'ph:star'
             return (
               <div key={cat.id} onClick={onStart} className="cat-card" style={{
                 borderRadius:14, overflow:'hidden', cursor:'pointer',
-                boxShadow:'0 3px 14px rgba(0,53,148,0.10)',
+                boxShadow:'0 3px 14px rgba(0,0,0,0.10)',
                 position:'relative', height:100,
               }}>
                 {photo ? (
@@ -750,7 +729,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
                 )}
                 <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg, rgba(0,20,70,0.58) 0%, rgba(0,30,100,0.25) 100%)' }}/>
                 <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'10px 12px' }}>
-                  <div style={{ fontSize:16, marginBottom:2 }}>{cat.emoji}</div>
+                  <Icon icon={iconName} width={18} height={18} color="rgba(255,255,255,0.90)" style={{ marginBottom:4 }} />
                   <div style={{ fontSize:12, fontWeight:800, color:'#fff', textShadow:'0 1px 4px rgba(0,0,0,0.4)' }}>{cat.label}</div>
                 </div>
               </div>
@@ -764,43 +743,49 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 
       {/* ── 버킷리스트 추천 배너 ── */}
       <div style={{ padding:'16px 20px 12px', background:'#fff' }}>
-        <div style={{ borderRadius:18, overflow:'hidden', position:'relative', height:140, boxShadow:'0 4px 20px rgba(0,53,148,0.12)' }}>
+        <div style={{ borderRadius:18, overflow:'hidden', position:'relative', height:140, boxShadow:`0 4px 20px rgba(27,110,243,0.12)` }}>
           <div style={{ position:'absolute', inset:0, backgroundImage:`url(${imgSuggest})`, backgroundSize:'cover', backgroundPosition:'center top' }}/>
           <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(0,30,100,0.85) 0%, rgba(0,30,100,0.50) 55%, rgba(0,30,100,0.15) 100%)' }}/>
           <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', padding:'0 20px', gap:16 }}>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:15, fontWeight:900, color:'#fff', marginBottom:4 }}>버킷리스트 추천</div>
-              <div style={{ fontSize:12, color:'rgba(255,255,255,0.82)', lineHeight:1.6 }}>경험을 쉐어해 주세요 🦘</div>
+              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:4 }}>
+                <Icon icon="ph:paper-plane-tilt" width={15} height={15} color={GOLD} />
+                <div style={{ fontSize:15, fontWeight:900, color:'#fff' }}>버킷리스트 추천하기</div>
+              </div>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.82)', lineHeight:1.6 }}>경험을 쉐어해 주세요</div>
             </div>
-            <button onClick={() => setShowSuggestion(true)} style={{ flexShrink:0, height:40, padding:'0 16px', background:'#FFCD00', color:'#002870', border:'none', borderRadius:12, fontSize:13, fontWeight:800, cursor:'pointer', whiteSpace:'nowrap', boxShadow:'0 4px 14px rgba(255,205,0,0.4)' }}>추천하기</button>
+            <button onClick={() => setShowSuggestion(true)} style={{ flexShrink:0, height:40, padding:'0 16px', background:GOLD, color:'#002870', border:'none', borderRadius:12, fontSize:13, fontWeight:800, cursor:'pointer', whiteSpace:'nowrap', boxShadow:`0 4px 14px rgba(255,184,0,0.4)` }}>추천하기</button>
           </div>
         </div>
       </div>
 
       {/* ── 업체 등록 배너 ── */}
       <div style={{ padding:'12px 20px 32px', background:'#fff' }}>
-        <div style={{ borderRadius:18, overflow:'hidden', position:'relative', height:140, boxShadow:'0 4px 20px rgba(0,53,148,0.12)' }}>
+        <div style={{ borderRadius:18, overflow:'hidden', position:'relative', height:140, boxShadow:`0 4px 20px rgba(27,110,243,0.12)` }}>
           <div style={{ position:'absolute', inset:0, backgroundImage:`url(${imgBusiness})`, backgroundSize:'cover', backgroundPosition:'center' }}/>
           <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(0,20,80,0.90) 0%, rgba(0,20,80,0.58) 55%, rgba(0,20,80,0.15) 100%)' }}/>
           <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', padding:'0 20px', gap:16 }}>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:15, fontWeight:900, color:'#fff', marginBottom:4 }}>업체 등록 신청</div>
+              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:4 }}>
+                <Icon icon="ph:storefront" width={15} height={15} color={GOLD} />
+                <div style={{ fontSize:15, fontWeight:900, color:'#fff' }}>업체 등록 신청</div>
+              </div>
               <div style={{ fontSize:12, color:'rgba(255,255,255,0.82)', lineHeight:1.6 }}>한인 커뮤니티에 홍보하세요</div>
               <div style={{ display:'flex', gap:5, marginTop:6 }}>
                 {['무료','한인타겟','직접관리'].map(t => (
-                  <span key={t} style={{ background:'rgba(255,205,0,0.22)', color:'#FFCD00', fontSize:10, fontWeight:700, borderRadius:20, padding:'2px 8px', border:'1px solid rgba(255,205,0,0.30)' }}>{t}</span>
+                  <span key={t} style={{ background:`rgba(255,184,0,0.22)`, color:GOLD, fontSize:10, fontWeight:700, borderRadius:20, padding:'2px 8px', border:`1px solid rgba(255,184,0,0.30)` }}>{t}</span>
                 ))}
               </div>
             </div>
-            <button onClick={() => setShowForm(true)} style={{ flexShrink:0, height:40, padding:'0 16px', background:'#FFCD00', color:'#002870', border:'none', borderRadius:12, fontSize:13, fontWeight:800, cursor:'pointer', whiteSpace:'nowrap', boxShadow:'0 4px 14px rgba(255,205,0,0.4)' }}>신청하기</button>
+            <button onClick={() => setShowForm(true)} style={{ flexShrink:0, height:40, padding:'0 16px', background:GOLD, color:'#002870', border:'none', borderRadius:12, fontSize:13, fontWeight:800, cursor:'pointer', whiteSpace:'nowrap', boxShadow:`0 4px 14px rgba(255,184,0,0.4)` }}>신청하기</button>
           </div>
         </div>
       </div>
 
       {/* ── 푸터 ── */}
-      <div style={{ background:'#001f5c', padding:'20px 20px 40px', textAlign:'center' }}>
-        <div style={{ fontSize:14, fontWeight:900, color:'#FFCD00', marginBottom:4 }}>🦘 호주가자</div>
-        <div style={{ fontSize:11, color:'rgba(255,255,255,0.45)' }}>www.hojugaja.com · 무료 호주 버킷리스트</div>
+      <div style={{ background:'#fff', borderTop:'1px solid #F1F5F9', padding:'20px 20px 40px', textAlign:'center' }}>
+        <div style={{ fontSize:14, fontWeight:900, color:BLUE, marginBottom:4 }}>호주가자</div>
+        <div style={{ fontSize:11, color:'#94A3B8' }}>www.hojugaja.com · 무료 호주 버킷리스트</div>
       </div>
 
       {/* ── 모달: 버킷리스트 추천 ── */}
