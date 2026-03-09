@@ -191,7 +191,7 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
               onMouseEnter={e => (e.currentTarget.style.background='#F0F4FF')}
               onMouseLeave={e => (e.currentTarget.style.background='#fff')}
             >
-              <Icon icon="ph:map-pin-simple" width={14} height={14} color="#003594" />
+              <Icon icon="ph:map-pin-simple" width={14} height={14} color={BLUE} />
               {s.placePrediction?.text?.text || ''}
             </div>
           ))}
@@ -284,7 +284,7 @@ function SydneyMap() {
     setSelected(null)
   }, [catFilter])
 
-  // 태그 클릭 → 지도 panTo
+  // 태그 클릭 → 지도 panTo + InfoWindow
   const handleSpotClick = (filteredIdx: number) => {
     setSelected(filteredIdx)
     const spot = filteredSpots[filteredIdx]
@@ -292,6 +292,11 @@ function SydneyMap() {
     if (!map) return
     map.panTo({ lat: spot.lat, lng: spot.lng })
     if (map.getZoom() < 14) map.setZoom(14)
+    // 해당 마커 찾아서 InfoWindow 표시
+    const globalIdx = SYDNEY_SPOTS.findIndex(s => s.name === spot.name)
+    const marker = markersRef.current[globalIdx]
+    const showInfo = (mapRef.current as any)?.__showInfo
+    if (marker && showInfo) showInfo(marker, spot)
   }
 
   useEffect(() => {
@@ -333,6 +338,22 @@ function SydneyMap() {
             </svg>
           `)
 
+        // 이름 풍선 InfoWindow (하나만 재사용)
+        const infoWindow = new google.maps.InfoWindow({
+          disableAutoPan: true,
+          pixelOffset: new google.maps.Size(0, -4),
+        })
+
+        const showInfo = (marker: any, spot: any) => {
+          infoWindow.setContent(`
+            <div style="font-family:'Pretendard',sans-serif;font-size:12px;font-weight:700;color:#1E293B;
+                        padding:4px 2px;white-space:nowrap;line-height:1.3;">
+              ${spot.name}
+            </div>
+          `)
+          infoWindow.open(map, marker)
+        }
+
         SYDNEY_SPOTS.forEach((spot, i) => {
           const marker = new google.maps.Marker({
             position: { lat: spot.lat, lng: spot.lng },
@@ -348,9 +369,14 @@ function SydneyMap() {
             setSelected(i)
             map.panTo({ lat: spot.lat, lng: spot.lng })
             if (map.getZoom() < 14) map.setZoom(14)
+            showInfo(marker, spot)
           })
           markersRef.current.push(marker)
         })
+
+        // 태그 클릭 시 InfoWindow 표시를 위해 map ref에 저장
+        ;(mapRef.current as any).__infoWindow = infoWindow
+        ;(mapRef.current as any).__showInfo   = showInfo
         if (!cancelled) setLoaded(true)
       } catch {}
     }
@@ -465,7 +491,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
       <div style={{ fontSize:48, marginBottom:16 }}>🎉</div>
       <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:8 }}>신청이 완료됐어요!</div>
       <div style={{ fontSize:13, color:'#64748B', lineHeight:1.6, marginBottom:24 }}>검토 후 등록해드릴게요.<br/>감사합니다 🙏</div>
-      <button onClick={onClose} style={{ width:'100%', height:48, background:'#003594', color:'#fff', border:'none', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
+      <button onClick={onClose} style={{ width:'100%', height:48, background:BLUE, color:'#fff', border:'none', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
     </div>
   )
 
@@ -477,7 +503,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
           {lbl('카테고리 *')}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
             {businessCats.map(cat => (
-              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:12, border:'none', cursor:'pointer', background: form.category===cat.id ? '#003594' : '#fff', color: form.category===cat.id ? '#fff' : '#1E293B', fontSize:12, fontWeight:700, boxShadow: form.category===cat.id ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)' }}>{cat.label}</button>
+              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:12, border:'none', cursor:'pointer', background: form.category===cat.id ? BLUE : '#fff', color: form.category===cat.id ? '#fff' : '#1E293B', fontSize:12, fontWeight:700, boxShadow: form.category===cat.id ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)' }}>{cat.label}</button>
             ))}
           </div>
         </div>
@@ -491,7 +517,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
         <div>{lbl('웹사이트')}<input value={form.website} onChange={e => set('website', e.target.value)} placeholder="https://..." style={iStyle} /></div>
       </div>
       {error && <div style={{ marginTop:10, padding:'8px 12px', background:'rgba(239,68,68,0.08)', borderRadius:8, fontSize:12, color:'#DC2626', fontWeight:600 }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:'#003594', color:'#fff', border:'none', borderRadius:12, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)' }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:BLUE, color:'#fff', border:'none', borderRadius:12, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)' }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
     </div>
   )
 }
@@ -521,13 +547,13 @@ function SuggestionForm({ onClose }: { onClose: () => void }) {
       <div style={{ fontSize:48, marginBottom:16 }}>🙏</div>
       <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:8 }}>감사합니다!</div>
       <div style={{ fontSize:13, color:'#64748B', lineHeight:1.7, marginBottom:24 }}>소중한 경험을 나눠주셨어요.<br/>채택되면 이메일로 알려드릴게요 😊</div>
-      <button onClick={onClose} style={{ width:'100%', height:48, background:'#003594', color:'#fff', border:'none', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
+      <button onClick={onClose} style={{ width:'100%', height:48, background:BLUE, color:'#fff', border:'none', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
     </div>
   )
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
       <div style={{ background:'rgba(0,53,148,0.05)', borderRadius:12, padding:'12px 14px' }}>
-        <div style={{ fontSize:13, color:'#003594', fontWeight:700, marginBottom:4 }}>💡 이런 것들을 추천해주세요</div>
+        <div style={{ fontSize:13, color:BLUE, fontWeight:700, marginBottom:4 }}>💡 이런 것들을 추천해주세요</div>
         <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6 }}>호주에서 꼭 해봐야 할 것, 먹어봐야 할 것, 가봐야 할 곳!</div>
       </div>
       <div>
@@ -539,7 +565,7 @@ function SuggestionForm({ onClose }: { onClose: () => void }) {
         <input value={email} onChange={e => setEmail(e.target.value)} placeholder="example@email.com" type="email" style={iStyle} />
       </div>
       {error && <div style={{ padding:'8px 12px', background:'rgba(239,68,68,0.08)', borderRadius:8, fontSize:12, color:'#DC2626', fontWeight:600 }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', height:50, background:'#003594', color:'#fff', border:'none', borderRadius:12, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:4 }}>
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', height:50, background:BLUE, color:'#fff', border:'none', borderRadius:12, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:4 }}>
         <Icon icon="ph:paper-plane-tilt" width={16} height={16} color="'${GOLD}'" />
         {submitting ? '제출 중...' : '추천 제출하기'}
       </button>
