@@ -145,6 +145,31 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     '시드니가 기다리고 있어요 🌉',
     '잊으면 진짜 후회해요 😤',
     '이건 무조건 체크! ✅',
+    '캥거루도 엄지척 👍',
+    '비행기 티켓 끊어야겠는데요 🎫',
+    '오 이거 저도 가고 싶다 🤩',
+    '호주 마스터 등극 중 👑',
+    '이 정도면 가이드북 써도 되겠어요 📖',
+    '와 진짜요? 이것도요? 😲',
+    '잘하셨어요, 진심으로 🫶',
+    '호주가 기다리고 있어요! 🌅',
+    '인스타 피드 대박 예감 📱',
+    '이거 안 하면 진짜 손해예요 💸',
+    '벌써 설레는데요 🥹',
+    '호주 여행 A+ 예상 🎓',
+    '이 선택, 두고두고 잘했다 할 거예요 😌',
+    '한국 친구들이 부러워할 거예요 😏',
+    '여행 고수의 냄새가 나요 🐨',
+    '이거 리얼 꿀팁이에요 🍀',
+    '준비성 하나는 최고예요 💪',
+    '호주 현지인 인정 도장 🔖',
+    '이쯤 되면 호주 홍보대사 아닌가요 😄',
+    '오늘도 한 걸음 더! 👣',
+    '이 여행, 절대 후회 없을 거예요 🌈',
+    '체크 소리가 들려요 딸깍 🎵',
+    '역대급 여행 준비 중 🏄',
+    '이거 찐이에요, 찐 🫡',
+    '보는 눈이 있으시네요 🕶️',
   ]
 
   const showToast = () => {
@@ -596,7 +621,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {/* ── 토스트 ── */}
       {toast && (
         <div style={{
-          position:'fixed', top:90, left:'50%', transform:'translateX(-50%)',
+          position:'fixed', top:135, left:'50%', transform:'translateX(-50%)',
           zIndex:998, pointerEvents:'none',
           display:'flex', alignItems:'center', gap:10,
           background:'#fff',
@@ -609,7 +634,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         }}>
           <div style={{
             width:26, height:26, borderRadius:'50%',
-            background:'#1B6EF3',
+            background:'#DC2626',
             display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
           }}>
             <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
