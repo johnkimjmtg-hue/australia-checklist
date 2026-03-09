@@ -303,7 +303,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
+      <div style={{ background:'rgba(232,237,243,0.97)', borderBottom:'1.5px solid #D1D9E3', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
@@ -335,7 +335,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       ) : (
         <>
           {/* ── SUB HEADER (버튼들) — 스크롤 시 사라짐 ── */}
-          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
+          <div style={{ background:'rgba(232,237,243,0.97)', borderBottom:'1.5px solid #D1D9E3' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 20px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                 <span style={{ fontSize:14, fontWeight:700, color: done>0 ? '#1B6EF3' : '#94A3B8' }}>
