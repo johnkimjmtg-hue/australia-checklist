@@ -596,15 +596,26 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {/* ── 토스트 ── */}
       {toast && (
         <div style={{
-          position:'fixed', top:72, left:'50%', transform:'translateX(-50%)',
+          position:'fixed', top:90, left:'50%', transform:'translateX(-50%)',
           zIndex:998, pointerEvents:'none',
-          background:'rgba(15,23,42,0.88)', backdropFilter:'blur(8px)',
-          color:'#fff', fontSize:14, fontWeight:700,
-          padding:'10px 20px', borderRadius:24,
-          boxShadow:'0 4px 20px rgba(0,0,0,0.25)',
+          display:'flex', alignItems:'center', gap:10,
+          background:'#fff',
+          border:'1.5px solid #E2E8F0',
+          color:'#1E293B', fontSize:15, fontWeight:700,
+          padding:'13px 20px', borderRadius:14,
+          boxShadow:'0 8px 24px rgba(0,0,0,0.13)',
           whiteSpace:'nowrap',
           animation:'toastIn 0.25s ease both',
         }}>
+          <div style={{
+            width:26, height:26, borderRadius:'50%',
+            background:'#1B6EF3',
+            display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
+          }}>
+            <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
+              <path d="M1 5L5 9L12 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
           {toast}
         </div>
       )}
