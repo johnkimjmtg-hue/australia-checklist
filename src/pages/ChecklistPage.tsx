@@ -264,6 +264,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             const next = { ...state, meta: { ...state.meta, lastIssuedAt: undefined } }
             setState(next)
             try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
+            // 버킷체크뷰 달성 기록도 초기화 (수정 모드로 돌아가면 진행률 리셋)
+            try { localStorage.removeItem('bucket-achieved') } catch {}
+            setAchieved({})
           }}
           onDelete={doReset}
           onShare={() => {
