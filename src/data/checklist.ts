@@ -63,6 +63,7 @@ export const ITEMS: CheckItem[] = [
   { id:'f01', categoryId:'food', label:'허리케인 그릴 폭립', emoji:'🍖' },
   { id:'f02', categoryId:'food', label:'팀탐 슬램 체험', emoji:'🍫' },
   { id:'f03', categoryId:'food', label:'해리스 카페 드 휠 타이거 파이', emoji:'🥧' },
+  { id:'i_1773020127451', categoryId:'food', label:'블랙 스타 페이스트리 수박 케익', emoji:'⭐' },
   { id:'f04', categoryId:'food', label:'시드니 피쉬 마켓 굴 먹기', emoji:'🦪' },
   { id:'f05', categoryId:'food', label:'팬케이크 온 더 록스', emoji:'🥞' },
   { id:'f06', categoryId:'food', label:'치킨 파르마 펍 메뉴', emoji:'🍗' },
@@ -148,6 +149,7 @@ export const ITEMS: CheckItem[] = [
 
   // 자연/동물
   { id:'n01', categoryId:'nature', label:'블루마운틴 별보기', emoji:'⭐' },
+  { id:'i_1773020002843', categoryId:'nature', label:'캥거루 먹이주기', emoji:'⭐' },
   { id:'n02', categoryId:'nature', label:'그레이트 오션 로드 12사도', emoji:'🪨' },
   { id:'n03', categoryId:'nature', label:'로트네스트 섬 쿼카 셀카', emoji:'🐾' },
   { id:'n04', categoryId:'nature', label:'울루루 선셋 샴페인', emoji:'🌅' },
@@ -615,4 +617,6 @@ export const ITEM_ICONS: Record<string, string> = {
   e28:'ph:chat-circle',
   e29:'ph:device-mobile',
   e30:'ph:orange',
+  i_1773020002843:'ph:coin',
+  i_1773020127451:'ph:cake',
 }
