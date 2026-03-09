@@ -12,8 +12,8 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
   // 날짜 그리드 높이 계산: 4열, 각 셀 약 66px + gap 6px
   const rows     = Math.ceil(days.length / 4)
   const gridH    = rows * 66 + (rows - 1) * 6
-  // 헤더(핸들+제목) + 그리드 + 버튼 + 패딩
-  const innerH   = 14 + 4 + 14 + 16 + gridH + 14 + 44 + 36
+  // 헤더(핸들+제목) + 그리드 + 패딩 + 버튼 + 여유
+  const innerH   = 14 + 4 + 14 + 16 + gridH + 30 + 44 + 48
   // 최대 85vh 제한
   const maxVh    = Math.round(window.innerHeight * 0.85)
   const sheetH   = Math.min(innerH, maxVh)
@@ -36,7 +36,7 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
         <p style={{ fontWeight:800, fontSize:14, textAlign:'center', marginBottom:14, color:'#0F1B2D', flexShrink:0 }}>
           <span style={{ color:'#1E4D83' }}>"{itemLabel}"</span> 일정 추가
         </p>
-        <div style={{ flex:1, overflowY:'auto', paddingBottom:8 }}>
+        <div style={{ flex:1, overflowY:'auto', paddingBottom:16 }}>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6 }}>
             {days.map((d, idx) => {
               const sel = currentDays.includes(idx)
