@@ -6,15 +6,14 @@ import { getBookmarks, getFolders, getBookmarksByFolder, Folder } from '../lib/b
 import BusinessCard from '../components/BusinessCard'
 import CategoryFilter from '../components/CategoryFilter'
 
-type Props = { onSelectBusiness: (id: string) => void; onBack: () => void }
-type ServiceTab = 'all' | 'bookmarks'
+type Props = { onSelectBusiness: (id: string) => void; onBack: () => void; initialCategory?: string }
 
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
-export default function Services({ onSelectBusiness, onBack }: Props) {
+export default function Services({ onSelectBusiness, onBack, initialCategory }: Props) {
   const [serviceTab, setServiceTab]   = useState<ServiceTab>('all')
   const [search, setSearch]           = useState('')
-  const [category, setCategory]       = useState('all')
+  const [category, setCategory]       = useState(initialCategory ?? 'all')
   const [businesses, setBusinesses]   = useState<Business[]>([])
   const [featured, setFeatured]       = useState<Business[]>([])
   const [allBizMap, setAllBizMap]     = useState<Record<string, Business>>({})
@@ -23,6 +22,11 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const [loading, setLoading]         = useState(true)
   const [showAll, setShowAll]         = useState(false)
   const [bookmarkCount, setBookmarkCount] = useState(() => getBookmarks().length)
+
+  // initialCategory 변경 시 (버킷리스트에서 넘어올 때) 카테고리 동기화
+  useEffect(() => {
+    if (initialCategory) setCategory(initialCategory)
+  }, [initialCategory])
 
   // 북마크 변경 시 카운트 즉시 업데이트
   useEffect(() => {

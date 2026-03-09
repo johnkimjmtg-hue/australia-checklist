@@ -37,6 +37,7 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [mainTab, setMainTab]         = useState<MainTab>(
     searchParams.get('tab') === 'services' ? 'services' : 'bucketlist'
   )
+  const [serviceCategory, setServiceCategory] = useState<string>('all')
   const [showScheduleView, setShowScheduleView] = useState(!!trip)
   const [scheduleSelectedItem, setScheduleSelectedItem] = useState<string|null>(null)
   const [scrollTrigger, setScrollTrigger] = useState(0)
@@ -271,7 +272,7 @@ export default function ChecklistPage({ state, setState }: Props) {
             setIssuedAt(at)
             setShowReceipt(true)
           }}
-          onServices={() => setMainTab('services')}
+          onServices={(bizCat) => { setServiceCategory(bizCat ?? 'all'); setMainTab('services') }}
         />
         {showReceipt && trip && (
           <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
@@ -331,7 +332,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       </div>
 
       {mainTab === 'services' ? (
-        <Services onSelectBusiness={() => {}} onBack={() => setMainTab('bucketlist')} />
+        <Services onSelectBusiness={() => {}} onBack={() => setMainTab('bucketlist')} initialCategory={serviceCategory} />
       ) : (
         <>
           {/* ── SUB HEADER (버튼들) — 스크롤 시 사라짐 ── */}
