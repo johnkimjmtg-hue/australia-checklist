@@ -42,6 +42,22 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [scrollTrigger, setScrollTrigger] = useState(0)
   const [logoTapCount, setLogoTapCount] = useState(0)
   const logoTapTimer = useRef<any>(null)
+
+  // URL ?cat=food&item=f36 처리 — 랜딩에서 추천 버킷리스트 클릭 시
+  useEffect(() => {
+    const cat  = searchParams.get('cat')
+    const item = searchParams.get('item')
+    if (cat) {
+      setState(setCategory(state, cat))
+      if (item) {
+        setTimeout(() => {
+          const el = document.getElementById(`item-${item}`)
+          if (el) el.scrollIntoView({ behavior:'smooth', block:'center' })
+        }, 600)
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   // date picker state
   const [pickerStep, setPickerStep]   = useState<'start'|'end'>('start')
   const [startDate, setStartDate]     = useState(trip?.startDate ?? '')
@@ -59,9 +75,7 @@ export default function ChecklistPage({ state, setState }: Props) {
     }, 400)
   }
 
-  const activeCategory = state.meta.activeCategory && CATEGORIES.some(c => c.id === state.meta.activeCategory)
-    ? state.meta.activeCategory
-    : CATEGORIES[0].id
+  const activeCategory = state.meta.activeCategory
   const allItems = [...ITEMS, ...state.customItems.map(c => ({ ...c, emoji:'📝' }))]
   const catItems = allItems.filter(i => i.categoryId === activeCategory)
   const done  = Object.keys(state.selected).length
@@ -391,7 +405,43 @@ export default function ChecklistPage({ state, setState }: Props) {
             })()}
           </div>
 
-
+          {/* ── 온보딩 CTA (일정 미설정 시) ── */}
+          {!trip && (
+            <>
+              {/* 블러 오버레이 */}
+              <div style={{
+                position:'fixed', inset:0, zIndex:25,
+                background:'rgba(241,245,249,0.75)',
+                backdropFilter:'blur(6px)',
+                WebkitBackdropFilter:'blur(6px)',
+              }} />
+              {/* CTA 카드 */}
+              <div style={{ position:'fixed', left:'50%', top:'50%', transform:'translate(-50%,-50%)', zIndex:26, width:'calc(100% - 32px)', maxWidth:358 }}>
+                <div onClick={handleOpenTripPicker} style={{
+                  background:'linear-gradient(135deg, #002870, #003594)',
+                  borderRadius:16, padding:'24px 20px',
+                  display:'flex', alignItems:'center', gap:16,
+                  cursor:'pointer', boxShadow:'0 8px 32px rgba(0,53,148,0.30)',
+                }}>
+                  <div style={{
+                    width:52, height:52, borderRadius:12, flexShrink:0,
+                    background:'rgba(255,205,0,0.15)',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                  }}>
+                    <Icon icon="ph:airplane-takeoff" width={28} height={28} color="#FFCD00" />
+                  </div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:16, fontWeight:800, color:'#fff', marginBottom:5 }}>여행 날짜를 먼저 설정하세요</div>
+                    <div style={{ fontSize:12, color:'rgba(255,255,255,0.65)', lineHeight:1.5 }}>출발일과 도착일을 입력하면<br/>항목 선택이 가능해요</div>
+                  </div>
+                  <Icon icon="ph:caret-right" width={20} height={20} color="rgba(255,255,255,0.5)" />
+                </div>
+                <div style={{ textAlign:'center', marginTop:14, fontSize:12, color:'#94A3B8' }}>
+                  일정을 설정하지 않으면 항목을 선택할 수 없어요
+                </div>
+              </div>
+            </>
+          )}
 
           {/* ── LIST ── */}
           <div style={{ paddingBottom:100 }}>
@@ -437,7 +487,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                 const dayCount = (state.schedules[item.id] ?? []).length
                 const needsSch = checked && dayCount===0
                 return (
-                  <div key={item.id} style={{
+                  <div key={item.id} id={`item-${item.id}`} style={{
                     display:'flex', alignItems:'center', gap:12,
                     padding:'12px 14px',
                     borderRadius:10,
@@ -488,6 +538,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                     {/* Schedule button */}
                     <button onClick={() => {
                       if (!checked) return
+                      if (!trip) { setModal('noTrip'); return }
                       setSheetItem(item as CheckItem)
                     }} style={{
                       height:28, padding:'0 10px', borderRadius:6, fontSize:11, fontWeight:700,
