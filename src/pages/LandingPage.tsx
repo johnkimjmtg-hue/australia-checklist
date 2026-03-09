@@ -638,15 +638,15 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         <div style={{ display:'flex', alignItems:'center', gap:16 }}>
 
           {/* 도넛 그래프 */}
-          <div style={{ flexShrink:0, position:'relative', width:80, height:80 }}>
-            <svg width="80" height="80" viewBox="0 0 80 80">
-              <circle cx="40" cy="40" r="32" fill="none" stroke="#EEF3FF" strokeWidth="8"/>
-              <circle cx="40" cy="40" r="32" fill="none"
+          <div style={{ flexShrink:0, position:'relative', width:128, height:128 }}>
+            <svg width="128" height="128" viewBox="0 0 128 128">
+              <circle cx="64" cy="64" r="51" fill="none" stroke="#EEF3FF" strokeWidth="10"/>
+              <circle cx="64" cy="64" r="51" fill="none"
                 stroke={progress === 100 ? '#10B981' : BLUE}
-                strokeWidth="8" strokeLinecap="round"
-                strokeDasharray={`${2 * Math.PI * 32}`}
-                strokeDashoffset={`${2 * Math.PI * 32 * (1 - progress / 100)}`}
-                transform="rotate(-90 40 40)"
+                strokeWidth="10" strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 51}`}
+                strokeDashoffset={`${2 * Math.PI * 51 * (1 - progress / 100)}`}
+                transform="rotate(-90 64 64)"
                 style={{ transition:'stroke-dashoffset 1s ease' }}
               />
             </svg>
@@ -654,7 +654,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
               position:'absolute', inset:0,
               display:'flex', alignItems:'center', justifyContent:'center',
             }}>
-              <span style={{ fontSize:16, fontWeight:900, color: progress === 100 ? '#10B981' : BLUE, lineHeight:1 }}>{progress}%</span>
+              <span style={{ fontSize:22, fontWeight:900, color: progress === 100 ? '#10B981' : BLUE, lineHeight:1 }}>{progress}%</span>
             </div>
           </div>
 
@@ -706,7 +706,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         }}>
           {BUCKET_RECS.map((item, i) => (
             <div key={item.id} style={{
-              flexShrink:0, width:'68%', borderRadius:16, overflow:'hidden',
+              flexShrink:0, width:'68%', borderRadius:12, overflow:'hidden',
               background:'#fff', cursor:'pointer',
               scrollSnapAlign:'start',
               boxShadow: i === sliderIdx
@@ -733,7 +733,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
                 <div style={{ fontSize:12, color:'#64748B', marginBottom:12, lineHeight:1.5 }}>{item.desc}</div>
                 <div style={{
                   display:'inline-flex', alignItems:'center', gap:5,
-                  background:GOLD, borderRadius:20, padding:'6px 14px',
+                  background:GOLD, borderRadius:12, padding:'6px 14px',
                 }}>
                   <Icon icon="ph:heart" width={12} height={12} color="#002870" />
                   <span style={{ fontSize:11, fontWeight:800, color:'#002870' }}>버킷리스트에 추가 ›</span>
