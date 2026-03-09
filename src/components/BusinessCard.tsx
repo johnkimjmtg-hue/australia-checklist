@@ -87,7 +87,11 @@ export default function BusinessCard({ business }: Props) {
               {is_featured && (
                 <div style={{ background:'#1B6EF3', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'3px 10px' }}>추천</div>
               )}
-              <button onClick={() => setBookmarked(toggleBookmark(business.id))} style={{
+              <button onClick={() => {
+                const next = toggleBookmark(business.id)
+                setBookmarked(next)
+                window.dispatchEvent(new CustomEvent('bookmark-changed'))
+              }} style={{
                 background:'none', border:'none', cursor:'pointer', padding:2,
                 display:'flex', alignItems:'center', justifyContent:'center',
               }}>

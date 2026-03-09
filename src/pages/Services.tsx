@@ -22,6 +22,13 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const [showAll, setShowAll]         = useState(false)
   const [bookmarkCount, setBookmarkCount] = useState(() => getBookmarks().length)
 
+  // 북마크 변경 시 카운트 즉시 업데이트
+  useEffect(() => {
+    const handler = () => setBookmarkCount(getBookmarks().length)
+    window.addEventListener('bookmark-changed', handler)
+    return () => window.removeEventListener('bookmark-changed', handler)
+  }, [])
+
   useEffect(() => {
     getFeaturedBusinesses().then(setFeatured)
   }, [])
@@ -43,15 +50,20 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     return () => clearTimeout(t)
   }, [search, category])
 
-  // 북마크 탭 진입 시 북마크된 업체 로드
+  // 북마크 탭 진입 또는 변경 시 북마크된 업체 로드
   useEffect(() => {
     if (serviceTab !== 'bookmarks') return
-    const ids = getBookmarks()
-    setBookmarkCount(ids.length)
-    if (ids.length === 0) { setBookmarked([]); return }
-    getBusinesses('all').then(all => {
-      setBookmarked(all.filter(b => ids.includes(b.id)))
-    })
+    const load = () => {
+      const ids = getBookmarks()
+      setBookmarkCount(ids.length)
+      if (ids.length === 0) { setBookmarked([]); return }
+      getBusinesses('all').then(all => {
+        setBookmarked(all.filter(b => ids.includes(b.id)))
+      })
+    }
+    load()
+    window.addEventListener('bookmark-changed', load)
+    return () => window.removeEventListener('bookmark-changed', load)
   }, [serviceTab])
 
   const isSearch    = !!search.trim()
