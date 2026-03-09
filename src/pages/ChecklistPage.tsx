@@ -283,7 +283,7 @@ export default function ChecklistPage({ state, setState }: Props) {
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:'#F1F5F9',
+    <div style={{ minHeight:'100vh', background:'#E8EDF3',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       boxSizing:'border-box' }}>
 
@@ -377,7 +377,7 @@ export default function ChecklistPage({ state, setState }: Props) {
           </div>
 
           {/* ── STICKY: 달력 + 카테고리 칩 ── */}
-          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:24 }}>
+          <div style={{ background:'rgba(232,237,243,0.97)', borderBottom:'1.5px solid #D1D9E3', position:'sticky', top:0, zIndex:24, boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
 
             {/* Schedule grid view */}
             {showScheduleView && trip && (
@@ -477,17 +477,19 @@ export default function ChecklistPage({ state, setState }: Props) {
                   <div key={item.id} id={`item-${item.id}`} style={{
                     display:'flex', alignItems:'center', gap:12,
                     padding:'12px 14px',
-                    borderRadius:10,
+                    borderRadius:12,
                     background: isHighlight ? '#EFF6FF'
                               : checked && dayCount===0 ? '#fffbeb'
                               : checked ? '#fff8e4'
                               : '#fff',
-                    boxShadow: isHighlight ? '0 2px 12px rgba(27,110,243,0.18)'
-                              : checked ? '0 2px 8px rgba(180,130,0,0.10)'
-                              : '0 1px 4px rgba(0,0,0,0.05)',
+                    boxShadow: isHighlight ? '0 4px 16px rgba(27,110,243,0.18)'
+                              : checked ? '0 4px 12px rgba(180,130,0,0.10)'
+                              : '0 4px 16px rgba(0,0,0,0.08)',
                     minHeight:52, cursor:'pointer',
-                    border: isHighlight ? '1.5px solid #1B6EF3'
-                          : checked && dayCount===0 ? '1px solid rgba(255,205,0,0.4)' : 'none',
+                    border:'1px solid #E2E8F0',
+                    borderLeft: isHighlight ? '4px solid #1B6EF3'
+                              : checked ? '4px solid #16A34A'
+                              : '4px solid #CBD5E1',
                     transition:'all 0.3s',
                   }}>
                     {/* Checkbox — 녹색 */}
