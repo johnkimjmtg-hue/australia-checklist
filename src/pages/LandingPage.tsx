@@ -627,9 +627,13 @@ function ChatBubble() {
 // ══════════════════════════════════════════════════
 export default function LandingPage({ state, onStart, onServices }: Props) {
   const navigate = useNavigate()
-  const total    = ITEMS.length + (state.customItems?.length ?? 0)
-  const checked  = Object.keys(state.selected ?? {}).length
-  const progress = total > 0 ? Math.round((checked / total) * 100) : 0
+  // BucketCheckView와 동일한 방식
+  const allItems     = [...ITEMS, ...(state.customItems ?? []).map((c: any) => ({ ...c, emoji:'📝' }))]
+  const checkedItems = allItems.filter((i: any) => state.selected?.[i.id])
+  const total        = checkedItems.length
+  const achieved     = (() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })()
+  const checked      = Object.keys(achieved).filter(id => achieved[id]).length
+  const progress     = total > 0 ? Math.round((checked / total) * 100) : 0
   const [bizCount, setBizCount] = useState(BUSINESSES.length)
 
   useEffect(() => {
