@@ -24,6 +24,7 @@ const EMPTY_FORM = {
 type Cat  = { id:string; label:string; receiptLabel:string; emoji:string }
 type Item = { id:string; categoryId:string; label:string; emoji:string }
 
+const EMOJI_MAP: [string[], string][] = [
   [['크림','로션','에센스','토너','팩'], '🧴'],
   [['선크림'], '☀️'],
   [['올리브영'], '🛍'],
