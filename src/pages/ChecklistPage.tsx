@@ -42,6 +42,21 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [scrollTrigger, setScrollTrigger] = useState(0)
   const [logoTapCount, setLogoTapCount] = useState(0)
   const logoTapTimer = useRef<any>(null)
+  const [bizCount, setBizCount] = useState(0)
+
+  useEffect(() => {
+    async function fetchBizCount() {
+      try {
+        const { supabase } = await import('../lib/supabase')
+        const { count } = await supabase
+          .from('businesses')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true)
+        if (count !== null) setBizCount(count)
+      } catch {}
+    }
+    fetchBizCount()
+  }, [])
 
   const [highlightItem, setHighlightItem] = useState<string | null>(null)
 
@@ -294,7 +309,9 @@ export default function ChecklistPage({ state, setState }: Props) {
           <span onClick={handleLogoTap}
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
-          <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>{done}/{total}</span>
+          <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
+            {mainTab === 'services' ? `전체 업체 ${bizCount}개` : `${total}개 버킷리스트`}
+          </span>
         </div>
         {/* 탭 */}
         <div style={{ display:'flex', padding:'8px 20px 0', gap:4 }}>

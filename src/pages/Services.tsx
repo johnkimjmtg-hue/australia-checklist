@@ -129,10 +129,10 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 background:'#fff', border:'none', borderRadius:12,
                 cursor:'pointer', display:'flex', alignItems:'center',
                 justifyContent:'center', gap:8,
-                fontSize:14, fontWeight:700, color:'#003594',
+                fontSize:14, fontWeight:700, color:'#1B6EF3',
                 boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
               }}>
-                <Icon icon="ph:list-bullets" width={16} height={16} color="#003594" />
+                <Icon icon="ph:list-bullets" width={16} height={16} color="#1B6EF3" />
                 더 많은 업체 보기
                 <Icon icon="ph:caret-down" width={14} height={14} color="#94A3B8" />
               </button>
