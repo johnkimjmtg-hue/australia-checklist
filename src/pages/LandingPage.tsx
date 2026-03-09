@@ -6,7 +6,7 @@ import { ITEMS, CATEGORIES } from '../data/checklist'
 import { CATEGORIES as BCATS, BUSINESSES } from '../data/businesses'
 
 // ── 이미지 import (src/assets/landing/ 폴더에 넣어주세요)
-import imgHero     from '../assets/landing/hero.png'
+import imgHero     from '../assets/landing/hero-clean.png'
 import imgCafe     from '../assets/landing/cafe-brunch.png'
 import imgFood     from '../assets/landing/food-korean-bbq.png'
 import imgShopping from '../assets/landing/shopping.png'
@@ -511,24 +511,24 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         .slider-wrap { scrollbar-width:none; }
       `}</style>
 
-      {/* ── 히어로 + 투명 헤더 ── */}
+      {/* ── 히어로 ── */}
       <div style={{ position:'relative', overflow:'hidden' }}>
 
         {/* 배경 이미지 */}
         <img
           src={imgHero}
-          alt="호주에서 꼭 해야 할 모든 것"
+          alt="시드니"
           style={{ width:'100%', display:'block', objectFit:'cover' }}
         />
 
-        {/* 투명 헤더 */}
+        {/* 상단 헤더 — 호주가자 + 개수 뱃지 */}
         <div style={{
           position:'absolute', top:0, left:0, right:0, zIndex:10,
           padding:'14px 24px',
           display:'flex', alignItems:'center', justifyContent:'space-between',
         }}>
           <div onClick={handleLogoTap} style={{ cursor:'pointer', userSelect:'none' as any }}>
-            <span style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:-0.5, textShadow:'0 1px 8px rgba(0,0,0,0.40)' }}>호주가자</span>
+            <span style={{ fontSize:19, fontWeight:900, color:'#fff', letterSpacing:-0.5, textShadow:'0 1px 8px rgba(0,0,0,0.40)' }}>호주가자</span>
           </div>
           <div style={{
             display:'flex', gap:8,
@@ -548,21 +548,60 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           </div>
         </div>
 
-        {/* 문구 — 이미지 중간쯤 */}
+        {/* 파란 배너 위 텍스트 — "호주 이민·여행자를 위한" */}
+        <div style={{
+          position:'absolute', top:'18%', left:0, right:0,
+          textAlign:'center', zIndex:10,
+          padding:'0 20px',
+        }}>
+          <p style={{
+            margin:0, fontSize:14, fontWeight:700,
+            letterSpacing:0.5,
+            textShadow:'0 1px 4px rgba(0,0,0,0.20)',
+          }}>
+            <span style={{ color: GOLD }}>호주 이민·여행자</span>
+            <span style={{ color:'#fff' }}>를 위한</span>
+          </p>
+        </div>
+
+        {/* 메인 타이틀 — 호주에서 꼭 해야 할 / 모든 것! */}
+        <div style={{
+          position:'absolute', top:'32%', left:0, right:0,
+          textAlign:'center', zIndex:10,
+          padding:'0 16px',
+        }}>
+          <div style={{
+            fontFamily:'"Gaegu", "Pretendard", sans-serif',
+            color:'#fff',
+            lineHeight:1.15,
+            textShadow:'0 2px 12px rgba(0,0,20,0.30)',
+          }}>
+            {/* 첫 줄 — 작게 */}
+            <div style={{ fontSize:32, fontWeight:700, letterSpacing:-0.5 }}>
+              호주에서 꼭 해야 할
+            </div>
+            {/* 둘째 줄 — 크게 */}
+            <div style={{ fontSize:48, fontWeight:900, letterSpacing:-1, marginTop:2 }}>
+              모든 것!
+            </div>
+          </div>
+        </div>
+
+        {/* 서브 문구 */}
         <div style={{
           position:'absolute', top:'62%', left:0, right:0,
           textAlign:'center', zIndex:10,
         }}>
           <p style={{
-            fontSize:13, color:'rgba(255,255,255,0.95)',
+            fontSize:13, color:'rgba(255,255,255,0.92)',
             margin:0, lineHeight:1.6,
-            textShadow:'0 1px 4px rgba(0,0,0,0.30)',
+            textShadow:'0 1px 4px rgba(0,0,0,0.25)',
           }}>
             가고 싶은 곳, 먹고 싶은 것, 지금 체크하세요
           </p>
         </div>
 
-        {/* 하단 버튼 */}
+        {/* 하단 버튼 2개 */}
         <div style={{
           position:'absolute', bottom:0, left:0, right:0,
           padding:'0 24px 24px',
@@ -573,7 +612,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             flex:2, height:50, background:GOLD, color:'#002870',
             border:'none', borderRadius:14, fontSize:14, fontWeight:900,
             cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-            boxShadow:`0 4px 20px rgba(255,184,0,0.50)`,
+            boxShadow:`0 4px 20px rgba(255,184,0,0.55)`,
           }}>
             <Icon icon="ph:list-checks" width={16} height={16} color="#002870" />
             나의 버킷리스트
