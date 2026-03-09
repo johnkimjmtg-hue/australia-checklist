@@ -550,13 +550,12 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 
         {/* 파란 배너 위 텍스트 — "호주 이민·여행자를 위한" */}
         <div style={{
-          position:'absolute', top:'18%', left:0, right:0,
+          position:'absolute', top:'24%', left:0, right:0,
           textAlign:'center', zIndex:10,
-          padding:'0 20px',
         }}>
           <p style={{
-            margin:0, fontSize:14, fontWeight:700,
-            letterSpacing:0.5,
+            margin:0, fontSize:15, fontWeight:700,
+            letterSpacing:0.3,
             textShadow:'0 1px 4px rgba(0,0,0,0.20)',
           }}>
             <span style={{ color: GOLD }}>호주 이민·여행자</span>
@@ -564,37 +563,37 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           </p>
         </div>
 
-        {/* 메인 타이틀 — 호주에서 꼭 해야 할 / 모든 것! */}
+        {/* 메인 타이틀 */}
         <div style={{
-          position:'absolute', top:'32%', left:0, right:0,
+          position:'absolute', top:'33%', left:0, right:0,
           textAlign:'center', zIndex:10,
           padding:'0 16px',
+          color:'#fff',
+          textShadow:'0 2px 14px rgba(0,0,30,0.35)',
+          lineHeight:1.2,
         }}>
-          <div style={{
-            color:'#fff',
-            lineHeight:1.15,
-            textShadow:'0 2px 12px rgba(0,0,20,0.30)',
-          }}>
-            {/* 첫 줄 — 작게 */}
-            <div style={{ fontSize:30, fontWeight:800, letterSpacing:-0.5 }}>
-              호주에서 꼭 해야 할
-            </div>
-            {/* 둘째 줄 — 크게 */}
-            <div style={{ fontSize:50, fontWeight:900, letterSpacing:-1, marginTop:2 }}>
-              모든 것!
-            </div>
+          {/* 호주에서 꼭 해야 할 */}
+          <div style={{ fontSize:36, fontWeight:900 }}>
+            <span style={{ fontSize:44 }}>호주</span>
+            <span style={{ fontSize:28, fontWeight:700 }}>에서 </span>
+            <span style={{ fontSize:44 }}>꼭</span>
+            <span style={{ fontSize:28, fontWeight:700 }}> 해야 할</span>
+          </div>
+          {/* 모든 것! */}
+          <div style={{ fontSize:56, fontWeight:900, marginTop:4, letterSpacing:-1 }}>
+            모든 것!
           </div>
         </div>
 
         {/* 서브 문구 */}
         <div style={{
-          position:'absolute', top:'62%', left:0, right:0,
+          position:'absolute', top:'57%', left:0, right:0,
           textAlign:'center', zIndex:10,
         }}>
           <p style={{
-            fontSize:13, color:'rgba(255,255,255,0.92)',
-            margin:0, lineHeight:1.6,
-            textShadow:'0 1px 4px rgba(0,0,0,0.25)',
+            fontSize:14, color:'rgba(255,255,255,0.95)',
+            margin:0, lineHeight:1.6, fontWeight:500,
+            textShadow:'0 1px 4px rgba(0,0,0,0.30)',
           }}>
             가고 싶은 곳, 먹고 싶은 것, 지금 체크하세요
           </p>
