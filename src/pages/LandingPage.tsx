@@ -702,42 +702,6 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         </div>
       </div>
 
-      {/* ── 카테고리 섹션 ── */}
-      <div style={{ padding:'24px 20px 20px', background:'#F8FAFF' }}>
-        <div style={{ marginBottom:16 }}>
-          <div style={{ fontSize:18, fontWeight:900, color:'#0F172A', marginBottom:4 }}>
-            {CATEGORIES.length}개 카테고리 · {total}개 항목
-          </div>
-          <div style={{ fontSize:13, color:'#64748B' }}>
-            호주 생활에 꼭 필요한 모든 것
-          </div>
-        </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:10 }}>
-          {displayCats.map(cat => {
-            const photo    = CAT_PHOTO_MAP[cat.id]
-            const iconName = CAT_ICON_MAP[cat.id] || 'ph:star'
-            return (
-              <div key={cat.id} onClick={onStart} className="cat-card" style={{
-                borderRadius:14, overflow:'hidden', cursor:'pointer',
-                boxShadow:'0 3px 14px rgba(0,0,0,0.10)',
-                position:'relative', height:100,
-              }}>
-                {photo ? (
-                  <div style={{ position:'absolute', inset:0, backgroundImage:`url(${photo})`, backgroundSize:'cover', backgroundPosition:'center' }}/>
-                ) : (
-                  <div style={{ position:'absolute', inset:0, background:'#EEF3FF' }}/>
-                )}
-                <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg, rgba(0,20,70,0.58) 0%, rgba(0,30,100,0.25) 100%)' }}/>
-                <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'10px 12px' }}>
-                  <Icon icon={iconName} width={18} height={18} color="rgba(255,255,255,0.90)" style={{ marginBottom:4 }} />
-                  <div style={{ fontSize:12, fontWeight:800, color:'#fff', textShadow:'0 1px 4px rgba(0,0,0,0.4)' }}>{cat.label}</div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
       {/* ── 지도 섹션 ── */}
       <SydneyMap />
 
