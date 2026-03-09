@@ -293,13 +293,13 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
     return (
       <div style={{
         display:'flex',alignItems:'center',gap:12,
-        padding:'12px 16px',margin:'0 16px',borderRadius:10,
+        padding:'12px 16px',margin:'0 16px',borderRadius:12,
         background: isAchieved ? '#fff8e4' : '#fff',
-        border:'none',
-        boxShadow: isAchieved ? '0 2px 8px rgba(180,130,0,0.10)' : '0 2px 8px rgba(0,0,0,0.06)',
+        border:'1px solid #E2E8F0',
+        borderLeft: isAchieved ? '4px solid #16A34A' : '4px solid #CBD5E1',
+        boxShadow: isAchieved ? '0 4px 12px rgba(180,130,0,0.10)' : '0 4px 16px rgba(0,0,0,0.08)',
         minHeight:52,transition:'all 0.15s ease',
       }}>
-        {/* 녹색 체크박스 */}
         <div onClick={() => toggleAchieved(item.id, day)} style={{
           width:22,height:22,borderRadius:4,flexShrink:0,
           border: isAchieved ? 'none' : '1.5px solid #CBD5E1',
@@ -323,7 +323,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
   }
 
   return (
-    <div style={{ minHeight:'100vh',background:'#F1F5F9',fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif' }}>
+    <div style={{ minHeight:'100vh',background:'#E8EDF3',fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes confettiFall {
@@ -340,7 +340,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
       <Confetti trigger={confettiTrigger} />
 
       {/* ══ 헤더 + 탭 ══ */}
-      <div style={{ background:'#fff',borderBottom:'1px solid #E2E8F0' }}>
+      <div style={{ background:'rgba(232,237,243,0.97)',borderBottom:'1.5px solid #D1D9E3', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
         <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
@@ -363,7 +363,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
       </div>
 
       {/* ══ 진행 카드 — sticky ══ */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background:'#F1F5F9', padding:'16px 16px 0' }}>
+      <div style={{ position:'sticky', top:0, zIndex:30, background:'#E8EDF3', padding:'16px 16px 0' }}>
         <div style={{
           background:'#fff',borderRadius:12,
           boxShadow:'0 4px 20px rgba(27,110,243,0.10),0 1px 4px rgba(0,0,0,0.06)',
