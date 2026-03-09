@@ -43,6 +43,8 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [logoTapCount, setLogoTapCount] = useState(0)
   const logoTapTimer = useRef<any>(null)
 
+  const [highlightItem, setHighlightItem] = useState<string | null>(null)
+
   // URL ?cat=food&item=f36 처리 — 랜딩에서 추천 버킷리스트 클릭 시
   useEffect(() => {
     const cat  = searchParams.get('cat')
@@ -50,10 +52,13 @@ export default function ChecklistPage({ state, setState }: Props) {
     if (cat) {
       setState(setCategory(state, cat))
       if (item) {
+        setHighlightItem(item)
         setTimeout(() => {
           const el = document.getElementById(`item-${item}`)
           if (el) el.scrollIntoView({ behavior:'smooth', block:'center' })
         }, 600)
+        // 3초 후 하이라이트 제거
+        setTimeout(() => setHighlightItem(null), 3500)
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -450,20 +455,23 @@ export default function ChecklistPage({ state, setState }: Props) {
                 const checked  = !!state.selected[item.id]
                 const dayCount = (state.schedules[item.id] ?? []).length
                 const needsSch = checked && dayCount===0
+                const isHighlight = highlightItem === item.id
                 return (
                   <div key={item.id} id={`item-${item.id}`} style={{
                     display:'flex', alignItems:'center', gap:12,
                     padding:'12px 14px',
                     borderRadius:10,
-                    background: checked && dayCount===0 ? '#fffbeb'
+                    background: isHighlight ? '#EFF6FF'
+                              : checked && dayCount===0 ? '#fffbeb'
                               : checked ? '#fff8e4'
                               : '#fff',
-                    boxShadow: checked
-                      ? '0 2px 8px rgba(180,130,0,0.10)'
-                      : '0 1px 4px rgba(0,0,0,0.05)',
+                    boxShadow: isHighlight ? '0 2px 12px rgba(27,110,243,0.18)'
+                              : checked ? '0 2px 8px rgba(180,130,0,0.10)'
+                              : '0 1px 4px rgba(0,0,0,0.05)',
                     minHeight:52, cursor:'pointer',
-                    border: checked && dayCount===0 ? '1px solid rgba(255,205,0,0.4)' : 'none',
-                    transition:'all 0.12s',
+                    border: isHighlight ? '1.5px solid #1B6EF3'
+                          : checked && dayCount===0 ? '1px solid rgba(255,205,0,0.4)' : 'none',
+                    transition:'all 0.3s',
                   }}>
                     {/* Checkbox — 녹색 */}
                     <button onClick={() => {
