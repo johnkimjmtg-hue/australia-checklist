@@ -162,6 +162,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
   const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const prevAchieved = useRef(0)
