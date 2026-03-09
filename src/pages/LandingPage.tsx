@@ -629,8 +629,10 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
   const navigate = useNavigate()
   // BucketCheckView와 완전히 동일한 방식 (1아이템 N일 배정 → N개로 카운트)
   const totalItems   = ITEMS.length  // 히어로 섹션용 전체 버킷리스트 개수
+  // 발행된 버킷리스트가 있을 때만 진행률 계산 (수정중/작성중이면 0/0)
+  const isIssued     = !!state.meta?.lastIssuedAt
   const allItems     = [...ITEMS, ...(state.customItems ?? []).map((c: any) => ({ ...c, emoji:'📝' }))]
-  const checkedItems = allItems.filter((i: any) => state.selected?.[i.id])
+  const checkedItems = isIssued ? allItems.filter((i: any) => state.selected?.[i.id]) : []
   const allRows      = (() => {
     const rows: { id: string; day?: number }[] = []
     checkedItems.forEach((item: any) => {
