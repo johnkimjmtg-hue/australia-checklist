@@ -13,6 +13,8 @@ const CAT_ICONS: Record<string, string> = {
   academy:     'ph:graduation-cap',
   telecom:     'ph:device-mobile',
   travel:      'ph:airplane',
+  hotel:       'ph:bed',
+  banking:     'ph:currency-dollar',
   gp:          'ph:first-aid-kit',
   dental:      'ph:tooth',
   oriental:    'ph:leaf',
@@ -23,6 +25,10 @@ const CAT_ICONS: Record<string, string> = {
   beauty:      'ph:scissors',
   moving:      'ph:package',
   handyman:    'ph:wrench',
+  shopping:    'ph:bag-simple',
+  culture:     'ph:buildings',
+  transport:   'ph:bus',
+  etc:         'ph:dots-three-circle',
 }
 
 export default function CategoryFilter({ selected, onChange }: Props) {
@@ -36,9 +42,9 @@ export default function CategoryFilter({ selected, onChange }: Props) {
             padding:'8px 10px', borderRadius:10, flexShrink:0,
             background: isActive ? '#1B6EF3' : '#fff',
             color: isActive ? '#fff' : '#64748B',
-            border: isActive ? 'none' : '1px solid #E2E8F0',
+            border: isActive ? 'none' : '1.5px solid #D1D9E3',
             fontSize:10, fontWeight:700, cursor:'pointer',
-            boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.20)' : '0 1px 3px rgba(0,0,0,0.05)',
+            boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.20)' : '0 2px 6px rgba(0,0,0,0.07)',
             transition:'all 0.15s',
           }}>
             <Icon icon={CAT_ICONS[cat.id] ?? 'ph:star'} width={18} height={18}
