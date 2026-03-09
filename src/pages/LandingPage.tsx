@@ -7,6 +7,7 @@ import { CATEGORIES as BCATS, BUSINESSES } from '../data/businesses'
 
 // ── 이미지 import (src/assets/landing/ 폴더에 넣어주세요)
 import imgHero     from '../assets/landing/hero.png'
+import imgCoins    from '../assets/landing/coins.png'
 import imgCafe     from '../assets/landing/cafe-brunch.png'
 import imgFood     from '../assets/landing/food-korean-bbq.png'
 import imgShopping from '../assets/landing/shopping.png'
@@ -156,7 +157,7 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
   }
 
   const iStyle: React.CSSProperties = {
-    width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:10,
+    width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:12,
     padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff',
     boxSizing:'border-box', fontFamily:ff, outline:'none',
   }
@@ -168,7 +169,7 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
       {suggestions.length > 0 && (
         <div style={{
           position:'absolute', top:'100%', left:0, right:0, zIndex:200,
-          background:'#fff', borderRadius:10, boxShadow:'0 4px 20px rgba(0,0,0,0.12)',
+          background:'#fff', borderRadius:12, boxShadow:'0 4px 20px rgba(0,0,0,0.12)',
           border:'1px solid #E2E8F0', overflow:'hidden', marginTop:4,
         }}>
           {suggestions.map((s: any, i: number) => (
@@ -192,14 +193,14 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
 
 // ── 시드니 주요 명소 고정 지도
 const SYDNEY_SPOTS = [
-  { name: 'Sydney Opera House', emoji: '🎭', lat: -33.8568, lng: 151.2153, desc: '세계적 공연 예술 센터' },
-  { name: 'Bondi Beach',        emoji: '🏄', lat: -33.8908, lng: 151.2743, desc: '시드니 대표 해변' },
-  { name: 'Harbour Bridge',     emoji: '🌉', lat: -33.8523, lng: 151.2108, desc: '브릿지클라임 명소' },
-  { name: 'Black Star Pastry',  emoji: '🍰', lat: -33.8991, lng: 151.1731, desc: '세계 최고 케이크 맛집' },
-  { name: 'Darling Harbour',    emoji: '🎡', lat: -33.8731, lng: 151.1985, desc: '쇼핑·식사·관광' },
-  { name: 'Taronga Zoo',        emoji: '🦘', lat: -33.8433, lng: 151.2411, desc: '캥거루·코알라 만나기' },
-  { name: 'Royal Botanic Garden', emoji: '🌸', lat: -33.8642, lng: 151.2166, desc: '시드니 중심 공원' },
-  { name: 'Manly Beach',        emoji: '🌊', lat: -33.7969, lng: 151.2868, desc: '페리타고 가는 해변' },
+  { name: 'Sydney Opera House', icon: 'ph:music-notes',   lat: -33.8568, lng: 151.2153, desc: '세계적 공연 예술 센터' },
+  { name: 'Bondi Beach',        icon: 'ph:waves',         lat: -33.8908, lng: 151.2743, desc: '시드니 대표 해변' },
+  { name: 'Harbour Bridge',     icon: 'ph:bridge',        lat: -33.8523, lng: 151.2108, desc: '브릿지클라임 명소' },
+  { name: 'Black Star Pastry',  icon: 'ph:cake',          lat: -33.8991, lng: 151.1731, desc: '세계 최고 케이크 맛집' },
+  { name: 'Darling Harbour',    icon: 'ph:anchor',        lat: -33.8731, lng: 151.1985, desc: '쇼핑·식사·관광' },
+  { name: 'Taronga Zoo',        icon: 'ph:paw-print',     lat: -33.8433, lng: 151.2411, desc: '캥거루·코알라 만나기' },
+  { name: 'Royal Botanic Garden', icon: 'ph:tree',        lat: -33.8642, lng: 151.2166, desc: '시드니 중심 공원' },
+  { name: 'Manly Beach',        icon: 'ph:sun-horizon',   lat: -33.7969, lng: 151.2868, desc: '페리타고 가는 해변' },
 ]
 
 function SydneyMap() {
@@ -227,13 +228,13 @@ function SydneyMap() {
           ],
         })
 
-        const pinSvg = (emoji: string) =>
+        const pinSvg = (_icon: string) =>
           'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46">
-              <ellipse cx="18" cy="43" rx="7" ry="3" fill="rgba(0,0,0,0.18)"/>
-              <path d="M18 0C10.268 0 4 6.268 4 14c0 9.6 14 30 14 30S32 23.6 32 14C32 6.268 25.732 0 18 0z" fill="#003594"/>
-              <circle cx="18" cy="14" r="10" fill="white"/>
-              <text x="18" y="19" text-anchor="middle" font-size="13">${emoji}</text>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
+              <ellipse cx="16" cy="39" rx="6" ry="2.5" fill="rgba(0,0,0,0.18)"/>
+              <path d="M16 0C9.373 0 4 5.373 4 12c0 8.8 12 26 12 26S28 20.8 28 12C28 5.373 22.627 0 16 0z" fill="#FFB800"/>
+              <circle cx="16" cy="12" r="6" fill="#fff"/>
+              <circle cx="16" cy="12" r="3" fill="#FFB800"/>
             </svg>
           `)
 
@@ -242,7 +243,7 @@ function SydneyMap() {
             position: { lat: spot.lat, lng: spot.lng },
             map,
             icon: {
-              url: pinSvg(spot.emoji),
+              url: pinSvg(spot.icon),
               scaledSize: new google.maps.Size(36, 46),
               anchor: new google.maps.Point(18, 46),
             },
@@ -260,7 +261,10 @@ function SydneyMap() {
   return (
     <div style={{ background:'#fff', padding:'24px 20px' }}>
       <div style={{ marginBottom:14 }}>
-        <div style={{ fontSize:18, fontWeight:900, color:'#0F172A', marginBottom:4 }}>🗺️ 시드니 버킷리스트 지도</div>
+        <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
+          <Icon icon="ph:map-pin" width={20} height={20} color={BLUE} />
+          <div style={{ fontSize:18, fontWeight:900, color:'#0F172A' }}>시드니 버킷리스트 지도</div>
+        </div>
         <div style={{ fontSize:13, color:'#64748B' }}>꼭 가봐야 할 명소를 지도에서 확인하세요</div>
       </div>
 
@@ -275,7 +279,7 @@ function SydneyMap() {
             cursor:'pointer', transition:'all 0.2s',
             border: selected === i ? 'none' : `1px solid rgba(27,110,243,0.15)`,
           }} onClick={() => setSelected(i)}>
-            <span>{s.emoji}</span>
+            <Icon icon={s.icon} width={13} height={13} color={selected === i ? '#fff' : BLUE} />
             <span style={{ whiteSpace:'nowrap' }}>{s.name}</span>
           </div>
         ))}
@@ -290,7 +294,7 @@ function SydneyMap() {
             background:'#F1F5F9', display:'flex', flexDirection:'column',
             alignItems:'center', justifyContent:'center', gap:10,
           }}>
-            <div style={{ fontSize:28, animation:'spin 1.5s linear infinite' }}>🗺️</div>
+            <div style={{ animation:'spin 1.5s linear infinite', display:'flex' }}><Icon icon="ph:map-pin" width={28} height={28} color={BLUE} /></div>
             <div style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>지도 불러오는 중...</div>
           </div>
         )}
@@ -304,7 +308,7 @@ function SydneyMap() {
           border:`1px solid rgba(27,110,243,0.10)`,
           display:'flex', alignItems:'center', gap:10,
         }}>
-          <span style={{ fontSize:24 }}>{SYDNEY_SPOTS[selected].emoji}</span>
+          <Icon icon={SYDNEY_SPOTS[selected].icon} width={24} height={24} color={BLUE} />
           <div>
             <div style={{ fontSize:13, fontWeight:800, color:BLUE }}>{SYDNEY_SPOTS[selected].name}</div>
             <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>{SYDNEY_SPOTS[selected].desc}</div>
@@ -344,7 +348,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
     setSubmitting(false)
   }
 
-  const iStyle: React.CSSProperties = { width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:10, padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff', boxSizing:'border-box', fontFamily:ff, outline:'none' }
+  const iStyle: React.CSSProperties = { width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:12, padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff', boxSizing:'border-box', fontFamily:ff, outline:'none' }
   const taStyle: React.CSSProperties = { ...iStyle, height:80, padding:'10px 12px', resize:'none' as any }
   const lbl = (t: string, s?: string) => <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>{t} {s && <span style={{ fontWeight:500, color:'#94A3B8' }}>{s}</span>}</div>
   const businessCats = BCATS.filter(c => c.id !== 'all')
@@ -354,7 +358,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
       <div style={{ fontSize:48, marginBottom:16 }}>🎉</div>
       <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:8 }}>신청이 완료됐어요!</div>
       <div style={{ fontSize:13, color:'#64748B', lineHeight:1.6, marginBottom:24 }}>검토 후 등록해드릴게요.<br/>감사합니다 🙏</div>
-      <button onClick={onClose} style={{ width:'100%', height:48, background:'#003594', color:'#fff', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
+      <button onClick={onClose} style={{ width:'100%', height:48, background:'#003594', color:'#fff', border:'none', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
     </div>
   )
 
@@ -380,7 +384,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
         <div>{lbl('웹사이트')}<input value={form.website} onChange={e => set('website', e.target.value)} placeholder="https://..." style={iStyle} /></div>
       </div>
       {error && <div style={{ marginTop:10, padding:'8px 12px', background:'rgba(239,68,68,0.08)', borderRadius:8, fontSize:12, color:'#DC2626', fontWeight:600 }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:'#003594', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)' }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:'#003594', color:'#fff', border:'none', borderRadius:12, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)' }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
     </div>
   )
 }
@@ -392,7 +396,7 @@ function SuggestionForm({ onClose }: { onClose: () => void }) {
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone]             = useState(false)
   const [error, setError]           = useState('')
-  const iStyle: React.CSSProperties = { width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:10, padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff', boxSizing:'border-box', fontFamily:ff, outline:'none' }
+  const iStyle: React.CSSProperties = { width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:12, padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff', boxSizing:'border-box', fontFamily:ff, outline:'none' }
   const taStyle: React.CSSProperties = { ...iStyle, height:110, padding:'12px', resize:'none' as any, lineHeight:1.6 }
   const handleSubmit = async () => {
     if (!suggestion.trim()) { setError('추천 내용을 입력해주세요'); return }
@@ -410,12 +414,12 @@ function SuggestionForm({ onClose }: { onClose: () => void }) {
       <div style={{ fontSize:48, marginBottom:16 }}>🙏</div>
       <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:8 }}>감사합니다!</div>
       <div style={{ fontSize:13, color:'#64748B', lineHeight:1.7, marginBottom:24 }}>소중한 경험을 나눠주셨어요.<br/>채택되면 이메일로 알려드릴게요 😊</div>
-      <button onClick={onClose} style={{ width:'100%', height:48, background:'#003594', color:'#fff', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
+      <button onClick={onClose} style={{ width:'100%', height:48, background:'#003594', color:'#fff', border:'none', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
     </div>
   )
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-      <div style={{ background:'rgba(0,53,148,0.05)', borderRadius:10, padding:'12px 14px' }}>
+      <div style={{ background:'rgba(0,53,148,0.05)', borderRadius:12, padding:'12px 14px' }}>
         <div style={{ fontSize:13, color:'#003594', fontWeight:700, marginBottom:4 }}>💡 이런 것들을 추천해주세요</div>
         <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6 }}>호주에서 꼭 해봐야 할 것, 먹어봐야 할 것, 가봐야 할 곳!</div>
       </div>
@@ -428,7 +432,7 @@ function SuggestionForm({ onClose }: { onClose: () => void }) {
         <input value={email} onChange={e => setEmail(e.target.value)} placeholder="example@email.com" type="email" style={iStyle} />
       </div>
       {error && <div style={{ padding:'8px 12px', background:'rgba(239,68,68,0.08)', borderRadius:8, fontSize:12, color:'#DC2626', fontWeight:600 }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', height:50, background:'#003594', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:4 }}>
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', height:50, background:'#003594', color:'#fff', border:'none', borderRadius:12, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:4 }}>
         <Icon icon="ph:paper-plane-tilt" width={16} height={16} color="#FFCD00" />
         {submitting ? '제출 중...' : '추천 제출하기'}
       </button>
@@ -442,7 +446,7 @@ function ChatBubble() {
   return (
     <div style={{ position:'fixed', bottom:'10%', right:20, zIndex:300, display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8 }}>
       {open && (
-        <div style={{ background:'#fff', borderRadius:14, padding:'14px 16px', boxShadow:'0 4px 20px rgba(0,53,148,0.15)', maxWidth:240, position:'relative', animation:'fadeInUp 0.25s ease', border:'1px solid rgba(0,53,148,0.08)' }}>
+        <div style={{ background:'#fff', borderRadius:12, padding:'14px 16px', boxShadow:'0 4px 20px rgba(0,53,148,0.15)', maxWidth:240, position:'relative', animation:'fadeInUp 0.25s ease', border:'1px solid rgba(0,53,148,0.08)' }}>
           <button onClick={() => setOpen(false)} style={{ position:'absolute', top:8, right:8, background:'none', border:'none', cursor:'pointer', color:'#94A3B8', fontSize:14, lineHeight:1, padding:2 }}>✕</button>
           <div style={{ fontSize:12, fontWeight:800, color:'#003594', marginBottom:6 }}>호주가자 운영자입니다.</div>
           <div style={{ fontSize:12, color:'#475569', lineHeight:1.6 }}>
@@ -608,7 +612,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         }}>
           <button onClick={onStart} style={{
             flex:2, height:50, background:GOLD, color:'#002870',
-            border:'none', borderRadius:14, fontSize:14, fontWeight:900,
+            border:'none', borderRadius:12, fontSize:14, fontWeight:900,
             cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
             boxShadow:`0 4px 20px rgba(255,184,0,0.55)`,
           }}>
@@ -618,7 +622,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           <button onClick={onServices} style={{
             flex:1, height:50,
             background:'rgba(255,255,255,0.18)', color:'#fff',
-            border:'1.5px solid rgba(255,255,255,0.40)', borderRadius:14,
+            border:'1.5px solid rgba(255,255,255,0.40)', borderRadius:12,
             fontSize:13, fontWeight:700, cursor:'pointer',
             display:'flex', alignItems:'center', justifyContent:'center', gap:5,
             backdropFilter:'blur(8px)', whiteSpace:'nowrap' as any,
@@ -632,12 +636,11 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {/* ── 나의 버킷리스트 진행 카드 ── */}
       <div style={{ background:'#fff', padding:'20px', borderBottom:'1px solid #F1F5F9' }}>
         <div style={{ display:'flex', alignItems:'center', gap:20 }}>
-          {/* 도넛 그래프 */}
-          <div style={{ flexShrink:0, position:'relative', width:80, height:80 }}>
-            <svg width="80" height="80" viewBox="0 0 80 80">
-              {/* 배경 원 */}
+          {/* 도넛 + 동전 */}
+          <div style={{ flexShrink:0, position:'relative', width:90, height:80 }}>
+            {/* 도넛 그래프 */}
+            <svg width="80" height="80" viewBox="0 0 80 80" style={{ position:'absolute', left:0, top:0 }}>
               <circle cx="40" cy="40" r="32" fill="none" stroke="#EEF3FF" strokeWidth="8"/>
-              {/* 진행 원 */}
               <circle cx="40" cy="40" r="32" fill="none"
                 stroke={progress === 100 ? '#10B981' : BLUE}
                 strokeWidth="8"
@@ -648,12 +651,19 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
                 style={{ transition:'stroke-dashoffset 1s ease' }}
               />
             </svg>
+            {/* % 텍스트 */}
             <div style={{
-              position:'absolute', inset:0,
+              position:'absolute', left:0, top:0, width:80, height:80,
               display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
             }}>
               <span style={{ fontSize:16, fontWeight:900, color: progress === 100 ? '#10B981' : BLUE, lineHeight:1 }}>{progress}%</span>
             </div>
+            {/* 동전 이미지 — 우하단에 살짝 겹치게 */}
+            <img src={imgCoins} alt="coins" style={{
+              position:'absolute', right:-6, bottom:-8,
+              width:38, height:38, objectFit:'contain',
+              filter:'drop-shadow(0 2px 4px rgba(0,0,0,0.15))',
+            }}/>
           </div>
 
           {/* 텍스트 */}
@@ -673,7 +683,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             )}
             <button onClick={onStart} style={{
               marginTop:10, height:34, padding:'0 16px',
-              background:BLUE, color:'#fff', border:'none', borderRadius:20,
+              background:BLUE, color:'#fff', border:'none', borderRadius:12,
               fontSize:12, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:5,
               boxShadow:`0 2px 8px rgba(27,110,243,0.25)`,
