@@ -477,8 +477,14 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
   const [showSuggestion, setShowSuggestion] = useState(false)
   const [logoTap, setLogoTap]               = useState(0)
   const [sliderIdx, setSliderIdx]           = useState(0)
+  const [sliderAnimate, setSliderAnimate]   = useState(true)
   const sliderRef  = useRef<HTMLDivElement>(null)
   const logoTimer  = useRef<any>(null)
+
+  // 카드 앞뒤로 복제해서 무한루프
+  const CLONED = [...BUCKET_RECS, ...BUCKET_RECS, ...BUCKET_RECS]
+  const OFFSET  = BUCKET_RECS.length // 가운데 세트 시작 인덱스
+  const [realIdx, setRealIdx] = useState(OFFSET)
 
   const handleLogoTap = () => {
     const next = logoTap + 1
@@ -488,17 +494,34 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
     logoTimer.current = setTimeout(() => setLogoTap(0), 2000)
   }
 
-  // 슬라이더 자동 재생
+  // 자동 재생
   useEffect(() => {
-    const t = setInterval(() => setSliderIdx(i => (i + 1) % BUCKET_RECS.length), 3500)
+    const t = setInterval(() => {
+      setSliderAnimate(true)
+      setRealIdx(i => i + 1)
+    }, 3000)
     return () => clearInterval(t)
   }, [])
 
+  // 끝에 닿으면 애니 없이 순간이동
   useEffect(() => {
-    if (!sliderRef.current) return
-    const cardW = sliderRef.current.offsetWidth * 0.72 + 12
-    sliderRef.current.scrollTo({ left: sliderIdx * cardW, behavior:'smooth' })
-  }, [sliderIdx])
+    if (realIdx >= BUCKET_RECS.length * 2) {
+      const timer = setTimeout(() => {
+        setSliderAnimate(false)
+        setRealIdx(OFFSET)
+      }, 350)
+      return () => clearTimeout(timer)
+    }
+    if (realIdx < OFFSET) {
+      const timer = setTimeout(() => {
+        setSliderAnimate(false)
+        setRealIdx(BUCKET_RECS.length * 2 - 1)
+      }, 350)
+      return () => clearTimeout(timer)
+    }
+    // dot 인덱스 동기화
+    setSliderIdx((realIdx - OFFSET) % BUCKET_RECS.length)
+  }, [realIdx])
 
   const displayCats = CATEGORIES.filter(c => c.id !== 'custom')
 
@@ -690,57 +713,60 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           </div>
           <div style={{ display:'flex', gap:5 }}>
             {BUCKET_RECS.map((_, i) => (
-              <div key={i} onClick={() => setSliderIdx(i)} style={{
+              <div key={i} style={{
                 width: i === sliderIdx ? 18 : 6, height:6, borderRadius:3,
                 background: i === sliderIdx ? BLUE : '#CBD5E1',
                 cursor:'pointer', transition:'all 0.3s ease',
-              }}/>
+              }} onClick={() => { setSliderAnimate(true); setRealIdx(OFFSET + i) }}/>
             ))}
           </div>
         </div>
 
-        <div ref={sliderRef} className="slider-wrap" style={{
-          display:'flex', gap:12,
-          overflowX:'auto', paddingLeft:20, paddingRight:20,
-          scrollSnapType:'x mandatory',
-        }}>
-          {BUCKET_RECS.map((item, i) => (
-            <div key={item.id} style={{
-              flexShrink:0, width:'68%', borderRadius:12, overflow:'hidden',
-              background:'#fff', cursor:'pointer',
-              scrollSnapAlign:'start',
-              boxShadow: i === sliderIdx
-                ? `0 8px 28px rgba(27,110,243,0.18)`
-                : '0 2px 12px rgba(0,0,0,0.08)',
-              border: i === sliderIdx ? `1.5px solid rgba(27,110,243,0.15)` : '1.5px solid #F1F5F9',
-              transform: i === sliderIdx ? 'scale(1)' : 'scale(0.97)',
-              transition:'all 0.3s ease',
+        {/* 무한루프 슬라이더 */}
+        <div style={{ overflow:'hidden', paddingLeft:20 }}>
+          <div
+            ref={sliderRef}
+            style={{
+              display:'flex', gap:12,
+              transition: sliderAnimate ? 'transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94)' : 'none',
+              transform: `translateX(calc(-${realIdx} * (68vw + 12px) + 0px))`,
             }}
-              onClick={() => navigate(`/?cat=${item.catId}&item=${item.itemId}`)}
-            >
-              {/* 이미지 — 오버레이 없이 깨끗하게 */}
-              <div style={{
-                width:'100%', height:140,
-                backgroundImage:`url(${item.img})`,
-                backgroundSize:'cover',
-                backgroundPosition: item.pos,
-              }}/>
-              {/* 흰 배경 텍스트 영역 */}
-              <div style={{ padding:'12px 14px 14px' }}>
-                <div style={{ fontSize:14, fontWeight:900, color:'#0F172A', marginBottom:3 }}>
-                  {item.title}
+          >
+            {CLONED.map((item, i) => {
+              const dotIdx = (i - OFFSET + BUCKET_RECS.length * 10) % BUCKET_RECS.length
+              const isActive = dotIdx === sliderIdx
+              return (
+                <div key={i} style={{
+                  flexShrink:0, width:'68vw', maxWidth:300, borderRadius:12, overflow:'hidden',
+                  background:'#fff', cursor:'pointer',
+                  boxShadow: isActive ? `0 8px 28px rgba(27,110,243,0.18)` : '0 2px 12px rgba(0,0,0,0.08)',
+                  border: isActive ? `1.5px solid rgba(27,110,243,0.15)` : '1.5px solid #F1F5F9',
+                  transform: isActive ? 'scale(1)' : 'scale(0.97)',
+                  transition:'all 0.3s ease',
+                }}
+                  onClick={() => navigate(`/?cat=${item.catId}&item=${item.itemId}`)}
+                >
+                  <div style={{
+                    width:'100%', height:140,
+                    backgroundImage:`url(${item.img})`,
+                    backgroundSize:'cover',
+                    backgroundPosition: item.pos,
+                  }}/>
+                  <div style={{ padding:'12px 14px 14px' }}>
+                    <div style={{ fontSize:14, fontWeight:900, color:'#0F172A', marginBottom:3 }}>{item.title}</div>
+                    <div style={{ fontSize:12, color:'#64748B', marginBottom:12, lineHeight:1.5 }}>{item.desc}</div>
+                    <div style={{
+                      display:'inline-flex', alignItems:'center', gap:5,
+                      background:GOLD, borderRadius:12, padding:'6px 14px',
+                    }}>
+                      <Icon icon="ph:heart" width={12} height={12} color="#002870" />
+                      <span style={{ fontSize:11, fontWeight:800, color:'#002870' }}>버킷리스트에 추가 ›</span>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize:12, color:'#64748B', marginBottom:12, lineHeight:1.5 }}>{item.desc}</div>
-                <div style={{
-                  display:'inline-flex', alignItems:'center', gap:5,
-                  background:GOLD, borderRadius:12, padding:'6px 14px',
-                }}>
-                  <Icon icon="ph:heart" width={12} height={12} color="#002870" />
-                  <span style={{ fontSize:11, fontWeight:800, color:'#002870' }}>버킷리스트에 추가 ›</span>
-                </div>
-              </div>
-            </div>
-          ))}
+              )
+            })}
+          </div>
         </div>
       </div>
 
