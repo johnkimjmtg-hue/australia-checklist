@@ -1035,46 +1035,53 @@ const PH_ICONS = [
   'ph:heart','ph:star','ph:check-circle','ph:map-pin','ph:calendar',
   'ph:camera','ph:gift','ph:flag','ph:crown','ph:trophy',
   'ph:sparkle','ph:shooting-star','ph:smiley','ph:sun','ph:moon',
+  // ── 호주 & 동물 (신규) ──
+  'ph:paw-print','ph:bird','ph:butterfly','ph:horse','ph:bug',
+  'ph:fish','ph:fish-simple','ph:shrimp','ph:crab','ph:seal',
+  'ph:feather','ph:leaf','ph:tree-palm','ph:island','ph:waves',
+  'ph:sun-horizon','ph:rainbow','ph:cloud','ph:lightning','ph:snowflake',
+  'ph:mountains','ph:mountain','ph:cave','ph:lighthouse','ph:anchor',
+  'ph:boomerang','ph:tent','ph:campfire','ph:compass','ph:map-trifold',
   // 카페/브런치
   'ph:coffee','ph:tea-bag','ph:croissant','ph:bread','ph:cake',
   'ph:cookie','ph:egg','ph:drop','ph:drop-half','ph:orange',
-  'ph:leaf','ph:plant','ph:flower','ph:jar-label','ph:bottle',
-  // 음식/먹거리
+  'ph:plant','ph:flower','ph:jar-label','ph:bottle',
+  // ── 음식/먹거리 (대폭 확충) ──
   'ph:fork-knife','ph:bowl-food','ph:beer-stein','ph:wine','ph:whiskey',
-  'ph:fish','ph:fish-simple','ph:shrimp','ph:pepper','ph:flame',
+  'ph:flame','ph:pepper','ph:nut','ph:pie','ph:popcorn','ph:grains',
   'ph:ice-cream','ph:donut','ph:hamburger','ph:hot-dog','ph:cheese',
-  'ph:storefront','ph:nut','ph:pie','ph:popcorn','ph:grains',
+  'ph:bread','ph:pretzel','ph:corn','ph:apple','ph:strawberry',
+  'ph:avocado','ph:lemon','ph:jar','ph:jar-label','ph:bottle-water',
+  'ph:knife','ph:fork-knife-fill','ph:grains',
+  'ph:meat','ph:pizza','ph:taco','ph:wrap',
+  'ph:noodle','ph:bowl-steam','ph:pot','ph:frying-pan',
+  'ph:soup-bowl','ph:sticker','ph:receipt',
   // 쇼핑
   'ph:shopping-bag','ph:shopping-cart','ph:package','ph:t-shirt',
   'ph:diamond','ph:sunglasses','ph:boot','ph:wallet','ph:lipstick',
   'ph:baby','ph:pill','ph:bandaids','ph:first-aid-kit',
-  // 자연/동물
-  'ph:tree','ph:tree-evergreen','ph:tree-palm','ph:mountains','ph:mountain',
-  'ph:waves','ph:island','ph:lighthouse','ph:rainbow','ph:snowflake',
-  'ph:paw-print','ph:bird','ph:butterfly','ph:horse','ph:bug',
-  'ph:leaf','ph:flower','ph:sun-horizon','ph:sunset','ph:cloud',
   // 도시/문화
   'ph:buildings','ph:building','ph:castle','ph:church','ph:bank',
   'ph:palette','ph:music-note','ph:microphone','ph:film-slate','ph:ticket',
   'ph:binoculars','ph:books','ph:graduation-cap','ph:medal','ph:dove',
-  'ph:frame-corners','ph:lightbulb','ph:clock','ph:map-trifold',
+  'ph:frame-corners','ph:lightbulb','ph:clock','ph:bridge',
   // 해변/물놀이
   'ph:umbrella','ph:umbrella-simple','ph:oar','ph:boat','ph:sailboat',
-  'ph:anchor','ph:swimming-pool','ph:shell','ph:crab','ph:wave',
+  'ph:swimming-pool','ph:shell','ph:wave','ph:surf',
   // 백패커/여행
   'ph:airplane','ph:airplane-takeoff','ph:train','ph:train-simple',
-  'ph:bus','ph:car','ph:van','ph:jeep','ph:bicycle','ph:tent',
-  'ph:backpack','ph:map-pin','ph:compass','ph:globe','ph:bed',
-  'ph:wifi','ph:device-mobile','ph:printer','ph:paper-plane',
+  'ph:bus','ph:car','ph:van','ph:jeep','ph:bicycle',
+  'ph:backpack','ph:globe','ph:bed',
+  'ph:wifi','ph:device-mobile','ph:paper-plane',
   'ph:identification-card','ph:certificate','ph:hand-waving',
   // 이색경험/활동
   'ph:parachute','ph:balloon','ph:helicopter','ph:guitar','ph:drum',
-  'ph:shooting-star','ph:cave','ph:boomerang','ph:gas-pump',
-  'ph:horse','ph:bat','ph:owl','ph:clothes-hanger','ph:coin',
+  'ph:bat','ph:owl','ph:clothes-hanger','ph:coin',
   'ph:film-reel','ph:confetti','ph:party-popper',
   // 기타
   'ph:person-simple','ph:users','ph:users-three','ph:house','ph:house-line',
   'ph:pencil-simple','ph:note','ph:alarm','ph:shield',
+  'ph:storefront','ph:syringe','ph:stethoscope','ph:heartbeat',
 ]
 
 function IconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -1133,8 +1140,29 @@ function ItemsTab({ cats, items, setItems, iconMap, setIconMap }: {
   const [newLabel, setNewLabel] = useState('')
   const [newIcon, setNewIcon]   = useState('ph:star')
   const [toast, setToast] = useState('')
+  const [dragIdx, setDragIdx]     = useState<number|null>(null)
+  const [dragOverIdx, setDragOverIdx] = useState<number|null>(null)
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2000) }
+
+  function handleItemDragStart(localIdx: number) { setDragIdx(localIdx) }
+  function handleItemDragOver(e: React.DragEvent, localIdx: number) {
+    e.preventDefault(); setDragOverIdx(localIdx)
+  }
+  function handleItemDragEnd() {
+    if (dragIdx === null || dragOverIdx === null || dragIdx === dragOverIdx) {
+      setDragIdx(null); setDragOverIdx(null); return
+    }
+    const catIs = items.filter(i => i.categoryId === selCat)
+    const allItems = [...items]
+    const fromGlobal = allItems.findIndex(i => i.id === catIs[dragIdx].id)
+    const toGlobal   = allItems.findIndex(i => i.id === catIs[dragOverIdx].id)
+    const [moved] = allItems.splice(fromGlobal, 1)
+    allItems.splice(toGlobal, 0, moved)
+    setItems(allItems as any)
+    setDragIdx(null); setDragOverIdx(null)
+    showToast('순서 변경됨')
+  }
 
   const catItems = items.filter(i => i.categoryId === selCat)
   const isLocked = selCat === 'custom'
@@ -1223,17 +1251,38 @@ function ItemsTab({ cats, items, setItems, iconMap, setIconMap }: {
           <p style={{ color:'#ccc', fontSize:13, textAlign:'center', padding:'20px 0' }}>항목이 없어요. 위에서 추가해보세요!</p>
         ) : (
           <div>
-            {catItems.map((item, localIdx) => (
-              <div key={item.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 0', borderBottom:'1px solid #f3f3f3' }}>
-                <IconPicker value={iconMap[item.id] || CAT_DEFAULT[selCat] || 'ph:star'} onChange={v => updateIcon(item.id, v)} />
-                <input value={item.label} onChange={e=>updateItem(item.id,'label',e.target.value)} style={{ flex:1, fontSize:13, border:'none', background:'transparent', color:'#444' }} />
-                <div style={{ display:'flex', gap:4 }}>
-                  <button onClick={() => moveItem(item.id,-1)} disabled={localIdx===0} style={{ ...btnSmGhost, opacity:localIdx===0?0.3:1 }}>↑</button>
-                  <button onClick={() => moveItem(item.id, 1)} disabled={localIdx===catItems.length-1} style={{ ...btnSmGhost, opacity:localIdx===catItems.length-1?0.3:1 }}>↓</button>
-                  <button onClick={() => deleteItem(item.id)} style={{ ...btnSmDanger }}>✕</button>
+            {catItems.map((item, localIdx) => {
+              const isDragging = dragIdx === localIdx
+              const isOver     = dragOverIdx === localIdx
+              return (
+                <div key={item.id}
+                  draggable={!isLocked}
+                  onDragStart={() => handleItemDragStart(localIdx)}
+                  onDragOver={e => handleItemDragOver(e, localIdx)}
+                  onDragEnd={handleItemDragEnd}
+                  style={{
+                    display:'flex', alignItems:'center', gap:8,
+                    padding:'8px 0', borderBottom:'1px solid #f3f3f3',
+                    opacity: isDragging ? 0.4 : 1,
+                    background: isOver ? '#eef2fb' : 'transparent',
+                    borderRadius: isOver ? 8 : 0,
+                    cursor: isLocked ? 'default' : 'grab',
+                    transition:'background 0.15s',
+                  }}>
+                  {/* 드래그 핸들 */}
+                  {!isLocked && (
+                    <Icon icon="ph:dots-six-vertical" width={16} height={16} color="#ccc" style={{ flexShrink:0, cursor:'grab' }} />
+                  )}
+                  <IconPicker value={iconMap[item.id] || CAT_DEFAULT[selCat] || 'ph:star'} onChange={v => updateIcon(item.id, v)} />
+                  <input value={item.label} onChange={e=>updateItem(item.id,'label',e.target.value)} style={{ flex:1, fontSize:13, border:'none', background:'transparent', color:'#444' }} />
+                  <div style={{ display:'flex', gap:4 }}>
+                    <button onClick={() => moveItem(item.id,-1)} disabled={localIdx===0} style={{ ...btnSmGhost, opacity:localIdx===0?0.3:1 }}>↑</button>
+                    <button onClick={() => moveItem(item.id, 1)} disabled={localIdx===catItems.length-1} style={{ ...btnSmGhost, opacity:localIdx===catItems.length-1?0.3:1 }}>↓</button>
+                    <button onClick={() => deleteItem(item.id)} style={{ ...btnSmDanger }}>✕</button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </Card>
