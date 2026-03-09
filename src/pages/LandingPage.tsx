@@ -48,7 +48,7 @@ const BUCKET_RECS = [
     desc: '시드니에서 수박 케이크 먹기',
     img: imgCafe,
     pos: 'center',
-    itemId: 'f36',
+    itemId: 'f14',
     catId: 'food',
   },
   {
@@ -57,17 +57,17 @@ const BUCKET_RECS = [
     desc: '시드니 대표 해변 즐기기',
     img: imgBeach,
     pos: 'center 30%',
-    itemId: 'g24',
-    catId: 'places',
+    itemId: 'b02',
+    catId: 'beach',
   },
   {
     id: 'bridgeclimb',
-    title: '하버 브릿지 클라이밍',
+    title: '하버 브리지 클라이밍',
     desc: '시드니 전경을 발밑에 두기',
     img: imgUnique,
     pos: 'center',
-    itemId: 'g23',
-    catId: 'places',
+    itemId: 'u03',
+    catId: 'city',
   },
   {
     id: 'bbq',
@@ -75,7 +75,7 @@ const BUCKET_RECS = [
     desc: '호주식 바베큐 파티 즐기기',
     img: imgFood,
     pos: 'center',
-    itemId: 'f37',
+    itemId: 'f12',
     catId: 'food',
   },
   {
@@ -84,8 +84,8 @@ const BUCKET_RECS = [
     desc: '야생동물 공원 체험',
     img: imgNature,
     pos: 'center',
-    itemId: 'g25',
-    catId: 'places',
+    itemId: 'i_1773020002843',
+    catId: 'nature',
   },
   {
     id: 'bluemountains',
@@ -93,8 +93,8 @@ const BUCKET_RECS = [
     desc: '은하수 아래 쓰리시스터즈 감상',
     img: imgStars,
     pos: 'center 40%',
-    itemId: 'g26',
-    catId: 'places',
+    itemId: 'n01',
+    catId: 'nature',
   },
 ]
 
