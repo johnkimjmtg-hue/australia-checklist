@@ -457,10 +457,10 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
         display:'flex', gap:8,
       }}>
         <button onClick={onLanding} style={{
-          flex:1, height:54, borderRadius:12, border:'none',
-          background:'linear-gradient(135deg,#003594,#1B6EF3)',
-          fontSize:15, fontWeight:800, color:'#fff', cursor:'pointer',
-          boxShadow:'0 4px 16px rgba(0,53,148,0.35)',
+          flex:1, height:54, borderRadius:8, border:'none',
+          background:'#1B6EF3', color:'#fff',
+          fontSize:15, fontWeight:700, cursor:'pointer',
+          boxShadow:'0 10px 15px rgba(0,0,0,0.15)',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
         }}>
           <Icon icon="ph:check-circle" width={18} height={18} color="#FFCD00" />
