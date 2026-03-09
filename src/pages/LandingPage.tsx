@@ -514,24 +514,17 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {/* ── 히어로 + 투명 헤더 ── */}
       <div style={{ position:'relative', overflow:'hidden' }}>
 
-        {/* 배경 이미지 — 이미지 자체에 텍스트 포함 */}
+        {/* 배경 이미지 */}
         <img
           src={imgHero}
           alt="호주에서 꼭 해야 할 모든 것"
           style={{ width:'100%', display:'block', objectFit:'cover' }}
         />
 
-        {/* 하단 그라데이션 — 버튼 가독성 */}
-        <div style={{
-          position:'absolute', bottom:0, left:0, right:0, height:160,
-          background:'linear-gradient(to bottom, transparent 0%, rgba(0,10,40,0.72) 100%)',
-          pointerEvents:'none',
-        }}/>
-
         {/* 투명 헤더 */}
         <div style={{
           position:'absolute', top:0, left:0, right:0, zIndex:10,
-          padding:'14px 20px',
+          padding:'14px 24px',
           display:'flex', alignItems:'center', justifyContent:'space-between',
         }}>
           <div onClick={handleLogoTap} style={{ cursor:'pointer', userSelect:'none' as any }}>
@@ -555,45 +548,47 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           </div>
         </div>
 
-        {/* 하단 — 문구 + 버튼 */}
+        {/* 문구 — 이미지 중간쯤 */}
         <div style={{
-          position:'absolute', bottom:0, left:0, right:0,
-          padding:'0 20px 24px',
-          display:'flex', flexDirection:'column', alignItems:'center', gap:14,
-          zIndex:10,
+          position:'absolute', top:'62%', left:0, right:0,
+          textAlign:'center', zIndex:10,
         }}>
-          {/* 서브 문구 */}
           <p style={{
-            fontSize:13, color:'rgba(255,255,255,0.90)',
-            margin:0, textAlign:'center', lineHeight:1.6,
-            textShadow:'0 1px 6px rgba(0,0,0,0.40)',
+            fontSize:13, color:'rgba(255,255,255,0.95)',
+            margin:0, lineHeight:1.6,
+            textShadow:'0 1px 4px rgba(0,0,0,0.30)',
           }}>
             가고 싶은 곳, 먹고 싶은 것, 지금 체크하세요
           </p>
+        </div>
 
-          {/* CTA 버튼 두 개 */}
-          <div style={{ display:'flex', gap:10, width:'100%' }}>
-            <button onClick={onStart} style={{
-              flex:2, height:50, background:GOLD, color:'#002870',
-              border:'none', borderRadius:14, fontSize:14, fontWeight:900,
-              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-              boxShadow:`0 4px 20px rgba(255,184,0,0.50)`,
-            }}>
-              <Icon icon="ph:list-checks" width={16} height={16} color="#002870" />
-              나의 버킷리스트
-            </button>
-            <button onClick={onServices} style={{
-              flex:1, height:50,
-              background:'rgba(255,255,255,0.18)', color:'#fff',
-              border:'1.5px solid rgba(255,255,255,0.40)', borderRadius:14,
-              fontSize:13, fontWeight:700, cursor:'pointer',
-              display:'flex', alignItems:'center', justifyContent:'center', gap:5,
-              backdropFilter:'blur(8px)', whiteSpace:'nowrap' as any,
-            }}>
-              <Icon icon="ph:buildings" width={14} height={14} color="#fff" />
-              업체/서비스
-            </button>
-          </div>
+        {/* 하단 버튼 */}
+        <div style={{
+          position:'absolute', bottom:0, left:0, right:0,
+          padding:'0 24px 24px',
+          display:'flex', gap:10,
+          zIndex:10,
+        }}>
+          <button onClick={onStart} style={{
+            flex:2, height:50, background:GOLD, color:'#002870',
+            border:'none', borderRadius:14, fontSize:14, fontWeight:900,
+            cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+            boxShadow:`0 4px 20px rgba(255,184,0,0.50)`,
+          }}>
+            <Icon icon="ph:list-checks" width={16} height={16} color="#002870" />
+            나의 버킷리스트
+          </button>
+          <button onClick={onServices} style={{
+            flex:1, height:50,
+            background:'rgba(255,255,255,0.18)', color:'#fff',
+            border:'1.5px solid rgba(255,255,255,0.40)', borderRadius:14,
+            fontSize:13, fontWeight:700, cursor:'pointer',
+            display:'flex', alignItems:'center', justifyContent:'center', gap:5,
+            backdropFilter:'blur(8px)', whiteSpace:'nowrap' as any,
+          }}>
+            <Icon icon="ph:buildings" width={14} height={14} color="#fff" />
+            업체/서비스
+          </button>
         </div>
       </div>
 
