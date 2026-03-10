@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import Community from './Community'
 import { Icon } from '@iconify/react'
 import { CATEGORIES, ITEMS, CheckItem, ITEM_ICONS } from '../data/checklist'
 import {
@@ -22,7 +21,7 @@ const CAT_ICON_MAP: Record<string,string> = {
 
 type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker'
-type MainTab = 'bucketlist' | 'services' | 'community'
+type MainTab = 'bucketlist' | 'services'
 
 export default function ChecklistPage({ state, setState, onLanding }: Props & { onLanding?: () => void }) {
   const [searchParams] = useSearchParams()
@@ -345,24 +344,22 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         </div>
         {/* 탭 */}
         <div style={{ display:'flex', padding:'8px 20px 0', gap:4 }}>
-          {(['bucketlist','services','community'] as MainTab[]).map(tab => (
+          {(['bucketlist','services'] as MainTab[]).map(tab => (
             <button key={tab} className="tab-btn" onClick={() => setMainTab(tab)} style={{
               flex:1, height:38, border:'none', cursor:'pointer',
               borderRadius:'6px 6px 0 0',
-              fontSize:13, fontWeight: mainTab===tab ? 700 : 500,
+              fontSize:14, fontWeight: mainTab===tab ? 700 : 500,
               color: mainTab===tab ? '#fff' : '#94A3B8',
               background: mainTab===tab ? '#1B6EF3' : 'transparent',
               borderBottom: mainTab===tab ? '2px solid #1B6EF3' : '2px solid transparent',
             }}>
-              {tab==='bucketlist' ? '버킷리스트' : tab==='services' ? '업체/서비스' : '커뮤니티'}
+              {tab==='bucketlist' ? '버킷리스트' : '업체/서비스 찾기'}
             </button>
           ))}
         </div>
       </div>
 
-      {mainTab === 'community' ? (
-        <Community />
-      ) : mainTab === 'services' ? (
+      {mainTab === 'services' ? (
         <Services onSelectBusiness={() => {}} onBack={() => setMainTab('bucketlist')} />
       ) : (
         <>
