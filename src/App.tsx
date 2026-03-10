@@ -36,7 +36,11 @@ function LandingWrapper() {
 // ── Admin 래퍼
 function AdminWrapper() {
   const navigate = useNavigate()
-  return <AdminPage onBack={() => navigate('/')} />
+  return (
+    <div className="app-shell">
+      <AdminPage onBack={() => navigate('/')} />
+    </div>
+  )
 }
 
 // ── 라우터
