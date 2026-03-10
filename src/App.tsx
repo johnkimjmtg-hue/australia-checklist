@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import { loadState, AppState } from './store/state'
 import LandingPage from './pages/LandingPage'
 import ChecklistPage from './pages/ChecklistPage'
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="/admin"    element={<AdminWrapper />} />
         <Route path="*"         element={<LandingWrapper />} />
       </Routes>
+      <Analytics />
     </BrowserRouter>
   )
 }
