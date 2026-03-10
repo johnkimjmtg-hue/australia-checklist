@@ -108,8 +108,22 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   // 정렬된 결과
   const sorted = useMemo(() => sortByName(filtered), [filtered])
 
-  // 랜덤 10개 (전체 탭, 검색 없을 때)
-  const randomTen = useMemo(() => pickRandom(allBusinesses, 10), [allBusinesses])
+  // 처음 10개: 추천업체 먼저(랜덤), 나머지 일반업체 랜덤으로 채우기
+  const initialTen = useMemo(() => {
+    const featured = allBusinesses.filter(b => b.is_featured)
+    const normal   = allBusinesses.filter(b => !b.is_featured)
+    const shuffledFeatured = [...featured].sort(() => Math.random() - 0.5)
+    const shuffledNormal   = [...normal].sort(() => Math.random() - 0.5)
+    if (shuffledFeatured.length >= 10) return shuffledFeatured.slice(0, 10)
+    return [...shuffledFeatured, ...shuffledNormal].slice(0, 10)
+  }, [allBusinesses])
+
+  // 전체 보기: 추천업체 가나다순 먼저, 그 다음 일반업체 가나다순
+  const sortedAll = useMemo(() => {
+    const featured = sortByName(allBusinesses.filter(b => b.is_featured))
+    const normal   = sortByName(allBusinesses.filter(b => !b.is_featured))
+    return [...featured, ...normal]
+  }, [allBusinesses])
 
   const isSearch    = !!search.trim()
   const isCatFilter = category !== 'all'
@@ -273,13 +287,13 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
 
         {serviceTab === 'all' && !isFiltered && (
           <>
-            {/* 랜덤 10개 */}
+            {/* 처음 10개 */}
             {!showAll && (
               <>
                 <SectionLabel icon="ph:shuffle" label="이런 업체 어때요?" color="#64748B" />
                 {loading ? <LoadingState /> : (
                   <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                    {sortByName(randomTen).map(b => <BusinessCard key={b.id} business={b} />)}
+                    {initialTen.map(b => <BusinessCard key={b.id} business={b} />)}
                   </div>
                 )}
                 <button onClick={() => setShowAll(true)} style={{
@@ -297,13 +311,13 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               </>
             )}
 
-            {/* 전체 목록 */}
+            {/* 전체 목록: 추천 먼저 가나다순, 그 다음 일반 가나다순 */}
             {showAll && (
               <>
-                <SectionLabel icon="ph:list-bullets" label={`전체 업체 (${sorted.length})`} color="#64748B" />
-                {loading ? <LoadingState /> : sorted.length === 0 ? <EmptyState /> : (
+                <SectionLabel icon="ph:list-bullets" label={`전체 업체 (${sortedAll.length})`} color="#64748B" />
+                {loading ? <LoadingState /> : sortedAll.length === 0 ? <EmptyState /> : (
                   <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                    {sorted.map(b => <BusinessCard key={b.id} business={b} />)}
+                    {sortedAll.map(b => <BusinessCard key={b.id} business={b} />)}
                   </div>
                 )}
               </>
