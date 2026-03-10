@@ -423,7 +423,7 @@ function WriteScreen({ onBack, onDone }: { onBack: () => void; onDone: () => voi
         </button>
         <span style={{ fontSize: 15, fontWeight: 800, color: '#1A202C' }}>새 글 작성</span>
         <button onClick={submit} disabled={submitting} style={{
-          marginRight: 10, padding: '7px 18px', borderRadius: 20, border: 'none',
+          marginRight: 10, padding: '7px 18px', borderRadius: 10, border: 'none',
           background: BLUE, color: '#fff', fontSize: 13, fontWeight: 700,
           cursor: 'pointer', opacity: submitting ? 0.6 : 1, fontFamily: ff,
         }}>
@@ -435,22 +435,24 @@ function WriteScreen({ onBack, onDone }: { onBack: () => void; onDone: () => voi
       <div style={{ background: '#fff', marginTop: 8 }}>
 
         {/* 카테고리 */}
-        <div style={{ padding: '14px 18px', borderBottom: '1px solid #F1F4F7', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {writeCats.map(cat => {
-            const active = category === cat.id
-            return (
-              <button key={cat.id} onClick={() => setCategory(cat.id)} style={{
-                padding: '5px 14px', borderRadius: 20,
-                border: `1.5px solid ${active ? cat.color : '#E2E8F0'}`,
-                background: active ? cat.color : '#fff',
-                color: active ? '#fff' : '#94A3B8',
-                fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: ff,
-                transition: 'all 0.15s',
-              }}>
-                {cat.label}
-              </button>
-            )
-          })}
+        <div style={{ padding: '12px 18px 10px', borderBottom: '1px solid #F1F4F7' }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: '#94A3B8', marginBottom: 8, letterSpacing: 0.5 }}>게시판 선택</div>
+          <div style={{ display: 'flex', gap: 2 }}>
+            {writeCats.map(cat => {
+              const active = category === cat.id
+              return (
+                <button key={cat.id} onClick={() => setCategory(cat.id)} style={{
+                  padding: '7px 12px', borderRadius: 8, border: 'none',
+                  background: active ? '#F1F5F9' : 'transparent',
+                  color: active ? cat.color : '#94A3B8',
+                  fontSize: 13, fontWeight: active ? 800 : 500,
+                  cursor: 'pointer', fontFamily: ff, transition: 'all 0.15s',
+                }}>
+                  {cat.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* 제목 */}
