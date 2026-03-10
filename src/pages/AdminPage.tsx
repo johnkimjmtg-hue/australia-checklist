@@ -313,6 +313,8 @@ function BusinessTab() {
   const [saving, setSaving]         = useState(false)
   const [deleteId, setDeleteId]     = useState<string|null>(null)
   const [toast, setToast]           = useState('')
+  const [bizSearch, setBizSearch]   = useState('')
+  const [bizCat, setBizCat]         = useState('all')
 
   useEffect(() => { load() }, [])
 
@@ -415,13 +417,51 @@ function BusinessTab() {
         </div>
       ) : (
         <>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
             <span style={{ fontSize:13, color:'#888', fontWeight:700 }}>총 {businesses.length}개 업체</span>
             <button onClick={openNew} style={btnPrimary}>+ 업체 등록</button>
           </div>
+
+          {/* 검색 + 카테고리 필터 */}
+          <div style={{ display:'flex', gap:8, marginBottom:12 }}>
+            <input
+              value={bizSearch}
+              onChange={e => setBizSearch(e.target.value)}
+              placeholder="업체명 검색..."
+              style={{ ...inputStyle, flex:1, margin:0 }}
+            />
+            <select
+              value={bizCat}
+              onChange={e => setBizCat(e.target.value)}
+              style={{ ...inputStyle, width:130, margin:0, flexShrink:0 }}
+            >
+              <option value="all">전체 카테고리</option>
+              {CATEGORIES.filter(c=>c.id!=='all').map(c=>(
+                <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* 필터 결과 수 */}
+          {(bizSearch || bizCat !== 'all') && (
+            <div style={{ fontSize:12, color:'#888', marginBottom:8 }}>
+              {businesses.filter(b =>
+                (bizCat === 'all' || b.category === bizCat) &&
+                (!bizSearch || b.name.toLowerCase().includes(bizSearch.toLowerCase()))
+              ).length}개 표시 중
+              <button onClick={() => { setBizSearch(''); setBizCat('all') }}
+                style={{ marginLeft:8, fontSize:11, color:'#1E4D83', background:'none', border:'none', cursor:'pointer', fontWeight:700 }}>
+                초기화
+              </button>
+            </div>
+          )}
+
           {loading ? <div style={{ textAlign:'center', padding:40, color:'#aaa' }}>불러오는 중...</div> : (
             <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-              {businesses.map(b => (
+              {businesses.filter(b =>
+                (bizCat === 'all' || b.category === bizCat) &&
+                (!bizSearch || b.name.toLowerCase().includes(bizSearch.toLowerCase()))
+              ).map(b => (
                 <Card key={b.id}>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:6 }}>
                     <div>
