@@ -30,22 +30,19 @@ const BLUE = '#1B6EF3'
 const BG = '#E8EDF3'
 
 const CATEGORIES = [
-  { id: 'all',      label: '전체',      icon: 'ph:squares-four',   color: '#64748B' },
-  { id: 'tip',      label: '호주꿀팁',  icon: 'ph:star',           color: '#FFB800' },
-  { id: 'together', label: '같이가요',  icon: 'ph:users',          color: '#16A34A' },
-  { id: 'job',      label: '구인구직',  icon: 'ph:briefcase',      color: '#1B6EF3' },
-  { id: 'question', label: '질문있어요',icon: 'ph:question',       color: '#EA580C' },
-  { id: 'free',     label: '자유',      icon: 'ph:chat-circle',    color: '#94A3B8' },
+  { id: 'all',      label: '전체',      icon: 'ph:squares-four', color: '#64748B' },
+  { id: 'tip',      label: '호주꿀팁',  icon: 'ph:star',         color: '#FFB800' },
+  { id: 'question', label: '질문있어요',icon: 'ph:question',     color: '#EA580C' },
+  { id: 'job',      label: '구인구직',  icon: 'ph:briefcase',    color: '#1B6EF3' },
+  { id: 'free',     label: '자유',      icon: 'ph:chat-circle',  color: '#94A3B8' },
 ]
 
 const CAT_COLOR: Record<string, string> = {
-  tip: '#FFB800', together: '#16A34A', job: '#1B6EF3',
-  question: '#EA580C', free: '#94A3B8',
+  tip: '#FFB800', question: '#EA580C', job: '#1B6EF3', free: '#94A3B8',
 }
 
 const CAT_BG: Record<string, string> = {
-  tip: '#FFFBEB', together: '#F0FDF4', job: '#EFF6FF',
-  question: '#FFF7ED', free: '#F8FAFC',
+  tip: '#FFFBEB', question: '#FFF7ED', job: '#EFF6FF', free: '#F8FAFC',
 }
 
 function timeAgo(dateStr: string) {
@@ -384,50 +381,20 @@ function WriteScreen({ onBack, onDone }: { onBack: () => void; onDone: () => voi
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:BG, fontFamily:ff, paddingBottom:80 }}>
-      {/* 헤더 */}
-      <div style={{
-        background:'#fff', borderBottom:'1px solid #E8EDF3',
-        padding:'14px 16px', display:'flex', alignItems:'center', gap:10,
-        position:'sticky', top:0, zIndex:50,
-      }}>
-        <button onClick={onBack} style={{
-          background:'#F1F5F9', border:'none', borderRadius:10, cursor:'pointer',
-          width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center',
-        }}>
-          <Icon icon="ph:arrow-left" width={18} height={18} color="#475569" />
-        </button>
-        <span style={{ fontSize:15, fontWeight:900, color:'#0F172A', flex:1 }}>글쓰기</span>
-        <button onClick={submit} disabled={submitting} style={{
-          padding:'8px 18px', borderRadius:10, border:'none',
-          background: BLUE, color:'#fff', fontSize:13, fontWeight:700,
-          cursor:'pointer', opacity: submitting ? 0.6 : 1,
-        }}>
-          {submitting ? '등록 중...' : '등록하기'}
-        </button>
-      </div>
-
+    <div style={{ minHeight:'100vh', background:BG, fontFamily:ff, paddingBottom:40 }}>
       <div style={{ padding:'16px 14px' }}>
-        {/* 카테고리 */}
+
+        {/* 제목 */}
         <div style={{ background:'#fff', borderRadius:14, padding:'16px', marginBottom:10, boxShadow:'0 2px 8px rgba(0,0,0,0.05)' }}>
-          <div style={{ fontSize:12, fontWeight:800, color:BLUE, marginBottom:10 }}>카테고리</div>
-          <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
-            {writeCats.map(cat => {
-              const active = category === cat.id
-              return (
-                <button key={cat.id} onClick={() => setCategory(cat.id)} style={{
-                  display:'flex', alignItems:'center', gap:5,
-                  padding:'7px 12px', borderRadius:20, border:`1.5px solid ${active ? cat.color : '#E2E8F0'}`,
-                  background: active ? cat.color : '#fff',
-                  color: active ? '#fff' : '#64748B',
-                  fontSize:12, fontWeight:700, cursor:'pointer',
-                }}>
-                  <Icon icon={cat.icon} width={12} height={12} color={active ? '#fff' : cat.color} />
-                  {cat.label}
-                </button>
-              )
-            })}
-          </div>
+          <div style={{ fontSize:12, fontWeight:800, color:BLUE, marginBottom:8 }}>제목</div>
+          <input
+            value={title} onChange={e => setTitle(e.target.value)}
+            placeholder="제목을 입력하세요"
+            style={{
+              width:'100%', padding:'11px 14px', border:'1.5px solid #E2E8F0',
+              borderRadius:10, fontSize:14, fontFamily:ff, outline:'none', boxSizing:'border-box',
+            }}
+          />
         </div>
 
         {/* 닉네임 */}
@@ -443,17 +410,26 @@ function WriteScreen({ onBack, onDone }: { onBack: () => void; onDone: () => voi
           />
         </div>
 
-        {/* 제목 */}
+        {/* 카테고리 */}
         <div style={{ background:'#fff', borderRadius:14, padding:'16px', marginBottom:10, boxShadow:'0 2px 8px rgba(0,0,0,0.05)' }}>
-          <div style={{ fontSize:12, fontWeight:800, color:BLUE, marginBottom:8 }}>제목</div>
-          <input
-            value={title} onChange={e => setTitle(e.target.value)}
-            placeholder="제목을 입력하세요"
-            style={{
-              width:'100%', padding:'11px 14px', border:'1.5px solid #E2E8F0',
-              borderRadius:10, fontSize:14, fontFamily:ff, outline:'none', boxSizing:'border-box',
-            }}
-          />
+          <div style={{ fontSize:12, fontWeight:800, color:BLUE, marginBottom:10 }}>카테고리</div>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+            {writeCats.map(cat => {
+              const active = category === cat.id
+              return (
+                <button key={cat.id} onClick={() => setCategory(cat.id)} style={{
+                  display:'flex', alignItems:'center', gap:5,
+                  padding:'7px 14px', borderRadius:20, border:`1.5px solid ${active ? cat.color : '#E2E8F0'}`,
+                  background: active ? cat.color : '#fff',
+                  color: active ? '#fff' : '#64748B',
+                  fontSize:13, fontWeight:700, cursor:'pointer',
+                }}>
+                  <Icon icon={cat.icon} width={13} height={13} color={active ? '#fff' : cat.color} />
+                  {cat.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* 내용 */}
@@ -477,6 +453,19 @@ function WriteScreen({ onBack, onDone }: { onBack: () => void; onDone: () => voi
             color:'#DC2626', fontSize:13, fontWeight:700, marginBottom:10,
           }}>{error}</div>
         )}
+
+        {/* 버튼 */}
+        <div style={{ display:'flex', gap:8, marginTop:4 }}>
+          <button onClick={onBack} style={{
+            flex:1, height:50, borderRadius:14, border:'1.5px solid #E2E8F0',
+            background:'#fff', color:'#64748B', fontSize:15, fontWeight:700, cursor:'pointer',
+          }}>취소</button>
+          <button onClick={submit} disabled={submitting} style={{
+            flex:2, height:50, borderRadius:14, border:'none',
+            background:BLUE, color:'#fff', fontSize:15, fontWeight:700,
+            cursor:'pointer', opacity: submitting ? 0.6 : 1,
+          }}>{submitting ? '등록 중...' : '등록하기'}</button>
+        </div>
       </div>
     </div>
   )
