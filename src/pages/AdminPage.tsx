@@ -274,8 +274,8 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
     <div style={{
       minHeight:'100vh', background:'#F0F2F7',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
-      paddingBottom:72,
     }}>
+    <div style={{ maxWidth:430, margin:'0 auto', minHeight:'100vh', position:'relative', background:'#F0F2F7', paddingBottom:72 }}>
       {/* 헤더 */}
       <div style={{
         background:'#1B6EF3', color:'#fff',
@@ -302,7 +302,7 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* 탭 콘텐츠 */}
-      <div style={{ maxWidth:600, margin:'0 auto', padding:'16px 14px 16px' }}>
+      <div style={{ padding:'16px 14px 16px' }}>
         {tab==='business'    && <BusinessTab />}
         {tab==='requests'    && <RequestsTab />}
         {tab==='suggestions' && <SuggestionsTab />}
@@ -333,6 +333,7 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
           </button>
         ))}
       </div>
+    </div>
     </div>
   )
 }
