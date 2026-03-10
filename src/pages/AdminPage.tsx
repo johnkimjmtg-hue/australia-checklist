@@ -13,6 +13,17 @@ const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'hojugaja2024'
 // ── 탭 타입
 type MainTab = 'business' | 'categories' | 'items' | 'export' | 'requests' | 'suggestions'
 
+// ── 탭 메타
+const TAB_META: { id: MainTab; icon: string; label: string }[] = [
+  { id:'business',    icon:'ph:buildings',         label:'업체' },
+  { id:'requests',    icon:'ph:envelope-open',      label:'신청' },
+  { id:'suggestions', icon:'ph:lightbulb',          label:'추천' },
+  { id:'categories',  icon:'ph:folder-open',        label:'카테고리' },
+  { id:'items',       icon:'ph:list-checks',        label:'체크리스트' },
+  { id:'export',      icon:'ph:code',               label:'내보내기' },
+]
+
+
 // ── 업체 폼 초기값
 const EMPTY_FORM = {
   id:'', name:'', category:'realestate', description:'',
@@ -234,7 +245,7 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
   if (!authed) return (
     <div style={{
       minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center',
-      background:'linear-gradient(170deg,#eef2fa,#f5f7fb)',
+      background:'#F0F2F7',
       fontFamily:'-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
     }}>
       <div style={{
@@ -251,57 +262,76 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
           style={inputStyle}
         />
         {pwError && <div style={{ color:'#e8420a', fontSize:12, marginTop:6, fontWeight:700 }}>비밀번호가 틀렸어요</div>}
-        <button onClick={handleLogin} style={{ ...btnPrimary, marginTop:12 }}>로그인</button>
-        <button onClick={onBack} style={{ ...btnGhost, marginTop:8 }}>← 돌아가기</button>
+        <button onClick={handleLogin} style={{ ...btnPrimary, marginTop:12, width:'100%', justifyContent:'center', display:'flex' }}>로그인</button>
+        <button onClick={onBack} style={{ ...btnGhost, marginTop:8, width:'100%', justifyContent:'center', display:'flex', alignItems:'center', gap:6 }}><Icon icon="ph:arrow-left" width={14} height={14} /> 돌아가기</button>
       </div>
     </div>
   )
 
+  const currentTab = TAB_META.find(t => t.id === tab)!
+
   return (
     <div style={{
-      minHeight:'100vh', background:'#f0f2f5',
-      fontFamily:'-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
+      minHeight:'100vh', background:'#F0F2F7',
+      fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
+      paddingBottom:72,
     }}>
       {/* 헤더 */}
       <div style={{
-        background:'#1E4D83', color:'#fff', padding:'16px 20px',
-        display:'flex', alignItems:'center', gap:12,
+        background:'#1B6EF3', color:'#fff',
+        padding:'14px 16px 14px',
+        display:'flex', alignItems:'center', gap:10,
         position:'sticky', top:0, zIndex:50,
+        boxShadow:'0 2px 8px rgba(27,110,243,0.18)',
       }}>
-        <button onClick={onBack} style={{ background:'none', border:'none', color:'#fff', fontSize:20, cursor:'pointer', padding:0 }}>←</button>
-        <div>
-          <div style={{ fontSize:17, fontWeight:900 }}>🛠 호주가자 Admin</div>
-          <div style={{ fontSize:11, opacity:0.7 }}>관리자 페이지</div>
+        <button onClick={onBack} style={{
+          background:'rgba(255,255,255,0.15)', border:'none', color:'#fff',
+          width:36, height:36, borderRadius:10, cursor:'pointer',
+          display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
+        }}>
+          <Icon icon="ph:arrow-left" width={18} height={18} color="#fff" />
+        </button>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:16, fontWeight:900, lineHeight:1.2 }}>호주가자 Admin</div>
+          <div style={{ fontSize:11, opacity:0.75 }}>{currentTab.label}</div>
         </div>
-      </div>
-
-      {/* 탭 */}
-      <div style={{ background:'#fff', borderBottom:'1px solid #e8e8e8', display:'flex', overflowX:'auto' }}>
-        {([
-          ['business',    '🏢 업체 관리'],
-          ['requests',    '📬 등록 신청'],
-          ['suggestions', '💡 버킷 추천'],
-          ['categories',  '📂 카테고리'],
-          ['items',       '📝 체크리스트'],
-          ['export',      '💾 코드 내보내기'],
-        ] as [MainTab, string][]).map(([id, label]) => (
-          <button key={id} onClick={() => setTab(id)} style={{
-            padding:'12px 18px', border:'none', background:'none', cursor:'pointer',
-            fontSize:13, fontWeight:700, whiteSpace:'nowrap',
-            color: tab===id ? '#1E4D83' : '#888',
-            borderBottom: tab===id ? '2.5px solid #1E4D83' : '2.5px solid transparent',
-          }}>{label}</button>
-        ))}
+        <div style={{
+          background:'rgba(255,255,255,0.15)', borderRadius:8,
+          padding:'4px 10px', fontSize:11, fontWeight:700,
+        }}>🔒 관리자</div>
       </div>
 
       {/* 탭 콘텐츠 */}
-      <div style={{ maxWidth:900, margin:'0 auto', padding:'24px 16px 80px' }}>
+      <div style={{ maxWidth:600, margin:'0 auto', padding:'16px 14px 16px' }}>
         {tab==='business'    && <BusinessTab />}
         {tab==='requests'    && <RequestsTab />}
         {tab==='suggestions' && <SuggestionsTab />}
         {tab==='categories'  && <CategoriesTab cats={sharedCats} setCats={setSharedCats} items={sharedItems} setItems={setSharedItems} />}
         {tab==='items'       && <ItemsTab cats={sharedCats} items={sharedItems} setItems={setSharedItems} iconMap={sharedIconMap} setIconMap={setSharedIconMap} />}
         {tab==='export'      && <ExportTab cats={sharedCats} items={sharedItems} iconMap={sharedIconMap} />}
+      </div>
+
+      {/* 하단 네비바 */}
+      <div style={{
+        position:'fixed', bottom:0, left:0, right:0, zIndex:100,
+        background:'#fff', borderTop:'1px solid #E8EDF3',
+        display:'flex', boxShadow:'0 -4px 16px rgba(0,0,0,0.08)',
+        paddingBottom:'env(safe-area-inset-bottom)',
+      }}>
+        {TAB_META.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            flex:1, border:'none', background:'none', cursor:'pointer',
+            padding:'8px 2px 6px',
+            display:'flex', flexDirection:'column', alignItems:'center', gap:3,
+            color: tab===t.id ? '#1B6EF3' : '#94A3B8',
+          }}>
+            <Icon icon={t.icon} width={22} height={22} color={tab===t.id ? '#1B6EF3' : '#94A3B8'} />
+            <span style={{ fontSize:9, fontWeight:700, lineHeight:1 }}>{t.label}</span>
+            {tab===t.id && (
+              <div style={{ width:16, height:2, borderRadius:2, background:'#1B6EF3', marginTop:1 }} />
+            )}
+          </button>
+        ))}
       </div>
     </div>
   )
@@ -384,9 +414,11 @@ function BusinessTab() {
 
       {showForm ? (
         <div>
-          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
-            <button onClick={() => setShowForm(false)} style={btnGhost}>← 목록</button>
-            <h2 style={{ fontSize:16, fontWeight:900, color:'#0F1B2D', margin:0 }}>{editTarget ? '업체 수정' : '업체 등록'}</h2>
+          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
+            <button onClick={() => setShowForm(false)} style={{ ...btnGhost, display:'flex', alignItems:'center', gap:6, padding:'9px 14px' }}>
+              <Icon icon="ph:arrow-left" width={15} height={15} /> 목록
+            </button>
+            <h2 style={{ fontSize:16, fontWeight:900, color:'#0F172A', margin:0 }}>{editTarget ? '업체 수정' : '업체 등록'}</h2>
           </div>
           <Card>
             <Grid2>
@@ -417,7 +449,10 @@ function BusinessTab() {
               <label style={checkLabel}><input type="checkbox" checked={form.is_featured} onChange={e=>setForm(f=>({...f,is_featured:e.target.checked}))} /> ⭐ 추천 업체</label>
               <label style={checkLabel}><input type="checkbox" checked={form.is_active} onChange={e=>setForm(f=>({...f,is_active:e.target.checked}))} /> ✅ 활성화</label>
             </div>
-            <button onClick={save} disabled={saving} style={{ ...btnPrimary, marginTop:16 }}>{saving ? '저장 중...' : editTarget ? '수정 완료' : '등록하기'}</button>
+            <button onClick={save} disabled={saving} style={{ ...btnPrimary, marginTop:16, width:'100%', justifyContent:'center', display:'flex', alignItems:'center', gap:8 }}>
+              <Icon icon={saving ? 'ph:spinner' : 'ph:check'} width={16} height={16} />
+              {saving ? '저장 중...' : editTarget ? '수정 완료' : '등록하기'}
+            </button>
           </Card>
 
           {/* 리뷰 관리 - 수정 모드일 때만 */}
@@ -426,8 +461,8 @@ function BusinessTab() {
       ) : (
         <>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
-            <span style={{ fontSize:13, color:'#888', fontWeight:700 }}>총 {businesses.length}개 업체</span>
-            <button onClick={openNew} style={btnPrimary}>+ 업체 등록</button>
+            <span style={{ fontSize:13, color:'#64748B', fontWeight:700 }}>총 {businesses.length}개 업체</span>
+            <button onClick={openNew} style={{ ...btnPrimary, padding:'9px 16px', fontSize:13 }}>+ 등록</button>
           </div>
 
           {/* 검색 + 카테고리 필터 */}
@@ -473,7 +508,7 @@ function BusinessTab() {
                 <Card key={b.id}>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:6 }}>
                     <div>
-                      <span style={{ fontSize:15, fontWeight:900, color:'#0F1B2D' }}>{b.name}</span>
+                      <span style={{ fontSize:15, fontWeight:900, color:'#0F172A' }}>{b.name}</span>
                       {b.is_featured && <span style={{ marginLeft:6, fontSize:10, background:'#1E4D83', color:'#fff', borderRadius:10, padding:'2px 8px', fontWeight:800 }}>추천</span>}
                       {!b.is_active  && <span style={{ marginLeft:6, fontSize:10, background:'#e8420a', color:'#fff', borderRadius:10, padding:'2px 8px', fontWeight:800 }}>비활성</span>}
                     </div>
@@ -627,7 +662,7 @@ function CategoriesTab({ cats, setCats, items, setItems }: {
             style={{ ...inputStyle, width:52, textAlign:'center', fontSize:20, flexShrink:0 }} />
           <input value={newLabel} onChange={e=>setNewLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addCat()}
             placeholder="카테고리 이름" style={{ ...inputStyle, flex:1, minWidth:0 }} />
-          <button onClick={addCat} style={{ ...btnPrimary, flexShrink:0, whiteSpace:'nowrap' }}>추가</button>
+          <button onClick={addCat} style={{ ...btnPrimary, flexShrink:0, padding:'11px 16px', fontSize:13 }}>추가</button>
         </div>
         <p style={{ fontSize:12, color:'#aaa', marginTop:6 }}>이모티콘 비워두면 자동 선택됩니다</p>
       </Card>
@@ -882,11 +917,11 @@ function ItemsTab({ cats, items, setItems, iconMap, setIconMap }: {
         <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
           {cats.map(c => (
             <button key={c.id} onClick={() => { setSelCat(c.id); setNewIcon(CAT_DEFAULT[c.id] || 'ph:star') }} style={{
-              padding:'6px 14px', borderRadius:8, border:'1.5px solid',
-              borderColor: selCat===c.id ? '#1E4D83' : '#ddd',
-              background: selCat===c.id ? '#1E4D83' : '#fff',
-              color: selCat===c.id ? '#fff' : '#666',
-              fontSize:13, fontWeight:700, cursor:'pointer',
+              padding:'8px 14px', borderRadius:10, border:'1.5px solid',
+              borderColor: selCat===c.id ? '#1B6EF3' : '#E2E8F0',
+              background: selCat===c.id ? '#1B6EF3' : '#fff',
+              color: selCat===c.id ? '#fff' : '#475569',
+              fontSize:13, fontWeight:700, cursor:'pointer', minHeight:38,
             }}>{c.emoji} {c.label}</button>
           ))}
         </div>
@@ -1010,7 +1045,7 @@ function ExportTab({ cats, items, iconMap }: {
       <textarea
         value={code} readOnly
         placeholder="'코드 생성' 버튼을 눌러주세요..."
-        style={{ width:'100%', minHeight:320, padding:14, border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'monospace', fontSize:12, color:'#333', background:'#fafafa', resize:'vertical', outline:'none', lineHeight:1.6, boxSizing:'border-box' }}
+        style={{ width:'100%', minHeight:240, padding:14, border:'1.5px solid #E2E8F0', borderRadius:10, fontFamily:'monospace', fontSize:11, color:'#334155', background:'#F8FAFC', resize:'vertical', outline:'none', lineHeight:1.6, boxSizing:'border-box' }}
       />
     </Card>
   )
@@ -1020,23 +1055,23 @@ function ExportTab({ cats, items, iconMap }: {
 // SHARED UI COMPONENTS
 // ════════════════════════════════════════════
 function Card({ children }: { children: React.ReactNode }) {
-  return <div style={{ background:'#fff', borderRadius:14, padding:20, marginBottom:16, boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>{children}</div>
+  return <div style={{ background:'#fff', borderRadius:16, padding:'18px 16px', marginBottom:12, boxShadow:'0 2px 8px rgba(0,0,0,0.06)', border:'1px solid #F1F5F9' }}>{children}</div>
 }
 
 function SectionTitle({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  return <div style={{ fontSize:13, fontWeight:800, color:'#444', marginBottom:14, letterSpacing:0.5, ...style }}>{children}</div>
+  return <div style={{ fontSize:14, fontWeight:800, color:'#0F172A', marginBottom:14, letterSpacing:0.3, ...style }}>{children}</div>
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div style={{ marginBottom:10 }}><div style={{ fontSize:12, fontWeight:800, color:'#1E4D83', marginBottom:4 }}>{label}</div>{children}</div>
+  return <div style={{ marginBottom:14 }}><div style={{ fontSize:12, fontWeight:800, color:'#1B6EF3', marginBottom:6, letterSpacing:0.3 }}>{label}</div>{children}</div>
 }
 
 function Grid2({ children }: { children: React.ReactNode }) {
-  return <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>{children}</div>
+  return <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:10 }}>{children}</div>
 }
 
 function Toast({ msg }: { msg: string }) {
-  return <div style={{ position:'fixed', bottom:32, left:'50%', transform:'translateX(-50%)', background:'#222', color:'#fff', padding:'10px 22px', borderRadius:99, fontSize:13, fontWeight:600, zIndex:999 }}>{msg}</div>
+  return <div style={{ position:'fixed', bottom:86, left:'50%', transform:'translateX(-50%)', background:'#1E293B', color:'#fff', padding:'11px 22px', borderRadius:12, fontSize:13, fontWeight:700, zIndex:999, boxShadow:'0 4px 16px rgba(0,0,0,0.2)', whiteSpace:'nowrap' }}>{msg}</div>
 }
 
 function Confirm({ msg, onOk, onCancel, danger }: { msg: string; onOk: ()=>void; onCancel: ()=>void; danger?: boolean }) {
@@ -1056,33 +1091,36 @@ function Confirm({ msg, onOk, onCancel, danger }: { msg: string; onOk: ()=>void;
 
 // ── 공통 스타일
 const inputStyle: React.CSSProperties = {
-  width:'100%', minWidth:0, padding:'9px 12px', border:'1.5px solid #e0e0e0', borderRadius:9,
-  fontSize:14, color:'#333', outline:'none', boxSizing:'border-box',
-  fontFamily:'inherit', display:'block',
+  width:'100%', minWidth:0, padding:'11px 14px', border:'1.5px solid #E2E8F0', borderRadius:10,
+  fontSize:14, color:'#1E293B', outline:'none', boxSizing:'border-box',
+  fontFamily:'inherit', display:'block', background:'#fff',
 }
 
 const btnPrimary: React.CSSProperties = {
-  padding:'9px 18px', borderRadius:9, border:'none', background:'#1E4D83', color:'#fff',
-  fontSize:13, fontWeight:700, cursor:'pointer', flexShrink:0, whiteSpace:'nowrap',
+  padding:'11px 20px', borderRadius:10, border:'none', background:'#1B6EF3', color:'#fff',
+  fontSize:14, fontWeight:700, cursor:'pointer', flexShrink:0, whiteSpace:'nowrap',
+  minHeight:44,
 }
 
 const btnGhost: React.CSSProperties = {
-  padding:'9px 16px', borderRadius:9, border:'1.5px solid #e0e0e0', background:'#fff', color:'#666',
-  fontSize:13, fontWeight:700, cursor:'pointer', flexShrink:0, whiteSpace:'nowrap',
+  padding:'11px 16px', borderRadius:10, border:'1.5px solid #E2E8F0', background:'#fff', color:'#475569',
+  fontSize:14, fontWeight:700, cursor:'pointer', flexShrink:0, whiteSpace:'nowrap',
+  minHeight:44,
 }
 
 const btnSmGhost: React.CSSProperties = {
-  padding:'4px 8px', borderRadius:6, border:'1.5px solid #e0e0e0', background:'#f4f5f8', color:'#666',
-  fontSize:12, fontWeight:700, cursor:'pointer',
+  padding:'7px 12px', borderRadius:8, border:'1.5px solid #E2E8F0', background:'#F8FAFC', color:'#64748B',
+  fontSize:12, fontWeight:700, cursor:'pointer', minHeight:36,
 }
 
 const btnSmDanger: React.CSSProperties = {
-  padding:'4px 8px', borderRadius:6, border:'none', background:'#fee2e2', color:'#e05252',
-  fontSize:12, fontWeight:700, cursor:'pointer',
+  padding:'7px 12px', borderRadius:8, border:'none', background:'#FEE2E2', color:'#DC2626',
+  fontSize:12, fontWeight:700, cursor:'pointer', minHeight:36,
 }
 
 const checkLabel: React.CSSProperties = {
-  display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:700, color:'#1E4D83', cursor:'pointer',
+  display:'flex', alignItems:'center', gap:8, fontSize:14, fontWeight:700, color:'#1B6EF3', cursor:'pointer',
+  padding:'8px 0',
 }
 
 // ════════════════════════════════════════════
@@ -1191,7 +1229,7 @@ function RequestsTab() {
   return (
     <div>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
-        <div style={{ fontSize:18, fontWeight:900, color:'#0F1B2D' }}>업체 등록 신청</div>
+        <div style={{ fontSize:16, fontWeight:900, color:'#0F172A' }}>업체 등록 신청</div>
         <button onClick={loadRequests} style={{ ...btnSmGhost }}>새로고침 ↻</button>
       </div>
 
@@ -1339,10 +1377,12 @@ function SuggestionsTab() {
     <div>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
         <div>
-          <div style={{ fontSize:18, fontWeight:900, color:'#0F1B2D' }}>버킷리스트 추천</div>
-          <div style={{ fontSize:12, color:'#94A3B8', marginTop:2 }}>검토 후 체크리스트에 직접 추가해주세요</div>
+          <div style={{ fontSize:16, fontWeight:900, color:'#0F172A' }}>버킷리스트 추천</div>
+          <div style={{ fontSize:12, color:'#94A3B8', marginTop:2 }}>검토 후 체크리스트에 추가해주세요</div>
         </div>
-        <button onClick={loadSuggestions} style={{ ...btnSmGhost }}>새로고침 ↻</button>
+        <button onClick={loadSuggestions} style={{ ...btnSmGhost, display:'flex', alignItems:'center', gap:4 }}>
+          <Icon icon="ph:arrow-clockwise" width={13} height={13} /> 새로고침
+        </button>
       </div>
 
       {loading ? (
