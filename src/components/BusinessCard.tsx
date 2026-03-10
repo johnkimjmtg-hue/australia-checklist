@@ -80,9 +80,7 @@ export default function BusinessCard({ business }: Props) {
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
             <div style={{ fontSize:17, fontWeight:800, color:'#0F172A', flex:1, paddingRight:8 }}>{name}</div>
             <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
-              {is_featured && (
-                <div style={{ background:'#1B6EF3', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'3px 10px' }}>추천</div>
-              )}
+
               <button onClick={() => setBookmarked(toggleBookmark(business.id))} style={{
                 background: bookmarked ? 'rgba(220,38,38,0.08)' : 'none',
                 border:'none', cursor:'pointer', padding:'4px 6px', borderRadius:8,
