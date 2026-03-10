@@ -130,6 +130,7 @@ function loadGoogleMaps(): Promise<void> {
 function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [suggestions, setSuggestions] = useState<any[]>([])
   const [loading, setLoading]         = useState(false)
+  const [manualMode, setManualMode]   = useState(false)
   const debounceRef = useRef<any>(null)
 
   async function handleInput(val: string) {
@@ -171,6 +172,21 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
     padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff',
     boxSizing:'border-box', fontFamily:ff, outline:'none',
   }
+
+  // 직접 입력 모드
+  if (manualMode) {
+    return (
+      <div>
+        <input value={value} onChange={e => onChange(e.target.value)}
+          placeholder="주소를 직접 입력하세요" style={iStyle} autoFocus />
+        <button onClick={() => { setManualMode(false); onChange('') }}
+          style={{ background:'none', border:'none', fontSize:11, color:'#94A3B8', cursor:'pointer', marginTop:4, padding:0 }}>
+          ← 자동완성으로 돌아가기
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div style={{ position:'relative' }}>
       <input value={value} onChange={e => handleInput(e.target.value)}
@@ -195,7 +211,29 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
               {s.placePrediction?.text?.text || ''}
             </div>
           ))}
+          {/* 직접 입력 옵션 */}
+          <div onClick={() => { setSuggestions([]); setManualMode(true); onChange('') }} style={{
+            padding:'10px 14px', fontSize:13, cursor:'pointer',
+            color:'#1B6EF3', fontWeight:700,
+            display:'flex', alignItems:'center', gap:8,
+            borderTop:'1px solid #E2E8F0', background:'#F8FAFF',
+          }}
+            onMouseEnter={e => (e.currentTarget.style.background='#EFF6FF')}
+            onMouseLeave={e => (e.currentTarget.style.background='#F8FAFF')}
+          >
+            <Icon icon="ph:pencil-simple" width={14} height={14} color="#1B6EF3" />
+            찾는 주소가 없어요 — 직접 입력하기
+          </div>
         </div>
+      )}
+      {/* 검색 결과 없을 때 직접 입력 안내 */}
+      {!loading && !suggestions.length && value.length >= 3 && (
+        <button onClick={() => setManualMode(true)} style={{
+          background:'none', border:'none', fontSize:11, color:'#1B6EF3',
+          cursor:'pointer', marginTop:4, padding:0, fontWeight:700,
+        }}>
+          주소를 찾을 수 없나요? 직접 입력하기 →
+        </button>
       )}
     </div>
   )
