@@ -7,7 +7,7 @@ import BusinessCard from '../components/BusinessCard'
 import CategoryFilter from '../components/CategoryFilter'
 
 type Props = { onSelectBusiness: (id: string) => void; onBack: () => void }
-type ServiceTab = 'all' | 'bookmarks'
+type ServiceTab = 'all' | 'bookmarks' | 'emergency'
 
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
@@ -126,9 +126,9 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         borderBottom:'1.5px solid #D1D9E3',
         boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
       }}>
-        {/* 전체/북마크 탭 */}
+        {/* 전체/북마크/비상연락처 탭 */}
         <div style={{ display:'flex', gap:6, marginBottom:10 }}>
-          {(['all', 'bookmarks'] as ServiceTab[]).map(tab => (
+          {(['all', 'bookmarks', 'emergency'] as ServiceTab[]).map(tab => (
             <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
               height:32, padding:'0 14px', borderRadius:10, border:'none',
               cursor:'pointer', fontSize:13, fontWeight:700,
@@ -137,10 +137,10 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               boxShadow: serviceTab === tab ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
               display:'flex', alignItems:'center', gap:5,
             }}>
-              <Icon icon={tab === 'all' ? 'ph:list-bullets' : 'ph:bookmark-simple-fill'}
+              <Icon icon={tab === 'all' ? 'ph:list-bullets' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:phone-call'}
                 width={13} height={13}
-                color={tab === 'bookmarks' && serviceTab !== tab ? '#DC2626' : serviceTab === tab ? '#fff' : '#94A3B8'} />
-              {tab === 'all' ? '전체 업체' : `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}`}
+                color={tab === 'bookmarks' && serviceTab !== tab ? '#DC2626' : tab === 'emergency' && serviceTab !== tab ? '#DC2626' : serviceTab === tab ? '#fff' : '#94A3B8'} />
+              {tab === 'all' ? '전체 업체' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'}
             </button>
           ))}
         </div>
@@ -238,6 +238,10 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             </>
           )
         )}
+
+
+        {/* 비상연락처 탭 */}
+        {serviceTab === 'emergency' && <EmergencyTab />}
 
         {/* 검색 결과 */}
         {serviceTab === 'all' && isSearch && (
@@ -351,6 +355,170 @@ function EmptyState() {
     <div style={{ textAlign:'center', padding:'48px 0', color:'#94A3B8', fontSize:14, fontWeight:600 }}>
       <Icon icon="ph:magnifying-glass" width={36} height={36} color="#CBD5E1" />
       <div style={{ marginTop:12 }}>검색 결과가 없어요</div>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════
+// 비상연락처 탭
+// ══════════════════════════════════════════
+const EMERGENCY_DATA = [
+  {
+    section: '🚨 긴급 상황 (전국 공통)',
+    color: '#DC2626',
+    bg: '#FFF5F5',
+    border: '#FECDD3',
+    items: [
+      { label: '경찰 / 구급차 / 화재', number: '000', desc: '모든 긴급상황' },
+      { label: '휴대폰 긴급번호', number: '112', desc: '000과 동일' },
+      { label: '음성·청각 장애 긴급', number: '106', desc: 'TTY 전용' },
+      { label: '비긴급 경찰 신고', number: '131 444', desc: '긴급하지 않은 신고' },
+    ],
+  },
+  {
+    section: '🚑 의료 / 병원',
+    color: '#D97706',
+    bg: '#FFFBEB',
+    border: '#FDE68A',
+    items: [
+      { label: '구급차 (긴급)', number: '000', desc: '생명 위험 시' },
+      { label: 'Healthdirect', number: '1800 022 222', desc: '24시간 의료 상담' },
+      { label: 'Poison Information', number: '13 11 26', desc: '독극물·약물 중독' },
+    ],
+  },
+  {
+    section: '🔥 화재 / 재난',
+    color: '#EA580C',
+    bg: '#FFF7ED',
+    border: '#FED7AA',
+    items: [
+      { label: '소방서 (긴급)', number: '000', desc: '화재 긴급' },
+      { label: 'NSW Rural Fire', number: '1800 679 737', desc: 'NSW 산불' },
+      { label: 'VIC Emergency', number: '1800 226 226', desc: 'VIC 재난' },
+      { label: 'QLD Disaster', number: '13 74 68', desc: 'QLD 재난' },
+    ],
+  },
+  {
+    section: '🚗 로드사이드 어시스턴스',
+    color: '#2563EB',
+    bg: '#EFF6FF',
+    border: '#BFDBFE',
+    items: [
+      { label: 'NRMA (NSW/ACT)', number: '13 11 22', desc: '차량 긴급출동' },
+      { label: 'RACV (VIC)', number: '13 11 11', desc: '차량 긴급출동' },
+      { label: 'RACQ (QLD)', number: '13 11 11', desc: '차량 긴급출동' },
+      { label: 'RAC (WA)', number: '13 11 11', desc: '차량 긴급출동' },
+      { label: 'RAA (SA)', number: '13 11 11', desc: '차량 긴급출동' },
+    ],
+  },
+  {
+    section: '💊 정신건강 / 위기상담',
+    color: '#7C3AED',
+    bg: '#F5F3FF',
+    border: '#DDD6FE',
+    items: [
+      { label: 'Lifeline (자살예방)', number: '13 11 14', desc: '24시간 위기상담' },
+      { label: 'Beyond Blue', number: '1300 224 636', desc: '정신건강 상담' },
+      { label: 'Suicide Call Back', number: '1300 659 467', desc: '자살예방 콜백' },
+    ],
+  },
+  {
+    section: '🧒 아동 / 가정 문제',
+    color: '#0891B2',
+    bg: '#ECFEFF',
+    border: '#A5F3FC',
+    items: [
+      { label: 'Kids Helpline', number: '1800 55 1800', desc: '아동·청소년 상담' },
+      { label: 'Domestic Violence', number: '1800 737 732', desc: '가정폭력 상담' },
+    ],
+  },
+  {
+    section: '🧳 여행자 / 외국인',
+    color: '#059669',
+    bg: '#ECFDF5',
+    border: '#A7F3D0',
+    items: [
+      { label: '통역 서비스', number: '13 14 50', desc: 'Interpreter Service' },
+      { label: '영사관 긴급', number: '1300 555 135', desc: '호주 정부 영사 긴급' },
+    ],
+  },
+  {
+    section: '⚡ 유틸리티 사고',
+    color: '#CA8A04',
+    bg: '#FEFCE8',
+    border: '#FEF08A',
+    items: [
+      { label: '가스 누출', number: '1800 898 220', desc: '가스 긴급' },
+      { label: '정전 신고 (NSW)', number: '13 20 80', desc: 'NSW 전력' },
+    ],
+  },
+]
+
+function EmergencyTab() {
+  const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+  return (
+    <div style={{ paddingBottom: 40 }}>
+      {/* 안내 배너 */}
+      <div style={{
+        background:'linear-gradient(135deg,#DC2626,#B91C1C)',
+        borderRadius:14, padding:'16px', marginBottom:16,
+        display:'flex', alignItems:'center', gap:12,
+      }}>
+        <div style={{ fontSize:32 }}>🇦🇺</div>
+        <div>
+          <div style={{ fontSize:15, fontWeight:800, color:'#fff', marginBottom:2 }}>호주 긴급 전화번호</div>
+          <div style={{ fontSize:12, color:'rgba(255,255,255,0.85)', lineHeight:1.5 }}>전화번호를 누르면 바로 연결돼요</div>
+        </div>
+      </div>
+
+      {EMERGENCY_DATA.map((group, gi) => (
+        <div key={gi} style={{ marginBottom:14 }}>
+          {/* 섹션 헤더 */}
+          <div style={{
+            fontSize:13, fontWeight:800, color: group.color,
+            marginBottom:8, paddingLeft:2,
+          }}>{group.section}</div>
+
+          {/* 카드 */}
+          <div style={{
+            background:'#fff', borderRadius:12, overflow:'hidden',
+            border:`1.5px solid ${group.border}`,
+            boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
+          }}>
+            {group.items.map((item, ii) => (
+              <a
+                key={ii}
+                href={`tel:${item.number.replace(/\s/g, '')}`}
+                style={{
+                  display:'flex', alignItems:'center', justifyContent:'space-between',
+                  padding:'13px 16px',
+                  borderBottom: ii < group.items.length - 1 ? '1px solid #F1F5F9' : 'none',
+                  textDecoration:'none',
+                  background: 'transparent',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize:13, fontWeight:700, color:'#1E293B', fontFamily:ff }}>{item.label}</div>
+                  <div style={{ fontSize:11, color:'#94A3B8', marginTop:2, fontFamily:ff }}>{item.desc}</div>
+                </div>
+                <div style={{
+                  display:'flex', alignItems:'center', gap:6,
+                  background: group.bg, borderRadius:10,
+                  padding:'8px 12px', flexShrink:0,
+                }}>
+                  <Icon icon="ph:phone-call" width={14} height={14} color={group.color} />
+                  <span style={{ fontSize:14, fontWeight:800, color: group.color, fontFamily:ff, letterSpacing:0.3 }}>{item.number}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* 하단 안내 */}
+      <div style={{ textAlign:'center', padding:'16px 0', color:'#94A3B8', fontSize:12 }}>
+        긴급 상황 시 망설이지 말고 000에 전화하세요
+      </div>
     </div>
   )
 }
