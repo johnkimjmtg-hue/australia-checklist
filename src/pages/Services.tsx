@@ -132,14 +132,17 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
               height:32, padding:'0 14px', borderRadius:10, border:'none',
               cursor:'pointer', fontSize:13, fontWeight:700,
-              background: serviceTab === tab ? '#1B6EF3' : '#fff',
-              color: serviceTab === tab ? '#fff' : '#64748B',
+              background: serviceTab === tab
+                ? '#1B6EF3'
+                : tab === 'emergency' ? 'rgba(220,38,38,0.08)' : '#fff',
+              color: serviceTab === tab ? '#fff'
+                : tab === 'emergency' ? '#DC2626' : '#64748B',
               boxShadow: serviceTab === tab ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
               display:'flex', alignItems:'center', gap:5,
             }}>
-              <Icon icon={tab === 'all' ? 'ph:list-bullets' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:phone-call'}
+              <Icon icon={tab === 'all' ? 'ph:list-bullets' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:siren'}
                 width={13} height={13}
-                color={tab === 'bookmarks' && serviceTab !== tab ? '#DC2626' : tab === 'emergency' && serviceTab !== tab ? '#DC2626' : serviceTab === tab ? '#fff' : '#94A3B8'} />
+                color={serviceTab === tab ? '#fff' : tab === 'emergency' ? '#DC2626' : tab === 'bookmarks' ? '#DC2626' : '#94A3B8'} />
               {tab === 'all' ? '전체 업체' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'}
             </button>
           ))}
@@ -364,7 +367,7 @@ function EmptyState() {
 // ══════════════════════════════════════════
 const EMERGENCY_DATA = [
   {
-    section: '🚨 긴급 상황 (전국 공통)',
+    section: '긴급 상황 (전국 공통)', icon: 'ph:siren',
     color: '#DC2626',
     bg: '#FFF5F5',
     border: '#FECDD3',
@@ -376,7 +379,7 @@ const EMERGENCY_DATA = [
     ],
   },
   {
-    section: '🚑 의료 / 병원',
+    section: '의료 / 병원', icon: 'ph:first-aid-kit',
     color: '#D97706',
     bg: '#FFFBEB',
     border: '#FDE68A',
@@ -387,7 +390,7 @@ const EMERGENCY_DATA = [
     ],
   },
   {
-    section: '🔥 화재 / 재난',
+    section: '화재 / 재난', icon: 'ph:fire',
     color: '#EA580C',
     bg: '#FFF7ED',
     border: '#FED7AA',
@@ -399,7 +402,7 @@ const EMERGENCY_DATA = [
     ],
   },
   {
-    section: '🚗 로드사이드 어시스턴스',
+    section: '로드사이드 어시스턴스', icon: 'ph:car',
     color: '#2563EB',
     bg: '#EFF6FF',
     border: '#BFDBFE',
@@ -412,7 +415,7 @@ const EMERGENCY_DATA = [
     ],
   },
   {
-    section: '💊 정신건강 / 위기상담',
+    section: '정신건강 / 위기상담', icon: 'ph:heart',
     color: '#7C3AED',
     bg: '#F5F3FF',
     border: '#DDD6FE',
@@ -423,7 +426,7 @@ const EMERGENCY_DATA = [
     ],
   },
   {
-    section: '🧒 아동 / 가정 문제',
+    section: '아동 / 가정 문제', icon: 'ph:baby',
     color: '#0891B2',
     bg: '#ECFEFF',
     border: '#A5F3FC',
@@ -433,17 +436,18 @@ const EMERGENCY_DATA = [
     ],
   },
   {
-    section: '🧳 여행자 / 외국인',
+    section: '여행자 / 외국인', icon: 'ph:airplane',
     color: '#059669',
     bg: '#ECFDF5',
     border: '#A7F3D0',
     items: [
       { label: '통역 서비스', number: '13 14 50', desc: 'Interpreter Service' },
-      { label: '영사관 긴급', number: '1300 555 135', desc: '호주 정부 영사 긴급' },
+      { label: '호주 영사관 긴급', number: '1300 555 135', desc: '호주 정부 영사 긴급' },
+      { label: '한국 긴급 영사콜센터', number: '+82-2-3210-0404', desc: '재외국민 24시간 긴급지원' },
     ],
   },
   {
-    section: '⚡ 유틸리티 사고',
+    section: '유틸리티 사고', icon: 'ph:lightning',
     color: '#CA8A04',
     bg: '#FEFCE8',
     border: '#FEF08A',
@@ -464,7 +468,7 @@ function EmergencyTab() {
         borderRadius:14, padding:'16px', marginBottom:16,
         display:'flex', alignItems:'center', gap:12,
       }}>
-        <div style={{ fontSize:32 }}>🇦🇺</div>
+        <Icon icon="ph:flag" width={36} height={36} color="#fff" />
         <div>
           <div style={{ fontSize:15, fontWeight:800, color:'#fff', marginBottom:2 }}>호주 긴급 전화번호</div>
           <div style={{ fontSize:12, color:'rgba(255,255,255,0.85)', lineHeight:1.5 }}>전화번호를 누르면 바로 연결돼요</div>
@@ -475,9 +479,13 @@ function EmergencyTab() {
         <div key={gi} style={{ marginBottom:14 }}>
           {/* 섹션 헤더 */}
           <div style={{
+            display:'flex', alignItems:'center', gap:6,
             fontSize:13, fontWeight:800, color: group.color,
             marginBottom:8, paddingLeft:2,
-          }}>{group.section}</div>
+          }}>
+            <Icon icon={group.icon} width={15} height={15} color={group.color} />
+            {group.section}
+          </div>
 
           {/* 카드 */}
           <div style={{
