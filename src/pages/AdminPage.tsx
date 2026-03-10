@@ -119,6 +119,12 @@ function AddressAutocomplete({ address, city, onSelect }: {
   const [loading, setLoading]         = useState(false)
   const [manual, setManual]           = useState(false)
   const [manualCity, setManualCity]   = useState(city || '')
+
+  // 수정 모드로 열릴 때 prop 변경 반영
+  useEffect(() => {
+    setQuery(address || '')
+    setManualCity(city || '')
+  }, [address, city])
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   async function handleInput(val: string) {
@@ -343,9 +349,11 @@ function BusinessTab() {
   }
 
   async function save() {
-    if (!form.name || !form.city) { showToast('업체명, 도시는 필수예요'); return }
+    if (!form.name) { showToast('업체명은 필수예요'); return }
     setSaving(true)
-    const payload = { ...form, tags: form.tags.split(',').map(t=>t.trim()).filter(Boolean), rating:0, reviews_count:0 }
+    // city가 없으면 address에서 suburb 추출해서 채우기
+    const cityVal = form.city || form.address.split(',').find(p => /[A-Z]{2,3}/.test(p.trim()) === false && p.trim().length > 2)?.trim() || ''
+    const payload = { ...form, city: cityVal, tags: form.tags.split(',').map(t=>t.trim()).filter(Boolean), rating:0, reviews_count:0 }
     if (editTarget) {
       const result = await updateBusiness(editTarget.id, payload)
       if (result) showToast('✅ 수정 완료')
@@ -1115,7 +1123,11 @@ function RequestsTab() {
 
   async function updateStatus(id: string, status: RequestStatus) {
     const { supabase } = await import('../lib/supabase')
-    await supabase.from('business_requests').update({ status }).eq('id', id)
+    const { error: updateError } = await supabase.from('business_requests').update({ status }).eq('id', id)
+    if (updateError) {
+      alert(`상태 변경 실패:\n${updateError.message}\n\n(business_requests 테이블에 status 컬럼이 있는지 확인해주세요)`)
+      return
+    }
     setRequests(rs => rs.map(r => r.id === id ? { ...r, status } : r))
 
     // 승인 시 businesses 테이블에 자동 등록
