@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import Community from './Community'
 import { Icon } from '@iconify/react'
 import { CATEGORIES, ITEMS, CheckItem, ITEM_ICONS } from '../data/checklist'
 import {
