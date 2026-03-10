@@ -36,6 +36,7 @@ export const CATEGORIES = [
   { id: 'beauty',     label: '미용/네일',      emoji: '💇'  },
   { id: 'moving',     label: '이사/공항픽업',  emoji: '📦'  },
   { id: 'handyman',   label: '핸디맨',         emoji: '🔧'  },
+  { id: 'construction', label: '건설·시공',      emoji: '🏗'  },
   { id: 'shopping',   label: '쇼핑',           emoji: '🛍'  },
   { id: 'culture',    label: '문화시설',       emoji: '🎨'  },
   { id: 'transport',  label: '교통',           emoji: '🚌'  },
