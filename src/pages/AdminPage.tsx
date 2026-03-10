@@ -1130,7 +1130,9 @@ type RequestStatus = 'pending' | 'approved' | 'rejected'
 type BusinessRequest = {
   id: string
   business_name: string
+  category?: string
   address: string
+  city?: string
   description: string
   hashtags: string[]
   phone: string | null
@@ -1140,11 +1142,47 @@ type BusinessRequest = {
   created_at: string
 }
 
+type EditableRequest = {
+  business_name: string
+  category: string
+  address: string
+  city: string
+  description: string
+  tags: string
+  phone: string
+  kakao: string
+  website: string
+}
+
 function RequestsTab() {
   const [requests, setRequests] = useState<BusinessRequest[]>([])
   const [loading, setLoading]   = useState(true)
   const [filter, setFilter]     = useState<RequestStatus | 'all'>('all')
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [editMap, setEditMap]   = useState<Record<string, EditableRequest>>({})
+
+  function getEdit(req: BusinessRequest): EditableRequest {
+    if (editMap[req.id]) return editMap[req.id]
+    const suburb = req.city || req.address.split(',').slice(-2,-1)[0]?.trim() || ''
+    return {
+      business_name: req.business_name,
+      category:      req.category || 'restaurant',
+      address:       req.address,
+      city:          suburb,
+      description:   req.description || '',
+      tags:          Array.isArray(req.hashtags) ? req.hashtags.join(', ') : '',
+      phone:         req.phone || '',
+      kakao:         req.kakao || '',
+      website:       req.website || '',
+    }
+  }
+
+  function setEdit(id: string, field: keyof EditableRequest, val: string) {
+    setEditMap(prev => ({
+      ...prev,
+      [id]: { ...getEdit(requests.find(r => r.id === id)!), ...prev[id], [field]: val }
+    }))
+  }
 
   useEffect(() => { loadRequests() }, [])
 
@@ -1168,31 +1206,32 @@ function RequestsTab() {
     }
     setRequests(rs => rs.map(r => r.id === id ? { ...r, status } : r))
 
-    // 승인 시 businesses 테이블에 자동 등록
+    // 승인 시 businesses 테이블에 자동 등록 (editMap 수정 내용 반영)
     if (status === 'approved') {
       const req = requests.find(r => r.id === id)
       if (req) {
-        const suburb = req.address.split(',').slice(-2, -1)[0]?.trim() || ''
+        const ed = editMap[id] || getEdit(req)
+        const tags = ed.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
         const { error } = await (await import('../lib/supabase')).supabase
           .from('businesses')
           .insert({
             id:          crypto.randomUUID(),
-            name:        req.business_name,
-            category:    req.category || 'restaurant',
-            description: req.description,
-            phone:       req.phone    || null,
-            website:     req.website  || null,
-            kakao:       req.kakao    || null,
-            address:     req.address,
-            city:        suburb,
-            tags:        req.hashtags,
+            name:        ed.business_name,
+            category:    ed.category || 'restaurant',
+            description: ed.description,
+            phone:       ed.phone    || null,
+            website:     ed.website  || null,
+            kakao:       ed.kakao    || null,
+            address:     ed.address,
+            city:        ed.city || ed.address.split(',').slice(-2,-1)[0]?.trim() || '',
+            tags:        tags,
             is_featured: false,
             is_active:   true,
           })
         if (error) {
           alert(`승인됐지만 업체 등록 중 오류가 발생했어요:\n${error.message}`)
         } else {
-          alert(`✅ "${req.business_name}" 업체가 등록됐어요!`)
+          alert(`✅ "${ed.business_name}" 업체가 등록됐어요!`)
         }
       }
     }
@@ -1280,34 +1319,65 @@ function RequestsTab() {
                 <span style={{ color:'#94A3B8', fontSize:14 }}>{expanded === req.id ? '▲' : '▼'}</span>
               </div>
 
-              {/* 상세 */}
-              {expanded === req.id && (
-                <div style={{ borderTop:'1px solid #F1F5F9', padding:'14px 16px', background:'#FAFAFA' }}>
-                  <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:14 }}>
-                    <Row label="주소"    value={req.address} />
-                    <Row label="설명"    value={req.description} />
-                    <Row label="해시태그" value={req.hashtags.map(t => `#${t}`).join(' ')} />
-                    {req.phone   && <Row label="전화번호"   value={req.phone} />}
-                    {req.kakao   && <Row label="카카오채팅" value={req.kakao} link />}
-                    {req.website && <Row label="웹사이트"   value={req.website} link />}
+              {/* 상세 - 편집 가능 폼 */}
+              {expanded === req.id && (() => {
+                const ed = editMap[req.id] || getEdit(req)
+                const fld = (label: string, field: keyof EditableRequest, opts?: { type?: string; placeholder?: string }) => (
+                  <div style={{ marginBottom:10 }}>
+                    <div style={{ fontSize:11, fontWeight:800, color:'#1B6EF3', marginBottom:4 }}>{label}</div>
+                    <input
+                      value={ed[field] as string}
+                      onChange={e => setEdit(req.id, field, e.target.value)}
+                      type={opts?.type || 'text'}
+                      placeholder={opts?.placeholder || ''}
+                      style={{ ...inputStyle, fontSize:13, padding:'8px 10px' }}
+                    />
                   </div>
+                )
+                return (
+                <div style={{ borderTop:'1px solid #F1F5F9', padding:'14px 16px', background:'#F8FAFF' }}>
+                  {/* 업체명 + 카테고리 */}
+                  {fld('업체명 *', 'business_name')}
+                  <div style={{ marginBottom:10 }}>
+                    <div style={{ fontSize:11, fontWeight:800, color:'#1B6EF3', marginBottom:4 }}>카테고리</div>
+                    <select value={ed.category} onChange={e => setEdit(req.id, 'category', e.target.value)} style={{ ...inputStyle, fontSize:13, padding:'8px 10px' }}>
+                      {CATEGORIES.filter(c => c.id !== 'all').map(c => (
+                        <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {fld('주소', 'address', { placeholder: '123 George St, Sydney NSW 2000' })}
+                  {fld('Suburb / City', 'city', { placeholder: 'Sydney' })}
+                  <div style={{ marginBottom:10 }}>
+                    <div style={{ fontSize:11, fontWeight:800, color:'#1B6EF3', marginBottom:4 }}>설명</div>
+                    <textarea
+                      value={ed.description}
+                      onChange={e => setEdit(req.id, 'description', e.target.value)}
+                      rows={3}
+                      style={{ ...inputStyle, fontSize:13, padding:'8px 10px', resize:'none' }}
+                    />
+                  </div>
+                  {fld('태그 (쉼표 구분)', 'tags', { placeholder: '부동산, 투자, 컨설팅' })}
+                  {fld('전화번호', 'phone', { placeholder: '+61 2 1234 5678' })}
+                  {fld('카카오 ID', 'kakao')}
+                  {fld('웹사이트', 'website', { placeholder: 'https://...' })}
                   {/* 액션 버튼 */}
-                  <div style={{ display:'flex', gap:8 }}>
+                  <div style={{ display:'flex', gap:8, marginTop:14 }}>
                     {req.status !== 'approved' && (
                       <button onClick={() => updateStatus(req.id, 'approved')} style={{
-                        flex:1, height:38, border:'none', borderRadius:8,
+                        flex:1, height:44, border:'none', borderRadius:10,
                         background:'#16A34A', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer',
-                      }}>✓ 승인</button>
+                      }}>✓ 수정 후 승인</button>
                     )}
                     {req.status !== 'rejected' && (
                       <button onClick={() => updateStatus(req.id, 'rejected')} style={{
-                        flex:1, height:38, border:'none', borderRadius:8,
+                        flex:1, height:44, border:'none', borderRadius:10,
                         background:'#FEE2E2', color:'#EF4444', fontSize:13, fontWeight:700, cursor:'pointer',
                       }}>✕ 거절</button>
                     )}
                     {req.status !== 'pending' && (
                       <button onClick={() => updateStatus(req.id, 'pending')} style={{
-                        ...btnSmGhost, flex:1, height:38, borderRadius:8, fontSize:13,
+                        ...btnSmGhost, flex:1, height:44, borderRadius:10, fontSize:13,
                       }}>대기로 되돌리기</button>
                     )}
                     <button onClick={() => deleteRequest(req.id)} style={{
@@ -1316,7 +1386,7 @@ function RequestsTab() {
                     }}>🗑</button>
                   </div>
                 </div>
-              )}
+                )})()}
             </div>
           ))}
         </div>
