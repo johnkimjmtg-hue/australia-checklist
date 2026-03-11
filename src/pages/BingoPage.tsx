@@ -202,6 +202,7 @@ export default function BingoPage({ onBack }: Props) {
   const [prevBingoCount, setPrevBingoCount] = useState(0)
   const [stampAnim, setStampAnim] = useState<number|null>(null)
   const [showReset, setShowReset] = useState(false)
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
@@ -233,6 +234,17 @@ export default function BingoPage({ onBack }: Props) {
       setConfettiTrigger(v => v+1)
     }
     setChecked(next)
+  }
+
+  const handleShare = async () => {
+    setShowMoreMenu(false)
+    const text = `☕ 멜번 카페 도장깨기\n${checked.size}/25개 카페를 방문했어요!${bingoCount > 0 ? `\n🟢 ${bingoCount}빙고 달성!` : ''}\n\nhojugaja.com`
+    if (navigator.share) {
+      try { await navigator.share({ title: '호주가자 - 멜번 카페 빙고', text }) } catch {}
+    } else {
+      await navigator.clipboard.writeText(text)
+      alert('클립보드에 복사됐어요!')
+    }
   }
 
   const handleLogoTap = () => {
@@ -272,6 +284,7 @@ export default function BingoPage({ onBack }: Props) {
           50%     { opacity:0.6; }
         }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
         @keyframes scaleIn { from{opacity:0;transform:translate(-50%,-50%) scale(0.92)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
         @keyframes flashOut { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(-50%,-50%) scale(3);opacity:0} }
         @keyframes fwBurst {
@@ -336,8 +349,8 @@ export default function BingoPage({ onBack }: Props) {
           </div>
           {/* 카운터 */}
           <div style={{ textAlign:'center', flexShrink:0 }}>
-            <div style={{ fontSize:26, fontWeight:800, color:'#FFB800', lineHeight:1 }}>{checked.size}</div>
-            <div style={{ fontSize:11, color:'#94A3B8', fontWeight:600, marginTop:2 }}>/25 카페</div>
+            <div style={{ fontSize:52, fontWeight:800, color:'#FFB800', lineHeight:1 }}>{checked.size}</div>
+            <div style={{ fontSize:22, color:'#94A3B8', fontWeight:600, marginTop:2 }}>/25 카페</div>
           </div>
         </div>
       </div>
@@ -465,7 +478,7 @@ export default function BingoPage({ onBack }: Props) {
           <Icon icon="ph:check-circle" width={18} height={18} color="#fff" />
           저장하고 나가기
         </button>
-        <button onClick={() => setShowReset(true)} style={{
+        <button onClick={() => setShowMoreMenu(true)} style={{
           width:54, height:54, borderRadius:12, flexShrink:0,
           border:'1px solid #E2E8F0', background:'#fff',
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
@@ -474,6 +487,42 @@ export default function BingoPage({ onBack }: Props) {
           <Icon icon="ph:arrow-counter-clockwise" width={20} height={20} color="#64748B" />
         </button>
       </div>
+
+      {/* ── 더보기 바텀시트 */}
+      {showMoreMenu && (
+        <div style={{
+          position:'fixed', inset:0, zIndex:600,
+          background:'rgba(0,0,0,0.45)', backdropFilter:'blur(2px)',
+          display:'flex', alignItems:'flex-end', justifyContent:'center',
+        }} onClick={() => setShowMoreMenu(false)}>
+          <div style={{
+            width:'100%', maxWidth:430,
+            background:'#fff', borderRadius:'20px 20px 0 0',
+            padding:'20px 16px 36px',
+            boxShadow:'0 -4px 24px rgba(0,0,0,0.15)',
+            animation:'slideUp 0.25s ease',
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ width:40, height:4, borderRadius:2, background:'#E2E8F0', margin:'0 auto 20px' }}/>
+            <div style={{ fontSize:13, fontWeight:800, color:'#94A3B8', marginBottom:14, letterSpacing:0.5 }}>더보기</div>
+            <button onClick={handleShare} style={{
+              width:'100%', height:52, borderRadius:12, border:'none',
+              background:'#1B6EF3', color:'#fff',
+              fontSize:15, fontWeight:700, cursor:'pointer',
+              display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
+            }}>
+              <Icon icon="ph:share-network" width={18} height={18} color="#fff" />공유하기
+            </button>
+            <button onClick={() => { setShowMoreMenu(false); setShowReset(true) }} style={{
+              width:'100%', height:52, borderRadius:12,
+              border:'1.5px solid #FECDD3', background:'#FFF5F5', color:'#DC2626',
+              fontSize:15, fontWeight:700, cursor:'pointer',
+              display:'flex', alignItems:'center', gap:10, padding:'0 18px',
+            }}>
+              <Icon icon="ph:arrow-counter-clockwise" width={18} height={18} color="#DC2626" />리셋하기
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── 리셋 모달 */}
       {showReset && (
