@@ -130,15 +130,13 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const isFiltered  = isSearch || isCatFilter
 
   return (
-    <div style={{ minHeight:'100vh', background:'#E8EDF3', fontFamily:ff, paddingBottom:40 }}>
+    <div style={{ minHeight:'100vh', background:'#F0F4F8', fontFamily:ff, paddingBottom:40 }}>
 
       {/* ── 스티키 헤더 ── */}
       <div style={{
         position:'sticky', top:0, zIndex:10,
-        background:'rgba(232,237,243,0.97)', backdropFilter:'blur(10px)',
+        background:'rgba(240,244,248,0.97)', backdropFilter:'blur(10px)',
         padding:'12px 16px 12px',
-        borderBottom:'1.5px solid #D1D9E3',
-        boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
       }}>
         {/* 전체/북마크/비상연락처 탭 */}
         <div style={{ display:'flex', gap:6, marginBottom:10 }}>
