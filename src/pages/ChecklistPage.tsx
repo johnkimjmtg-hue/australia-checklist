@@ -593,11 +593,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
           {/* ── Bottom CTA ── */}
           <div style={{
-            position:'fixed', bottom:0, left:0, right:0,
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:480,
             background:'#fff',
             zIndex:20, boxSizing:'border-box',
+            padding:'12px 14px 28px',
           }}>
-            <div style={{ maxWidth:480, margin:'0 auto', padding:'12px 14px 28px', boxSizing:'border-box' }}>
             {unscheduledCount>0 && done>0 && (
               <div style={{ fontSize:11, color:'#92620a', textAlign:'center', marginBottom:8, fontWeight:700,
                 background:'rgba(255,205,0,0.15)', borderRadius:6, padding:'5px 0' }}>
@@ -617,7 +618,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 background:'#fff', color:'#64748B',
                 border:'1px solid #E2E8F0', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer',
               }}>↻ 초기화</button>
-            </div>
             </div>
           </div>
         </>
