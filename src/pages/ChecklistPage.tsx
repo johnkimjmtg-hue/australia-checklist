@@ -5,7 +5,7 @@ import { CheckItem } from '../data/checklist'
 import { supabase } from '../lib/supabase'
 
 type Category = { id: string; label: string; emoji: string; sort_order: number }
-type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; suburb?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null }
+type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null }
 import {
   AppState, TripInfo,
   toggleItem, setSchedule, setCategory, addCustom,
@@ -604,7 +604,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       color={checked ? '#78716C' : '#CBD5E1'}
                     />
 
-                    {/* 제목 + suburb + description */}
+                    {/* 제목 + address + description */}
                     <div style={{ flex:1, display:'flex', flexDirection:'column', gap:2, minWidth:0 }}
                       onClick={() => { if (checked && showScheduleView) setScheduleSelectedItem(item.id) }}>
                       <span style={{
@@ -617,11 +617,11 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                         const db = dbItems.find(d => d.id === item.id)
                         return (
                           <>
-                            {db?.suburb && (
+                            {db?.address && (
                               <span
-                                onClick={e => { e.stopPropagation(); window.open(`https://maps.google.com/?q=${encodeURIComponent(db.suburb!)}`, '_blank') }}
+                                onClick={e => { e.stopPropagation(); window.open(`https://maps.google.com/?q=${encodeURIComponent(db.address!)}`, '_blank') }}
                                 style={{ fontSize:11, color:'#1B6EF3', fontWeight:500, cursor:'pointer', textDecoration:'underline', textDecorationColor:'rgba(27,110,243,0.3)' }}>
-                                📍 {db.suburb}
+                                📍 {db.address}
                               </span>
                             )}
                             {db?.description && (

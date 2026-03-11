@@ -31,7 +31,7 @@ const EMPTY_FORM = {
 
 // ── 체크리스트 타입 (DB 기반)
 type Cat  = { id:string; label:string; emoji:string; sort_order:number }
-type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean; suburb?:string|null; description?:string|null; related_business_id?:string|null; related_business_ids?:string[]|null }
+type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean; address?:string|null; description?:string|null; related_business_id?:string|null; related_business_ids?:string[]|null }
 
 const EMOJI_MAP: [string[], string][] = [
   [['크림','로션','에센스','토너','팩'], '🧴'],
@@ -167,15 +167,15 @@ function AddressAutocomplete({ address, city, onSelect }: {
       const place = suggestion.placePrediction.toPlace()
       await place.fetchFields({ fields: ['addressComponents', 'formattedAddress'] })
       const components = place.addressComponents || []
-      const suburb = components.find((c: any) => c.types.includes('locality') || c.types.includes('sublocality_level_1'))?.longText || ''
+      const address = components.find((c: any) => c.types.includes('locality') || c.types.includes('sublocality_level_1'))?.longText || ''
       const state  = components.find((c: any) => c.types.includes('administrative_area_level_1'))?.shortText || ''
       const post   = components.find((c: any) => c.types.includes('postal_code'))?.longText || ''
       const streetNum = components.find((c: any) => c.types.includes('street_number'))?.longText || ''
       const route     = components.find((c: any) => c.types.includes('route'))?.longText || ''
-      const streetAddress = [streetNum, route, suburb, state, post].filter(Boolean).join(', ')
+      const streetAddress = [streetNum, route, address, state, post].filter(Boolean).join(', ')
       setQuery(streetAddress)
-      setManualCity(suburb)
-      onSelect(streetAddress, suburb)
+      setManualCity(address)
+      onSelect(streetAddress, address)
     } catch (e) { console.error('Place detail error:', e) }
   }
 
@@ -390,7 +390,7 @@ function BusinessTab() {
   async function save() {
     if (!form.name) { showToast('업체명은 필수예요'); return }
     setSaving(true)
-    // city가 없으면 address에서 suburb 추출해서 채우기
+    // city가 없으면 address에서 address 추출해서 채우기
     const cityVal = form.city || form.address.split(',').find(p => /[A-Z]{2,3}/.test(p.trim()) === false && p.trim().length > 2)?.trim() || ''
     const payload = { ...form, city: cityVal, tags: form.tags.split(',').map(t=>t.trim()).filter(Boolean), rating:0, reviews_count:0 }
     if (editTarget) {
@@ -860,7 +860,7 @@ function ItemsTab({ cats, items, setItems }: {
       id, category_id: selCat, label: newLabel.trim(),
       icon: newIcon, sort_order, is_active: true,
     }
-    if (newSuburb.trim()) insertData.suburb = newSuburb.trim()
+    if (newSuburb.trim()) insertData.address = newSuburb.trim()
     if (newDesc.trim()) insertData.description = newDesc.trim()
     if (newBizIds.length > 0) { insertData.related_business_id = newBizIds[0]; insertData.related_business_ids = newBizIds }
     const { error } = await supabase.from('checklist_items').insert(insertData)
@@ -887,7 +887,7 @@ function ItemsTab({ cats, items, setItems }: {
     showToast('저장됨')
   }
 
-  async function saveDetail(id: string, field: 'suburb'|'description', val: string) {
+  async function saveDetail(id: string, field: 'address'|'description', val: string) {
     const value = val.trim() || null
     await supabase.from('checklist_items').update({ [field]: value }).eq('id', id)
     setItems(items.map(i => i.id===id ? {...i, [field]: value} : i))
@@ -1091,8 +1091,8 @@ function ItemsTab({ cats, items, setItems }: {
                 <div style={{ display:'flex', gap:8, alignItems:'center' }}>
                   <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0 }}>📍 Suburb</span>
                   <input
-                    defaultValue={item.suburb ?? ''}
-                    onBlur={e => saveDetail(item.id, 'suburb', e.target.value)}
+                    defaultValue={item.address ?? ''}
+                    onBlur={e => saveDetail(item.id, 'address', e.target.value)}
                     placeholder="예: Surry Hills"
                     style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px' }}
                   />
@@ -1344,12 +1344,12 @@ function RequestsTab() {
 
   function getEdit(req: BusinessRequest): EditableRequest {
     if (editMap[req.id]) return editMap[req.id]
-    const suburb = req.city || req.address.split(',').slice(-2,-1)[0]?.trim() || ''
+    const address = req.city || req.address.split(',').slice(-2,-1)[0]?.trim() || ''
     return {
       business_name: req.business_name,
       category:      req.category || 'restaurant',
       address:       req.address,
-      city:          suburb,
+      city:          address,
       description:   req.description || '',
       tags:          Array.isArray(req.hashtags) ? req.hashtags.join(', ') : '',
       phone:         req.phone || '',
