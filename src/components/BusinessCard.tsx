@@ -10,7 +10,7 @@ const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans
 
 export default function BusinessCard({ business }: Props) {
   const { name, description, phone, website, kakao, address, city, is_featured, tags } = business
-  const fullAddress = [address, city].filter(Boolean).join(', ')
+  const fullAddress = address || ''
   const mapsUrl = fullAddress
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
     : null
@@ -67,12 +67,12 @@ export default function BusinessCard({ business }: Props) {
     phone ? (
       isMobile ? (
         <a key="phone" href={`tel:${phone}`} style={{ ...btnBlue, textDecoration:'none' }}>
-          <Icon icon="ph:phone" width={13} height={13} color="#fff" />전화
+          <Icon icon="ph:phone" width={13} height={13} color="#fff" />전화하기
         </a>
       ) : (
         <div key="phone" style={{ position:'relative' }}>
           <button onClick={() => setShowPhone(v => !v)} style={{ ...btnBlue }}>
-            <Icon icon="ph:phone" width={13} height={13} color="#fff" />전화
+            <Icon icon="ph:phone" width={13} height={13} color="#fff" />전화하기
           </button>
           {showPhone && (
             <div style={{ position:'absolute', bottom:'110%', left:0, background:'#1E293B', color:'#fff', padding:'8px 14px', borderRadius:10, fontSize:13, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', zIndex:50 }}>{phone}</div>
@@ -82,7 +82,7 @@ export default function BusinessCard({ business }: Props) {
     ) : null,
     mapsUrl ? (
       <a key="map" href={mapsUrl} target="_blank" rel="noreferrer" style={{ ...btnBase, textDecoration:'none' }}>
-        <Icon icon="ph:navigation-arrow" width={13} height={13} color="#475569" />경로
+        <Icon icon="ph:navigation-arrow" width={13} height={13} color="#475569" />경로찾기
       </a>
     ) : null,
     website ? (
@@ -96,11 +96,7 @@ export default function BusinessCard({ business }: Props) {
         <Icon icon="ph:chat-circle" width={13} height={13} color="#3C1E1E" />카톡
       </a>
     ) : null,
-    <button key="vote" onClick={handleToggleVotes}
-      style={{ ...btnBase, background: showVotes ? '#1B6EF3' : '#fff', color: showVotes ? '#fff' : '#1E293B', border: showVotes ? 'none' : '1.5px solid #D1D9E3' }}>
-      <Icon icon="ph:thumbs-up" width={13} height={13} color={showVotes ? '#fff' : '#475569'} />
-      한줄평{myVote ? ' ✓' : ''}
-    </button>,
+
     <button key="share" onClick={() => setShowShareModal(true)} style={{ ...btnBase }}>
       <Icon icon="ph:share-network" width={13} height={13} color="#475569" />공유
     </button>,
@@ -188,8 +184,8 @@ export default function BusinessCard({ business }: Props) {
           </div>
         </div>
 
-        {/* 펼친 상태에서만 한줄평 섹션 표시 */}
-        {expanded && showVotes && (
+        {/* 펼친 상태에서 한줄평 자동 표시 */}
+        {expanded && (
           <div style={{ borderTop:'1.5px solid #D1D9E3', background:'#F1F5F9', padding:'14px 16px' }}>
             {loading ? (
               <div style={{ textAlign:'center', padding:'12px 0', color:'#94A3B8', fontSize:13 }}>불러오는 중...</div>
