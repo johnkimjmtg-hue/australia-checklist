@@ -329,6 +329,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .list-item { transition: background .1s; }
         .list-item:active { background: #F1F5F9 !important; }
+        .cat-scroll { scrollbar-width:none; -ms-overflow-style:none; }
+        .cat-scroll::-webkit-scrollbar { display:none; }
+        .cat-scroll { overflow-x:auto; }
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
@@ -423,7 +426,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               const customCat = CATEGORIES.find(c => c.id === 'custom')
               const allCats = customCat ? [...nonCustomCats, customCat] : nonCustomCats
               return (
-                <div style={{ display:'flex', gap:6, padding:'8px 16px 10px', overflowX:'auto', scrollbarWidth:'none' }}>
+                <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'8px 16px 10px' }}
+                  onWheel={e => { e.preventDefault(); (e.currentTarget as HTMLDivElement).scrollLeft += e.deltaY }}
+                >
                   {allCats.map(cat => {
                     const isActive = activeCategory === cat.id
                     const catDone  = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id]).length
