@@ -495,7 +495,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
           display:'flex', alignItems:'flex-end', justifyContent:'center',
         }} onClick={() => setShowMoreMenu(false)}>
           <div style={{
-            width:'100%', maxWidth:390,
+            width:'100%', maxWidth:480,
             background:'#fff', borderRadius:'20px 20px 0 0',
             padding:'20px 16px 36px',
             boxShadow:'0 -4px 24px rgba(0,0,0,0.15)',
@@ -508,7 +508,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
               fontSize:15, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
             }}>
-              <Icon icon="ph:share-network" width={18} height={18} color="#FFCD00" />공유하기
+              <Icon icon="ph:share-network" width={18} height={18} color="#fff" />공유하기
             </button>
             <button onClick={() => { setShowMoreMenu(false); onEdit() }} style={{
               width:'100%', height:52, borderRadius:12,
