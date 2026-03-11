@@ -672,7 +672,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           {/* ── Bottom CTA ── */}
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:480,
+            width:'100%', maxWidth:430,
             background:'#fff',
             zIndex:20, boxSizing:'border-box',
             padding:'18px 14px 28px',
