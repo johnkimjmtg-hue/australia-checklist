@@ -42,7 +42,18 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [scrollTrigger, setScrollTrigger] = useState(0)
   const [logoTapCount, setLogoTapCount] = useState(0)
   const logoTapTimer = useRef<any>(null)
+  const pageRef = useRef<HTMLDivElement>(null)
+  const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
   const [bizCount, setBizCount] = useState(0)
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
+    }
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [])
 
   useEffect(() => {
     async function fetchBizCount() {
@@ -312,7 +323,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:'#F0F4F8',
+    <div ref={pageRef} style={{ minHeight:'100vh', background:'#F0F4F8',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       boxSizing:'border-box', maxWidth:480, margin:'0 auto', position:'relative' }}>
 
@@ -594,7 +605,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           {/* ── Bottom CTA ── */}
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:480,
+            width: footerWidth ?? '100%',
             background:'#fff',
             zIndex:20, boxSizing:'border-box',
             padding:'18px 14px 28px',
