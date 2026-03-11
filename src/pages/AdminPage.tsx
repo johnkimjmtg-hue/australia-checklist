@@ -763,10 +763,19 @@ const PH_ICONS = [
 function IconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
+  const [pos, setPos] = useState({ top:0, left:0 })
+  const btnRef = useRef<HTMLButtonElement>(null)
   const filtered = search ? PH_ICONS.filter(i => i.includes(search)) : PH_ICONS
+  const handleOpen = () => {
+    if (btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect()
+      setPos({ top: r.bottom + 4, left: r.left })
+    }
+    setOpen(o => !o)
+  }
   return (
     <div style={{ position:'relative' }}>
-      <button type="button" onClick={() => setOpen(o => !o)} style={{
+      <button ref={btnRef} type="button" onClick={handleOpen} style={{
         width:44, height:38, border:'1.5px solid #e0e0e0', borderRadius:9,
         background:'#fafafa', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
       }}>
@@ -776,7 +785,7 @@ function IconPicker({ value, onChange }: { value: string; onChange: (v: string) 
         <>
           <div onClick={() => setOpen(false)} style={{ position:'fixed', inset:0, zIndex:700 }}/>
           <div style={{
-            position:'absolute', top:44, left:0, zIndex:701,
+            position:'fixed', top: pos.top, left: pos.left, zIndex:9999,
             background:'#fff', borderRadius:12, padding:12,
             boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
             width:260, maxHeight:300, overflowY:'auto',
@@ -1019,7 +1028,7 @@ function ItemsTab({ cats, items, setItems }: {
             const isOver = dragOverIdx === idx
             const isEditing = editId === item.id
             return (
-              <div key={item.id} style={{ borderRadius:10, overflow:'hidden' }}>
+              <div key={item.id} style={{ borderRadius:10 }}>
               <div
                 draggable
                 onDragStart={() => handleDragStart(idx)}
@@ -1154,7 +1163,7 @@ function EditBizMultiSearch({ businesses, values, onChange }: {
           />
           {filtered.length > 0 && (
             <div style={{
-              position:'absolute', top:'100%', left:0, right:0, zIndex:20,
+              position:'fixed', zIndex:9999,
               background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',
               border:'1px solid #E2E8F0', overflow:'hidden',
             }}>
