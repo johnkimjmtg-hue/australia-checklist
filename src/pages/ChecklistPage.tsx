@@ -332,14 +332,15 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'#fff', borderBottom:'1px solid #E8ECF0', boxShadow:'0 1px 4px rgba(0,0,0,0.04)' }}>
-        {/* 상단 여백 */}
-        <div style={{ height:10, background:'#F1F5F9', borderBottom:'1px solid #E8ECF0' }} />
-        {/* 브랜드 */}
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'12px 20px 0', position:'relative' }}>
+      <div style={{ background:'rgba(232,237,243,0.97)', borderBottom:'1.5px solid #D1D9E3', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
+        {/* 브랜드 + 카운터 */}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
-            style={{ fontSize:18, color:'#1B6EF3', fontWeight:900, letterSpacing:3, cursor:'pointer', userSelect:'none' }}
+            style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
+          <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
+            {mainTab === 'services' ? `${bizCount}개 업체` : `${total}개 버킷리스트`}
+          </span>
         </div>
         {/* 탭 */}
         <div style={{ display:'flex', padding:'8px 20px 0', gap:4 }}>
@@ -352,7 +353,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               background: mainTab===tab ? '#1B6EF3' : 'transparent',
               borderBottom: mainTab===tab ? '2px solid #1B6EF3' : '2px solid transparent',
             }}>
-              {tab==='bucketlist' ? '버킷리스트' : '업체/서비스'}
+              {tab==='bucketlist' ? '버킷리스트' : '업체/서비스 찾기'}
             </button>
           ))}
         </div>
