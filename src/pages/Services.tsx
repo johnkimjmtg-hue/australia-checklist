@@ -151,32 +151,8 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         background:'rgba(240,244,248,0.97)', backdropFilter:'blur(10px)',
         padding:'12px 16px 12px',
       }}>
-        {/* 전체/북마크/비상연락처 탭 */}
-        <div style={{ display:'flex', gap:6, marginBottom:10 }}>
-          {(['all', 'bookmarks', 'emergency'] as ServiceTab[]).map(tab => {
-            const isActive = serviceTab === tab
-            const emoji = tab === 'bookmarks' ? '🔖' : tab === 'emergency' ? '🔔' : null
-            const label = tab === 'all' ? '전체 업종' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
-            const inactiveColor = tab === 'emergency' ? '#DC2626' : '#64748B'
-            return (
-              <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
-                height:34, padding:'0 14px', borderRadius:20, border:'none',
-                cursor:'pointer', fontSize:13, fontWeight:700,
-                background: isActive ? '#1B6EF3' : '#fff',
-                color: isActive ? '#fff' : inactiveColor,
-                boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
-                display:'flex', alignItems:'center', gap:5,
-                whiteSpace:'nowrap',
-              }}>
-                {emoji && <span style={{ fontSize:13 }}>{emoji}</span>}
-                {label}
-              </button>
-            )
-          })}
-        </div>
-
         {/* 검색창 — 전체 탭만 */}
-        {serviceTab === 'all' && (<>
+        {serviceTab === 'all' && (
         <div style={{
           display:'flex', alignItems:'center', gap:8,
           background:'#fff', borderRadius:12, padding:'0 12px',
@@ -201,8 +177,35 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             </button>
           )}
         </div>
+        )}
 
-        {/* 카테고리 필터 — 체크리스트 스타일 통일 */}
+        {/* 전체/북마크/비상연락처 탭 */}
+        <div style={{ display:'flex', gap:6, marginBottom:10 }}>
+          {(['all', 'bookmarks', 'emergency'] as ServiceTab[]).map(tab => {
+            const isActive = serviceTab === tab
+            const iconName = tab === 'all' ? 'ph:list-bullets' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:bell'
+            const inactiveIconColor = tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? '#DC2626' : '#94A3B8'
+            const inactiveTextColor = tab === 'emergency' ? '#DC2626' : '#64748B'
+            const label = tab === 'all' ? '전체 업종' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
+            return (
+              <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
+                height:34, padding:'0 14px', borderRadius:20, border:'none',
+                cursor:'pointer', fontSize:13, fontWeight:700,
+                background: isActive ? '#1B6EF3' : '#fff',
+                color: isActive ? '#fff' : inactiveTextColor,
+                boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
+                display:'flex', alignItems:'center', gap:5,
+                whiteSpace:'nowrap',
+              }}>
+                <Icon icon={iconName} width={13} height={13} color={isActive ? '#fff' : inactiveIconColor} />
+                {label}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* 카테고리 필터 — 전체 탭만 */}
+        {serviceTab === 'all' && (
         <div className="cat-scroll" style={{ display:'flex', gap:6, paddingBottom:4, paddingTop:6 }}>
           {sortedCategories.map(cat => {
             const isActive = category === cat.id
@@ -227,7 +230,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             )
           })}
         </div>
-        </>)}
+        )}
       </div>
 
       {/* ── 콘텐츠 ── */}
