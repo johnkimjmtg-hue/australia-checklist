@@ -37,7 +37,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [mainTab, setMainTab]         = useState<MainTab>(
     searchParams.get('tab') === 'services' ? 'services' : 'bucketlist'
   )
-  const [showScheduleView, setShowScheduleView] = useState(false)
+  const [showScheduleView, setShowScheduleView] = useState(!!trip)
   const [scheduleSelectedItem, setScheduleSelectedItem] = useState<string|null>(null)
   const [scrollTrigger, setScrollTrigger] = useState(0)
   const [logoTapCount, setLogoTapCount] = useState(0)
@@ -400,23 +400,32 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   <Icon icon="ph:airplane-takeoff" width={15} height={15} color={tripLabel ? '#fff' : '#94A3B8'} />
                   {tripLabel ?? '여행일정 설정'}
                 </button>
-                <button onClick={() => setShowScheduleView(true)} style={{
+                <button onClick={() => setShowScheduleView(v=>!v)} style={{
                   height:34, padding:'0 14px', borderRadius:8, border:'none',
-                  background: '#1B6EF3',
-                  color: '#fff',
+                  background: showScheduleView ? '#1B6EF3' : '#fff',
+                  color: showScheduleView ? '#fff' : '#0F172A',
                   fontSize:13, fontWeight:800, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:5,
-                  boxShadow: '0 2px 8px rgba(27,110,243,0.25)',
+                  boxShadow: showScheduleView ? '0 2px 8px rgba(27,110,243,0.25)' : '0 2px 6px rgba(0,0,0,0.10)',
                 }}>
-                  <Icon icon="ph:list-checks" width={15} height={15} color='#fff' />
+                  <Icon icon="ph:list-checks" width={15} height={15} color={showScheduleView ? '#FFCD00' : '#94A3B8'} />
                   일정보기
                 </button>
               </div>
             </div>
           </div>
 
-          {/* ── STICKY: 카테고리 칩 ── */}
+          {/* ── STICKY: 달력 + 카테고리 칩 ── */}
           <div style={{ background:'#F0F4F8', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:24, boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
+
+            {/* Schedule grid view */}
+            {showScheduleView && trip && (
+              <ScheduleGrid
+                state={state} trip={trip} allItems={allItems}
+                selectedItemId={scheduleSelectedItem}
+                scrollTrigger={scrollTrigger}
+              />
+            )}
 
             {/* Category chips — custom 포함 4열 그리드, custom 항상 마지막 */}
             {(() => {
@@ -460,37 +469,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             })()}
           </div>
 
-          {/* ── 본문: 일정뷰 or 리스트 ── */}
-          {showScheduleView && trip ? (
-            <>
-              <ScheduleModal
-                state={state} trip={trip} allItems={allItems}
-                onClose={() => setShowScheduleView(false)}
-              />
-              {/* ── Bottom CTA — 수정하기 ── */}
-              <div style={{
-                position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-                width:'100%', maxWidth:390, padding:'8px 14px 20px',
-                background:'transparent', zIndex:20, boxSizing:'border-box',
-              }}>
-                <div style={{ display:'flex', gap:8 }}>
-                  <button onClick={() => setShowScheduleView(false)} style={{
-                    flex:4, height:54,
-                    background:'#1B6EF3', color:'#fff',
-                    border:'none', borderRadius:8, fontSize:15, fontWeight:700, cursor:'pointer',
-                    boxShadow:'0 10px 15px rgba(0,0,0,0.15)',
-                  }}>← 수정하기</button>
-                  <button onClick={() => setModal('confirmReset')} style={{
-                    flex:2, height:54,
-                    background:'rgba(255,255,255,0.92)', color:'#64748B',
-                    border:'1px solid #E2E8F0', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer',
-                    backdropFilter:'blur(8px)',
-                  }}>↻ 초기화</button>
-                </div>
-              </div>
-            </>
-          ) : (
-          <>
           {/* ── LIST ── */}
           <div style={{ paddingBottom:100 }}>
             {/* Section label */}
@@ -645,12 +623,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               선택한 항목들로 버킷리스트를 만들어요
             </div>
           </div>
-          </>
-          )}
         </>
       )}
 
-      {/* ── 풀스크린 일정 팝업 제거됨 ── */}
+      {/* ── 폭죽 ── */}
       {showFireworks && <Fireworks />}
 
 
@@ -732,108 +708,109 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   )
 }
 
-/* ── 인라인 일정 뷰 ── */
-function ScheduleModal({ state, trip, allItems, onClose }: {
-  state: AppState; trip: TripInfo; allItems: any[]; onClose: () => void
+/* ── Schedule Grid View ── */
+function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: {
+  state: AppState; trip: TripInfo; allItems: any[]; selectedItemId: string | null; scrollTrigger?: number
 }) {
   const days = getTripDays(trip)
-  const [selectedDayIdx, setSelectedDayIdx] = useState<number|null>(null)
-  const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+  const scrollRef = useRef<HTMLDivElement>(null)
 
-  const dayItems = (idx: number) =>
-    allItems.filter(item => state.selected[item.id] && (state.schedules[item.id] ?? []).includes(idx))
+  // selectedItemId 또는 schedules 가 바뀌면 첫 번째 할당 날짜로 스크롤
+  useEffect(() => {
+    if (!selectedItemId || !scrollRef.current) return
+    const assignedDays = state.schedules[selectedItemId] ?? []
+    if (assignedDays.length === 0) return
+    const firstDay = Math.min(...assignedDays)
+    const el = scrollRef.current.querySelector(`[data-dayidx="${firstDay}"]`) as HTMLElement | null
+    if (!el) return
+    const container = scrollRef.current
+    const containerWidth = container.offsetWidth
+    const elLeft = el.offsetLeft
+    const elWidth = el.offsetWidth
+    const targetScrollLeft = elLeft - containerWidth / 2 + elWidth / 2
+    container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' })
+  }, [selectedItemId, state.schedules, scrollTrigger])
 
-  function dayColor(count: number) {
-    if (count === 0) return { bg:'#F8FAFC', border:'#E2E8F0', text:'#94A3B8' }
-    if (count === 1) return { bg:'#D1FAE5', border:'#6EE7B7', text:'#065F46' }
-    if (count === 2) return { bg:'#FEF08A', border:'#FDE047', text:'#713F12' }
-    if (count === 3) return { bg:'#FED7AA', border:'#FDBA74', text:'#7C2D12' }
-    return { bg:'#FCA5A5', border:'#F87171', text:'#7F1D1D' }
+  // 각 날짜별 할당 수 (선택된 아이템 기준)
+  const assignedDays = selectedItemId ? (state.schedules[selectedItemId] ?? []) : []
+
+  // 날짜별 총 할당 아이템 수 (빨간 강도용)
+  const dayCount = days.map((_, idx) =>
+    allItems.filter(item => state.selected[item.id] && (state.schedules[item.id] ?? []).includes(idx)).length
+  )
+  const maxCount = Math.max(1, ...dayCount)
+
+  // 색상 4단계: 0=흰색, 1=연두, 2=노랑, 3=주황, 4+=빨강
+  function dayColor(count: number): string {
+    if (count <= 0) return '#ffffff'
+    if (count === 1) return '#D1FAE5'
+    if (count === 2) return '#FEF08A'
+    if (count === 3) return '#FED7AA'
+    return '#FCA5A5'
   }
 
+  // 선택된 아이템이 있는 날짜의 하단 아이템 목록 — activeDayIdx 없이 selectedItem 기준
+  const [activeDayIdx, setActiveDayIdx] = useState<number|null>(null)
+
+  const dayItems = activeDayIdx !== null
+    ? allItems.filter(item => state.selected[item.id] && (state.schedules[item.id] ?? []).includes(activeDayIdx))
+    : []
+
   return (
-    <div style={{ padding:'16px 16px 120px', fontFamily:ff }}>
-      {/* 헤더 */}
-      <div style={{ marginBottom:14 }}>
-        <div style={{ fontSize:15, fontWeight:800, color:'#0F172A' }}>전체 일정</div>
-        <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>
-          {trip.startDate} ~ {trip.endDate} · {days.length}일
-        </div>
-      </div>
-
-      {/* 범례 */}
-      <div style={{ display:'flex', gap:8, marginBottom:12, flexWrap:'wrap' }}>
-        {[
-          { label:'없음', bg:'#F8FAFC', border:'#E2E8F0' },
-          { label:'1개', bg:'#D1FAE5', border:'#6EE7B7' },
-          { label:'2개', bg:'#FEF08A', border:'#FDE047' },
-          { label:'3개', bg:'#FED7AA', border:'#FDBA74' },
-          { label:'4개+', bg:'#FCA5A5', border:'#F87171' },
-        ].map(c => (
-          <div key={c.label} style={{ display:'flex', alignItems:'center', gap:4 }}>
-            <div style={{ width:12, height:12, borderRadius:3, background:c.bg, border:`1px solid ${c.border}` }}/>
-            <span style={{ fontSize:11, color:'#64748B', fontWeight:600 }}>{c.label}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* 날짜 카드 그리드 */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
+    <div style={{ borderTop:'1px solid #E2E8F0', padding:'10px 16px 12px', background:'#F8FAFC' }}>
+      <div ref={scrollRef} style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4, scrollBehavior:'smooth' }}>
         {days.map((d, idx) => {
-          const items = dayItems(idx)
-          const color = dayColor(items.length)
-          const isSelected = selectedDayIdx === idx
+          const isActive   = activeDayIdx === idx
+          const bg = dayColor(dayCount[idx])
+
           return (
-            <button key={idx} onClick={() => setSelectedDayIdx(isSelected ? null : idx)} style={{
-              borderRadius:12, border:`2px solid ${isSelected ? '#1B6EF3' : color.border}`,
-              background: isSelected ? '#EFF6FF' : color.bg,
-              padding:'12px 10px', cursor:'pointer', textAlign:'center',
-              boxShadow: isSelected ? '0 2px 8px rgba(27,110,243,0.20)' : '0 1px 4px rgba(0,0,0,0.06)',
-              transition:'all 0.15s',
-            }}>
-              <div style={{ fontSize:11, fontWeight:700, color: isSelected ? '#1B6EF3' : '#64748B', marginBottom:4 }}>
-                {idx+1}일차
-              </div>
-              <div style={{ fontSize:13, fontWeight:800, color: isSelected ? '#1B6EF3' : '#0F172A', marginBottom:6 }}>
-                {fmtMD(d)}
-              </div>
-              <div style={{ fontSize:11, fontWeight:700, color: items.length === 0 ? '#CBD5E1' : color.text }}>
-                {items.length === 0 ? '없음' : `${items.length}개`}
-              </div>
+            <button
+              key={idx}
+              data-dayidx={idx}
+              onClick={() => setActiveDayIdx(isActive ? null : idx)}
+              style={{
+                minWidth:54, height:46, borderRadius:8, flexShrink:0,
+                border: isActive ? '2px solid #1B6EF3' : '2px solid transparent',
+                cursor:'pointer',
+                background: bg,
+                color: isActive ? '#1B6EF3' : '#0F172A',
+                fontSize:11, fontWeight:700, position:'relative', textAlign:'center',
+                lineHeight:1.3, padding:'4px 2px',
+                boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.20)' : '0 1px 3px rgba(0,0,0,0.06)',
+              }}>
+              <div>{idx+1}일차</div>
+              <div style={{ fontSize:10, opacity:0.8 }}>{fmtMD(d)}</div>
+              {dayCount[idx] > 0 && (
+                <span style={{
+                  position:'absolute', top:2, right:3,
+                  fontSize:8, fontWeight:900,
+                  color: '#44403C',
+                }}>{dayCount[idx]}</span>
+              )}
             </button>
           )
         })}
       </div>
 
-      {/* 선택된 날짜 상세 */}
-      {selectedDayIdx !== null && (
-        <div style={{
-          background:'#fff', borderRadius:14, padding:'16px',
-          boxShadow:'0 2px 8px rgba(0,0,0,0.06)', border:'1px solid #E2E8F0',
-        }}>
-          <div style={{ fontSize:14, fontWeight:800, color:'#0F172A', marginBottom:12 }}>
-            {selectedDayIdx+1}일차 · {fmtMD(days[selectedDayIdx])} 일정
+      {/* 선택된 날짜의 아이템 목록 */}
+      <div style={{ marginTop:8, minHeight:30 }}>
+        {activeDayIdx === null ? (
+          <p style={{ fontSize:11, color:'#94A3B8', textAlign:'center', padding:'6px 0' }}>
+            날짜를 눌러 할당된 항목을 확인하세요
+          </p>
+        ) : dayItems.length === 0 ? (
+          <p style={{ fontSize:11, color:'#94A3B8', textAlign:'center', padding:'6px 0' }}>항목의 "+일정" 버튼으로 추가하세요</p>
+        ) : (
+          <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
+            {dayItems.map(item => (
+              <span key={item.id} style={{
+                background:'rgba(27,110,243,0.08)', borderRadius:6,
+                padding:'3px 9px', fontSize:11, color:'#1B6EF3', fontWeight:600,
+              }}>{item.label}</span>
+            ))}
           </div>
-          {dayItems(selectedDayIdx).length === 0 ? (
-            <div style={{ textAlign:'center', padding:'20px 0', color:'#94A3B8', fontSize:13 }}>
-              이 날에 배정된 일정이 없어요
-            </div>
-          ) : (
-            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-              {dayItems(selectedDayIdx).map(item => (
-                <div key={item.id} style={{
-                  display:'flex', alignItems:'center', gap:10,
-                  padding:'10px 12px', borderRadius:10,
-                  background:'#F8FAFC', border:'1px solid #E2E8F0',
-                }}>
-                  <div style={{ width:8, height:8, borderRadius:'50%', background:'#1B6EF3', flexShrink:0 }}/>
-                  <span style={{ fontSize:14, fontWeight:600, color:'#0F172A' }}>{item.label}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
