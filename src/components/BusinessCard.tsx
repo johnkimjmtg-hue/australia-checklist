@@ -156,7 +156,7 @@ export default function BusinessCard({ business }: Props) {
           {/* 설명 — 접힌 상태: 2줄 제한 */}
           {description && (
             <div style={{
-              fontSize:13, color:'#334155', lineHeight:1.6, marginBottom:4,
+              fontSize:13, color:'#334155', lineHeight:1.6, marginBottom:10,
               ...(expanded ? {} : {
                 display:'-webkit-box',
                 WebkitLineClamp: 2,
@@ -168,7 +168,7 @@ export default function BusinessCard({ business }: Props) {
 
           {/* 해시태그 — 접힌 상태: 3개, 펼친 상태: 전체 */}
           {tags && tags.length > 0 && (
-            <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, marginTop:6 }}>
+            <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, marginTop:12 }}>
               {(expanded ? tags : tags.slice(0, 3)).map(tag => (
                 <span key={tag} style={{ background:'#EFF6FF', color:'#1B6EF3', fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:'1px solid #BFDBFE' }}>{tag}</span>
               ))}
