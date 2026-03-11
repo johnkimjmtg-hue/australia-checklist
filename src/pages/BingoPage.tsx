@@ -201,8 +201,7 @@ export default function BingoPage({ onBack }: Props) {
   const [showFireworks, setShowFireworks] = useState(false)
   const [prevBingoCount, setPrevBingoCount] = useState(0)
   const [stampAnim, setStampAnim] = useState<number|null>(null)
-  const [logoTapCount, setLogoTapCount] = useState(0)
-  const logoTapTimer = useRef<any>(null)
+  const [showReset, setShowReset] = useState(false)
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
@@ -237,11 +236,7 @@ export default function BingoPage({ onBack }: Props) {
   }
 
   const handleLogoTap = () => {
-    const next = logoTapCount + 1
-    setLogoTapCount(next)
-    if (logoTapTimer.current) clearTimeout(logoTapTimer.current)
-    if (next >= 5) { onBack(); setLogoTapCount(0); return }
-    logoTapTimer.current = setTimeout(() => setLogoTapCount(0), 400)
+    onBack()
   }
 
   // 빙고 라인에 포함된 셀 인덱스
@@ -277,6 +272,7 @@ export default function BingoPage({ onBack }: Props) {
           50%     { opacity:0.6; }
         }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes scaleIn { from{opacity:0;transform:translate(-50%,-50%) scale(0.92)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
         @keyframes flashOut { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(-50%,-50%) scale(3);opacity:0} }
         @keyframes fwBurst {
           0%   { transform: translate(-50%,-50%) scale(0) rotate(var(--r)); opacity:1; }
@@ -292,7 +288,10 @@ export default function BingoPage({ onBack }: Props) {
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}>
             HOJUGAJA
           </span>
-          <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>{checked.size}/25</span>
+          <div style={{ display:'flex', alignItems:'baseline', gap:2 }}>
+            <span style={{ fontSize:22, color:'#FFB800', fontWeight:800, lineHeight:1 }}>{checked.size}</span>
+            <span style={{ fontSize:14, color:'#94A3B8', fontWeight:600 }}>/25 카페</span>
+          </div>
         </div>
         <div style={{ display:'flex', padding:'8px 20px 0', gap:4 }}>
           <div style={{
@@ -331,7 +330,7 @@ export default function BingoPage({ onBack }: Props) {
                 ? Array.from({ length: bingoCount }).map((_, i) => (
                     <span key={i} style={{
                       fontSize:10, fontWeight:800, color:'#fff',
-                      background:'#1B6EF3', borderRadius:5, padding:'2px 8px',
+                      background:'#16A34A', borderRadius:5, padding:'2px 8px',
                       animation:'bingoFlash 1.5s ease infinite',
                     }}>BINGO {i+1}</span>
                   ))
@@ -339,11 +338,7 @@ export default function BingoPage({ onBack }: Props) {
               }
             </div>
           </div>
-          {/* 카페 수 */}
-          <div style={{ textAlign:'center', flexShrink:0 }}>
-            <div style={{ fontSize:28, fontWeight:800, color:'#1B6EF3', lineHeight:1 }}>{checked.size}</div>
-            <div style={{ fontSize:11, color:'#94A3B8', fontWeight:600 }}>/25 카페</div>
-          </div>
+
         </div>
       </div>
 
@@ -470,11 +465,7 @@ export default function BingoPage({ onBack }: Props) {
           <Icon icon="ph:check-circle" width={18} height={18} color="#fff" />
           저장하고 나가기
         </button>
-        <button onClick={() => {
-          if (confirm('도장을 모두 초기화할까요?')) {
-            setChecked(new Set())
-          }
-        }} style={{
+        <button onClick={() => setShowReset(true)} style={{
           width:54, height:54, borderRadius:12, flexShrink:0,
           border:'1px solid #E2E8F0', background:'#fff',
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
@@ -483,6 +474,35 @@ export default function BingoPage({ onBack }: Props) {
           <Icon icon="ph:arrow-counter-clockwise" width={20} height={20} color="#64748B" />
         </button>
       </div>
+
+      {/* ── 리셋 모달 */}
+      {showReset && (
+        <>
+          <div onClick={() => setShowReset(false)}
+            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.60)', zIndex:600, animation:'fadeIn 0.2s ease' }}/>
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            background:'#fff', borderRadius:16, padding:'24px 20px',
+            zIndex:601, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+            boxShadow:'0 10px 15px rgba(0,0,0,0.10)',
+            animation:'scaleIn 0.22s ease',
+          }}>
+            <div style={{ fontSize:32, marginBottom:8 }}>☕</div>
+            <p style={{ fontSize:16, fontWeight:700, color:'#0F172A', marginBottom:8, lineHeight:1.5 }}>도장깨기를 리셋하시겠습니까?</p>
+            <p style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.6 }}>지금까지의 방문 기록이 모두 삭제됩니다.</p>
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={() => setShowReset(false)} style={{
+                flex:1, height:48, border:'1px solid #E2E8F0', borderRadius:6,
+                background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer',
+              }}>아니요</button>
+              <button onClick={() => { setChecked(new Set()); setShowReset(false) }} style={{
+                flex:2, height:48, border:'none', borderRadius:6,
+                background:'#DC2626', color:'#fff', fontWeight:700, fontSize:15, cursor:'pointer',
+              }}>리셋하기</button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ── 효과 */}
       <Confetti trigger={confettiTrigger} />
