@@ -718,13 +718,36 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
   const [logoTap, setLogoTap]               = useState(0)
   const [sliderIdx, setSliderIdx]           = useState(0)
   const [sliderAnimate, setSliderAnimate]   = useState(true)
-  const sliderRef  = useRef<HTMLDivElement>(null)
-  const logoTimer  = useRef<any>(null)
+  const sliderRef    = useRef<HTMLDivElement>(null)
+  const logoTimer    = useRef<any>(null)
+  const touchStartX  = useRef<number>(0)
+  const touchStartY  = useRef<number>(0)
+  const isDragging   = useRef(false)
 
   // 카드 앞뒤로 복제해서 무한루프
   const CLONED = [...BUCKET_RECS, ...BUCKET_RECS, ...BUCKET_RECS]
   const OFFSET  = BUCKET_RECS.length // 가운데 세트 시작 인덱스
   const [realIdx, setRealIdx] = useState(OFFSET)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+    isDragging.current = false
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    const dy = e.changedTouches[0].clientY - touchStartY.current
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return // 탭 허용
+    if (Math.abs(dx) < Math.abs(dy) * 0.8) return // 세로 스크롤 무시
+    if (dx < -40) {
+      setSliderAnimate(true)
+      setRealIdx(i => i + 1)
+    } else if (dx > 40) {
+      setSliderAnimate(true)
+      setRealIdx(i => i - 1)
+    }
+  }
 
   const handleLogoTap = () => {
     const next = logoTap + 1
@@ -963,7 +986,11 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         </div>
 
         {/* 무한루프 슬라이더 */}
-        <div style={{ overflow:'hidden', paddingLeft:20 }}>
+        <div
+          style={{ overflow:'hidden', paddingLeft:20 }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           <div
             ref={sliderRef}
             style={{
