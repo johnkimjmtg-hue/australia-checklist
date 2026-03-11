@@ -950,8 +950,8 @@ function ItemsTab({ cats, items, setItems }: {
             const isOver = dragOverIdx === idx
             const isEditing = editId === item.id
             return (
+              <div key={item.id} style={{ borderRadius:10, overflow:'hidden' }}>
               <div
-                key={item.id}
                 draggable
                 onDragStart={() => handleDragStart(idx)}
                 onDragOver={e => handleDragOver(e, idx)}
@@ -959,7 +959,8 @@ function ItemsTab({ cats, items, setItems }: {
                 onDragEnd={handleDragEnd}
                 style={{
                   border: isOver ? '2px dashed #1B6EF3' : '1.5px solid #e8e8e8',
-                  borderRadius:10, padding:'10px 12px',
+                  borderRadius: expandedId === item.id ? '10px 10px 0 0' : 10,
+                  padding:'10px 12px',
                   background: isDragging ? '#e8f0fe' : item.is_active ? '#fafafa' : '#f5f5f5',
                   display:'flex', alignItems:'center', gap:8,
                   cursor:'grab', opacity: isDragging ? 0.5 : item.is_active ? 1 : 0.5,
@@ -999,7 +1000,6 @@ function ItemsTab({ cats, items, setItems }: {
                 <button onClick={() => deleteItem(item.id)}
                   style={{ background:'none', border:'none', color:'#e05252', cursor:'pointer', fontSize:14 }}>✕</button>
               </div>
-            )}
             {/* 상세정보 편집 패널 */}
             {expandedId === item.id && (
               <div style={{
@@ -1041,7 +1041,9 @@ function ItemsTab({ cats, items, setItems }: {
                 </div>
               </div>
             )}
-          ])}
+              </div>
+            )
+          })}
           {catItems.length === 0 && (
             <div style={{ textAlign:'center', color:'#aaa', fontSize:13, padding:'20px 0' }}>
               이 카테고리에 항목이 없어요
