@@ -333,8 +333,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
       {/* ── 헤더 + 탭 ── */}
       <div style={{ background:'#fff', borderBottom:'1px solid #E8ECF0', boxShadow:'0 1px 4px rgba(0,0,0,0.04)' }}>
+        {/* 상단 여백 */}
+        <div style={{ height:10, background:'#F1F5F9', borderBottom:'1px solid #E8ECF0' }} />
         {/* 브랜드 */}
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'14px 20px 0', position:'relative' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'12px 20px 0', position:'relative' }}>
           <span onClick={handleLogoTap}
             style={{ fontSize:18, color:'#1B6EF3', fontWeight:900, letterSpacing:3, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
