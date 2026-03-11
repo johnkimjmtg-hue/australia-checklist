@@ -312,7 +312,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:'#E8EDF3',
+    <div style={{ minHeight:'100vh', background:'#F0F4F8',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       boxSizing:'border-box' }}>
 
@@ -332,7 +332,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'rgba(232,237,243,0.97)', borderBottom:'1.5px solid #D1D9E3', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
+      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
@@ -364,7 +364,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : (
         <>
           {/* ── SUB HEADER (버튼들) — 스크롤 시 사라짐 ── */}
-          <div style={{ background:'rgba(232,237,243,0.97)', borderBottom:'1.5px solid #D1D9E3' }}>
+          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 20px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                 <span style={{ fontSize:14, fontWeight:700, color: done>0 ? '#1B6EF3' : '#94A3B8' }}>
@@ -381,7 +381,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 <button onClick={handleOpenTripPicker} style={{
                   height:34, padding:'0 14px', borderRadius:8, border:'none',
                   background: tripLabel ? '#16A34A' : '#fff',
-                  color: tripLabel ? '#fff' : '#1E293B',
+                  color: tripLabel ? '#fff' : '#0F172A',
                   fontSize:13, fontWeight:800, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:5,
                   boxShadow: tripLabel ? '0 2px 8px rgba(22,163,74,0.30)' : '0 2px 6px rgba(0,0,0,0.10)',
@@ -393,7 +393,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 <button onClick={() => setShowScheduleView(v=>!v)} style={{
                   height:34, padding:'0 14px', borderRadius:8, border:'none',
                   background: showScheduleView ? '#1B6EF3' : '#fff',
-                  color: showScheduleView ? '#fff' : '#1E293B',
+                  color: showScheduleView ? '#fff' : '#0F172A',
                   fontSize:13, fontWeight:800, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:5,
                   boxShadow: showScheduleView ? '0 2px 8px rgba(27,110,243,0.25)' : '0 2px 6px rgba(0,0,0,0.10)',
@@ -406,7 +406,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           </div>
 
           {/* ── STICKY: 달력 + 카테고리 칩 ── */}
-          <div style={{ background:'rgba(232,237,243,0.97)', borderBottom:'1.5px solid #D1D9E3', position:'sticky', top:0, zIndex:24, boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
+          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:24, boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
 
             {/* Schedule grid view */}
             {showScheduleView && trip && (
@@ -433,7 +433,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       <button key={cat.id} className="chip-btn" onClick={() => setState(setCategory(state, cat.id))} style={{
                         height:36, borderRadius:8, border:'none',
                         background: isActive ? '#1B6EF3' : '#fff',
-                        color: isActive ? '#fff' : '#1E293B',
+                        color: isActive ? '#fff' : '#0F172A',
                         fontSize:12, fontWeight:700,
                         cursor:'pointer', position:'relative',
                         boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
@@ -484,7 +484,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     onChange={e => setCustomLabel(e.target.value)}
                     onKeyDown={e => e.key==='Enter' && handleAddCustom()}
                     placeholder="직접 추가"
-                    style={{ flex:1, border:'none', outline:'none', fontSize:15, color:'#1E293B', background:'transparent' }}
+                    style={{ flex:1, border:'none', outline:'none', fontSize:15, color:'#0F172A', background:'transparent' }}
                   />
                 </div>
                 <button onClick={handleAddCustom} style={{
@@ -511,9 +511,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                               : checked && dayCount===0 ? '#fffbeb'
                               : checked ? '#fff8e4'
                               : '#fff',
-                    boxShadow: isHighlight ? '0 4px 16px rgba(27,110,243,0.18)'
-                              : checked ? '0 4px 12px rgba(180,130,0,0.10)'
-                              : '0 4px 16px rgba(0,0,0,0.08)',
+                    boxShadow: isHighlight ? '0 2px 8px rgba(27,110,243,0.12)'
+                              : checked ? '0 2px 8px rgba(0,0,0,0.06)'
+                              : '0 2px 8px rgba(0,0,0,0.06)',
                     minHeight:52, cursor:'pointer',
                     border:'1px solid #E2E8F0',
                     borderLeft: isHighlight ? '4px solid #1B6EF3'
@@ -551,7 +551,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       if (checked && showScheduleView) setScheduleSelectedItem(item.id)
                     }} style={{
                       flex:1, fontSize:15, fontWeight: checked ? 600 : 400,
-                      color: checked ? '#1E293B' : '#64748B', cursor: checked && showScheduleView ? 'pointer' : 'default',
+                      color: checked ? '#0F172A' : '#64748B', cursor: checked && showScheduleView ? 'pointer' : 'default',
                       lineHeight:1.4,
                     }}>{item.label}</span>
 
@@ -618,6 +618,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {/* ── 폭죽 ── */}
       {showFireworks && <Fireworks />}
 
+
+
       {/* ── 토스트 ── */}
       {toast && (
         <div style={{
@@ -626,7 +628,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           display:'flex', alignItems:'center', gap:10,
           background:'#fff',
           border:'1.5px solid #E2E8F0',
-          color:'#1E293B', fontSize:15, fontWeight:700,
+          color:'#0F172A', fontSize:15, fontWeight:700,
           padding:'13px 20px', borderRadius:14,
           boxShadow:'0 8px 24px rgba(0,0,0,0.13)',
           whiteSpace:'nowrap',
@@ -760,7 +762,7 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: 
                 border: isActive ? '2px solid #1B6EF3' : '2px solid transparent',
                 cursor:'pointer',
                 background: bg,
-                color: isActive ? '#1B6EF3' : '#1E293B',
+                color: isActive ? '#1B6EF3' : '#0F172A',
                 fontSize:11, fontWeight:700, position:'relative', textAlign:'center',
                 lineHeight:1.3, padding:'4px 2px',
                 boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.20)' : '0 1px 3px rgba(0,0,0,0.06)',
@@ -908,7 +910,7 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
             width: 32, height: 32, borderRadius: 6, border: '1px solid #E2E8F0',
             background: '#F1F5F9', cursor: 'pointer', fontSize: 14, color: '#1B6EF3', fontWeight: 800,
           }}>‹</button>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#1E293B' }}>{year}년 {month}월</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{year}년 {month}월</div>
           <button onClick={nextMonth} style={{
             width: 32, height: 32, borderRadius: 6, border: '1px solid #E2E8F0',
             background: '#F1F5F9', cursor: 'pointer', fontSize: 14, color: '#1B6EF3', fontWeight: 800,
@@ -974,7 +976,7 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
         transformOrigin:'center center',
         boxShadow:'0 10px 15px rgba(0,0,0,0.10)',
       }}>
-        <p style={{ fontSize:16, fontWeight:700, color:'#1E293B', marginBottom: message ? 8 : 20, lineHeight:1.5 }}>{title}</p>
+        <p style={{ fontSize:16, fontWeight:700, color:'#0F172A', marginBottom: message ? 8 : 20, lineHeight:1.5 }}>{title}</p>
         {message && <p style={{ fontSize:14, color:'#64748B', marginBottom:20, lineHeight:1.6 }}>{message}</p>}
         <div style={{ display:'flex', gap:8 }}>
           {confirmFirst && (
