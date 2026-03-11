@@ -406,7 +406,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           </div>
 
           {/* ── STICKY: 달력 + 카테고리 칩 ── */}
-          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:24, boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
+          <div style={{ background:'#F0F4F8', borderBottom:'1px solid #E2E8F0', position:'sticky', top:0, zIndex:24, boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
 
             {/* Schedule grid view */}
             {showScheduleView && trip && (
