@@ -5,7 +5,7 @@ import { CheckItem } from '../data/checklist'
 import { supabase } from '../lib/supabase'
 
 type Category = { id: string; label: string; emoji: string; sort_order: number }
-type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; suburb?: string | null; description?: string | null; related_business_id?: string | null }
+type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; suburb?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null }
 import {
   AppState, TripInfo,
   toggleItem, setSchedule, setCategory, addCustom,
@@ -628,22 +628,27 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                 overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
                               }}>{db.description}</span>
                             )}
-                            {db?.related_business_id && (
-                              <button
-                                onClick={async e => {
-                                  e.stopPropagation()
-                                  setDetailBizId(db.related_business_id!)
-                                  const { data } = await supabase.from('businesses').select('*').eq('id', db.related_business_id!).single()
-                                  if (data) setDetailBiz(data)
-                                }}
-                                style={{
-                                  alignSelf:'flex-start', marginTop:2,
-                                  fontSize:10, fontWeight:700, color:'#1B6EF3',
-                                  background:'rgba(27,110,243,0.08)', border:'none',
-                                  borderRadius:4, padding:'2px 7px', cursor:'pointer',
-                                }}>
-                                🏢 관련업체 →
-                              </button>
+                            {((db?.related_business_ids?.length ?? 0) > 0 || db?.related_business_id) && (
+                              <div style={{ display:'flex', gap:4, flexWrap:'wrap', marginTop:2 }}>
+                                {(db?.related_business_ids?.length ? db.related_business_ids : db?.related_business_id ? [db.related_business_id] : []).map(bizId => (
+                                  <button key={bizId}
+                                    onClick={async e => {
+                                      e.stopPropagation()
+                                      setDetailBizId(bizId)
+                                      const { data } = await supabase.from('businesses').select('*').eq('id', bizId).single()
+                                      if (data) setDetailBiz(data)
+                                    }}
+                                    style={{
+                                      display:'flex', alignItems:'center', gap:3,
+                                      fontSize:10, fontWeight:700, color:'#1B6EF3',
+                                      background:'rgba(27,110,243,0.08)', border:'none',
+                                      borderRadius:4, padding:'2px 7px', cursor:'pointer',
+                                    }}>
+                                    <Icon icon="ph:buildings" width={11} height={11} color="#1B6EF3" />
+                                    관련업체
+                                  </button>
+                                ))}
+                              </div>
                             )}
                           </>
                         )

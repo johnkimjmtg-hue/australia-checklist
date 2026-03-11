@@ -31,7 +31,7 @@ const EMPTY_FORM = {
 
 // ── 체크리스트 타입 (DB 기반)
 type Cat  = { id:string; label:string; emoji:string; sort_order:number }
-type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean; suburb?:string|null; description?:string|null; related_business_id?:string|null }
+type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean; suburb?:string|null; description?:string|null; related_business_id?:string|null; related_business_ids?:string[]|null }
 
 const EMOJI_MAP: [string[], string][] = [
   [['크림','로션','에센스','토너','팩'], '🧴'],
@@ -825,7 +825,7 @@ function ItemsTab({ cats, items, setItems }: {
   const [businesses, setBusinesses] = useState<{id:string;name:string}[]>([])
   const [newSuburb, setNewSuburb]   = useState('')
   const [newDesc, setNewDesc]       = useState('')
-  const [newBizId, setNewBizId]     = useState('')
+  const [newBizIds, setNewBizIds]   = useState<string[]>([])
   const [bizSearch, setBizSearch]   = useState('')
 
   useEffect(() => {
@@ -834,7 +834,7 @@ function ItemsTab({ cats, items, setItems }: {
   }, [])
 
   const filteredBiz = bizSearch
-    ? businesses.filter(b => b.name.toLowerCase().includes(bizSearch.toLowerCase())).slice(0, 8)
+    ? businesses.filter(b => b.name.toLowerCase().includes(bizSearch.toLowerCase()) && !newBizIds.includes(b.id)).slice(0, 8)
     : []
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2500) }
@@ -852,11 +852,11 @@ function ItemsTab({ cats, items, setItems }: {
     }
     if (newSuburb.trim()) insertData.suburb = newSuburb.trim()
     if (newDesc.trim()) insertData.description = newDesc.trim()
-    if (newBizId) insertData.related_business_id = newBizId
+    if (newBizIds.length > 0) { insertData.related_business_id = newBizIds[0]; insertData.related_business_ids = newBizIds }
     const { error } = await supabase.from('checklist_items').insert(insertData)
     if (!error) {
       setItems([...items, { ...insertData }])
-      setNewLabel(''); setNewSuburb(''); setNewDesc(''); setNewBizId(''); setBizSearch('')
+      setNewLabel(''); setNewSuburb(''); setNewDesc(''); setNewBizIds([]); setBizSearch('')
       showToast('항목 추가됨: ' + newLabel)
     } else showToast('오류: ' + error.message)
     setSaving(false)
@@ -877,10 +877,16 @@ function ItemsTab({ cats, items, setItems }: {
     showToast('저장됨')
   }
 
-  async function saveDetail(id: string, field: 'suburb'|'description'|'related_business_id', val: string) {
+  async function saveDetail(id: string, field: 'suburb'|'description', val: string) {
     const value = val.trim() || null
     await supabase.from('checklist_items').update({ [field]: value }).eq('id', id)
     setItems(items.map(i => i.id===id ? {...i, [field]: value} : i))
+    showToast('저장됨')
+  }
+
+  async function saveRelatedBiz(id: string, ids: string[]) {
+    await supabase.from('checklist_items').update({ related_business_ids: ids }).eq('id', id)
+    setItems(items.map(i => i.id===id ? {...i, related_business_ids: ids} : i))
     showToast('저장됨')
   }
 
@@ -960,32 +966,42 @@ function ItemsTab({ cats, items, setItems }: {
           <input value={newDesc} onChange={e=>setNewDesc(e.target.value)}
             placeholder="📝 한 줄 설명 (선택)"
             style={{ ...inputStyle, fontSize:13 }} />
-          {/* 관련업체 검색 */}
-          <div style={{ position:'relative' }}>
-            <input
-              value={newBizId ? (businesses.find(b=>b.id===newBizId)?.name ?? '') : bizSearch}
-              onChange={e => { setNewBizId(''); setBizSearch(e.target.value) }}
-              placeholder="🏢 관련업체 검색 (선택)"
-              style={{ ...inputStyle, fontSize:13 }}
-            />
-            {newBizId && (
-              <button onClick={() => { setNewBizId(''); setBizSearch('') }}
-                style={{ position:'absolute', right:8, top:'50%', transform:'translateY(-50%)',
-                  background:'none', border:'none', color:'#aaa', cursor:'pointer', fontSize:14 }}>✕</button>
-            )}
-            {filteredBiz.length > 0 && !newBizId && (
-              <div style={{
-                position:'absolute', top:'100%', left:0, right:0, zIndex:10,
-                background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',
-                border:'1px solid #E2E8F0', overflow:'hidden',
-              }}>
-                {filteredBiz.map(b => (
-                  <div key={b.id} onClick={() => { setNewBizId(b.id); setBizSearch('') }}
-                    style={{ padding:'9px 12px', fontSize:13, cursor:'pointer', borderBottom:'1px solid #F1F5F9' }}
-                    onMouseEnter={e => (e.currentTarget.style.background='#F8FAFC')}
-                    onMouseLeave={e => (e.currentTarget.style.background='#fff')}
-                  >{b.name}</div>
-                ))}
+          {/* 관련업체 검색 — 최대 3개 */}
+          <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
+            {newBizIds.map(id => {
+              const biz = businesses.find(b => b.id === id)
+              return biz ? (
+                <div key={id} style={{ display:'flex', alignItems:'center', gap:6,
+                  background:'rgba(27,110,243,0.08)', borderRadius:8, padding:'5px 10px' }}>
+                  <span style={{ flex:1, fontSize:12, color:'#1B6EF3', fontWeight:600 }}>🏢 {biz.name}</span>
+                  <button onClick={() => setNewBizIds(newBizIds.filter(i => i !== id))}
+                    style={{ background:'none', border:'none', color:'#aaa', cursor:'pointer', fontSize:13 }}>✕</button>
+                </div>
+              ) : null
+            })}
+            {newBizIds.length < 3 && (
+              <div style={{ position:'relative' }}>
+                <input
+                  value={bizSearch}
+                  onChange={e => setBizSearch(e.target.value)}
+                  placeholder="🏢 관련업체 검색 (최대 3개)"
+                  style={{ ...inputStyle, fontSize:13 }}
+                />
+                {filteredBiz.length > 0 && (
+                  <div style={{
+                    position:'absolute', top:'100%', left:0, right:0, zIndex:10,
+                    background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',
+                    border:'1px solid #E2E8F0', overflow:'hidden',
+                  }}>
+                    {filteredBiz.map(b => (
+                      <div key={b.id} onClick={() => { setNewBizIds([...newBizIds, b.id]); setBizSearch('') }}
+                        style={{ padding:'9px 12px', fontSize:13, cursor:'pointer', borderBottom:'1px solid #F1F5F9' }}
+                        onMouseEnter={e => (e.currentTarget.style.background='#F8FAFC')}
+                        onMouseLeave={e => (e.currentTarget.style.background='#fff')}
+                      >{b.name}</div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1081,10 +1097,10 @@ function ItemsTab({ cats, items, setItems }: {
                 </div>
                 <div style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
                   <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0, paddingTop:6 }}>🏢 관련업체</span>
-                  <EditBizSearch
+                  <EditBizMultiSearch
                     businesses={businesses}
-                    value={item.related_business_id ?? ''}
-                    onChange={val => saveDetail(item.id, 'related_business_id', val)}
+                    values={item.related_business_ids ?? (item.related_business_id ? [item.related_business_id] : [])}
+                    onChange={ids => saveRelatedBiz(item.id, ids)}
                   />
                 </div>
               </div>
@@ -1106,6 +1122,58 @@ function ItemsTab({ cats, items, setItems }: {
 // ════════════════════════════════════════════
 // SHARED UI COMPONENTS
 // ════════════════════════════════════════════
+function EditBizMultiSearch({ businesses, values, onChange }: {
+  businesses: {id:string;name:string}[]
+  values: string[]
+  onChange: (ids: string[]) => void
+}) {
+  const [search, setSearch] = useState('')
+  const filtered = search
+    ? businesses.filter(b => b.name.toLowerCase().includes(search.toLowerCase()) && !values.includes(b.id)).slice(0, 8)
+    : []
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', gap:4 }}>
+      {values.map(id => {
+        const biz = businesses.find(b => b.id === id)
+        return biz ? (
+          <div key={id} style={{ display:'flex', alignItems:'center', gap:6,
+            background:'rgba(27,110,243,0.08)', borderRadius:6, padding:'4px 8px' }}>
+            <span style={{ flex:1, fontSize:12, color:'#1B6EF3', fontWeight:600 }}>{biz.name}</span>
+            <button onMouseDown={() => onChange(values.filter(i => i !== id))}
+              style={{ background:'none', border:'none', color:'#aaa', cursor:'pointer', fontSize:12 }}>✕</button>
+          </div>
+        ) : null
+      })}
+      {values.length < 3 && (
+        <div style={{ position:'relative' }}>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="업체명 검색... (최대 3개)"
+            style={{ ...inputStyle, fontSize:12, padding:'5px 8px' }}
+          />
+          {filtered.length > 0 && (
+            <div style={{
+              position:'absolute', top:'100%', left:0, right:0, zIndex:20,
+              background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',
+              border:'1px solid #E2E8F0', overflow:'hidden',
+            }}>
+              {filtered.map(b => (
+                <div key={b.id}
+                  onMouseDown={() => { onChange([...values, b.id]); setSearch('') }}
+                  style={{ padding:'8px 12px', fontSize:12, cursor:'pointer', borderBottom:'1px solid #F1F5F9' }}
+                  onMouseEnter={e => (e.currentTarget.style.background='#F8FAFC')}
+                  onMouseLeave={e => (e.currentTarget.style.background='#fff')}
+                >{b.name}</div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function EditBizSearch({ businesses, value, onChange }: {
   businesses: {id:string;name:string}[]
   value: string
