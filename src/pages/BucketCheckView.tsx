@@ -495,7 +495,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
           display:'flex', alignItems:'flex-end', justifyContent:'center',
         }} onClick={() => setShowMoreMenu(false)}>
           <div style={{
-            width:'100%', maxWidth:480,
+            width:'100%', maxWidth:390,
             background:'#fff', borderRadius:'20px 20px 0 0',
             padding:'20px 16px 36px',
             boxShadow:'0 -4px 24px rgba(0,0,0,0.15)',
