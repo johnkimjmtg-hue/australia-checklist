@@ -16,7 +16,8 @@ import ScheduleSheet from '../components/ScheduleSheet'
 import ReceiptModal from '../components/ReceiptModal'
 import Services from './Services'
 import BucketCheckView from './BucketCheckView'
-import BusinessDetail from './BusinessDetail'
+import BusinessCard from '../components/BusinessCard'
+import type { Business } from '../lib/businessService'
 
 const CAT_ICON_MAP: Record<string,string> = {
   hospital:'ph:first-aid-kit',food:'ph:fork-knife',shopping:'ph:shopping-bag',
@@ -54,6 +55,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
   const [bizCount, setBizCount] = useState(0)
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
+  const [detailBiz, setDetailBiz] = useState<Business|null>(null)
 
   useEffect(() => {
     const updateWidth = () => {
@@ -628,7 +630,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                             )}
                             {db?.related_business_id && (
                               <button
-                                onClick={e => { e.stopPropagation(); setDetailBizId(db.related_business_id!) }}
+                                onClick={async e => {
+                                  e.stopPropagation()
+                                  setDetailBizId(db.related_business_id!)
+                                  const { data } = await supabase.from('businesses').select('*').eq('id', db.related_business_id!).single()
+                                  if (data) setDetailBiz(data)
+                                }}
                                 style={{
                                   alignSelf:'flex-start', marginTop:2,
                                   fontSize:10, fontWeight:700, color:'#1B6EF3',
@@ -783,19 +790,24 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {detailBizId && (
         <div style={{ position:'fixed', inset:0, zIndex:800 }}>
           <div onClick={() => setDetailBizId(null)}
-            style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
+            style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} onClick={() => { setDetailBizId(null); setDetailBiz(null) }} />
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:390,
             maxHeight:'85vh', overflowY:'auto',
             borderRadius:'20px 20px 0 0',
-            background:'#fff',
+            background:'#F0F4F8',
+            padding:'12px 12px 32px',
+            boxSizing:'border-box',
           }}>
-            <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 16px 0' }}>
-              <button onClick={() => setDetailBizId(null)}
+            <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:8 }}>
+              <button onClick={() => { setDetailBizId(null); setDetailBiz(null) }}
                 style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', color:'#94A3B8' }}>✕</button>
             </div>
-            <BusinessDetail businessId={detailBizId} onBack={() => setDetailBizId(null)} />
+            {detailBiz
+              ? <BusinessCard business={detailBiz} />
+              : <div style={{ textAlign:'center', padding:24, color:'#94A3B8', fontSize:14 }}>불러오는 중...</div>
+            }
           </div>
         </div>
       )}
