@@ -9,12 +9,12 @@ type Props = { business: Business }
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
 export default function BusinessCard({ business }: Props) {
-  const { name, description, phone, website, kakao, address, city, is_featured, tags } = business
-  const fullAddress = [address, city].filter(Boolean).join(', ')
-  const mapsUrl = fullAddress
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
+  const { name, description, phone, website, kakao, city, is_featured, tags } = business
+  const mapsUrl = city
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(city)}`
     : null
 
+  const [expanded, setExpanded]             = useState(false)
   const [showVotes, setShowVotes]           = useState(false)
   const [counts, setCounts]                 = useState<Record<string, number> | null>(null)
   const [loading, setLoading]               = useState(false)
@@ -46,10 +46,6 @@ export default function BusinessCard({ business }: Props) {
     }
   }
 
-  const topTags = counts
-    ? Object.entries(counts).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).slice(0,2)
-    : []
-
   const btnBase: React.CSSProperties = {
     display:'flex', alignItems:'center', justifyContent:'center', gap:5,
     height:36, padding:'0 14px', borderRadius:8,
@@ -58,6 +54,58 @@ export default function BusinessCard({ business }: Props) {
     boxShadow:'0 2px 6px rgba(0,0,0,0.08)',
     color:'#1E293B', background:'#fff',
   }
+
+  const btnBlue: React.CSSProperties = {
+    ...btnBase,
+    background:'#1B6EF3', color:'#fff', border:'none',
+    boxShadow:'0 2px 8px rgba(27,110,243,0.25)',
+  }
+
+  // 버튼 순서: 전화, 경로, 웹사이트, 카톡, 한줄평, 공유 (없는건 스킵)
+  const allButtons = [
+    phone ? (
+      isMobile ? (
+        <a key="phone" href={`tel:${phone}`} style={{ ...btnBlue, textDecoration:'none' }}>
+          <Icon icon="ph:phone" width={13} height={13} color="#fff" />전화
+        </a>
+      ) : (
+        <div key="phone" style={{ position:'relative' }}>
+          <button onClick={() => setShowPhone(v => !v)} style={{ ...btnBlue }}>
+            <Icon icon="ph:phone" width={13} height={13} color="#fff" />전화
+          </button>
+          {showPhone && (
+            <div style={{ position:'absolute', bottom:'110%', left:0, background:'#1E293B', color:'#fff', padding:'8px 14px', borderRadius:10, fontSize:13, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', zIndex:50 }}>{phone}</div>
+          )}
+        </div>
+      )
+    ) : null,
+    mapsUrl ? (
+      <a key="map" href={mapsUrl} target="_blank" rel="noreferrer" style={{ ...btnBase, textDecoration:'none' }}>
+        <Icon icon="ph:navigation-arrow" width={13} height={13} color="#475569" />경로
+      </a>
+    ) : null,
+    website ? (
+      <a key="web" href={website.startsWith('http') ? website : `https://${website}`} target="_blank" rel="noreferrer" style={{ ...btnBase, textDecoration:'none' }}>
+        <Icon icon="ph:globe" width={13} height={13} color="#475569" />웹사이트
+      </a>
+    ) : null,
+    kakao ? (
+      <a key="kakao" href={`https://open.kakao.com/o/${kakao}`} target="_blank" rel="noreferrer"
+        style={{ ...btnBase, background:'#FEE500', color:'#3C1E1E', border:'1.5px solid #F0D800', textDecoration:'none' }}>
+        <Icon icon="ph:chat-circle" width={13} height={13} color="#3C1E1E" />카톡
+      </a>
+    ) : null,
+    <button key="vote" onClick={handleToggleVotes}
+      style={{ ...btnBase, background: showVotes ? '#1B6EF3' : '#fff', color: showVotes ? '#fff' : '#1E293B', border: showVotes ? 'none' : '1.5px solid #D1D9E3' }}>
+      <Icon icon="ph:thumbs-up" width={13} height={13} color={showVotes ? '#fff' : '#475569'} />
+      한줄평{myVote ? ' ✓' : ''}
+    </button>,
+    <button key="share" onClick={() => setShowShareModal(true)} style={{ ...btnBase }}>
+      <Icon icon="ph:share-network" width={13} height={13} color="#475569" />공유
+    </button>,
+  ].filter(Boolean)
+
+  const visibleButtons = expanded ? allButtons : allButtons.slice(0, 3)
 
   return (
     <>
@@ -76,14 +124,22 @@ export default function BusinessCard({ business }: Props) {
       }}>
         <div style={{ padding:'16px' }}>
 
-          {/* 업체명 + 북마크 + 추천 뱃지 */}
+          {/* 업체명 + 펼쳐보기 아이콘 + 북마크 */}
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
             <div style={{ fontSize:17, fontWeight:800, color:'#0F172A', flex:1, paddingRight:8 }}>{name}</div>
-            <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
-
+            <div style={{ display:'flex', alignItems:'center', gap:2, flexShrink:0 }}>
+              <button
+                onClick={() => { setExpanded(v => !v); if (expanded) setShowVotes(false) }}
+                style={{
+                  background:'none', border:'none', cursor:'pointer', padding:'4px 6px', borderRadius:8,
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  transition:'transform 0.2s',
+                  transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}>
+                <Icon icon="ph:caret-down" width={18} height={18} color="#94A3B8" />
+              </button>
               <button onClick={() => setBookmarked(toggleBookmark(business.id))} style={{
-                background:  'none',
-                border:'none', cursor:'pointer', padding:'4px 6px', borderRadius:8,
+                background:'none', border:'none', cursor:'pointer', padding:'4px 6px', borderRadius:8,
                 display:'flex', alignItems:'center', justifyContent:'center',
               }}>
                 <Icon icon={bookmarked ? 'ph:bookmark-simple-fill' : 'ph:bookmark-simple'}
@@ -92,86 +148,55 @@ export default function BusinessCard({ business }: Props) {
             </div>
           </div>
 
-          {fullAddress && (
+          {/* 주소 (city만) */}
+          {city && (
             <div style={{ display:'flex', alignItems:'center', gap:4, marginBottom:8 }}>
               <Icon icon="ph:map-pin-simple" width={13} height={13} color="#64748B" />
-              <span style={{ fontSize:12, color:'#475569', fontWeight:500 }}>{fullAddress}</span>
+              <span style={{ fontSize:12, color:'#475569', fontWeight:500 }}>{city}</span>
             </div>
           )}
 
+          {/* 설명 — 접힌 상태: 2줄 제한 */}
           {description && (
-            <div style={{ fontSize:13, color:'#334155', lineHeight:1.6, marginBottom:10 }}>{description}</div>
+            <>
+              <div style={{
+                fontSize:13, color:'#334155', lineHeight:1.6, marginBottom:4,
+                ...(expanded ? {} : {
+                  display:'-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical' as any,
+                  overflow:'hidden',
+                }),
+              }}>{description}</div>
+              {!expanded && (
+                <button onClick={() => setExpanded(true)} style={{
+                  background:'none', border:'none', cursor:'pointer', padding:0,
+                  fontSize:12, color:'#1B6EF3', fontWeight:700, marginBottom:8, fontFamily:ff,
+                }}>더보기</button>
+              )}
+            </>
           )}
 
+          {/* 해시태그 — 접힌 상태: 3개, 펼친 상태: 전체 */}
           {tags && tags.length > 0 && (
-            <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
-              {tags.map(tag => (
+            <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, marginTop:6 }}>
+              {(expanded ? tags : tags.slice(0, 3)).map(tag => (
                 <span key={tag} style={{ background:'#EFF6FF', color:'#1B6EF3', fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:'1px solid #BFDBFE' }}>{tag}</span>
               ))}
+              {!expanded && tags.length > 3 && (
+                <span style={{ fontSize:11, color:'#94A3B8', fontWeight:600, padding:'4px 2px' }}>+{tags.length - 3}</span>
+              )}
             </div>
           )}
 
-          {!showVotes && topTags.length > 0 && (
-            <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
-              {topTags.map(([tag, count]) => (
-                <span key={tag} style={{
-                  background:'#FFF1F2', color:'#E11D48', fontSize:10, fontWeight:700,
-                  borderRadius:6, padding:'3px 8px', display:'flex', alignItems:'center', gap:3,
-                  border:'1px solid #FECDD3',
-                }}>
-                  <Icon icon="ph:thumbs-up" width={11} height={11} color="#E11D48" /> {tag} {count}
-                </span>
-              ))}
-            </div>
-          )}
-
+          {/* 버튼 라인 */}
           <div style={{ display:'flex', gap:7, flexWrap:'wrap' }}>
-            {phone && (
-              isMobile ? (
-                <a href={`tel:${phone}`} style={{ ...btnBase, textDecoration:'none' }}>
-                  <Icon icon="ph:phone" width={13} height={13} color="#475569" />전화
-                </a>
-              ) : (
-                <div style={{ position:'relative' }}>
-                  <button onClick={() => setShowPhone(v => !v)} style={{ ...btnBase }}>
-                    <Icon icon="ph:phone" width={13} height={13} color="#475569" />전화
-                  </button>
-                  {showPhone && (
-                    <div style={{ position:'absolute', bottom:'110%', left:0, background:'#1E293B', color:'#fff', padding:'8px 14px', borderRadius:10, fontSize:13, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', zIndex:50 }}>{phone}</div>
-                  )}
-                </div>
-              )
-            )}
-            {kakao && (
-              <a href={`https://open.kakao.com/o/${kakao}`} target="_blank" rel="noreferrer"
-                style={{ ...btnBase, background:'#FEE500', color:'#3C1E1E', border:'1.5px solid #F0D800', textDecoration:'none' }}>
-                <Icon icon="ph:chat-circle" width={13} height={13} color="#3C1E1E" />카톡
-              </a>
-            )}
-            {website && (
-              <a href={website.startsWith('http') ? website : `https://${website}`} target="_blank" rel="noreferrer"
-                style={{ ...btnBase, textDecoration:'none' }}>
-                <Icon icon="ph:globe" width={13} height={13} color="#475569" />웹사이트
-              </a>
-            )}
-            {mapsUrl && (
-              <a href={mapsUrl} target="_blank" rel="noreferrer"
-                style={{ ...btnBase, textDecoration:'none' }}>
-                <Icon icon="ph:navigation-arrow" width={13} height={13} color="#475569" />경로
-              </a>
-            )}
-            <button onClick={handleToggleVotes}
-              style={{ ...btnBase, background: showVotes ? '#1B6EF3' : '#fff', color: showVotes ? '#fff' : '#1E293B', border: showVotes ? 'none' : '1.5px solid #D1D9E3' }}>
-              <Icon icon="ph:thumbs-up" width={13} height={13} color={showVotes ? '#fff' : '#475569'} />
-              한줄평{myVote ? ' ✓' : ''}
-            </button>
-            <button onClick={() => setShowShareModal(true)} style={{ ...btnBase }}>
-              <Icon icon="ph:share-network" width={13} height={13} color="#475569" />공유
-            </button>
+            {visibleButtons}
           </div>
         </div>
 
-        {showVotes && (
+        {/* 펼친 상태에서만 한줄평 섹션 표시 */}
+        {expanded && showVotes && (
           <div style={{ borderTop:'1.5px solid #D1D9E3', background:'#F1F5F9', padding:'14px 16px' }}>
             {loading ? (
               <div style={{ textAlign:'center', padding:'12px 0', color:'#94A3B8', fontSize:13 }}>불러오는 중...</div>
