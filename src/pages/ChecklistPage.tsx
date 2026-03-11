@@ -507,7 +507,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             )}
 
             {/* Items list — card style */}
-            <div style={{ display:'flex', flexDirection:'column', gap:8, padding:'0 16px 110px' }}>
+            <div style={{ display:'flex', flexDirection:'column', gap:8, padding:'0 16px 106px' }}>
               {catItems.map(item => {
                 const checked  = !!state.selected[item.id]
                 const dayCount = (state.schedules[item.id] ?? []).length
@@ -594,12 +594,14 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           {/* ── Bottom CTA ── */}
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:390, padding:'8px 14px 20px',
-            background:'transparent',
+            width:'100%', maxWidth:390,
+            background:'#fff',
+            borderTop:'1px solid #E2E8F0',
             zIndex:20, boxSizing:'border-box',
+            padding:'12px 14px 28px',
           }}>
             {unscheduledCount>0 && done>0 && (
-              <div style={{ fontSize:11, color:'#92620a', textAlign:'center', marginBottom:6, fontWeight:700,
+              <div style={{ fontSize:11, color:'#92620a', textAlign:'center', marginBottom:8, fontWeight:700,
                 background:'rgba(255,205,0,0.15)', borderRadius:6, padding:'5px 0' }}>
                 ⚠️ {unscheduledCount}개 항목에 날짜를 지정해주세요
               </div>
@@ -610,17 +612,13 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 background:'#1B6EF3', color:'#fff',
                 border:'none', borderRadius:8, fontSize:15, fontWeight:700, cursor:'pointer',
                 animation: shakeBtn ? 'shake 0.5s ease' : 'none',
-                boxShadow:'0 10px 15px rgba(0,0,0,0.15)',
+                boxShadow:'0 4px 12px rgba(27,110,243,0.25)',
               }}>버킷리스트 발행하기</button>
               <button onClick={() => setModal('confirmReset')} style={{
                 flex:2, height:54,
-                background:'rgba(255,255,255,0.92)', color:'#64748B',
+                background:'#fff', color:'#64748B',
                 border:'1px solid #E2E8F0', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer',
-                backdropFilter:'blur(8px)',
               }}>↻ 초기화</button>
-            </div>
-            <div style={{ fontSize:11, color:'#94A3B8', textAlign:'center', marginTop:6, fontWeight:500 }}>
-              선택한 항목들로 버킷리스트를 만들어요
             </div>
           </div>
         </>
