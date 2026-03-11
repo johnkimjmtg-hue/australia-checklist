@@ -5,7 +5,7 @@ import { CheckItem } from '../data/checklist'
 import { supabase } from '../lib/supabase'
 
 type Category = { id: string; label: string; emoji: string; sort_order: number }
-type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number }
+type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; suburb?: string | null; description?: string | null; related_business_id?: string | null }
 import {
   AppState, TripInfo,
   toggleItem, setSchedule, setCategory, addCustom,
@@ -16,6 +16,7 @@ import ScheduleSheet from '../components/ScheduleSheet'
 import ReceiptModal from '../components/ReceiptModal'
 import Services from './Services'
 import BucketCheckView from './BucketCheckView'
+import BusinessDetail from './BusinessDetail'
 
 const CAT_ICON_MAP: Record<string,string> = {
   hospital:'ph:first-aid-kit',food:'ph:fork-knife',shopping:'ph:shopping-bag',
@@ -52,6 +53,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const pageRef = useRef<HTMLDivElement>(null)
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
   const [bizCount, setBizCount] = useState(0)
+  const [detailBizId, setDetailBizId] = useState<string|null>(null)
 
   useEffect(() => {
     const updateWidth = () => {
@@ -600,13 +602,46 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       color={checked ? '#78716C' : '#CBD5E1'}
                     />
 
-                    <span onClick={() => {
-                      if (checked && showScheduleView) setScheduleSelectedItem(item.id)
-                    }} style={{
-                      flex:1, fontSize:15, fontWeight: checked ? 600 : 400,
-                      color: checked ? '#0F172A' : '#64748B', cursor: checked && showScheduleView ? 'pointer' : 'default',
-                      lineHeight:1.4,
-                    }}>{item.label}</span>
+                    {/* 제목 + suburb + description */}
+                    <div style={{ flex:1, display:'flex', flexDirection:'column', gap:2, minWidth:0 }}
+                      onClick={() => { if (checked && showScheduleView) setScheduleSelectedItem(item.id) }}>
+                      <span style={{
+                        fontSize:15, fontWeight: checked ? 600 : 400,
+                        color: checked ? '#0F172A' : '#64748B',
+                        cursor: checked && showScheduleView ? 'pointer' : 'default',
+                        lineHeight:1.4,
+                      }}>{item.label}</span>
+                      {(() => {
+                        const db = dbItems.find(d => d.id === item.id)
+                        return (
+                          <>
+                            {db?.suburb && (
+                              <span style={{ fontSize:11, color:'#94A3B8', fontWeight:500 }}>
+                                📍 {db.suburb}
+                              </span>
+                            )}
+                            {db?.description && (
+                              <span style={{
+                                fontSize:11, color:'#94A3B8', fontWeight:400,
+                                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+                              }}>{db.description}</span>
+                            )}
+                            {db?.related_business_id && (
+                              <button
+                                onClick={e => { e.stopPropagation(); setDetailBizId(db.related_business_id!) }}
+                                style={{
+                                  alignSelf:'flex-start', marginTop:2,
+                                  fontSize:10, fontWeight:700, color:'#1B6EF3',
+                                  background:'rgba(27,110,243,0.08)', border:'none',
+                                  borderRadius:4, padding:'2px 7px', cursor:'pointer',
+                                }}>
+                                🏢 관련업체 →
+                              </button>
+                            )}
+                          </>
+                        )
+                      })()}
+                    </div>
 
                     {/* Schedule button */}
                     <button onClick={() => {
@@ -742,6 +777,26 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
           achieved={achieved}
           onClose={() => setShowReceipt(false)} onReset={() => setModal('confirmReset')} />
+      )}
+
+      {/* 관련업체 팝업 */}
+      {detailBizId && (
+        <div style={{ position:'fixed', inset:0, zIndex:800 }}>
+          <div onClick={() => setDetailBizId(null)}
+            style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
+          <div style={{
+            position:'absolute', bottom:0, left:0, right:0,
+            maxHeight:'85vh', overflowY:'auto',
+            borderRadius:'20px 20px 0 0',
+            background:'#fff',
+          }}>
+            <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 16px 0' }}>
+              <button onClick={() => setDetailBizId(null)}
+                style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', color:'#94A3B8' }}>✕</button>
+            </div>
+            <BusinessDetail businessId={detailBizId} onBack={() => setDetailBizId(null)} />
+          </div>
+        </div>
       )}
     </div>
   )

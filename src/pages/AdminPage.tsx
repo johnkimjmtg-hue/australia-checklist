@@ -31,7 +31,7 @@ const EMPTY_FORM = {
 
 // ── 체크리스트 타입 (DB 기반)
 type Cat  = { id:string; label:string; emoji:string; sort_order:number }
-type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean }
+type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean; suburb?:string|null; description?:string|null; related_business_id?:string|null }
 
 const EMOJI_MAP: [string[], string][] = [
   [['크림','로션','에센스','토너','팩'], '🧴'],
@@ -821,6 +821,13 @@ function ItemsTab({ cats, items, setItems }: {
   const [dragOverIdx, setDragOverIdx] = useState<number|null>(null)
   const [editId, setEditId]     = useState<string|null>(null)
   const [editLabel, setEditLabel] = useState('')
+  const [expandedId, setExpandedId] = useState<string|null>(null)
+  const [businesses, setBusinesses] = useState<{id:string;name:string}[]>([])
+
+  useEffect(() => {
+    supabase.from('businesses').select('id, name').eq('is_active', true).order('name')
+      .then(({ data }) => { if (data) setBusinesses(data) })
+  }, [])
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2500) }
 
@@ -855,6 +862,13 @@ function ItemsTab({ cats, items, setItems }: {
     await supabase.from('checklist_items').update({ label: editLabel.trim() }).eq('id', id)
     setItems(items.map(i => i.id===id ? {...i, label: editLabel.trim()} : i))
     setEditId(null)
+    showToast('저장됨')
+  }
+
+  async function saveDetail(id: string, field: 'suburb'|'description'|'related_business_id', val: string) {
+    const value = val.trim() || null
+    await supabase.from('checklist_items').update({ [field]: value }).eq('id', id)
+    setItems(items.map(i => i.id===id ? {...i, [field]: value} : i))
     showToast('저장됨')
   }
 
@@ -971,6 +985,12 @@ function ItemsTab({ cats, items, setItems }: {
                   <button onClick={() => saveLabel(item.id)}
                     style={{ ...btnPrimary, padding:'4px 10px', fontSize:12 }}>저장</button>
                 )}
+                <button
+                  onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                  title="상세정보 편집"
+                  style={{ background:'none', border:'none', cursor:'pointer', fontSize:14, opacity:0.7, color: expandedId===item.id ? '#1B6EF3' : '#888' }}>
+                  ✏️
+                </button>
                 <button onClick={() => toggleActive(item.id, item.is_active)}
                   title={item.is_active ? '비활성화' : '활성화'}
                   style={{ background:'none', border:'none', cursor:'pointer', fontSize:16, opacity:0.7 }}>
@@ -979,8 +999,49 @@ function ItemsTab({ cats, items, setItems }: {
                 <button onClick={() => deleteItem(item.id)}
                   style={{ background:'none', border:'none', color:'#e05252', cursor:'pointer', fontSize:14 }}>✕</button>
               </div>
-            )
-          })}
+            )}
+            {/* 상세정보 편집 패널 */}
+            {expandedId === item.id && (
+              <div style={{
+                border:'1px solid #E2E8F0', borderTop:'none',
+                borderRadius:'0 0 10px 10px', padding:'12px 14px',
+                background:'#F8FAFC', display:'flex', flexDirection:'column', gap:8,
+              }}>
+                <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+                  <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0 }}>📍 Suburb</span>
+                  <input
+                    defaultValue={item.suburb ?? ''}
+                    onBlur={e => saveDetail(item.id, 'suburb', e.target.value)}
+                    placeholder="예: Surry Hills"
+                    style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px' }}
+                  />
+                </div>
+                <div style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
+                  <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0, paddingTop:6 }}>📝 설명</span>
+                  <textarea
+                    defaultValue={item.description ?? ''}
+                    onBlur={e => saveDetail(item.id, 'description', e.target.value)}
+                    placeholder="한 줄 설명 (선택)"
+                    rows={2}
+                    style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px', resize:'vertical' }}
+                  />
+                </div>
+                <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+                  <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0 }}>🏢 관련업체</span>
+                  <select
+                    value={item.related_business_id ?? ''}
+                    onChange={e => saveDetail(item.id, 'related_business_id', e.target.value)}
+                    style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px' }}
+                  >
+                    <option value="">없음</option>
+                    {businesses.map(b => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+          ])}
           {catItems.length === 0 && (
             <div style={{ textAlign:'center', color:'#aaa', fontSize:13, padding:'20px 0' }}>
               이 카테고리에 항목이 없어요
