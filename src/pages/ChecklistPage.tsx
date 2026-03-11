@@ -57,7 +57,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     const updateWidth = () => {
       if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
     }
-    updateWidth()
+    requestAnimationFrame(updateWidth)
     window.addEventListener('resize', updateWidth)
     return () => window.removeEventListener('resize', updateWidth)
   }, [])
@@ -641,7 +641,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           {/* ── Bottom CTA ── */}
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:480,
+            width: footerWidth ?? '100%', maxWidth:480,
             background:'#fff',
             zIndex:20, boxSizing:'border-box',
             padding:'18px 14px 28px',
