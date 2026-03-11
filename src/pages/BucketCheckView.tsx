@@ -342,7 +342,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
       <Confetti trigger={confettiTrigger} />
 
       {/* ══ 헤더 + 탭 ══ */}
-      <div style={{ background:'rgba(232,237,243,0.97)',borderBottom:'1.5px solid #D1D9E3', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
+      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
         <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
