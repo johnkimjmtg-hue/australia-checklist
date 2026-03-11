@@ -51,6 +51,25 @@ function getCompletedLines(checked: Set<number>): number[][] {
   return getBingoLines(checked).filter(line => line.every(i => checked.has(i)))
 }
 
+// ── 원형 진행바
+function CircleProgress({ pct }: { pct: number }) {
+  const R = 44, C = 2 * Math.PI * R
+  return (
+    <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
+      <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
+        <circle cx={50} cy={50} r={R} fill="none" stroke="#F1F5F9" strokeWidth={10}/>
+        <circle cx={50} cy={50} r={R} fill="none" stroke="#FFCD00" strokeWidth={10}
+          strokeDasharray={C} strokeDashoffset={C-(pct/100)*C} strokeLinecap="round"
+          style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)' }}
+        />
+      </svg>
+      <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <span style={{ fontSize:15, fontWeight:800, color:'#1B6EF3' }}>{pct}%</span>
+      </div>
+    </div>
+  )
+}
+
 // ── 꽃가루
 interface Petal { id: number; x: number; color: string; size: number; duration: number; delay: number; rotate: number }
 function Confetti({ trigger }: { trigger: number }) {
@@ -88,64 +107,66 @@ function Confetti({ trigger }: { trigger: number }) {
 }
 
 // ── 폭죽 (ChecklistPage에서 가져옴)
-function FireworkBurst({ cx, cy, delay = 0 }: { cx: number; cy: number; delay?: number }) {
+function Fireworks() {
   const colors = ['#FFCD00','#1B6EF3','#FF4B4B','#4ECDC4','#FF9F43','#A29BFE','#55EFC4','#FD79A8','#fff']
-  const particles = Array.from({ length: 80 }, (_, i) => {
-    const angle  = (i / 80) * 360
-    const dist   = 100 + Math.random() * 160
-    const rad    = (angle * Math.PI) / 180
-    const tx     = Math.cos(rad) * dist
-    const ty     = Math.sin(rad) * dist
-    const color  = colors[Math.floor(Math.random() * colors.length)]
-    const dur    = 0.9 + Math.random() * 0.7
-    const size   = 5 + Math.random() * 8
-    const isRect = i % 3 !== 0
-    return { tx, ty, color, delay: delay + Math.random()*0.3, dur, size, isRect, angle }
-  })
+  const cx = 50; const cy = 50
+  const mk = (count: number, distMin: number, distMax: number, delayBase: number, sizeMin: number, sizeMax: number) =>
+    Array.from({ length: count }, (_, i) => {
+      const angle  = (i / count) * 360
+      const dist   = distMin + Math.random() * (distMax - distMin)
+      const rad    = (angle * Math.PI) / 180
+      return {
+        tx: Math.cos(rad) * dist, ty: Math.sin(rad) * dist,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        delay: delayBase + Math.random() * 0.3,
+        dur: 0.9 + Math.random() * 0.7,
+        size: sizeMin + Math.random() * (sizeMax - sizeMin),
+        isRect: i % 3 !== 0, angle,
+      }
+    })
+  const wave1 = mk(90, 120, 220, 0,    5, 10)
+  const wave2 = mk(60, 80,  180, 0.4,  4, 8)
+  const wave3 = mk(40, 60,  140, 0.8,  3, 7)
+  const all = [...wave1, ...wave2, ...wave3]
   return (
-    <>
-      {particles.map((p, i) => (
+    <div style={{ position:'fixed', inset:0, zIndex:9999, pointerEvents:'none', overflow:'hidden' }}>
+      {/* 큰 플래시 */}
+      <div style={{
+        position:'absolute', left:'50%', top:'50%',
+        transform:'translate(-50%,-50%)',
+        width:120, height:120, borderRadius:'50%',
+        background:'radial-gradient(circle, rgba(255,205,0,0.9) 0%, transparent 70%)',
+        animation:'flashOut 0.6s ease-out both',
+      }}/>
+      {all.map((p, i) => (
         <div key={i} style={{
           position:'absolute', left:`${cx}%`, top:`${cy}%`,
           width: p.isRect ? p.size*0.5 : p.size,
-          height: p.isRect ? p.size*2 : p.size,
+          height: p.isRect ? p.size*2.5 : p.size,
           borderRadius: p.isRect ? 2 : '50%',
           background: p.color,
           // @ts-ignore
           '--tx': `${p.tx}px`, '--ty': `${p.ty}px`, '--r': `${p.angle}deg`,
           animation: `fwBurst ${p.dur}s ease-out ${p.delay}s both`,
-          boxShadow: `0 0 ${p.size*1.5}px ${p.color}`,
+          boxShadow: `0 0 ${p.size*2}px ${p.color}`,
         }}/>
       ))}
-      {/* 중앙 플래시 */}
-      <div style={{
-        position:'absolute', left:`${cx}%`, top:`${cy}%`,
-        transform:'translate(-50%,-50%)',
-        width:80, height:80, borderRadius:'50%',
-        background:'radial-gradient(circle, rgba(255,205,0,0.95) 0%, transparent 70%)',
-        // @ts-ignore
-        '--tx':'0px', '--ty':'0px', '--r':'0deg',
-        animation: `fwBurst 0.6s ease-out ${delay}s both`,
-      }}/>
-    </>
+    </div>
   )
 }
 
-function Fireworks() {
-  return (
-    <div style={{ position:'fixed', inset:0, zIndex:9999, pointerEvents:'none', overflow:'hidden' }}>
-      {/* 가운데 크게 */}
-      <FireworkBurst cx={50} cy={45} delay={0} />
-      {/* 좌우 */}
-      <FireworkBurst cx={20} cy={55} delay={0.4} />
-      <FireworkBurst cx={80} cy={55} delay={0.4} />
-      {/* 상단 */}
-      <FireworkBurst cx={35} cy={25} delay={0.7} />
-      <FireworkBurst cx={65} cy={25} delay={0.9} />
-      {/* 가운데 두번째 */}
-      <FireworkBurst cx={50} cy={50} delay={1.2} />
-    </div>
-  )
+
+// ── 상황 메시지
+function getStatusMsg(checked: number, bingo: number): { title: string; sub: string } {
+  if (checked === 0)  return { title: '멜번 카페 도장깨기 시작!', sub: '카페를 방문하면 해당 칸을 눌러보세요 ☕' }
+  if (checked === 25) return { title: '🏆 완전정복! 대단해요!', sub: '멜번 카페 25곳을 모두 정복했어요!' }
+  if (bingo >= 5)     return { title: `🎉 ${bingo}빙고 달성!`, sub: `${checked}개 카페를 방문했어요. 거의 다 왔어요!` }
+  if (bingo >= 3)     return { title: `✨ ${bingo}빙고 달성!`, sub: `${checked}개 카페 완료! 계속 도전해봐요` }
+  if (bingo >= 1)     return { title: `🎯 ${bingo}빙고 달성!`, sub: `와우! ${checked}개 카페를 깨셨어요` }
+  if (checked >= 15)  return { title: `${checked}개 카페 방문 완료!`, sub: '빙고까지 얼마 안 남았어요 💪' }
+  if (checked >= 10)  return { title: `${checked}개 카페 방문!`, sub: '반 이상 왔어요! 계속 달려봐요 🔥' }
+  if (checked >= 5)   return { title: `${checked}개 카페 방문!`, sub: '좋은 출발이에요. 더 많이 도전해봐요!' }
+  return { title: `${checked}개 카페 방문!`, sub: '멜번 카페 투어가 시작됐어요 ☕' }
 }
 
 type Props = { onBack: () => void }
@@ -166,18 +187,12 @@ export default function BingoPage({ onBack }: Props) {
   const bingoCount = completedLines.length
   const isAllDone = checked.size === 25
 
-  // 빙고 달성 감지
+  // 빙고 달성 감지 — 줄 하나 완성할 때마다 폭죽
   useEffect(() => {
     if (bingoCount > prevBingoCount) {
-      if (bingoCount >= 5) {
-        // 5빙고 이상 — 폭죽 + 꽃가루
-        setShowFireworks(true)
-        setConfettiTrigger(v => v+1)
-        setTimeout(() => setShowFireworks(false), 4500)
-      } else {
-        // 1~4빙고 — 꽃가루만
-        setConfettiTrigger(v => v+1)
-      }
+      setShowFireworks(true)
+      setConfettiTrigger(v => v+1)
+      setTimeout(() => setShowFireworks(false), 3500)
     }
     setPrevBingoCount(bingoCount)
   }, [bingoCount])
@@ -241,6 +256,7 @@ export default function BingoPage({ onBack }: Props) {
           50%     { opacity:0.6; }
         }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes flashOut { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(-50%,-50%) scale(3);opacity:0} }
         @keyframes fwBurst {
           0%   { transform: translate(-50%,-50%) scale(0) rotate(var(--r)); opacity:1; }
           80%  { opacity:0.8; }
@@ -273,29 +289,40 @@ export default function BingoPage({ onBack }: Props) {
         </div>
       </div>
 
-      {/* ── 빙고 카운터 */}
-      <div style={{ background:'#F0F4F8', padding:'12px 16px 8px' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <div style={{ display:'flex', gap:6, flex:1, flexWrap:'wrap' }}>
-            {Array.from({ length: Math.max(bingoCount, 1) }).map((_, i) => (
-              <span key={i} style={{
-                fontSize:12, fontWeight:800,
-                color: i < bingoCount ? '#fff' : '#CBD5E1',
-                background: i < bingoCount ? '#1B6EF3' : '#E2E8F0',
-                borderRadius:6, padding:'3px 10px',
-                animation: i < bingoCount ? 'bingoFlash 1s ease infinite' : 'none',
-              }}>BINGO {i+1}</span>
-            ))}
-            {bingoCount === 0 && (
-              <span style={{ fontSize:12, color:'#94A3B8', fontWeight:500 }}>카페를 방문하면 눌러보세요!</span>
-            )}
+      {/* ── 상황판 */}
+      <div style={{ position:'sticky', top:0, zIndex:30, background:'#F0F4F8', padding:'12px 16px 0' }}>
+        <div style={{
+          background:'#fff', borderRadius:12,
+          boxShadow:'0 4px 20px rgba(27,110,243,0.10), 0 1px 4px rgba(0,0,0,0.06)',
+          padding:'16px 18px', display:'flex', alignItems:'center', gap:16,
+        }}>
+          <CircleProgress pct={Math.round((checked.size/25)*100)} />
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ fontSize:16, fontWeight:800, color:'#1E293B', marginBottom:3, lineHeight:1.3 }}>
+              {getStatusMsg(checked.size, bingoCount).title}
+            </div>
+            <div style={{ fontSize:12, color:'#94A3B8', fontWeight:500, marginBottom:8, lineHeight:1.5 }}>
+              {getStatusMsg(checked.size, bingoCount).sub}
+            </div>
+            {/* 빙고 뱃지 */}
+            <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+              {bingoCount > 0
+                ? Array.from({ length: bingoCount }).map((_, i) => (
+                    <span key={i} style={{
+                      fontSize:10, fontWeight:800, color:'#fff',
+                      background:'#1B6EF3', borderRadius:5, padding:'2px 8px',
+                      animation:'bingoFlash 1.5s ease infinite',
+                    }}>BINGO {i+1}</span>
+                  ))
+                : <span style={{ fontSize:11, color:'#CBD5E1', fontWeight:500 }}>빙고 도전 중...</span>
+              }
+            </div>
           </div>
-          {isAllDone && (
-            <span style={{ fontSize:11, fontWeight:800, color:'#FFB800',
-              background:'rgba(255,184,0,0.12)', borderRadius:6, padding:'3px 10px' }}>
-              🏆 완정정복!
-            </span>
-          )}
+          {/* 카페 수 */}
+          <div style={{ textAlign:'center', flexShrink:0 }}>
+            <div style={{ fontSize:28, fontWeight:800, color:'#1B6EF3', lineHeight:1 }}>{checked.size}</div>
+            <div style={{ fontSize:11, color:'#94A3B8', fontWeight:600 }}>/25 카페</div>
+          </div>
         </div>
       </div>
 
