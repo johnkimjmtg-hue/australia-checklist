@@ -10,7 +10,7 @@ import { supabase } from '../lib/supabase'
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'hojugaja2024'
 
 // ── 탭 타입
-type MainTab = 'business' | 'categories' | 'items' | 'export' | 'requests' | 'suggestions'
+type MainTab = 'business' | 'categories' | 'items' | 'requests' | 'suggestions'
 
 // ── 탭 메타
 const TAB_META: { id: MainTab; icon: string; label: string }[] = [
@@ -19,7 +19,6 @@ const TAB_META: { id: MainTab; icon: string; label: string }[] = [
   { id:'suggestions', icon:'ph:lightbulb',          label:'추천' },
   { id:'categories',  icon:'ph:folder-open',        label:'카테고리' },
   { id:'items',       icon:'ph:list-checks',        label:'체크리스트' },
-  { id:'export',      icon:'ph:code',               label:'내보내기' },
 ]
 
 
@@ -319,7 +318,6 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
         {tab==='suggestions' && <SuggestionsTab />}
         {tab==='categories'  && (clLoading ? <div style={{padding:32,textAlign:'center',color:'#aaa'}}>불러오는 중...</div> : <CategoriesTab cats={sharedCats} setCats={setSharedCats} />)}
         {tab==='items'       && (clLoading ? <div style={{padding:32,textAlign:'center',color:'#aaa'}}>불러오는 중...</div> : <ItemsTab cats={sharedCats} items={sharedItems} setItems={setSharedItems} />)}
-        {tab==='export'      && <ExportTab cats={sharedCats} items={sharedItems} iconMap={sharedIconMap} />}
       </div>
 
       {/* 하단 네비바 */}
@@ -991,72 +989,6 @@ function ItemsTab({ cats, items, setItems }: {
         </div>
       </Card>
     </>
-  )
-}
-
-// ════════════════════════════════════════════
-// TAB 4: 코드 내보내기
-// ════════════════════════════════════════════
-function ExportTab({ cats, items, iconMap }: {
-  cats: Cat[]; items: Item[]; iconMap: Record<string,string>
-}) {
-  const [code, setCode]   = useState('')
-  const [copied, setCopied] = useState(false)
-
-  function generate() {
-    const esc = (s: string) => s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")
-    // custom 항상 맨 마지막 정렬
-    const sortedCats = [...cats].sort((a,b) => a.sort_order - b.sort_order)
-    let out = `-- DB 기반으로 변경됨. checklist.ts 불필요.\n`
-    out += `-- Supabase checklist_categories: ${cats.length}개\n`
-    out += `-- Supabase checklist_items: ${items.length}개\n`
-    out += `\n각 항목은 Supabase 어드민에서 직접 관리하세요.\n`
-    out += `\n카테고리 목록:\n`
-    sortedCats.forEach((c: Cat) => { out += `  ${c.emoji} ${c.label} (id: ${c.id})\n` })
-    out += `\n항목 수:\n`
-    sortedCats.forEach((c: Cat) => {
-      const count = items.filter((i: Item) => i.category_id === c.id).length
-      out += `  ${c.label}: ${count}개\n`
-    })
-    out += `]\n\n`
-    // ITEM_ICONS 내보내기
-    out += `// 아이템별 Phosphor 아이콘 맵 — ChecklistPage.tsx 와 BucketCheckView.tsx 의 ITEM_ICONS 를 이 내용으로 교체하세요\n`
-    out += `export const ITEM_ICONS: Record<string, string> = {\n`
-    Object.entries(iconMap).forEach(([k, v]) => { out += `  ${k}:'${v}',\n` })
-    out += `}\n`
-    setCode(out)
-  }
-
-  async function copy() {
-    await navigator.clipboard.writeText(code)
-    setCopied(true); setTimeout(() => setCopied(false), 2000)
-  }
-
-  return (
-    <Card>
-      <SectionTitle>사용 방법</SectionTitle>
-      {[
-        '"코드 생성" 버튼을 클릭하세요',
-        '"전체 복사" 버튼으로 코드를 클립보드에 복사하세요',
-        'src/data/checklist.ts 파일 전체 내용을 붙여넣으세요',
-        'npm run build 후 배포하면 모든 사용자에게 반영됩니다',
-      ].map((step, i) => (
-        <div key={i} style={{ display:'flex', gap:10, alignItems:'flex-start', marginBottom:10 }}>
-          <div style={{ width:22, height:22, borderRadius:'50%', background:'#1E4D83', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:800, flexShrink:0 }}>{i+1}</div>
-          <span style={{ fontSize:13, color:'#555', lineHeight:1.7 }}>{step}</span>
-        </div>
-      ))}
-
-      <div style={{ display:'flex', gap:10, margin:'16px 0' }}>
-        <button onClick={generate} style={btnPrimary}>⚡ 코드 생성</button>
-        <button onClick={copy} disabled={!code} style={{ ...btnGhost, opacity:code?1:0.4 }}>{copied ? '✅ 복사됨!' : '📋 전체 복사'}</button>
-      </div>
-      <textarea
-        value={code} readOnly
-        placeholder="'코드 생성' 버튼을 눌러주세요..."
-        style={{ width:'100%', minHeight:240, padding:14, border:'1.5px solid #E2E8F0', borderRadius:10, fontFamily:'monospace', fontSize:11, color:'#334155', background:'#F8FAFC', resize:'vertical', outline:'none', lineHeight:1.6, boxSizing:'border-box' }}
-      />
-    </Card>
   )
 }
 

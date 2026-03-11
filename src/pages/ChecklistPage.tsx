@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
-import { CheckItem, ITEM_ICONS } from '../data/checklist'
+import { CheckItem } from '../data/checklist'
 import { supabase } from '../lib/supabase'
 
 type Category = { id: string; label: string; emoji: string; sort_order: number }
@@ -57,7 +57,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     const updateWidth = () => {
       if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
     }
-    requestAnimationFrame(updateWidth)
+    updateWidth()
     window.addEventListener('resize', updateWidth)
     return () => window.removeEventListener('resize', updateWidth)
   }, [])
@@ -600,7 +600,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
                     {/* 단색 아이콘 */}
                     <Icon
-                      icon={ITEM_ICONS[item.id] ?? CAT_ICON_MAP[(item as any).categoryId] ?? 'ph:star'}
+                      icon={dbItems.find(d => d.id === item.id)?.icon ?? CAT_ICON_MAP[(item as any).categoryId] ?? 'ph:star'}
                       width={20} height={20}
                       color={checked ? '#78716C' : '#CBD5E1'}
                     />
@@ -640,8 +640,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
           {/* ── Bottom CTA ── */}
           <div style={{
-            position:'sticky', bottom:0,
-            width:'100%',
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width: footerWidth ?? '100%',
             background:'#fff',
             zIndex:20, boxSizing:'border-box',
             padding:'18px 14px 28px',
