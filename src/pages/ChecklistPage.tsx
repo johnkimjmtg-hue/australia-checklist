@@ -460,6 +460,37 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             })()}
           </div>
 
+          {/* ── 본문: 일정뷰 or 리스트 ── */}
+          {showScheduleView && trip ? (
+            <>
+              <ScheduleModal
+                state={state} trip={trip} allItems={allItems}
+                onClose={() => setShowScheduleView(false)}
+              />
+              {/* ── Bottom CTA — 수정하기 ── */}
+              <div style={{
+                position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+                width:'100%', maxWidth:390, padding:'8px 14px 20px',
+                background:'transparent', zIndex:20, boxSizing:'border-box',
+              }}>
+                <div style={{ display:'flex', gap:8 }}>
+                  <button onClick={() => setShowScheduleView(false)} style={{
+                    flex:4, height:54,
+                    background:'#1B6EF3', color:'#fff',
+                    border:'none', borderRadius:8, fontSize:15, fontWeight:700, cursor:'pointer',
+                    boxShadow:'0 10px 15px rgba(0,0,0,0.15)',
+                  }}>← 수정하기</button>
+                  <button onClick={() => setModal('confirmReset')} style={{
+                    flex:2, height:54,
+                    background:'rgba(255,255,255,0.92)', color:'#64748B',
+                    border:'1px solid #E2E8F0', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer',
+                    backdropFilter:'blur(8px)',
+                  }}>↻ 초기화</button>
+                </div>
+              </div>
+            </>
+          ) : (
+          <>
           {/* ── LIST ── */}
           <div style={{ paddingBottom:100 }}>
             {/* Section label */}
@@ -614,16 +645,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               선택한 항목들로 버킷리스트를 만들어요
             </div>
           </div>
+          </>
+          )}
         </>
       )}
 
-      {/* ── 풀스크린 일정 팝업 ── */}
-      {showScheduleView && trip && (
-        <ScheduleModal
-          state={state} trip={trip} allItems={allItems}
-          onClose={() => setShowScheduleView(false)}
-        />
-      )}
+      {/* ── 풀스크린 일정 팝업 제거됨 ── */}
       {showFireworks && <Fireworks />}
 
 
@@ -705,7 +732,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   )
 }
 
-/* ── 풀스크린 일정 팝업 ── */
+/* ── 인라인 일정 뷰 ── */
 function ScheduleModal({ state, trip, allItems, onClose }: {
   state: AppState; trip: TripInfo; allItems: any[]; onClose: () => void
 }) {
@@ -713,11 +740,9 @@ function ScheduleModal({ state, trip, allItems, onClose }: {
   const [selectedDayIdx, setSelectedDayIdx] = useState<number|null>(null)
   const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
-  // 날짜별 할당 아이템
   const dayItems = (idx: number) =>
     allItems.filter(item => state.selected[item.id] && (state.schedules[item.id] ?? []).includes(idx))
 
-  // 날짜별 색상
   function dayColor(count: number) {
     if (count === 0) return { bg:'#F8FAFC', border:'#E2E8F0', text:'#94A3B8' }
     if (count === 1) return { bg:'#D1FAE5', border:'#6EE7B7', text:'#065F46' }
@@ -727,114 +752,88 @@ function ScheduleModal({ state, trip, allItems, onClose }: {
   }
 
   return (
-    <div style={{
-      position:'fixed', inset:0, zIndex:200,
-      background:'#F0F4F8',
-      fontFamily:ff,
-      display:'flex', flexDirection:'column',
-    }}>
+    <div style={{ padding:'16px 16px 120px', fontFamily:ff }}>
       {/* 헤더 */}
-      <div style={{
-        background:'#fff', borderBottom:'1px solid #E2E8F0',
-        padding:'16px 20px', display:'flex', alignItems:'center', justifyContent:'space-between',
-      }}>
-        <div>
-          <div style={{ fontSize:17, fontWeight:900, color:'#0F172A' }}>전체 일정</div>
-          <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>
-            {trip.startDate} ~ {trip.endDate} · {days.length}일
-          </div>
+      <div style={{ marginBottom:14 }}>
+        <div style={{ fontSize:15, fontWeight:800, color:'#0F172A' }}>전체 일정</div>
+        <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>
+          {trip.startDate} ~ {trip.endDate} · {days.length}일
         </div>
-        <button onClick={onClose} style={{
-          width:36, height:36, borderRadius:10, border:'none',
-          background:'#F0F4F8', cursor:'pointer',
-          display:'flex', alignItems:'center', justifyContent:'center',
+      </div>
+
+      {/* 범례 */}
+      <div style={{ display:'flex', gap:8, marginBottom:12, flexWrap:'wrap' }}>
+        {[
+          { label:'없음', bg:'#F8FAFC', border:'#E2E8F0' },
+          { label:'1개', bg:'#D1FAE5', border:'#6EE7B7' },
+          { label:'2개', bg:'#FEF08A', border:'#FDE047' },
+          { label:'3개', bg:'#FED7AA', border:'#FDBA74' },
+          { label:'4개+', bg:'#FCA5A5', border:'#F87171' },
+        ].map(c => (
+          <div key={c.label} style={{ display:'flex', alignItems:'center', gap:4 }}>
+            <div style={{ width:12, height:12, borderRadius:3, background:c.bg, border:`1px solid ${c.border}` }}/>
+            <span style={{ fontSize:11, color:'#64748B', fontWeight:600 }}>{c.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* 날짜 카드 그리드 */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
+        {days.map((d, idx) => {
+          const items = dayItems(idx)
+          const color = dayColor(items.length)
+          const isSelected = selectedDayIdx === idx
+          return (
+            <button key={idx} onClick={() => setSelectedDayIdx(isSelected ? null : idx)} style={{
+              borderRadius:12, border:`2px solid ${isSelected ? '#1B6EF3' : color.border}`,
+              background: isSelected ? '#EFF6FF' : color.bg,
+              padding:'12px 10px', cursor:'pointer', textAlign:'center',
+              boxShadow: isSelected ? '0 2px 8px rgba(27,110,243,0.20)' : '0 1px 4px rgba(0,0,0,0.06)',
+              transition:'all 0.15s',
+            }}>
+              <div style={{ fontSize:11, fontWeight:700, color: isSelected ? '#1B6EF3' : '#64748B', marginBottom:4 }}>
+                {idx+1}일차
+              </div>
+              <div style={{ fontSize:13, fontWeight:800, color: isSelected ? '#1B6EF3' : '#0F172A', marginBottom:6 }}>
+                {fmtMD(d)}
+              </div>
+              <div style={{ fontSize:11, fontWeight:700, color: items.length === 0 ? '#CBD5E1' : color.text }}>
+                {items.length === 0 ? '없음' : `${items.length}개`}
+              </div>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* 선택된 날짜 상세 */}
+      {selectedDayIdx !== null && (
+        <div style={{
+          background:'#fff', borderRadius:14, padding:'16px',
+          boxShadow:'0 2px 8px rgba(0,0,0,0.06)', border:'1px solid #E2E8F0',
         }}>
-          <Icon icon="ph:x" width={18} height={18} color="#64748B" />
-        </button>
-      </div>
-
-      {/* 날짜 그리드 */}
-      <div style={{ flex:1, overflowY:'auto', padding:16 }}>
-        {/* 범례 */}
-        <div style={{ display:'flex', gap:8, marginBottom:14, flexWrap:'wrap' }}>
-          {[
-            { label:'없음', bg:'#F8FAFC', border:'#E2E8F0', text:'#94A3B8' },
-            { label:'1개', bg:'#D1FAE5', border:'#6EE7B7', text:'#065F46' },
-            { label:'2개', bg:'#FEF08A', border:'#FDE047', text:'#713F12' },
-            { label:'3개', bg:'#FED7AA', border:'#FDBA74', text:'#7C2D12' },
-            { label:'4개+', bg:'#FCA5A5', border:'#F87171', text:'#7F1D1D' },
-          ].map(c => (
-            <div key={c.label} style={{ display:'flex', alignItems:'center', gap:4 }}>
-              <div style={{ width:12, height:12, borderRadius:3, background:c.bg, border:`1px solid ${c.border}` }}/>
-              <span style={{ fontSize:11, color:'#64748B', fontWeight:600 }}>{c.label}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* 날짜 카드 그리드 */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10, marginBottom:16 }}>
-          {days.map((d, idx) => {
-            const items = dayItems(idx)
-            const color = dayColor(items.length)
-            const isSelected = selectedDayIdx === idx
-            return (
-              <button key={idx} onClick={() => setSelectedDayIdx(isSelected ? null : idx)} style={{
-                borderRadius:12, border:`2px solid ${isSelected ? '#1B6EF3' : color.border}`,
-                background: isSelected ? '#EFF6FF' : color.bg,
-                padding:'12px 10px', cursor:'pointer', textAlign:'center',
-                boxShadow: isSelected ? '0 2px 8px rgba(27,110,243,0.20)' : '0 1px 4px rgba(0,0,0,0.06)',
-                transition:'all 0.15s',
-              }}>
-                <div style={{ fontSize:11, fontWeight:700, color: isSelected ? '#1B6EF3' : '#64748B', marginBottom:4 }}>
-                  {idx+1}일차
-                </div>
-                <div style={{ fontSize:13, fontWeight:800, color: isSelected ? '#1B6EF3' : '#0F172A', marginBottom:6 }}>
-                  {fmtMD(d)}
-                </div>
-                <div style={{
-                  fontSize:11, fontWeight:700,
-                  color: items.length === 0 ? '#CBD5E1' : color.text,
-                }}>
-                  {items.length === 0 ? '없음' : `${items.length}개`}
-                </div>
-              </button>
-            )
-          })}
-        </div>
-
-        {/* 선택된 날짜 상세 */}
-        {selectedDayIdx !== null && (
-          <div style={{
-            background:'#fff', borderRadius:14, padding:'16px',
-            boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
-            border:'1px solid #E2E8F0',
-          }}>
-            <div style={{ fontSize:14, fontWeight:800, color:'#0F172A', marginBottom:12 }}>
-              {selectedDayIdx+1}일차 · {fmtMD(days[selectedDayIdx])} 일정
-            </div>
-            {dayItems(selectedDayIdx).length === 0 ? (
-              <div style={{ textAlign:'center', padding:'20px 0', color:'#94A3B8', fontSize:13 }}>
-                이 날에 배정된 일정이 없어요
-              </div>
-            ) : (
-              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-                {dayItems(selectedDayIdx).map(item => (
-                  <div key={item.id} style={{
-                    display:'flex', alignItems:'center', gap:10,
-                    padding:'10px 12px', borderRadius:10,
-                    background:'#F8FAFC', border:'1px solid #E2E8F0',
-                  }}>
-                    <div style={{
-                      width:8, height:8, borderRadius:'50%', background:'#1B6EF3', flexShrink:0,
-                    }}/>
-                    <span style={{ fontSize:14, fontWeight:600, color:'#0F172A' }}>{item.label}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div style={{ fontSize:14, fontWeight:800, color:'#0F172A', marginBottom:12 }}>
+            {selectedDayIdx+1}일차 · {fmtMD(days[selectedDayIdx])} 일정
           </div>
-        )}
-      </div>
+          {dayItems(selectedDayIdx).length === 0 ? (
+            <div style={{ textAlign:'center', padding:'20px 0', color:'#94A3B8', fontSize:13 }}>
+              이 날에 배정된 일정이 없어요
+            </div>
+          ) : (
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              {dayItems(selectedDayIdx).map(item => (
+                <div key={item.id} style={{
+                  display:'flex', alignItems:'center', gap:10,
+                  padding:'10px 12px', borderRadius:10,
+                  background:'#F8FAFC', border:'1px solid #E2E8F0',
+                }}>
+                  <div style={{ width:8, height:8, borderRadius:'50%', background:'#1B6EF3', flexShrink:0 }}/>
+                  <span style={{ fontSize:14, fontWeight:600, color:'#0F172A' }}>{item.label}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
