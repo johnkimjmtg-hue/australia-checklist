@@ -314,7 +314,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   return (
     <div style={{ minHeight:'100vh', background:'#F0F4F8',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
-      boxSizing:'border-box' }}>
+      boxSizing:'border-box', maxWidth:480, margin:'0 auto', position:'relative' }}>
 
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -597,7 +597,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             width:'100%', maxWidth:480,
             background:'#fff',
             zIndex:20, boxSizing:'border-box',
-            padding:'12px 14px 28px',
+            padding:'18px 14px 28px',
           }}>
             {unscheduledCount>0 && done>0 && (
               <div style={{ fontSize:11, color:'#92620a', textAlign:'center', marginBottom:8, fontWeight:700,
