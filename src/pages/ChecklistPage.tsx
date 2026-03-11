@@ -470,7 +470,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           </div>
 
           {/* ── LIST ── */}
-          <div style={{ paddingBottom:100 }}>
+          <div style={{ paddingBottom:100, background:'#F0F4F8' }}>
             {/* Section label */}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 20px 8px' }}>
               <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
