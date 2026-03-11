@@ -836,15 +836,16 @@ function ItemsTab({ cats, items, setItems }: {
   const [newDesc, setNewDesc]       = useState('')
   const [newBizIds, setNewBizIds]   = useState<string[]>([])
   const [bizSearch, setBizSearch]   = useState('')
+  const [bizFocused, setBizFocused] = useState(false)
 
   useEffect(() => {
     supabase.from('businesses').select('id, name').eq('is_active', true).order('name')
       .then(({ data }) => { if (data) setBusinesses(data) })
   }, [])
 
-  const filteredBiz = bizSearch
-    ? businesses.filter(b => b.name.toLowerCase().includes(bizSearch.toLowerCase()) && !newBizIds.includes(b.id)).slice(0, 8)
-    : []
+  const filteredBiz = businesses
+    .filter(b => !newBizIds.includes(b.id) && (!bizSearch || b.name.toLowerCase().includes(bizSearch.toLowerCase())))
+    .slice(0, 8)
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2500) }
 
@@ -993,10 +994,12 @@ function ItemsTab({ cats, items, setItems }: {
                 <input
                   value={bizSearch}
                   onChange={e => setBizSearch(e.target.value)}
+                  onFocus={() => setBizFocused(true)}
+                  onBlur={() => setTimeout(() => setBizFocused(false), 150)}
                   placeholder="🏢 관련업체 검색 (최대 3개)"
                   style={{ ...inputStyle, fontSize:13 }}
                 />
-                {filteredBiz.length > 0 && (
+                {filteredBiz.length > 0 && bizFocused && (
                   <div style={{
                     position:'absolute', top:'100%', left:0, right:0, zIndex:10,
                     background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',
@@ -1137,8 +1140,9 @@ function EditBizMultiSearch({ businesses, values, onChange }: {
   onChange: (ids: string[]) => void
 }) {
   const [search, setSearch] = useState('')
-  const filtered = search
-    ? businesses.filter(b => b.name.toLowerCase().includes(search.toLowerCase()) && !values.includes(b.id)).slice(0, 8)
+  const [focused, setFocused] = useState(false)
+  const filtered = focused
+    ? businesses.filter(b => !values.includes(b.id) && (!search || b.name.toLowerCase().includes(search.toLowerCase()))).slice(0, 8)
     : []
   return (
     <div style={{ flex:1, display:'flex', flexDirection:'column', gap:4 }}>
@@ -1158,10 +1162,12 @@ function EditBizMultiSearch({ businesses, values, onChange }: {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setTimeout(() => setFocused(false), 150)}
             placeholder="업체명 검색... (최대 3개)"
             style={{ ...inputStyle, fontSize:12, padding:'5px 8px' }}
           />
-          {filtered.length > 0 && (
+          {filtered.length > 0 && focused && (
             <div style={{
               position:'fixed', zIndex:9999,
               background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',

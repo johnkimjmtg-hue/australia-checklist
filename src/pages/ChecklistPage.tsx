@@ -618,7 +618,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                         return (
                           <>
                             {db?.suburb && (
-                              <span style={{ fontSize:11, color:'#94A3B8', fontWeight:500 }}>
+                              <span
+                                onClick={e => { e.stopPropagation(); window.open(`https://maps.google.com/?q=${encodeURIComponent(db.suburb!)}`, '_blank') }}
+                                style={{ fontSize:11, color:'#1B6EF3', fontWeight:500, cursor:'pointer', textDecoration:'underline', textDecorationColor:'rgba(27,110,243,0.3)' }}>
                                 📍 {db.suburb}
                               </span>
                             )}
