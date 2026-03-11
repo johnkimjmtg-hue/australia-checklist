@@ -82,7 +82,7 @@ export default function BusinessCard({ business }: Props) {
             <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
 
               <button onClick={() => setBookmarked(toggleBookmark(business.id))} style={{
-                background: bookmarked ? 'rgba(255,184,0,0.10)' : 'none',
+                background:  'none',
                 border:'none', cursor:'pointer', padding:'4px 6px', borderRadius:8,
                 display:'flex', alignItems:'center', justifyContent:'center',
               }}>
