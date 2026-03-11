@@ -215,7 +215,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                   color: isActive ? '#fff' : '#0F172A',
                   fontSize:12, fontWeight:700,
                   cursor:'pointer', position:'relative',
-                  flexShrink:0, padding:'0 14px',
+                  flexShrink:0, width:88,
                   boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   whiteSpace:'nowrap',
