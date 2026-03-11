@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
-import { CATEGORIES, ITEMS, CheckItem, ITEM_ICONS } from '../data/checklist'
+import { CheckItem, ITEM_ICONS } from '../data/checklist'
+import { supabase } from '../lib/supabase'
+
+type Category = { id: string; label: string; emoji: string; sort_order: number }
+type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number }
 import {
   AppState, TripInfo,
   toggleItem, setSchedule, setCategory, addCustom,
@@ -27,6 +31,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
+  const [categories, setCategories]   = useState<Category[]>([])
+  const [dbItems, setDbItems]         = useState<DBItem[]>([])
+  const [dbLoading, setDbLoading]     = useState(true)
   const [modal, setModal]             = useState<Modal>('none')
   const [sheetItem, setSheetItem]     = useState<CheckItem|null>(null)
   const [showReceipt, setShowReceipt] = useState(false)
@@ -69,6 +76,19 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     fetchBizCount()
   }, [])
 
+  useEffect(() => {
+    const fetchChecklist = async () => {
+      const [{ data: cats }, { data: items }] = await Promise.all([
+        supabase.from('checklist_categories').select('*').order('sort_order'),
+        supabase.from('checklist_items').select('*').eq('is_active', true).order('sort_order'),
+      ])
+      if (cats) setCategories(cats)
+      if (items) setDbItems(items)
+      setDbLoading(false)
+    }
+    fetchChecklist()
+  }, [])
+
   const [highlightItem, setHighlightItem] = useState<string | null>(null)
 
   // URL ?cat=food&item=f36 처리 — 랜딩에서 추천 버킷리스트 클릭 시
@@ -106,9 +126,17 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     }, 400)
   }
 
+  const CATEGORIES = categories
+  const ITEMS: CheckItem[] = dbItems.map(i => ({
+    id: i.id,
+    categoryId: i.category_id,
+    label: i.label,
+    emoji: '📌',
+  }))
+
   const activeCategory = (state.meta.activeCategory && CATEGORIES.some(c => c.id === state.meta.activeCategory))
     ? state.meta.activeCategory
-    : CATEGORIES[0].id
+    : (CATEGORIES[0]?.id ?? 'cafe')
   const allItems = [...ITEMS, ...state.customItems.map(c => ({ ...c, emoji:'📝' }))]
   const catItems = allItems.filter(i => i.categoryId === activeCategory)
   const done  = Object.keys(state.selected).length
@@ -284,6 +312,14 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     setShowReceipt(false); setModal('none')
     try { localStorage.removeItem('bucket-achieved') } catch {}
   }
+
+  // ── DB 로딩 중 ──
+  if (dbLoading) return (
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center',
+      fontFamily:'-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif', background:'#F8FAFC' }}>
+      <div style={{ color:'#1B6EF3', fontSize:14, fontWeight:700 }}>불러오는 중...</div>
+    </div>
+  )
 
   // ── 발행된 버킷리스트 → 체크 화면 분기 ──
   const isIssued = !!state.meta.lastIssuedAt
@@ -485,7 +521,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             {/* Section label */}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 20px 8px' }}>
               <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
-                {CATEGORIES.find(c=>c.id===activeCategory)?.receiptLabel}
+                {CATEGORIES.find(c=>c.id===activeCategory)?.label}
               </span>
               <span style={{ fontSize:13, color:'#1B6EF3', fontWeight:700 }}>
                 {catItems.filter(i=>state.selected[i.id]).length}/{catItems.length}
