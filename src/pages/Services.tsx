@@ -131,6 +131,19 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
 
   return (
     <div style={{ minHeight:'100vh', background:'#F0F4F8', fontFamily:ff, paddingBottom:40 }}>
+      <style>{`
+        .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
+        .cat-scroll { overflow-x:auto; }
+        @media (max-width:768px) {
+          .cat-scroll { scrollbar-width:none; -ms-overflow-style:none; }
+          .cat-scroll::-webkit-scrollbar { display:none; }
+        }
+        @media (min-width:769px) {
+          .cat-scroll::-webkit-scrollbar { height:4px; }
+          .cat-scroll::-webkit-scrollbar-track { background:#F0F4F8; border-radius:2px; }
+          .cat-scroll::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:2px; }
+        }
+      `}</style>
 
       {/* ── 스티키 헤더 ── */}
       <div style={{
@@ -187,45 +200,27 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           )}
         </div>
 
-        {/* 카테고리 필터 — 개수 뱃지 포함, 많은 순 정렬 — 전체 탭만 */}
-        <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4, paddingTop:6 }}>
+        {/* 카테고리 필터 — 체크리스트 스타일 통일 */}
+        <div className="cat-scroll" style={{ display:'flex', gap:6, paddingBottom:4, paddingTop:6 }}>
           {sortedCategories.map(cat => {
             const isActive = category === cat.id
             const count = catCounts[cat.id] || 0
             if (cat.id !== 'all' && count === 0) return null
             return (
-              <button key={cat.id}
+              <button key={cat.id} className="chip-btn"
                 onClick={() => { setCategory(cat.id); setShowAll(false) }}
                 style={{
-                  position:'relative',
-                  display:'flex', flexDirection:'column', alignItems:'center', gap:3,
-                  width:64, padding:'8px 4px', borderRadius:10, flexShrink:0,
+                  height:36, borderRadius:8, border:'none',
                   background: isActive ? '#1B6EF3' : '#fff',
-                  color: isActive ? '#fff' : '#64748B',
-                  border: isActive ? 'none' : '1.5px solid #D1D9E3',
-                  fontSize:10, fontWeight:700, cursor:'pointer',
-                  boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.20)' : '0 2px 6px rgba(0,0,0,0.07)',
-                  transition:'all 0.15s',
+                  color: isActive ? '#fff' : '#0F172A',
+                  fontSize:12, fontWeight:700,
+                  cursor:'pointer', position:'relative',
+                  flexShrink:0, padding:'0 14px',
+                  boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  whiteSpace:'nowrap',
                 }}>
-                {/* 노란 뱃지 */}
-                {cat.id !== 'all' && count > 0 && (
-                  <div style={{
-                    position:'absolute', top:-5, right:-5,
-                    background:'#FFB800', color:'#fff',
-                    borderRadius:999, minWidth:16, height:16,
-                    fontSize:9, fontWeight:800,
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                    padding:'0 3px', lineHeight:1,
-                    boxShadow:'0 1px 3px rgba(0,0,0,0.2)',
-                  }}>
-                    {count > 99 ? '99+' : count}
-                  </div>
-                )}
-                <Icon icon={CAT_ICONS[cat.id] ?? 'ph:star'} width={18} height={18}
-                  color={isActive ? '#fff' : '#94A3B8'} />
-                <span style={{ fontSize:10, textAlign:'center', wordBreak:'keep-all', lineHeight:1.3, whiteSpace:'pre-wrap' }}>
-                  {cat.label}
-                </span>
+                {cat.label}
               </button>
             )
           })}
