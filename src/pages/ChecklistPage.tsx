@@ -58,6 +58,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
     }
     updateWidth()
+    requestAnimationFrame(updateWidth)
+    setTimeout(updateWidth, 100)
+    setTimeout(updateWidth, 300)
     window.addEventListener('resize', updateWidth)
     return () => window.removeEventListener('resize', updateWidth)
   }, [])
