@@ -153,24 +153,26 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       }}>
         {/* 전체/북마크/비상연락처 탭 */}
         <div style={{ display:'flex', gap:6, marginBottom:10 }}>
-          {(['all', 'bookmarks', 'emergency'] as ServiceTab[]).map(tab => (
-            <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
-              height:32, padding:'0 14px', borderRadius:10, border:'none',
-              cursor:'pointer', fontSize:13, fontWeight:700,
-              background: serviceTab === tab
-                ? '#1B6EF3'
-                : tab === 'emergency' ? 'rgba(220,38,38,0.08)' : '#fff',
-              color: serviceTab === tab ? '#fff'
-                : tab === 'emergency' ? '#DC2626' : '#64748B',
-              boxShadow: serviceTab === tab ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
-              display:'flex', alignItems:'center', gap:5,
-            }}>
-              <Icon icon={tab === 'all' ? 'ph:list-bullets' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:siren'}
-                width={13} height={13}
-                color={serviceTab === tab ? '#fff' : tab === 'emergency' ? '#DC2626' : tab === 'bookmarks' ? '#DC2626' : '#94A3B8'} />
-              {tab === 'all' ? '전체 업체' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'}
-            </button>
-          ))}
+          {(['all', 'bookmarks', 'emergency'] as ServiceTab[]).map(tab => {
+            const isActive = serviceTab === tab
+            const emoji = tab === 'bookmarks' ? '🔖' : tab === 'emergency' ? '🔔' : null
+            const label = tab === 'all' ? '전체 업종' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
+            const inactiveColor = tab === 'emergency' ? '#DC2626' : '#64748B'
+            return (
+              <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
+                height:34, padding:'0 14px', borderRadius:20, border:'none',
+                cursor:'pointer', fontSize:13, fontWeight:700,
+                background: isActive ? '#1B6EF3' : '#fff',
+                color: isActive ? '#fff' : inactiveColor,
+                boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
+                display:'flex', alignItems:'center', gap:5,
+                whiteSpace:'nowrap',
+              }}>
+                {emoji && <span style={{ fontSize:13 }}>{emoji}</span>}
+                {label}
+              </button>
+            )
+          })}
         </div>
 
         {/* 검색창 — 전체 탭만 */}
