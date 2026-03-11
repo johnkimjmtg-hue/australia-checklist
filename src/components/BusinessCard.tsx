@@ -9,9 +9,10 @@ type Props = { business: Business }
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
 export default function BusinessCard({ business }: Props) {
-  const { name, description, phone, website, kakao, city, is_featured, tags } = business
-  const mapsUrl = city
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(city)}`
+  const { name, description, phone, website, kakao, address, city, is_featured, tags } = business
+  const fullAddress = [address, city].filter(Boolean).join(', ')
+  const mapsUrl = fullAddress
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
     : null
 
   const [expanded, setExpanded]             = useState(false)
@@ -148,33 +149,25 @@ export default function BusinessCard({ business }: Props) {
             </div>
           </div>
 
-          {/* 주소 (city만) */}
-          {city && (
+          {/* 주소 */}
+          {fullAddress && (
             <div style={{ display:'flex', alignItems:'center', gap:4, marginBottom:8 }}>
               <Icon icon="ph:map-pin-simple" width={13} height={13} color="#64748B" />
-              <span style={{ fontSize:12, color:'#475569', fontWeight:500 }}>{city}</span>
+              <span style={{ fontSize:12, color:'#475569', fontWeight:500 }}>{fullAddress}</span>
             </div>
           )}
 
           {/* 설명 — 접힌 상태: 2줄 제한 */}
           {description && (
-            <>
-              <div style={{
-                fontSize:13, color:'#334155', lineHeight:1.6, marginBottom:4,
-                ...(expanded ? {} : {
-                  display:'-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical' as any,
-                  overflow:'hidden',
-                }),
-              }}>{description}</div>
-              {!expanded && (
-                <button onClick={() => setExpanded(true)} style={{
-                  background:'none', border:'none', cursor:'pointer', padding:0,
-                  fontSize:12, color:'#1B6EF3', fontWeight:700, marginBottom:8, fontFamily:ff,
-                }}>더보기</button>
-              )}
-            </>
+            <div style={{
+              fontSize:13, color:'#334155', lineHeight:1.6, marginBottom:4,
+              ...(expanded ? {} : {
+                display:'-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical' as any,
+                overflow:'hidden',
+              }),
+            }}>{description}</div>
           )}
 
           {/* 해시태그 — 접힌 상태: 3개, 펼친 상태: 전체 */}
