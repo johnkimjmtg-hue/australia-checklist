@@ -168,6 +168,17 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
   const prevAchieved = useRef(0)
   const logoTapCount = useRef(0)
   const logoTapTimer = useRef<any>(null)
+  const pageRef = useRef<HTMLDivElement>(null)
+  const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
+    }
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [])
 
   const handleLogoTap = () => {
     const next = logoTapCount.current + 1
@@ -325,7 +336,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
   }
 
   return (
-    <div style={{ minHeight:'100vh',background:'#E8EDF3',fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif' }}>
+    <div ref={pageRef} style={{ minHeight:'100vh', background:'#F0F4F8', fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif', maxWidth:480, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes confettiFall {
@@ -342,7 +353,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
       <Confetti trigger={confettiTrigger} />
 
       {/* ══ 헤더 + 탭 ══ */}
-      <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
+      <div style={{ background:'#fff' }}>
         <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
@@ -365,7 +376,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
       </div>
 
       {/* ══ 진행 카드 — sticky ══ */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background:'#E8EDF3', padding:'16px 16px 0' }}>
+      <div style={{ position:'sticky', top:0, zIndex:30, background:'#F0F4F8', padding:'16px 16px 0' }}>
         <div style={{
           background:'#fff',borderRadius:12,
           boxShadow:'0 4px 20px rgba(27,110,243,0.10),0 1px 4px rgba(0,0,0,0.06)',
@@ -450,9 +461,9 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
       <div style={{
         position:'fixed', bottom:0,
         left:'50%', transform:'translateX(-50%)',
-        width:'100%', maxWidth:390,
-        padding:'8px 14px 20px',
-        background:'transparent',
+        width: footerWidth ?? '100%',
+        padding:'18px 14px 28px',
+        background:'#fff',
         zIndex:20, boxSizing:'border-box',
         display:'flex', gap:8,
       }}>
@@ -460,17 +471,17 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
           flex:1, height:54, borderRadius:8, border:'none',
           background:'#1B6EF3', color:'#fff',
           fontSize:15, fontWeight:700, cursor:'pointer',
-          boxShadow:'0 10px 15px rgba(0,0,0,0.15)',
+          boxShadow:'0 4px 12px rgba(27,110,243,0.25)',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
         }}>
-          <Icon icon="ph:check-circle" width={18} height={18} color="#FFCD00" />
+          <Icon icon="ph:check-circle" width={18} height={18} color="#fff" />
           저장하고 나가기
         </button>
         <button onClick={() => setShowMoreMenu(true)} style={{
           width:54, height:54, borderRadius:12, flexShrink:0,
-          border:'1.5px solid #D1D9E3', background:'rgba(255,255,255,0.95)',
+          border:'1px solid #E2E8F0', background:'#fff',
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-          boxShadow:'0 2px 8px rgba(0,0,0,0.08)',
+          boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
         }}>
           <Icon icon="ph:dots-three-vertical" width={20} height={20} color="#64748B" />
         </button>
