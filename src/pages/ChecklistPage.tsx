@@ -313,14 +313,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     try { localStorage.removeItem('bucket-achieved') } catch {}
   }
 
-  // ── DB 로딩 중 ──
-  if (dbLoading) return (
-    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center',
-      fontFamily:'-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif', background:'#F8FAFC' }}>
-      <div style={{ color:'#1B6EF3', fontSize:14, fontWeight:700 }}>불러오는 중...</div>
-    </div>
-  )
-
   // ── 발행된 버킷리스트 → 체크 화면 분기 ──
   const isIssued = !!state.meta.lastIssuedAt
   if (mainTab === 'bucketlist' && isIssued && trip) {
