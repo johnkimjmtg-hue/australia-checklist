@@ -408,7 +408,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   display:'flex', alignItems:'center', gap:5,
                   boxShadow: showScheduleView ? '0 2px 8px rgba(27,110,243,0.25)' : '0 2px 6px rgba(0,0,0,0.10)',
                 }}>
-                  <Icon icon="ph:list-checks" width={15} height={15} color={showScheduleView ? '#FFCD00' : '#94A3B8'} />
+                  <Icon icon="ph:list-checks" width={15} height={15} color={showScheduleView ? '#fff' : '#94A3B8'} />
                   일정보기
                 </button>
               </div>
@@ -416,7 +416,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           </div>
 
           {/* ── STICKY: 달력 + 카테고리 칩 ── */}
-          <div style={{ background:'#F0F4F8', position:'sticky', top:0, zIndex:24, boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
+          <div style={{ background:'#F0F4F8', position:'sticky', top:0, zIndex:24 }}>
 
             {/* Schedule grid view */}
             {showScheduleView && trip && (
