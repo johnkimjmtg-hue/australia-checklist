@@ -88,35 +88,22 @@ function Confetti({ trigger }: { trigger: number }) {
 }
 
 // ── 폭죽 (ChecklistPage에서 가져옴)
-function Fireworks() {
+function FireworkBurst({ cx, cy, delay = 0 }: { cx: number; cy: number; delay?: number }) {
   const colors = ['#FFCD00','#1B6EF3','#FF4B4B','#4ECDC4','#FF9F43','#A29BFE','#55EFC4','#FD79A8','#fff']
-  const cx = 50; const cy = 45
-  const particles = Array.from({ length: 72 }, (_, i) => {
-    const angle = (i / 72) * 360
-    const dist  = 80 + Math.random() * 120
-    const rad   = (angle * Math.PI) / 180
-    const tx    = Math.cos(rad) * dist
-    const ty    = Math.sin(rad) * dist
-    const color = colors[Math.floor(Math.random() * colors.length)]
-    const delay = Math.random() * 0.3
-    const dur   = 0.8 + Math.random() * 0.6
-    const size  = 4 + Math.random() * 6
+  const particles = Array.from({ length: 80 }, (_, i) => {
+    const angle  = (i / 80) * 360
+    const dist   = 100 + Math.random() * 160
+    const rad    = (angle * Math.PI) / 180
+    const tx     = Math.cos(rad) * dist
+    const ty     = Math.sin(rad) * dist
+    const color  = colors[Math.floor(Math.random() * colors.length)]
+    const dur    = 0.9 + Math.random() * 0.7
+    const size   = 5 + Math.random() * 8
     const isRect = i % 3 !== 0
-    return { tx, ty, color, delay, dur, size, isRect, angle }
-  })
-  const burst2 = Array.from({ length: 48 }, (_, i) => {
-    const angle = (i / 48) * 360 + 15
-    const dist  = 50 + Math.random() * 90
-    const rad   = (angle * Math.PI) / 180
-    return {
-      tx: Math.cos(rad)*dist, ty: Math.sin(rad)*dist,
-      color: colors[Math.floor(Math.random()*colors.length)],
-      delay: 0.35+Math.random()*0.25, dur: 0.7+Math.random()*0.5,
-      size: 3+Math.random()*5,
-    }
+    return { tx, ty, color, delay: delay + Math.random()*0.3, dur, size, isRect, angle }
   })
   return (
-    <div style={{ position:'fixed', inset:0, zIndex:9999, pointerEvents:'none', overflow:'hidden' }}>
+    <>
       {particles.map((p, i) => (
         <div key={i} style={{
           position:'absolute', left:`${cx}%`, top:`${cy}%`,
@@ -127,18 +114,36 @@ function Fireworks() {
           // @ts-ignore
           '--tx': `${p.tx}px`, '--ty': `${p.ty}px`, '--r': `${p.angle}deg`,
           animation: `fwBurst ${p.dur}s ease-out ${p.delay}s both`,
-          boxShadow: `0 0 ${p.size}px ${p.color}`,
+          boxShadow: `0 0 ${p.size*1.5}px ${p.color}`,
         }}/>
       ))}
-      {burst2.map((p, i) => (
-        <div key={`b${i}`} style={{
-          position:'absolute', left:`${cx}%`, top:`${cy}%`,
-          width: p.size, height: p.size, borderRadius:'50%', background: p.color,
-          // @ts-ignore
-          '--tx': `${p.tx}px`, '--ty': `${p.ty}px`, '--r': '0deg',
-          animation: `fwBurst ${p.dur}s ease-out ${p.delay}s both`,
-        }}/>
-      ))}
+      {/* 중앙 플래시 */}
+      <div style={{
+        position:'absolute', left:`${cx}%`, top:`${cy}%`,
+        transform:'translate(-50%,-50%)',
+        width:80, height:80, borderRadius:'50%',
+        background:'radial-gradient(circle, rgba(255,205,0,0.95) 0%, transparent 70%)',
+        // @ts-ignore
+        '--tx':'0px', '--ty':'0px', '--r':'0deg',
+        animation: `fwBurst 0.6s ease-out ${delay}s both`,
+      }}/>
+    </>
+  )
+}
+
+function Fireworks() {
+  return (
+    <div style={{ position:'fixed', inset:0, zIndex:9999, pointerEvents:'none', overflow:'hidden' }}>
+      {/* 가운데 크게 */}
+      <FireworkBurst cx={50} cy={45} delay={0} />
+      {/* 좌우 */}
+      <FireworkBurst cx={20} cy={55} delay={0.4} />
+      <FireworkBurst cx={80} cy={55} delay={0.4} />
+      {/* 상단 */}
+      <FireworkBurst cx={35} cy={25} delay={0.7} />
+      <FireworkBurst cx={65} cy={25} delay={0.9} />
+      {/* 가운데 두번째 */}
+      <FireworkBurst cx={50} cy={50} delay={1.2} />
     </div>
   )
 }
@@ -164,10 +169,13 @@ export default function BingoPage({ onBack }: Props) {
   // 빙고 달성 감지
   useEffect(() => {
     if (bingoCount > prevBingoCount) {
-      if (isAllDone) {
+      if (bingoCount >= 5) {
+        // 5빙고 이상 — 폭죽 + 꽃가루
         setShowFireworks(true)
-        setTimeout(() => setShowFireworks(false), 3000)
+        setConfettiTrigger(v => v+1)
+        setTimeout(() => setShowFireworks(false), 4500)
       } else {
+        // 1~4빙고 — 꽃가루만
         setConfettiTrigger(v => v+1)
       }
     }
@@ -233,6 +241,11 @@ export default function BingoPage({ onBack }: Props) {
           50%     { opacity:0.6; }
         }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes fwBurst {
+          0%   { transform: translate(-50%,-50%) scale(0) rotate(var(--r)); opacity:1; }
+          80%  { opacity:0.8; }
+          100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1) rotate(var(--r)); opacity:0; }
+        }
       `}</style>
 
       {/* ── 헤더 */}
@@ -251,6 +264,12 @@ export default function BingoPage({ onBack }: Props) {
             fontSize:14, fontWeight:700, color:'#fff',
             background:'#1B6EF3', borderBottom:'2px solid #1B6EF3', userSelect:'none',
           }}>☕ 멜번 카페 도장깨기</div>
+          <div style={{
+            flex:1, height:38, borderRadius:'6px 6px 0 0',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            fontSize:14, fontWeight:500, color:'#94A3B8',
+            background:'transparent', borderBottom:'2px solid transparent', userSelect:'none',
+          }}>시드니 (준비중)</div>
         </div>
       </div>
 
