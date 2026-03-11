@@ -823,11 +823,19 @@ function ItemsTab({ cats, items, setItems }: {
   const [editLabel, setEditLabel] = useState('')
   const [expandedId, setExpandedId] = useState<string|null>(null)
   const [businesses, setBusinesses] = useState<{id:string;name:string}[]>([])
+  const [newSuburb, setNewSuburb]   = useState('')
+  const [newDesc, setNewDesc]       = useState('')
+  const [newBizId, setNewBizId]     = useState('')
+  const [bizSearch, setBizSearch]   = useState('')
 
   useEffect(() => {
     supabase.from('businesses').select('id, name').eq('is_active', true).order('name')
       .then(({ data }) => { if (data) setBusinesses(data) })
   }, [])
+
+  const filteredBiz = bizSearch
+    ? businesses.filter(b => b.name.toLowerCase().includes(bizSearch.toLowerCase())).slice(0, 8)
+    : []
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2500) }
 
@@ -838,13 +846,17 @@ function ItemsTab({ cats, items, setItems }: {
     const id = 'i_' + Date.now()
     const sort_order = catItems.length + 1
     setSaving(true)
-    const { error } = await supabase.from('checklist_items').insert({
+    const insertData: any = {
       id, category_id: selCat, label: newLabel.trim(),
       icon: newIcon, sort_order, is_active: true,
-    })
+    }
+    if (newSuburb.trim()) insertData.suburb = newSuburb.trim()
+    if (newDesc.trim()) insertData.description = newDesc.trim()
+    if (newBizId) insertData.related_business_id = newBizId
+    const { error } = await supabase.from('checklist_items').insert(insertData)
     if (!error) {
-      setItems([...items, { id, category_id: selCat, label: newLabel.trim(), icon: newIcon, sort_order, is_active: true }])
-      setNewLabel('')
+      setItems([...items, { ...insertData }])
+      setNewLabel(''); setNewSuburb(''); setNewDesc(''); setNewBizId(''); setBizSearch('')
       showToast('항목 추가됨: ' + newLabel)
     } else showToast('오류: ' + error.message)
     setSaving(false)
@@ -931,13 +943,54 @@ function ItemsTab({ cats, items, setItems }: {
       {/* 새 항목 추가 */}
       <Card>
         <SectionTitle>새 항목 추가</SectionTitle>
-        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-          <IconPicker value={newIcon} onChange={setNewIcon} />
-          <input value={newLabel} onChange={e=>setNewLabel(e.target.value)}
-            onKeyDown={e=>e.key==='Enter'&&addItem()}
-            placeholder="버킷리스트 항목 이름"
-            style={{ ...inputStyle, flex:1 }} />
-          <button onClick={addItem} disabled={saving} style={{ ...btnPrimary, flexShrink:0, padding:'11px 16px', fontSize:13 }}>추가</button>
+        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+          {/* 아이콘 + 이름 */}
+          <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+            <IconPicker value={newIcon} onChange={setNewIcon} />
+            <input value={newLabel} onChange={e=>setNewLabel(e.target.value)}
+              onKeyDown={e=>e.key==='Enter'&&addItem()}
+              placeholder="버킷리스트 항목 이름 *"
+              style={{ ...inputStyle, flex:1 }} />
+          </div>
+          {/* Suburb */}
+          <input value={newSuburb} onChange={e=>setNewSuburb(e.target.value)}
+            placeholder="📍 Suburb (선택)"
+            style={{ ...inputStyle, fontSize:13 }} />
+          {/* 설명 */}
+          <input value={newDesc} onChange={e=>setNewDesc(e.target.value)}
+            placeholder="📝 한 줄 설명 (선택)"
+            style={{ ...inputStyle, fontSize:13 }} />
+          {/* 관련업체 검색 */}
+          <div style={{ position:'relative' }}>
+            <input
+              value={newBizId ? (businesses.find(b=>b.id===newBizId)?.name ?? '') : bizSearch}
+              onChange={e => { setNewBizId(''); setBizSearch(e.target.value) }}
+              placeholder="🏢 관련업체 검색 (선택)"
+              style={{ ...inputStyle, fontSize:13 }}
+            />
+            {newBizId && (
+              <button onClick={() => { setNewBizId(''); setBizSearch('') }}
+                style={{ position:'absolute', right:8, top:'50%', transform:'translateY(-50%)',
+                  background:'none', border:'none', color:'#aaa', cursor:'pointer', fontSize:14 }}>✕</button>
+            )}
+            {filteredBiz.length > 0 && !newBizId && (
+              <div style={{
+                position:'absolute', top:'100%', left:0, right:0, zIndex:10,
+                background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',
+                border:'1px solid #E2E8F0', overflow:'hidden',
+              }}>
+                {filteredBiz.map(b => (
+                  <div key={b.id} onClick={() => { setNewBizId(b.id); setBizSearch('') }}
+                    style={{ padding:'9px 12px', fontSize:13, cursor:'pointer', borderBottom:'1px solid #F1F5F9' }}
+                    onMouseEnter={e => (e.currentTarget.style.background='#F8FAFC')}
+                    onMouseLeave={e => (e.currentTarget.style.background='#fff')}
+                  >{b.name}</div>
+                ))}
+              </div>
+            )}
+          </div>
+          <button onClick={addItem} disabled={saving}
+            style={{ ...btnPrimary, padding:'11px', fontSize:13 }}>추가</button>
         </div>
       </Card>
 
@@ -1026,18 +1079,13 @@ function ItemsTab({ cats, items, setItems }: {
                     style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px', resize:'vertical' }}
                   />
                 </div>
-                <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-                  <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0 }}>🏢 관련업체</span>
-                  <select
+                <div style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
+                  <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0, paddingTop:6 }}>🏢 관련업체</span>
+                  <EditBizSearch
+                    businesses={businesses}
                     value={item.related_business_id ?? ''}
-                    onChange={e => saveDetail(item.id, 'related_business_id', e.target.value)}
-                    style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px' }}
-                  >
-                    <option value="">없음</option>
-                    {businesses.map(b => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
-                    ))}
-                  </select>
+                    onChange={val => saveDetail(item.id, 'related_business_id', val)}
+                  />
                 </div>
               </div>
             )}
@@ -1058,6 +1106,52 @@ function ItemsTab({ cats, items, setItems }: {
 // ════════════════════════════════════════════
 // SHARED UI COMPONENTS
 // ════════════════════════════════════════════
+function EditBizSearch({ businesses, value, onChange }: {
+  businesses: {id:string;name:string}[]
+  value: string
+  onChange: (val: string) => void
+}) {
+  const [search, setSearch] = useState('')
+  const [open, setOpen] = useState(false)
+  const selected = businesses.find(b => b.id === value)
+  const filtered = search
+    ? businesses.filter(b => b.name.toLowerCase().includes(search.toLowerCase())).slice(0, 8)
+    : []
+  return (
+    <div style={{ flex:1, position:'relative' }}>
+      <div style={{ display:'flex', gap:4 }}>
+        <input
+          value={selected ? selected.name : search}
+          onChange={e => { onChange(''); setSearch(e.target.value); setOpen(true) }}
+          onFocus={() => setOpen(true)}
+          placeholder="업체명 검색..."
+          style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px' }}
+        />
+        {value && (
+          <button onClick={() => { onChange(''); setSearch(''); setOpen(false) }}
+            style={{ background:'none', border:'none', color:'#aaa', cursor:'pointer', fontSize:13 }}>✕</button>
+        )}
+      </div>
+      {open && filtered.length > 0 && !value && (
+        <div style={{
+          position:'absolute', top:'100%', left:0, right:0, zIndex:20,
+          background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',
+          border:'1px solid #E2E8F0', overflow:'hidden',
+        }}>
+          {filtered.map(b => (
+            <div key={b.id}
+              onMouseDown={() => { onChange(b.id); setSearch(''); setOpen(false) }}
+              style={{ padding:'8px 12px', fontSize:12, cursor:'pointer', borderBottom:'1px solid #F1F5F9' }}
+              onMouseEnter={e => (e.currentTarget.style.background='#F8FAFC')}
+              onMouseLeave={e => (e.currentTarget.style.background='#fff')}
+            >{b.name}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function Card({ children }: { children: React.ReactNode }) {
   return <div style={{ background:'#fff', borderRadius:16, padding:'18px 16px', marginBottom:12, boxShadow:'0 2px 8px rgba(0,0,0,0.06)', border:'1px solid #F1F5F9' }}>{children}</div>
 }
