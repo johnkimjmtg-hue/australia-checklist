@@ -288,10 +288,6 @@ export default function BingoPage({ onBack }: Props) {
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}>
             HOJUGAJA
           </span>
-          <div style={{ display:'flex', alignItems:'baseline', gap:2 }}>
-            <span style={{ fontSize:22, color:'#FFB800', fontWeight:800, lineHeight:1 }}>{checked.size}</span>
-            <span style={{ fontSize:14, color:'#94A3B8', fontWeight:600 }}>/25 카페</span>
-          </div>
         </div>
         <div style={{ display:'flex', padding:'8px 20px 0', gap:4 }}>
           <div style={{
@@ -338,7 +334,11 @@ export default function BingoPage({ onBack }: Props) {
               }
             </div>
           </div>
-
+          {/* 카운터 */}
+          <div style={{ textAlign:'center', flexShrink:0 }}>
+            <div style={{ fontSize:26, fontWeight:800, color:'#FFB800', lineHeight:1 }}>{checked.size}</div>
+            <div style={{ fontSize:11, color:'#94A3B8', fontWeight:600, marginTop:2 }}>/25 카페</div>
+          </div>
         </div>
       </div>
 
