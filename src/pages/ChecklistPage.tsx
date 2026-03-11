@@ -423,7 +423,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               const customCat = CATEGORIES.find(c => c.id === 'custom')
               const allCats = customCat ? [...nonCustomCats, customCat] : nonCustomCats
               return (
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6, padding:'8px 16px 10px' }}>
+                <div style={{ display:'flex', gap:6, padding:'8px 16px 10px', overflowX:'auto', scrollbarWidth:'none' }}>
                   {allCats.map(cat => {
                     const isActive = activeCategory === cat.id
                     const catDone  = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id]).length
@@ -436,6 +436,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                         color: isActive ? '#fff' : '#0F172A',
                         fontSize:12, fontWeight:700,
                         cursor:'pointer', position:'relative',
+                        flexShrink:0, padding:'0 14px',
                         boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
                         display:'flex', alignItems:'center', justifyContent:'center', gap: isCustom ? 4 : 0,
                       }}>
