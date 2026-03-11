@@ -781,11 +781,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
       {/* 관련업체 팝업 */}
       {detailBizId && (
-        <div style={{ position:'fixed', inset:0, zIndex:800, display:'flex', justifyContent:'center', alignItems:'flex-end' }}>
+        <div style={{ position:'fixed', inset:0, zIndex:800 }}>
           <div onClick={() => setDetailBizId(null)}
             style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
           <div style={{
-            position:'relative', width:'100%', maxWidth:480,
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:390,
             maxHeight:'85vh', overflowY:'auto',
             borderRadius:'20px 20px 0 0',
             background:'#fff',
