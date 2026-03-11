@@ -82,12 +82,12 @@ export default function BusinessCard({ business }: Props) {
             <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
 
               <button onClick={() => setBookmarked(toggleBookmark(business.id))} style={{
-                background: bookmarked ? 'rgba(220,38,38,0.08)' : 'none',
+                background: bookmarked ? 'rgba(255,184,0,0.10)' : 'none',
                 border:'none', cursor:'pointer', padding:'4px 6px', borderRadius:8,
                 display:'flex', alignItems:'center', justifyContent:'center',
               }}>
                 <Icon icon={bookmarked ? 'ph:bookmark-simple-fill' : 'ph:bookmark-simple'}
-                  width={20} height={20} color={bookmarked ? '#DC2626' : '#CBD5E1'} />
+                  width={20} height={20} color={bookmarked ? '#FFB800' : '#CBD5E1'} />
               </button>
             </div>
           </div>
