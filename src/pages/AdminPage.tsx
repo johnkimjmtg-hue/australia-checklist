@@ -6,7 +6,6 @@ import {
   updateBusiness, toggleFeatured,
 } from '../lib/businessService'
 import { supabase } from '../lib/supabase'
-import { CATEGORIES as CL_CATEGORIES, ITEMS as CL_ITEMS, ITEM_ICONS as CL_ITEM_ICONS } from '../data/checklist'
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'hojugaja2024'
 
@@ -31,9 +30,9 @@ const EMPTY_FORM = {
   is_featured:false, is_active:true, tags:'',
 }
 
-// ── 체크리스트 타입
-type Cat  = { id:string; label:string; receiptLabel:string; emoji:string }
-type Item = { id:string; categoryId:string; label:string; emoji:string }
+// ── 체크리스트 타입 (DB 기반)
+type Cat  = { id:string; label:string; emoji:string; sort_order:number }
+type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean }
 
 const EMOJI_MAP: [string[], string][] = [
   [['크림','로션','에센스','토너','팩'], '🧴'],
@@ -225,17 +224,29 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
   const [pwError, setPwError] = useState(false)
   const [tab, setTab]       = useState<MainTab>('business')
 
-  // ── 공유 checklist state (카테고리·아이템·아이콘 탭 간 공유)
-  // checklist.ts를 직접 읽어서 초기화 → 코드 내보내기 후 배포해도 항상 최신 상태 유지
-  const [sharedCats,    setSharedCats]    = useState<Cat[]>(() =>
-    JSON.parse(JSON.stringify(CL_CATEGORIES))
-  )
-  const [sharedItems,   setSharedItems]   = useState<Item[]>(() =>
-    JSON.parse(JSON.stringify(CL_ITEMS))
-  )
-  const [sharedIconMap, setSharedIconMap] = useState<Record<string,string>>(() =>
-    JSON.parse(JSON.stringify(CL_ITEM_ICONS))
-  )
+  // ── 공유 checklist state (DB 기반)
+  const [sharedCats,    setSharedCats]    = useState<Cat[]>([])
+  const [sharedItems,   setSharedItems]   = useState<Item[]>([])
+  const [sharedIconMap, setSharedIconMap] = useState<Record<string,string>>({})
+  const [clLoading,     setClLoading]     = useState(true)
+
+  useEffect(() => {
+    const fetchCL = async () => {
+      const [{ data: cats }, { data: items }] = await Promise.all([
+        supabase.from('checklist_categories').select('*').order('sort_order'),
+        supabase.from('checklist_items').select('*').order('sort_order'),
+      ])
+      if (cats) setSharedCats(cats)
+      if (items) {
+        setSharedItems(items)
+        const iconMap: Record<string,string> = {}
+        items.forEach((i: Item) => { if (i.icon) iconMap[i.id] = i.icon })
+        setSharedIconMap(iconMap)
+      }
+      setClLoading(false)
+    }
+    fetchCL()
+  }, [])
 
   function handleLogin() {
     if (pw === ADMIN_PASSWORD) { setAuthed(true); setPwError(false) }
@@ -306,8 +317,8 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
         {tab==='business'    && <BusinessTab />}
         {tab==='requests'    && <RequestsTab />}
         {tab==='suggestions' && <SuggestionsTab />}
-        {tab==='categories'  && <CategoriesTab cats={sharedCats} setCats={setSharedCats} items={sharedItems} setItems={setSharedItems} />}
-        {tab==='items'       && <ItemsTab cats={sharedCats} items={sharedItems} setItems={setSharedItems} iconMap={sharedIconMap} setIconMap={setSharedIconMap} />}
+        {tab==='categories'  && (clLoading ? <div style={{padding:32,textAlign:'center',color:'#aaa'}}>불러오는 중...</div> : <CategoriesTab cats={sharedCats} setCats={setSharedCats} />)}
+        {tab==='items'       && (clLoading ? <div style={{padding:32,textAlign:'center',color:'#aaa'}}>불러오는 중...</div> : <ItemsTab cats={sharedCats} items={sharedItems} setItems={setSharedItems} />)}
         {tab==='export'      && <ExportTab cats={sharedCats} items={sharedItems} iconMap={sharedIconMap} />}
       </div>
 
@@ -595,62 +606,72 @@ function ReviewManager({ businessId, onRefresh, showToast }: { businessId: strin
 }
 
 // ════════════════════════════════════════════
-// TAB 2: 카테고리 관리
+// TAB 2: 카테고리 관리 (DB 기반)
 // ════════════════════════════════════════════
-function CategoriesTab({ cats, setCats, items, setItems }: {
-  cats: Cat[]; setCats: (f: (p: Cat[]) => Cat[]) => void
-  items: Item[]; setItems: (f: (p: Item[]) => Item[]) => void
+function CategoriesTab({ cats, setCats }: {
+  cats: Cat[]
+  setCats: (cats: Cat[]) => void
 }) {
   const [newEmoji, setNewEmoji] = useState('')
   const [newLabel, setNewLabel] = useState('')
   const [toast, setToast]       = useState('')
-  const [selectedId, setSelectedId] = useState(cats[0]?.id ?? '')
+  const [saving, setSaving]     = useState(false)
   const [dragIdx, setDragIdx]   = useState<number|null>(null)
   const [dragOverIdx, setDragOverIdx] = useState<number|null>(null)
 
-  function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2000) }
+  function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2500) }
 
-  function addCat() {
+  async function addCat() {
     if (!newLabel.trim()) return
-    const emoji = newEmoji.trim() || autoEmoji(newLabel)
+    const emoji = newEmoji.trim() || '📌'
     const id = 'cat_' + Date.now()
-    setCats(prev => [...prev, { id, label:newLabel.trim(), receiptLabel:newLabel.trim(), emoji }])
-    setNewEmoji(''); setNewLabel('')
-    showToast('카테고리 추가됨: ' + newLabel)
+    const sort_order = cats.length + 1
+    setSaving(true)
+    const { error } = await supabase.from('checklist_categories').insert({
+      id, label: newLabel.trim(), emoji, sort_order
+    })
+    if (!error) {
+      setCats([...cats, { id, label: newLabel.trim(), emoji, sort_order }])
+      setNewEmoji(''); setNewLabel('')
+      showToast('카테고리 추가됨: ' + newLabel)
+    } else showToast('오류: ' + error.message)
+    setSaving(false)
   }
 
-  function deleteCat(id: string) {
+  async function deleteCat(id: string) {
     if (!confirm('이 카테고리와 하위 항목을 모두 삭제할까요?')) return
-    setCats(prev => prev.filter(c => c.id !== id))
-    setItems(prev => prev.filter(i => i.categoryId !== id))
+    await supabase.from('checklist_items').delete().eq('category_id', id)
+    await supabase.from('checklist_categories').delete().eq('id', id)
+    setCats(cats.filter(c => c.id !== id))
     showToast('삭제됨')
   }
 
-  function updateCat(id: string, field: 'label'|'emoji', val: string) {
+  async function updateCat(id: string, field: 'label'|'emoji', val: string) {
     if (!val) return
-    setCats(prev => prev.map(c => c.id===id ? {...c, [field]:val, ...(field==='label'?{receiptLabel:val}:{})} : c))
+    const updated = cats.map(c => c.id===id ? {...c, [field]:val} : c)
+    setCats(updated)
+    await supabase.from('checklist_categories').update({ [field]: val }).eq('id', id)
   }
 
   function handleDragStart(idx: number) { setDragIdx(idx) }
   function handleDragOver(e: React.DragEvent, idx: number) { e.preventDefault(); setDragOverIdx(idx) }
-  function handleDrop(toIdx: number) {
-    if (dragIdx === null || dragIdx === toIdx) { setDragIdx(null); setDragOverIdx(null); return }
-    setCats(prev => {
-      const next = [...prev]
-      const [moved] = next.splice(dragIdx, 1)
-      next.splice(toIdx, 0, moved)
-      // custom 항상 맨 마지막 강제
-      const customIdx = next.findIndex(c => c.id === 'custom')
-      if (customIdx !== -1 && customIdx !== next.length - 1) {
-        const [custom] = next.splice(customIdx, 1)
-        next.push(custom)
-      }
-      return next
-    })
-    setDragIdx(null); setDragOverIdx(null)
-    showToast('순서 변경됨')
-  }
   function handleDragEnd() { setDragIdx(null); setDragOverIdx(null) }
+
+  async function handleDrop(toIdx: number) {
+    if (dragIdx === null || dragIdx === toIdx) { setDragIdx(null); setDragOverIdx(null); return }
+    const next = [...cats]
+    const [moved] = next.splice(dragIdx, 1)
+    next.splice(toIdx, 0, moved)
+    // sort_order 재계산
+    const reordered = next.map((c, i) => ({ ...c, sort_order: i + 1 }))
+    setCats(reordered)
+    setDragIdx(null); setDragOverIdx(null)
+    // DB 업데이트
+    await Promise.all(reordered.map(c =>
+      supabase.from('checklist_categories').update({ sort_order: c.sort_order }).eq('id', c.id)
+    ))
+    showToast('순서 저장됨')
+  }
 
   return (
     <>
@@ -662,56 +683,48 @@ function CategoriesTab({ cats, setCats, items, setItems }: {
             style={{ ...inputStyle, width:52, textAlign:'center', fontSize:20, flexShrink:0 }} />
           <input value={newLabel} onChange={e=>setNewLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addCat()}
             placeholder="카테고리 이름" style={{ ...inputStyle, flex:1, minWidth:0 }} />
-          <button onClick={addCat} style={{ ...btnPrimary, flexShrink:0, padding:'11px 16px', fontSize:13 }}>추가</button>
+          <button onClick={addCat} disabled={saving} style={{ ...btnPrimary, flexShrink:0, padding:'11px 16px', fontSize:13 }}>추가</button>
         </div>
-        <p style={{ fontSize:12, color:'#aaa', marginTop:6 }}>이모티콘 비워두면 자동 선택됩니다</p>
       </Card>
 
       <Card>
         <SectionTitle>카테고리 목록 ({cats.length}) — 드래그로 순서 변경</SectionTitle>
         <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
           {cats.map((cat, idx) => {
-            const isLocked = cat.id === 'custom'
             const isDragging = dragIdx === idx
             const isOver = dragOverIdx === idx
             return (
               <div
                 key={cat.id}
-                draggable={!isLocked}
+                draggable
                 onDragStart={() => handleDragStart(idx)}
                 onDragOver={e => handleDragOver(e, idx)}
                 onDrop={() => handleDrop(idx)}
                 onDragEnd={handleDragEnd}
-                onClick={() => setSelectedId(cat.id)}
                 style={{
-                  border: isOver ? '2px dashed #1E4D83' : `1.5px solid ${selectedId===cat.id ? '#1E4D83' : '#e8e8e8'}`,
+                  border: isOver ? '2px dashed #1B6EF3' : '1.5px solid #e8e8e8',
                   borderRadius:12, padding:'12px 14px',
-                  background: isDragging ? '#e8f0fe' : selectedId===cat.id ? '#eef2fb' : '#fafafa',
-                  display:'flex', alignItems:'center', gap:10, cursor: isLocked ? 'default' : 'grab',
-                  opacity: isDragging ? 0.5 : 1,
-                  transition:'background 0.1s, opacity 0.1s',
+                  background: isDragging ? '#e8f0fe' : '#fafafa',
+                  display:'flex', alignItems:'center', gap:10,
+                  cursor:'grab', opacity: isDragging ? 0.5 : 1,
+                  transition:'background 0.1s',
                 }}>
-                {isLocked
-                  ? <span style={{ color:'#ccc', fontSize:16 }}>🔒</span>
-                  : <span style={{ color:'#aaa', fontSize:16, cursor:'grab', userSelect:'none' }}>⠿</span>
-                }
+                <span style={{ color:'#aaa', fontSize:16, userSelect:'none' }}>⠿</span>
                 <input
                   value={cat.emoji} maxLength={2}
                   onChange={e => updateCat(cat.id, 'emoji', e.target.value)}
                   onClick={e => e.stopPropagation()}
-                  disabled={isLocked}
-                  style={{ width:36, textAlign:'center', fontSize:20, border:'none', background:'transparent', cursor:isLocked?'default':'text' }}
+                  style={{ width:36, textAlign:'center', fontSize:20, border:'none', background:'transparent' }}
                 />
                 <input
                   value={cat.label}
                   onChange={e => updateCat(cat.id, 'label', e.target.value)}
                   onClick={e => e.stopPropagation()}
-                  disabled={isLocked}
-                  style={{ flex:1, fontSize:13, fontWeight:700, border:'none', background:'transparent', color:isLocked?'#aaa':'#222', cursor:isLocked?'default':'text' }}
+                  style={{ flex:1, fontSize:13, fontWeight:700, border:'none', background:'transparent', color:'#222' }}
                 />
-                {!isLocked && (
-                  <button onClick={e => { e.stopPropagation(); deleteCat(cat.id) }} style={{ background:'none', border:'none', color:'#e05252', cursor:'pointer', fontSize:14 }}>✕</button>
-                )}
+                <span style={{ fontSize:11, color:'#aaa' }}>#{cat.sort_order}</span>
+                <button onClick={e => { e.stopPropagation(); deleteCat(cat.id) }}
+                  style={{ background:'none', border:'none', color:'#e05252', cursor:'pointer', fontSize:14 }}>✕</button>
               </div>
             )
           })}
@@ -722,61 +735,31 @@ function CategoriesTab({ cats, setCats, items, setItems }: {
 }
 
 // ════════════════════════════════════════════
-// TAB 3: 체크리스트 항목
+// TAB 3: 체크리스트 항목 (DB 기반)
 // ════════════════════════════════════════════
-// 자주 쓰는 Phosphor 아이콘 목록 (카테고리별 그룹)
 const PH_ICONS = [
-  // 기본
   'ph:heart','ph:star','ph:check-circle','ph:map-pin','ph:calendar',
   'ph:camera','ph:gift','ph:flag','ph:crown','ph:trophy',
   'ph:sparkle','ph:shooting-star','ph:smiley','ph:sun','ph:moon',
-  // ── 호주 & 동물 (신규) ──
   'ph:paw-print','ph:bird','ph:butterfly','ph:horse','ph:bug',
-  'ph:fish','ph:fish-simple','ph:shrimp','ph:crab','ph:seal',
-  'ph:feather','ph:leaf','ph:tree-palm','ph:island','ph:waves',
-  'ph:sun-horizon','ph:rainbow','ph:cloud','ph:lightning','ph:snowflake',
-  'ph:mountains','ph:mountain','ph:cave','ph:lighthouse','ph:anchor',
-  'ph:boomerang','ph:tent','ph:campfire','ph:compass','ph:map-trifold',
-  // 카페/브런치
-  'ph:coffee','ph:tea-bag','ph:croissant','ph:bread','ph:cake',
-  'ph:cookie','ph:egg','ph:drop','ph:drop-half','ph:orange',
-  'ph:plant','ph:flower','ph:jar-label','ph:bottle',
-  // ── 음식/먹거리 (대폭 확충) ──
-  'ph:fork-knife','ph:bowl-food','ph:beer-stein','ph:wine','ph:whiskey',
-  'ph:flame','ph:pepper','ph:nut','ph:pie','ph:popcorn','ph:grains',
-  'ph:ice-cream','ph:donut','ph:hamburger','ph:hot-dog','ph:cheese',
-  'ph:bread','ph:pretzel','ph:corn','ph:apple','ph:strawberry',
-  'ph:avocado','ph:lemon','ph:jar','ph:jar-label','ph:bottle-water',
-  'ph:knife','ph:fork-knife-fill','ph:grains',
-  'ph:meat','ph:pizza','ph:taco','ph:wrap',
-  'ph:noodle','ph:bowl-steam','ph:pot','ph:frying-pan',
-  'ph:soup-bowl','ph:sticker','ph:receipt',
-  // 쇼핑
-  'ph:shopping-bag','ph:shopping-cart','ph:package','ph:t-shirt',
-  'ph:diamond','ph:sunglasses','ph:boot','ph:wallet','ph:lipstick',
-  'ph:baby','ph:pill','ph:bandaids','ph:first-aid-kit',
-  // 도시/문화
-  'ph:buildings','ph:building','ph:castle','ph:church','ph:bank',
-  'ph:palette','ph:music-note','ph:microphone','ph:film-slate','ph:ticket',
-  'ph:binoculars','ph:books','ph:graduation-cap','ph:medal','ph:dove',
-  'ph:frame-corners','ph:lightbulb','ph:clock','ph:bridge',
-  // 해변/물놀이
-  'ph:umbrella','ph:umbrella-simple','ph:oar','ph:boat','ph:sailboat',
-  'ph:swimming-pool','ph:shell','ph:wave','ph:surf',
-  // 백패커/여행
-  'ph:airplane','ph:airplane-takeoff','ph:train','ph:train-simple',
-  'ph:bus','ph:car','ph:van','ph:jeep','ph:bicycle',
-  'ph:backpack','ph:globe','ph:bed',
-  'ph:wifi','ph:device-mobile','ph:paper-plane',
-  'ph:identification-card','ph:certificate','ph:hand-waving',
-  // 이색경험/활동
-  'ph:parachute','ph:balloon','ph:helicopter','ph:guitar','ph:drum',
-  'ph:bat','ph:owl','ph:clothes-hanger','ph:coin',
-  'ph:film-reel','ph:confetti','ph:party-popper',
-  // 기타
-  'ph:person-simple','ph:users','ph:users-three','ph:house','ph:house-line',
-  'ph:pencil-simple','ph:note','ph:alarm','ph:shield',
-  'ph:storefront','ph:syringe','ph:stethoscope','ph:heartbeat',
+  'ph:fish','ph:fish-simple','ph:shrimp','ph:feather','ph:leaf',
+  'ph:tree-palm','ph:island','ph:waves','ph:sun-horizon','ph:rainbow',
+  'ph:mountains','ph:lighthouse','ph:anchor','ph:tent','ph:compass',
+  'ph:coffee','ph:tea-bag','ph:bread','ph:cake','ph:cookie',
+  'ph:egg','ph:drop','ph:drop-half','ph:orange','ph:plant','ph:flower',
+  'ph:fork-knife','ph:bowl-food','ph:beer-stein','ph:wine','ph:flame',
+  'ph:hamburger','ph:cheese','ph:ice-cream','ph:nut','ph:pepper',
+  'ph:shopping-bag','ph:shopping-cart','ph:t-shirt','ph:diamond',
+  'ph:boot','ph:wallet','ph:pill','ph:baby',
+  'ph:buildings','ph:building','ph:palette','ph:music-note',
+  'ph:film-slate','ph:ticket','ph:binoculars','ph:books',
+  'ph:graduation-cap','ph:medal','ph:frame-corners','ph:clock','ph:bridge',
+  'ph:umbrella','ph:boat','ph:sailboat','ph:airplane','ph:train',
+  'ph:bus','ph:car','ph:van','ph:bicycle','ph:backpack','ph:bed',
+  'ph:device-mobile','ph:identification-card','ph:certificate',
+  'ph:parachute','ph:balloon','ph:guitar','ph:coin','ph:confetti',
+  'ph:person-simple','ph:users','ph:house','ph:pencil-simple',
+  'ph:storefront','ph:stethoscope','ph:first-aid-kit',
 ]
 
 function IconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -789,7 +772,7 @@ function IconPicker({ value, onChange }: { value: string; onChange: (v: string) 
         width:44, height:38, border:'1.5px solid #e0e0e0', borderRadius:9,
         background:'#fafafa', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
       }}>
-        <Icon icon={value || 'ph:star'} width={20} height={20} color="#1E4D83" />
+        <Icon icon={value || 'ph:star'} width={20} height={20} color="#1B6EF3" />
       </button>
       {open && (
         <>
@@ -802,7 +785,7 @@ function IconPicker({ value, onChange }: { value: string; onChange: (v: string) 
           }}>
             <input
               value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="아이콘 검색 (예: heart, food...)"
+              placeholder="아이콘 검색..."
               style={{ ...inputStyle, marginBottom:10, fontSize:12, padding:'6px 10px' }}
               autoFocus
             />
@@ -811,11 +794,11 @@ function IconPicker({ value, onChange }: { value: string; onChange: (v: string) 
                 <button key={ic} type="button" onClick={() => { onChange(ic); setOpen(false); setSearch('') }}
                   title={ic.replace('ph:','')}
                   style={{
-                    width:32, height:32, border: value===ic ? '2px solid #1E4D83' : '1px solid #eee',
+                    width:32, height:32, border: value===ic ? '2px solid #1B6EF3' : '1px solid #eee',
                     borderRadius:6, background: value===ic ? '#eef2fb' : '#fafafa',
                     cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', padding:0,
                   }}>
-                  <Icon icon={ic} width={16} height={16} color={value===ic ? '#1E4D83' : '#555'} />
+                  <Icon icon={ic} width={16} height={16} color={value===ic ? '#1B6EF3' : '#555'} />
                 </button>
               ))}
             </div>
@@ -826,160 +809,186 @@ function IconPicker({ value, onChange }: { value: string; onChange: (v: string) 
   )
 }
 
-function ItemsTab({ cats, items, setItems, iconMap, setIconMap }: {
+function ItemsTab({ cats, items, setItems }: {
   cats: Cat[]
-  items: Item[]; setItems: (f: (p: Item[]) => Item[]) => void
-  iconMap: Record<string,string>; setIconMap: (f: (p: Record<string,string>) => Record<string,string>) => void
+  items: Item[]
+  setItems: (items: Item[]) => void
 }) {
   const [selCat, setSelCat] = useState(cats[0]?.id ?? '')
   const [newLabel, setNewLabel] = useState('')
   const [newIcon, setNewIcon]   = useState('ph:star')
-  const [toast, setToast] = useState('')
-  const [dragIdx, setDragIdx]     = useState<number|null>(null)
+  const [toast, setToast]       = useState('')
+  const [saving, setSaving]     = useState(false)
+  const [dragIdx, setDragIdx]       = useState<number|null>(null)
   const [dragOverIdx, setDragOverIdx] = useState<number|null>(null)
+  const [editId, setEditId]     = useState<string|null>(null)
+  const [editLabel, setEditLabel] = useState('')
 
-  function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2000) }
+  function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2500) }
 
-  function handleItemDragStart(localIdx: number) { setDragIdx(localIdx) }
-  function handleItemDragOver(e: React.DragEvent, localIdx: number) {
-    e.preventDefault(); setDragOverIdx(localIdx)
-  }
-  function handleItemDragEnd() {
-    if (dragIdx === null || dragOverIdx === null || dragIdx === dragOverIdx) {
-      setDragIdx(null); setDragOverIdx(null); return
-    }
-    const catIs = items.filter(i => i.categoryId === selCat)
-    const allItems = [...items]
-    const fromGlobal = allItems.findIndex(i => i.id === catIs[dragIdx].id)
-    const toGlobal   = allItems.findIndex(i => i.id === catIs[dragOverIdx].id)
-    const [moved] = allItems.splice(fromGlobal, 1)
-    allItems.splice(toGlobal, 0, moved)
-    setItems(allItems as any)
-    setDragIdx(null); setDragOverIdx(null)
-    showToast('순서 변경됨')
-  }
+  const catItems = items.filter(i => i.category_id === selCat)
 
-  const catItems = items.filter(i => i.categoryId === selCat)
-  const isLocked = selCat === 'custom'
-  const cat = cats.find(c => c.id === selCat)
-
-  // CAT_ICON_MAP 기본 아이콘
-  const CAT_DEFAULT: Record<string,string> = {
-    hospital:'ph:first-aid-kit', food:'ph:fork-knife', shopping:'ph:shopping-bag',
-    admin:'ph:files', people:'ph:users', parenting:'ph:baby', places:'ph:map-pin',
-    schedule:'ph:calendar', custom:'ph:star',
-  }
-
-  function addItem() {
+  async function addItem() {
     if (!newLabel.trim()) return
     const id = 'i_' + Date.now()
-    const icon = newIcon || CAT_DEFAULT[selCat] || 'ph:star'
-    setItems(prev => [...prev, { id, categoryId:selCat, label:newLabel.trim(), emoji:'⭐' }])
-    setIconMap(prev => ({ ...prev, [id]: icon }))
-    setNewLabel(''); setNewIcon(CAT_DEFAULT[selCat] || 'ph:star')
-    showToast('항목 추가됨: ' + newLabel)
+    const sort_order = catItems.length + 1
+    setSaving(true)
+    const { error } = await supabase.from('checklist_items').insert({
+      id, category_id: selCat, label: newLabel.trim(),
+      icon: newIcon, sort_order, is_active: true,
+    })
+    if (!error) {
+      setItems([...items, { id, category_id: selCat, label: newLabel.trim(), icon: newIcon, sort_order, is_active: true }])
+      setNewLabel('')
+      showToast('항목 추가됨: ' + newLabel)
+    } else showToast('오류: ' + error.message)
+    setSaving(false)
   }
 
-  function deleteItem(id: string) {
-    setItems(prev => prev.filter(i => i.id !== id))
-    setIconMap(prev => { const n = {...prev}; delete n[id]; return n })
+  async function deleteItem(id: string) {
+    if (!confirm('이 항목을 삭제할까요?')) return
+    await supabase.from('checklist_items').delete().eq('id', id)
+    setItems(items.filter(i => i.id !== id))
     showToast('항목 삭제됨')
   }
 
-  function updateItem(id: string, field: 'label'|'emoji', val: string) {
-    if (!val) return
-    setItems(prev => prev.map(i => i.id===id ? {...i,[field]:val} : i))
+  async function saveLabel(id: string) {
+    if (!editLabel.trim()) return
+    await supabase.from('checklist_items').update({ label: editLabel.trim() }).eq('id', id)
+    setItems(items.map(i => i.id===id ? {...i, label: editLabel.trim()} : i))
+    setEditId(null)
+    showToast('저장됨')
   }
 
-  function updateIcon(id: string, icon: string) {
-    setIconMap(prev => ({ ...prev, [id]: icon }))
+  async function updateIcon(id: string, icon: string) {
+    await supabase.from('checklist_items').update({ icon }).eq('id', id)
+    setItems(items.map(i => i.id===id ? {...i, icon} : i))
   }
 
-  function moveItem(id: string, dir: number) {
-    const catIs = items.filter(i => i.categoryId === selCat)
-    const localIdx = catIs.findIndex(i => i.id === id)
-    const newIdx = localIdx + dir
-    if (newIdx < 0 || newIdx >= catIs.length) return
-    const allItems = [...items]
-    const a = allItems.findIndex(i => i.id === catIs[localIdx].id)
-    const b = allItems.findIndex(i => i.id === catIs[newIdx].id)
-    ;[allItems[a], allItems[b]] = [allItems[b], allItems[a]]
-    setItems(allItems)
+  async function toggleActive(id: string, current: boolean) {
+    await supabase.from('checklist_items').update({ is_active: !current }).eq('id', id)
+    setItems(items.map(i => i.id===id ? {...i, is_active: !current} : i))
   }
 
-  // ExportTab과 state 공유 (props로 처리)
+  function handleDragStart(idx: number) { setDragIdx(idx) }
+  function handleDragOver(e: React.DragEvent, idx: number) { e.preventDefault(); setDragOverIdx(idx) }
+  function handleDragEnd() { setDragIdx(null); setDragOverIdx(null) }
+
+  async function handleDrop(toIdx: number) {
+    if (dragIdx === null || dragIdx === toIdx) { setDragIdx(null); setDragOverIdx(null); return }
+    const catIs = [...catItems]
+    const [moved] = catIs.splice(dragIdx, 1)
+    catIs.splice(toIdx, 0, moved)
+    // sort_order 재계산
+    const reordered = catIs.map((item, i) => ({ ...item, sort_order: i + 1 }))
+    // 전체 items에서 이 카테고리 항목들 교체
+    const otherItems = items.filter(i => i.category_id !== selCat)
+    setItems([...otherItems, ...reordered])
+    setDragIdx(null); setDragOverIdx(null)
+    // DB 업데이트
+    await Promise.all(reordered.map(item =>
+      supabase.from('checklist_items').update({ sort_order: item.sort_order }).eq('id', item.id)
+    ))
+    showToast('순서 저장됨')
+  }
 
   return (
     <>
       {toast && <Toast msg={toast} />}
+      {/* 카테고리 선택 */}
       <Card>
         <SectionTitle>카테고리 선택</SectionTitle>
         <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
           {cats.map(c => (
-            <button key={c.id} onClick={() => { setSelCat(c.id); setNewIcon(CAT_DEFAULT[c.id] || 'ph:star') }} style={{
+            <button key={c.id} onClick={() => setSelCat(c.id)} style={{
               padding:'8px 14px', borderRadius:10, border:'1.5px solid',
-              borderColor: selCat===c.id ? '#1B6EF3' : '#E2E8F0',
+              borderColor: selCat===c.id ? '#1B6EF3' : '#e0e0e0',
               background: selCat===c.id ? '#1B6EF3' : '#fff',
-              color: selCat===c.id ? '#fff' : '#475569',
-              fontSize:13, fontWeight:700, cursor:'pointer', minHeight:38,
-            }}>{c.emoji} {c.label}</button>
+              color: selCat===c.id ? '#fff' : '#444',
+              fontWeight:700, fontSize:13, cursor:'pointer',
+            }}>
+              {c.emoji} {c.label}
+              <span style={{ marginLeft:6, opacity:0.7, fontSize:11 }}>
+                ({items.filter(i=>i.category_id===c.id).length})
+              </span>
+            </button>
           ))}
         </div>
       </Card>
 
+      {/* 새 항목 추가 */}
       <Card>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
-          <SectionTitle style={{ margin:0 }}>{cat?.emoji} {cat?.label} 항목 ({catItems.length})</SectionTitle>
+        <SectionTitle>새 항목 추가</SectionTitle>
+        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+          <IconPicker value={newIcon} onChange={setNewIcon} />
+          <input value={newLabel} onChange={e=>setNewLabel(e.target.value)}
+            onKeyDown={e=>e.key==='Enter'&&addItem()}
+            placeholder="버킷리스트 항목 이름"
+            style={{ ...inputStyle, flex:1 }} />
+          <button onClick={addItem} disabled={saving} style={{ ...btnPrimary, flexShrink:0, padding:'11px 16px', fontSize:13 }}>추가</button>
         </div>
+      </Card>
 
-        {!isLocked && (
-          <div style={{ display:'flex', gap:8, marginBottom:14, alignItems:'center' }}>
-            <IconPicker value={newIcon} onChange={setNewIcon} />
-            <input value={newLabel} onChange={e=>setNewLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addItem()} placeholder="새 항목 이름" style={{ ...inputStyle, flex:1, minWidth:0 }} />
-            <button onClick={addItem} style={btnPrimary}>추가</button>
-          </div>
-        )}
-
-        {isLocked ? (
-          <p style={{ color:'#aaa', fontSize:13 }}>🔒 직접입력 카테고리는 앱에서 사용자가 직접 추가합니다.</p>
-        ) : catItems.length === 0 ? (
-          <p style={{ color:'#ccc', fontSize:13, textAlign:'center', padding:'20px 0' }}>항목이 없어요. 위에서 추가해보세요!</p>
-        ) : (
-          <div>
-            {catItems.map((item, localIdx) => {
-              const isDragging = dragIdx === localIdx
-              const isOver     = dragOverIdx === localIdx
-              return (
-                <div key={item.id}
-                  draggable={!isLocked}
-                  onDragStart={() => handleItemDragStart(localIdx)}
-                  onDragOver={e => handleItemDragOver(e, localIdx)}
-                  onDragEnd={handleItemDragEnd}
-                  style={{
-                    display:'flex', alignItems:'center', gap:8,
-                    padding:'8px 0', borderBottom:'1px solid #f3f3f3',
-                    opacity: isDragging ? 0.4 : 1,
-                    background: isOver ? '#eef2fb' : 'transparent',
-                    borderRadius: isOver ? 8 : 0,
-                    cursor: isLocked ? 'default' : 'grab',
-                    transition:'background 0.15s',
-                  }}>
-                  {/* 드래그 핸들 */}
-                  {!isLocked && (
-                    <Icon icon="ph:dots-six-vertical" width={16} height={16} color="#ccc" style={{ flexShrink:0, cursor:'grab' }} />
-                  )}
-                  <IconPicker value={iconMap[item.id] || CAT_DEFAULT[selCat] || 'ph:star'} onChange={v => updateIcon(item.id, v)} />
-                  <input value={item.label} onChange={e=>updateItem(item.id,'label',e.target.value)} style={{ flex:1, fontSize:13, border:'none', background:'transparent', color:'#444' }} />
-                  <div style={{ display:'flex', gap:4 }}>
-                    <button onClick={() => moveItem(item.id,-1)} disabled={localIdx===0} style={{ ...btnSmGhost, opacity:localIdx===0?0.3:1 }}>↑</button>
-                    <button onClick={() => moveItem(item.id, 1)} disabled={localIdx===catItems.length-1} style={{ ...btnSmGhost, opacity:localIdx===catItems.length-1?0.3:1 }}>↓</button>
-                    <button onClick={() => deleteItem(item.id)} style={{ ...btnSmDanger }}>✕</button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
+      {/* 항목 목록 */}
+      <Card>
+        <SectionTitle>항목 목록 ({catItems.length}개) — 드래그로 순서 변경</SectionTitle>
+        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+          {catItems.map((item, idx) => {
+            const isDragging = dragIdx === idx
+            const isOver = dragOverIdx === idx
+            const isEditing = editId === item.id
+            return (
+              <div
+                key={item.id}
+                draggable
+                onDragStart={() => handleDragStart(idx)}
+                onDragOver={e => handleDragOver(e, idx)}
+                onDrop={() => handleDrop(idx)}
+                onDragEnd={handleDragEnd}
+                style={{
+                  border: isOver ? '2px dashed #1B6EF3' : '1.5px solid #e8e8e8',
+                  borderRadius:10, padding:'10px 12px',
+                  background: isDragging ? '#e8f0fe' : item.is_active ? '#fafafa' : '#f5f5f5',
+                  display:'flex', alignItems:'center', gap:8,
+                  cursor:'grab', opacity: isDragging ? 0.5 : item.is_active ? 1 : 0.5,
+                }}>
+                <span style={{ color:'#aaa', fontSize:14, userSelect:'none' }}>⠿</span>
+                <IconPicker value={item.icon || 'ph:star'} onChange={icon => updateIcon(item.id, icon)} />
+                {isEditing ? (
+                  <input
+                    value={editLabel}
+                    onChange={e => setEditLabel(e.target.value)}
+                    onKeyDown={e => { if(e.key==='Enter') saveLabel(item.id); if(e.key==='Escape') setEditId(null) }}
+                    autoFocus
+                    style={{ ...inputStyle, flex:1, fontSize:13, padding:'4px 8px' }}
+                  />
+                ) : (
+                  <span
+                    onClick={() => { setEditId(item.id); setEditLabel(item.label) }}
+                    style={{ flex:1, fontSize:13, color:'#222', cursor:'text' }}
+                    title="클릭하여 수정"
+                  >{item.label}</span>
+                )}
+                {isEditing && (
+                  <button onClick={() => saveLabel(item.id)}
+                    style={{ ...btnPrimary, padding:'4px 10px', fontSize:12 }}>저장</button>
+                )}
+                <button onClick={() => toggleActive(item.id, item.is_active)}
+                  title={item.is_active ? '비활성화' : '활성화'}
+                  style={{ background:'none', border:'none', cursor:'pointer', fontSize:16, opacity:0.7 }}>
+                  {item.is_active ? '✅' : '⬜'}
+                </button>
+                <button onClick={() => deleteItem(item.id)}
+                  style={{ background:'none', border:'none', color:'#e05252', cursor:'pointer', fontSize:14 }}>✕</button>
+              </div>
+            )
+          })}
+          {catItems.length === 0 && (
+            <div style={{ textAlign:'center', color:'#aaa', fontSize:13, padding:'20px 0' }}>
+              이 카테고리에 항목이 없어요
+            </div>
+          )}
+        </div>
       </Card>
     </>
   )
@@ -997,17 +1006,17 @@ function ExportTab({ cats, items, iconMap }: {
   function generate() {
     const esc = (s: string) => s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")
     // custom 항상 맨 마지막 정렬
-    const sortedCats = [...cats.filter(c => c.id !== 'custom'), ...cats.filter(c => c.id === 'custom')]
-    let out = `export type Category = { id: string; label: string; receiptLabel: string; emoji: string }\n`
-    out += `export type CheckItem = { id: string; categoryId: string; label: string; emoji: string }\n\n`
-    out += `export const CATEGORIES: Category[] = [\n`
-    sortedCats.forEach((c: Cat) => { out += `  { id:'${esc(c.id)}', label:'${esc(c.label)}', receiptLabel:'${esc(c.receiptLabel)}', emoji:'${c.emoji}' },\n` })
-    out += `]\n\nexport const ITEMS: CheckItem[] = [`
-    let lastCat = ''
-    items.forEach((item: Item) => {
-      const cat = sortedCats.find((c: Cat) => c.id === item.categoryId)
-      if (cat && cat.id !== lastCat) { out += `\n\n  // ${cat.label}\n`; lastCat = cat.id }
-      out += `  { id:'${esc(item.id)}', categoryId:'${esc(item.categoryId)}', label:'${esc(item.label)}', emoji:'${item.emoji}' },\n`
+    const sortedCats = [...cats].sort((a,b) => a.sort_order - b.sort_order)
+    let out = `-- DB 기반으로 변경됨. checklist.ts 불필요.\n`
+    out += `-- Supabase checklist_categories: ${cats.length}개\n`
+    out += `-- Supabase checklist_items: ${items.length}개\n`
+    out += `\n각 항목은 Supabase 어드민에서 직접 관리하세요.\n`
+    out += `\n카테고리 목록:\n`
+    sortedCats.forEach((c: Cat) => { out += `  ${c.emoji} ${c.label} (id: ${c.id})\n` })
+    out += `\n항목 수:\n`
+    sortedCats.forEach((c: Cat) => {
+      const count = items.filter((i: Item) => i.category_id === c.id).length
+      out += `  ${c.label}: ${count}개\n`
     })
     out += `]\n\n`
     // ITEM_ICONS 내보내기
