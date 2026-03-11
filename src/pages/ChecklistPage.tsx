@@ -364,7 +364,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : (
         <>
           {/* ── SUB HEADER (버튼들) — 스크롤 시 사라짐 ── */}
-          <div style={{ background:'#fff', borderBottom:'1px solid #E2E8F0' }}>
+          <div style={{ background:'#F0F4F8', borderBottom:'1px solid #E2E8F0' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 20px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                 <span style={{ fontSize:14, fontWeight:700, color: done>0 ? '#1B6EF3' : '#94A3B8' }}>
