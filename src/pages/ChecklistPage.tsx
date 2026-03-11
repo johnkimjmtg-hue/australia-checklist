@@ -331,44 +331,28 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         .list-item:active { background: #F1F5F9 !important; }
       `}</style>
 
-      {/* ── 헤더 + 탭 ── (흰색 배경) */}
-      <div style={{ background:'#fff', padding:'18px 16px 16px', boxShadow:'0 1px 0 #E2E8F0' }}>
-        {/* 브랜드 타이틀 — 중앙 정렬 */}
-        <div style={{ textAlign:'center', marginBottom:16 }}>
-          <span
-            onClick={handleLogoTap}
-            style={{ fontSize:22, color:'#1B6EF3', fontWeight:900, letterSpacing:4, cursor:'pointer', userSelect:'none' }}
-          >HOJUGAJA</span>
-        </div>
-        {/* 탭 — 회색 배경 위 pill 스타일 */}
-        <div style={{
-          display:'flex', gap:5,
-          background:'#F0F4F8', borderRadius:14, padding:5,
-        }}>
-          <button className="tab-btn" onClick={() => setMainTab('bucketlist')} style={{
-            flex:1, height:44, border:'none', cursor:'pointer',
-            borderRadius:10,
-            fontSize:15, fontWeight:700,
-            color: mainTab==='bucketlist' ? '#0F172A' : '#94A3B8',
-            background: mainTab==='bucketlist' ? '#fff' : 'transparent',
-            boxShadow: mainTab==='bucketlist' ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            transition:'all 0.15s',
-          }}>
-            버킷리스트
-          </button>
-          <button className="tab-btn" onClick={() => setMainTab('services')} style={{
-            flex:1, height:44, border:'none', cursor:'pointer',
-            borderRadius:10,
-            fontSize:15, fontWeight:700,
-            color: mainTab==='services' ? '#fff' : '#94A3B8',
-            background: mainTab==='services' ? '#1B6EF3' : 'transparent',
-            boxShadow: mainTab==='services' ? '0 3px 10px rgba(27,110,243,0.30)' : 'none',
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            transition:'all 0.15s',
-          }}>
-            업체 찾기 <span style={{ fontSize:14 }}>›</span>
-          </button>
+      {/* ── 헤더: 로고 (흰색) ── */}
+      <div style={{ background:'#fff', padding:'16px 20px 14px', textAlign:'center' }}>
+        <span onClick={handleLogoTap}
+          style={{ fontSize:20, color:'#1B6EF3', fontWeight:900, letterSpacing:3, cursor:'pointer', userSelect:'none' }}
+        >HOJUGAJA</span>
+      </div>
+
+      {/* ── 탭 (회색 배경, 기존 스타일 그대로) ── */}
+      <div style={{ background:'rgba(232,237,243,0.97)', borderBottom:'1.5px solid #D1D9E3', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
+        <div style={{ display:'flex', padding:'8px 20px 0', gap:4 }}>
+          {(['bucketlist','services'] as MainTab[]).map(tab => (
+            <button key={tab} className="tab-btn" onClick={() => setMainTab(tab)} style={{
+              flex:1, height:38, border:'none', cursor:'pointer',
+              borderRadius:'6px 6px 0 0',
+              fontSize:14, fontWeight: mainTab===tab ? 700 : 500,
+              color: mainTab===tab ? '#fff' : '#94A3B8',
+              background: mainTab===tab ? '#1B6EF3' : 'transparent',
+              borderBottom: mainTab===tab ? '2px solid #1B6EF3' : '2px solid transparent',
+            }}>
+              {tab==='bucketlist' ? '버킷리스트' : '업체 찾기 ›'}
+            </button>
+          ))}
         </div>
       </div>
 
