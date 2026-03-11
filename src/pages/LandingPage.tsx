@@ -640,12 +640,24 @@ function SuggestionForm({ onClose }: { onClose: () => void }) {
 // ── 말풍선
 function ChatBubble() {
   const [open, setOpen] = useState(false)
+  const [tapCount, setTapCount] = useState(0)
+  const navigate = useNavigate()
+  const tapTimer = useRef<any>(null)
+
+  const handleTitleTap = () => {
+    const next = tapCount + 1
+    setTapCount(next)
+    if (tapTimer.current) clearTimeout(tapTimer.current)
+    if (next >= 5) { navigate('/bingo'); setTapCount(0); return }
+    tapTimer.current = setTimeout(() => setTapCount(0), 1500)
+  }
+
   return (
     <div style={{ position:'fixed', bottom:'10%', right:20, zIndex:300, display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8 }}>
       {open && (
         <div style={{ background:'#fff', borderRadius:12, padding:'14px 16px', boxShadow:'0 4px 20px rgba(27,110,243,0.15)', maxWidth:240, position:'relative', animation:'fadeInUp 0.25s ease', border:'1px solid rgba(27,110,243,0.08)' }}>
           <button onClick={() => setOpen(false)} style={{ position:'absolute', top:8, right:8, background:'none', border:'none', cursor:'pointer', color:'#94A3B8', fontSize:14, lineHeight:1, padding:2 }}>✕</button>
-          <div style={{ fontSize:12, fontWeight:800, color:BLUE, marginBottom:6 }}>호주가자 운영자입니다.</div>
+          <div onClick={handleTitleTap} style={{ fontSize:12, fontWeight:800, color:BLUE, marginBottom:6, cursor:'pointer', userSelect:'none' }}>호주가자 운영자입니다.</div>
           <div style={{ fontSize:12, color:'#475569', lineHeight:1.6 }}>
             본 서비스는 무료로 제공됩니다. 문의는{' '}
             <a href="https://www.threads.net/@palaslouise" target="_blank" rel="noreferrer" style={{ color:BLUE, fontWeight:700, textDecoration:'none' }}>@palaslouise</a>로 연락주세요.

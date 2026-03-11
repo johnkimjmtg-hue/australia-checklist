@@ -5,6 +5,7 @@ import { loadState, AppState } from './store/state'
 import LandingPage from './pages/LandingPage'
 import ChecklistPage from './pages/ChecklistPage'
 import AdminPage from './pages/AdminPage'
+import BingoPage from './pages/BingoPage'
 
 // ── 메인 앱
 function MainApp() {
@@ -43,6 +44,16 @@ function AdminWrapper() {
   )
 }
 
+// ── 빙고 페이지
+function BingoWrapper() {
+  const navigate = useNavigate()
+  return (
+    <div className="app-shell">
+      <BingoPage onBack={() => navigate('/')} />
+    </div>
+  )
+}
+
 // ── 라우터
 export default function App() {
   return (
@@ -51,6 +62,7 @@ export default function App() {
         <Route path="/"         element={<LandingWrapper />} />
         <Route path="/app"      element={<MainApp />} />
         <Route path="/admin"    element={<AdminWrapper />} />
+        <Route path="/bingo"    element={<BingoWrapper />} />
         <Route path="*"         element={<LandingWrapper />} />
       </Routes>
       <Analytics />
