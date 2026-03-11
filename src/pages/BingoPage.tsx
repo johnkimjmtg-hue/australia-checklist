@@ -51,20 +51,41 @@ function getCompletedLines(checked: Set<number>): number[][] {
   return getBingoLines(checked).filter(line => line.every(i => checked.has(i)))
 }
 
-// ── 원형 진행바
-function CircleProgress({ pct }: { pct: number }) {
-  const R = 44, C = 2 * Math.PI * R
+// ── 25칸 미니 빙고판 진행바
+function MiniGrid({ count }: { count: number }) {
   return (
     <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
-      <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
-        <circle cx={50} cy={50} r={R} fill="none" stroke="#F1F5F9" strokeWidth={10}/>
-        <circle cx={50} cy={50} r={R} fill="none" stroke="#FFCD00" strokeWidth={10}
-          strokeDasharray={C} strokeDashoffset={C-(pct/100)*C} strokeLinecap="round"
-          style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)' }}
-        />
-      </svg>
-      <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <span style={{ fontSize:15, fontWeight:800, color:'#1B6EF3' }}>{pct}%</span>
+      {/* 5x5 미니칸 */}
+      <div style={{
+        display:'grid', gridTemplateColumns:'repeat(5,1fr)',
+        gap:2, width:100, height:100,
+        borderRadius:8, overflow:'hidden',
+      }}>
+        {Array.from({ length: 25 }, (_, i) => (
+          <div key={i} style={{
+            borderRadius:2,
+            background: i < count ? '#FFCD00' : '#F1F5F9',
+            transition: `background 0.3s ease ${i * 0.04}s`,
+            boxShadow: i < count ? 'inset 0 1px 2px rgba(180,130,0,0.3)' : 'none',
+          }}/>
+        ))}
+      </div>
+      {/* 가운데 커피 아이콘 */}
+      <div style={{
+        position:'absolute', inset:0,
+        display:'flex', alignItems:'center', justifyContent:'center',
+        pointerEvents:'none',
+      }}>
+        <div style={{
+          width:36, height:36, borderRadius:'50%',
+          background: count > 0 ? 'rgba(255,205,0,0.92)' : 'rgba(241,245,249,0.92)',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          boxShadow: count > 0 ? '0 2px 8px rgba(180,130,0,0.35)' : '0 1px 4px rgba(0,0,0,0.08)',
+          transition:'background 0.4s ease, box-shadow 0.4s ease',
+        }}>
+          <Icon icon="ph:coffee" width={18} height={18}
+            color={count > 0 ? '#92620a' : '#CBD5E1'} />
+        </div>
       </div>
     </div>
   )
@@ -296,7 +317,7 @@ export default function BingoPage({ onBack }: Props) {
           boxShadow:'0 4px 20px rgba(27,110,243,0.10), 0 1px 4px rgba(0,0,0,0.06)',
           padding:'16px 18px', display:'flex', alignItems:'center', gap:16,
         }}>
-          <CircleProgress pct={Math.round((checked.size/25)*100)} />
+          <MiniGrid count={checked.size} />
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ fontSize:16, fontWeight:800, color:'#1E293B', marginBottom:3, lineHeight:1.3 }}>
               {getStatusMsg(checked.size, bingoCount).title}
