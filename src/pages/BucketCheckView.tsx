@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ITEMS, CATEGORIES, ITEM_ICONS } from '../data/checklist'
+import { CheckItem, ITEM_ICONS } from '../data/checklist'
 import { AppState, TripInfo, getTripDays, fmtMD, dow } from '../store/state'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
@@ -9,6 +9,7 @@ type Props = {
   state:      AppState
   trip:       TripInfo
   setState:   (s: AppState) => void
+  items:      CheckItem[]
   onAchievedChange?: (achieved: Record<string,boolean>) => void
   onEdit:     () => void
   onDelete:   () => void
@@ -158,7 +159,7 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=
 }
 
 /* ══ 메인 ══ */
-export default function BucketCheckView({ state, trip, setState, onAchievedChange, onEdit, onDelete, onShare, onServices, onLanding }: Props) {
+export default function BucketCheckView({ state, trip, setState, items, onAchievedChange, onEdit, onDelete, onShare, onServices, onLanding }: Props) {
   const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
@@ -191,7 +192,7 @@ export default function BucketCheckView({ state, trip, setState, onAchievedChang
     }, 400)
   }
 
-  const allItems     = [...ITEMS, ...state.customItems.map(c => ({ ...c, emoji:'📝', categoryId: c.categoryId ?? 'custom' }))]
+  const allItems     = [...items, ...state.customItems.map(c => ({ ...c, emoji:'📝', categoryId: c.categoryId ?? 'custom' }))]
   const checkedItems = allItems.filter(i => state.selected[i.id])
   const tripDays     = getTripDays(trip)
 
