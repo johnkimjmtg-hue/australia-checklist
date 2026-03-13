@@ -91,7 +91,7 @@ const PANTHEON_LORE: string[] = [
 ]
 
 // ── 멜번 판테온 이미지 (체크 시 표시)
-const MEL_IMGS = Array.from({ length: 25 }, (_, i) => `/mel_coffee/${i + 1}.png`)
+const MEL_IMGS = Array.from({ length: 25 }, (_, i) => `/mel_coffee/${i + 1}.jpg`)
 
 // ── 빙고 라인 체크 (5x5)
 function getBingoLines(checked: Set<number>): number[][] {
@@ -295,6 +295,14 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
   const isAllDone = checked.size === 25
+
+  // 이미지 preload — 마운트 시 백그라운드에서 미리 다운로드
+  useEffect(() => {
+    MEL_IMGS.forEach(src => {
+      const img = new Image()
+      img.src = src
+    })
+  }, [])
 
   // 빙고 달성 감지 — 줄 하나 완성할 때마다 폭죽
   useEffect(() => {
