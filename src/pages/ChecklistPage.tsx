@@ -426,7 +426,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ fontSize:13, color:'#CBD5E1' }}>준비 중이에요 🛍</div>
         </div>
       ) : mainTab === 'bingo' ? (
-        <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => setMainTab('bucketlist')} />
+        <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
       ) : mainTab === 'community' ? (
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'60vh', gap:12 }}>
           <Icon icon="ph:chats-circle" width={48} height={48} color="#CBD5E1" />
