@@ -393,7 +393,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             { id:'melbourne', label:'🇦🇺 멜번' },
             { id:'sydney',    label:'🌉 시드니' },
           ] as { id: 'melbourne'|'sydney'; label: string }[]).map(c => (
-            <button key={c.id} onClick={() => setCity(c.id)} style={{
+            <button key={c.id} onClick={() => { setCity(c.id); onCityChange?.(c.id) }} style={{
               flex:1, height:36, borderRadius:8, border:'none', cursor:'pointer',
               fontWeight: city===c.id ? 700 : 500,
               fontSize:13,
