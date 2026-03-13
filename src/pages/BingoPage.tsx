@@ -203,6 +203,7 @@ export default function BingoPage({ onBack }: Props) {
   const [stampAnim, setStampAnim] = useState<number|null>(null)
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [city, setCity] = useState<'melbourne'|'sydney'>('melbourne')
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
@@ -302,24 +303,54 @@ export default function BingoPage({ onBack }: Props) {
             HOJUGAJA
           </span>
         </div>
-        <div style={{ display:'flex', padding:'8px 20px 0', gap:4 }}>
-          <div style={{
-            flex:1, height:38, borderRadius:'6px 6px 0 0',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            fontSize:14, fontWeight:700, color:'#fff',
-            background:'#1B6EF3', borderBottom:'2px solid #1B6EF3', userSelect:'none',
-          }}>☕ 멜번 카페 도장깨기</div>
-          <div style={{
-            flex:1, height:38, borderRadius:'6px 6px 0 0',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            fontSize:14, fontWeight:500, color:'#94A3B8',
-            background:'transparent', borderBottom:'2px solid transparent', userSelect:'none',
-          }}>시드니 (준비중)</div>
+        <div style={{ display:'flex', padding:'8px 8px 0', gap:2, overflowX:'auto', scrollbarWidth:'none' }}>
+          {([
+            { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트', action: onBack },
+            { id:'services',   icon:'ph:buildings',    label:'업체/서비스', action: () => {} },
+            { id:'shopping',   icon:'ph:shopping-bag', label:'필수쇼핑',   action: () => {} },
+            { id:'bingo',      icon:'ph:coffee',       label:'도장깨기',   action: () => {} },
+            { id:'community',  icon:'ph:chats-circle', label:'커뮤니티',   action: () => {} },
+          ]).map(tab => {
+            const active = tab.id === 'bingo'
+            return (
+              <button key={tab.id} onClick={tab.action} style={{
+                flex:1, minWidth:0, height:48, border:'none', cursor:'pointer',
+                borderRadius:'6px 6px 0 0',
+                display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2,
+                background: active ? '#1B6EF3' : 'transparent',
+                borderBottom: active ? '2px solid #1B6EF3' : '2px solid transparent',
+              }}>
+                <Icon icon={tab.icon} width={16} height={16} color={active ? '#fff' : '#94A3B8'} />
+                <span style={{ fontSize:10, fontWeight: active ? 700 : 500, color: active ? '#fff' : '#94A3B8', whiteSpace:'nowrap' }}>
+                  {tab.label}
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
       {/* ── 상황판 */}
       <div style={{ position:'sticky', top:0, zIndex:30, background:'#F0F4F8', padding:'12px 16px 0' }}>
+        {/* 도시 선택 */}
+        <div style={{ display:'flex', gap:8, marginBottom:10 }}>
+          {([
+            { id:'melbourne', label:'🇦🇺 멜번' },
+            { id:'sydney',    label:'🌉 시드니' },
+          ] as { id: 'melbourne'|'sydney'; label: string }[]).map(c => (
+            <button key={c.id} onClick={() => setCity(c.id)} style={{
+              flex:1, height:36, borderRadius:8, border:'none', cursor:'pointer',
+              fontWeight: city===c.id ? 700 : 500,
+              fontSize:13,
+              color: city===c.id ? '#fff' : '#64748B',
+              background: city===c.id ? '#1B6EF3' : '#fff',
+              boxShadow: city===c.id ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 4px rgba(0,0,0,0.06)',
+              transition:'all 0.2s',
+            }}>
+              {c.label}{c.id==='sydney' ? ' (준비중)' : ''}
+            </button>
+          ))}
+        </div>
         <div style={{
           background:'#fff', borderRadius:12,
           boxShadow:'0 4px 20px rgba(27,110,243,0.10), 0 1px 4px rgba(0,0,0,0.06)',
