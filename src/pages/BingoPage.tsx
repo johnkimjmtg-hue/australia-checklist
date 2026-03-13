@@ -522,8 +522,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               fontWeight: city===c.id ? 700 : 500,
               fontSize:13,
               color: city===c.id ? '#fff' : '#64748B',
-              background: city===c.id ? '#B45309' : '#fff',
-              boxShadow: city===c.id ? '0 2px 8px rgba(180,83,9,0.35)' : '0 1px 4px rgba(0,0,0,0.06)',
+              background: city===c.id ? '#1B6EF3' : '#fff',
+              boxShadow: city===c.id ? '0 2px 8px rgba(27,110,243,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
               transition:'all 0.2s',
             }}>
               {c.label}
