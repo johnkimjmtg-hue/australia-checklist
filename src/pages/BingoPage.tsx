@@ -331,8 +331,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity }: Pro
                 background: active ? '#1B6EF3' : 'transparent',
                 borderBottom: active ? '2px solid #1B6EF3' : '2px solid transparent',
               }}>
-                <Icon icon={tab.icon} width={16} height={16} color={active ? '#fff' : '#94A3B8'} />
-                <span style={{ fontSize:10, fontWeight: active ? 700 : 500, color: active ? '#fff' : '#94A3B8', whiteSpace:'nowrap' }}>
+                <Icon icon={tab.icon} width={16} height={16} color={active ? '#fff' : '#475569'} />
+                <span style={{ fontSize:10, fontWeight: active ? 700 : 500, color: active ? '#fff' : '#475569', whiteSpace:'nowrap' }}>
                   {tab.label}
                 </span>
               </button>
