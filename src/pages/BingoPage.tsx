@@ -747,7 +747,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                 flex:1, height:48, border:'1px solid #E2E8F0', borderRadius:10,
                 background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer',
               }}>닫기</button>
-              <button onClick={() => { setShowAllDone(false); setShowReset(true) }} style={{
+              <button onClick={() => { setChecked(new Set()); setCheckOrder([]); setShowAllDone(false) }} style={{
                 flex:2, height:48, border:'none', borderRadius:10,
                 background:'#DC2626', color:'#fff', fontWeight:700, fontSize:14, cursor:'pointer',
               }}>리셋하기</button>
@@ -776,7 +776,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                 flex:1, height:48, border:'1px solid #E2E8F0', borderRadius:6,
                 background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer',
               }}>아니요</button>
-              <button onClick={() => { setChecked(new Set()); setShowReset(false) }} style={{
+              <button onClick={() => { setChecked(new Set()); setCheckOrder([]); setShowReset(false) }} style={{
                 flex:2, height:48, border:'none', borderRadius:6,
                 background:'#DC2626', color:'#fff', fontWeight:700, fontSize:15, cursor:'pointer',
               }}>리셋하기</button>
