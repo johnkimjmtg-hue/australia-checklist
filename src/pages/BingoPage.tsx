@@ -522,8 +522,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               fontWeight: city===c.id ? 700 : 500,
               fontSize:13,
               color: city===c.id ? '#fff' : '#64748B',
-              background: city===c.id ? '#475569' : '#fff',
-              boxShadow: city===c.id ? '0 2px 8px rgba(71,85,105,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
+              background: city===c.id ? '#B45309' : '#fff',
+              boxShadow: city===c.id ? '0 2px 8px rgba(180,83,9,0.35)' : '0 1px 4px rgba(0,0,0,0.06)',
               transition:'all 0.2s',
             }}>
               {c.label}
@@ -798,6 +798,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             boxShadow:'0 20px 60px rgba(0,0,0,0.5)',
             animation:'scaleIn 0.22s ease', overflowY:'auto', maxHeight:'90vh',
           }}>
+            <img src="/mel_coffee/mel_final.jpg" alt="멜번 판테온 완성"
+              style={{ width:'100%', borderRadius:12, display:'block', marginBottom:16, objectFit:'cover' }} />
             <div style={{ fontSize:15, fontWeight:800, color:'#FFB800', letterSpacing:1, marginBottom:12, textAlign:'center' }}>
               🏆 멜번 판테온 완전정복!
             </div>
