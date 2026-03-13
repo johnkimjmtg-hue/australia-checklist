@@ -59,6 +59,41 @@ const SYDNEY_CAFES = [
   { id: 25, name: 'Penny Lane',            img: '' },
 ]
 
+
+// ── 멜번 판테온 멘트 (1~25)
+const PANTHEON_LORE: string[] = [
+  '당신은 혼돈의 공허 속에 첫 번째 빛을 선언했습니다.',
+  '당신은 빛을 더욱 선명하게 할 심연의 어둠을 드리웠습니다.',
+  '당신은 영원히 멈춰 있던 세상에 시간의 바퀴를 돌리기 시작했습니다.',
+  '당신은 만물이 거할 무한한 우주와 행성의 공간을 빚어냈습니다.',
+  '당신은 존재의 경계를 획정하여 "있음"과 "없음"을 구분했습니다.',
+  '당신은 메마른 대지에 생명의 근원인 물을 흘려보냈습니다.',
+  '당신은 대지의 심장에 뜨거운 불과 마그마를 심어 에너지를 주었습니다.',
+  '당신은 솟구친 불로 산맥을 이루고 굳건한 땅을 다졌습니다.',
+  '당신은 정체된 공기에 숨결을 불어넣어 대기를 순환시켰습니다.',
+  '당신은 대지에 푸른 숲을 입히고 숨 쉬는 모든 생명을 깨웠습니다.',
+  '당신은 흐르는 시간 속에서 세상의 모든 "기억"을 기록으로 남겼습니다.',
+  '당신은 이성적인 세상 너머에 환상과 상상의 "꿈"을 펼쳤습니다.',
+  '당신은 세상의 진리를 탐구하는 지식과 지혜를 만물에 부여했습니다.',
+  '당신은 삶을 다채롭게 할 희로애락의 감정을 심장에 불어넣었습니다.',
+  '당신은 세상을 아름답게 수놓을 음악과 춤의 예술을 허락했습니다.',
+  '당신은 생각과 마음을 소리로 전하는 "언어"를 가르쳤습니다.',
+  '당신은 상반된 원소들을 조율하여 완벽한 "균형"을 이루었습니다.',
+  '당신은 성장을 위한 시련과 극복의 원동력인 "투쟁"을 시험했습니다.',
+  '당신은 세상의 모든 미각을 뛰어넘을 성스러운 "커피의 원두"를 점지했습니다.',
+  '당신은 커피를 도구로 다루는 고귀한 "기술"을 인간에게 전수했습니다.',
+  '당신은 커피의 정신이 깃든 도시, "멜버른"의 풍경을 그려냈습니다.',
+  '당신은 멜버른의 카페에 신비로운 향기를 더할 "게이샤"의 숨결을 불어넣었습니다.',
+  '당신은 전 세계의 커피 문화를 하나의 완벽한 "블렌드"로 융합했습니다.',
+  '당신은 한 방울의 완벽한 추출을 위해 기술을 극한으로 닦았습니다.',
+  '당신은 마침내 자신만의 완벽한 멜버른 판테온을 완성했습니다.',
+]
+
+// ── 멜번 판테온 이미지 (체크 시 표시)
+const MEL_IMGS = Array.from({ length: 25 }, (_, i) =>
+  new URL(`../assets/mel_coffee/${i + 1}.png`, import.meta.url).href
+)
+
 // ── 빙고 라인 체크 (5x5)
 function getBingoLines(checked: Set<number>): number[][] {
   const lines: number[][] = []
@@ -243,6 +278,20 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const [stampAnim, setStampAnim] = useState<number|null>(null)
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [orderMelbourne, setOrderMelbourne] = useState<number[]>(() => {
+    try { return JSON.parse(localStorage.getItem('bingo-order-melbourne') ?? '[]') }
+    catch { return [] }
+  })
+  const [orderSydney, setOrderSydney] = useState<number[]>(() => {
+    try { return JSON.parse(localStorage.getItem('bingo-order-sydney') ?? '[]') }
+    catch { return [] }
+  })
+  const checkOrder    = city === 'melbourne' ? orderMelbourne : orderSydney
+  const setCheckOrder = (val: number[]) => {
+    if (city === 'melbourne') setOrderMelbourne(val)
+    else setOrderSydney(val)
+  }
+  const [lastCheckedIdx, setLastCheckedIdx] = useState<number|null>(null)
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
@@ -265,8 +314,20 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   useEffect(() => {
     localStorage.setItem('bingo-sydney', JSON.stringify([...checkedSydney]))
   }, [checkedSydney])
+  useEffect(() => {
+    localStorage.setItem('bingo-order-melbourne', JSON.stringify(orderMelbourne))
+  }, [orderMelbourne])
+  useEffect(() => {
+    localStorage.setItem('bingo-order-sydney', JSON.stringify(orderSydney))
+  }, [orderSydney])
 
   const handleCell = (idx: number) => {
+    if (!checked.has(idx)) {
+      setLastCheckedIdx(idx)
+      setCheckOrder([...checkOrder, idx])
+    } else {
+      setCheckOrder(checkOrder.filter(i => i !== idx))
+    }
     const next = new Set(checked)
     if (next.has(idx)) {
       next.delete(idx)
@@ -413,11 +474,16 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         }}>
           <MiniGrid count={checked.size} />
           <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize:16, fontWeight:800, color:'#1E293B', marginBottom:3, lineHeight:1.3 }}>
+            <div style={{ fontSize:10, fontWeight:700, color:'#6F4E37', letterSpacing:1, marginBottom:2 }}>
+              멜버른 판테온: 창조의 연대기
+            </div>
+            <div style={{ fontSize:15, fontWeight:800, color:'#1E293B', marginBottom:3, lineHeight:1.3 }}>
               {getStatusMsg(checked.size, bingoCount).title}
             </div>
-            <div style={{ fontSize:12, color:'#94A3B8', fontWeight:500, marginBottom:8, lineHeight:1.5 }}>
-              {getStatusMsg(checked.size, bingoCount).sub}
+            <div style={{ fontSize:11, color:'#64748B', fontWeight:500, marginBottom:8, lineHeight:1.5 }}>
+              {lastCheckedIdx !== null && checked.has(lastCheckedIdx) && checkOrder.indexOf(lastCheckedIdx) >= 0
+                ? PANTHEON_LORE[checkOrder.indexOf(lastCheckedIdx)]
+                : getStatusMsg(checked.size, bingoCount).sub}
             </div>
             {/* 빙고 뱃지 */}
             <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
@@ -451,6 +517,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             const isChecked = checked.has(idx)
             const isHighlight = highlightedCells.has(idx)
             const isStamping = stampAnim === idx
+            const orderIdx = checkOrder.indexOf(idx)  // 체크 순서 (0-based), -1이면 미체크
+            const imgNum = orderIdx >= 0 ? orderIdx + 1 : null  // 1~25
             return (
               <div
                 key={c.id}
@@ -460,10 +528,10 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                   borderRadius:10,
                   overflow:'hidden',
                   cursor:'pointer',
-                  border: isHighlight ? '2px solid #1B6EF3' : '2px solid #E2E8F0',
+                  border: isHighlight ? '2px solid #EF4444' : '2px solid #E2E8F0',
                   background: '#fff',
                   boxShadow: isHighlight
-                    ? '0 2px 10px rgba(27,110,243,0.20)'
+                    ? '0 2px 10px rgba(239,68,68,0.20)'
                     : '0 1px 4px rgba(0,0,0,0.06)',
                   transition:'all 0.2s',
                   aspectRatio:'1',
@@ -477,15 +545,20 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                 <div style={{
                   width:'100%', flex:1,
                   background: isChecked
-                    ? 'linear-gradient(135deg, #1B6EF3 0%, #0ea5e9 100%)'
+                    ? 'linear-gradient(135deg, #6F4E37 0%, #a0522d 100%)'
                     : 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   transition:'background 0.3s',
+                  overflow:'hidden', position:'relative',
                 }}>
-                  {c.img ? (
+                  {isChecked && imgNum !== null ? (
+                    <img src={MEL_IMGS[imgNum - 1]} alt={`pantheon-${imgNum}`}
+                      style={{ width:'100%', height:'100%', objectFit:'cover', transition:'opacity 0.3s' }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    />
+                  ) : c.img ? (
                     <img src={c.img} alt={c.name}
-                      style={{ width:'100%', height:'100%', objectFit:'cover',
-                        filter: isChecked ? 'brightness(0.7)' : 'none', transition:'filter 0.3s' }}
+                      style={{ width:'100%', height:'100%', objectFit:'cover' }}
                     />
                   ) : (
                     <Icon
