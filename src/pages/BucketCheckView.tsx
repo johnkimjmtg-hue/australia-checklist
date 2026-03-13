@@ -413,18 +413,30 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           >HOJUGAJA</span>
           <span style={{ fontSize:13,color:'#64748B',fontWeight:600 }}>{achievedCount}/{total}</span>
         </div>
-        <div style={{ display:'flex',padding:'8px 20px 0',gap:4 }}>
-          <div style={{
-            flex:1,height:38,borderRadius:'6px 6px 0 0',
-            display:'flex',alignItems:'center',justifyContent:'center',
-            fontSize:14,fontWeight:700,color:'#fff',
-            background:'#1B6EF3',borderBottom:'2px solid #1B6EF3',userSelect:'none',
-          }}>버킷리스트</div>
-          <button onClick={onServices} style={{
-            flex:1,height:38,border:'none',borderRadius:'6px 6px 0 0',
-            background:'transparent',borderBottom:'2px solid transparent',
-            fontSize:14,fontWeight:500,color:'#94A3B8',cursor:'pointer',
-          }}>업체/서비스 찾기</button>
+        <div style={{ display:'flex', padding:'8px 8px 0', gap:2, overflowX:'auto', scrollbarWidth:'none' }}>
+          {([
+            { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트', action: () => {} },
+            { id:'services',   icon:'ph:buildings',    label:'업체/서비스', action: onServices },
+            { id:'shopping',   icon:'ph:shopping-bag', label:'필수쇼핑',   action: () => {} },
+            { id:'bingo',      icon:'ph:coffee',       label:'도장깨기',   action: () => {} },
+            { id:'community',  icon:'ph:chats-circle', label:'커뮤니티',   action: () => {} },
+          ]).map(tab => {
+            const active = tab.id === 'bucketlist'
+            return (
+              <button key={tab.id} onClick={tab.action} style={{
+                flex:1, minWidth:0, height:48, border:'none', cursor:'pointer',
+                borderRadius:'6px 6px 0 0',
+                display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2,
+                background: active ? '#1B6EF3' : 'transparent',
+                borderBottom: active ? '2px solid #1B6EF3' : '2px solid transparent',
+              }}>
+                <Icon icon={tab.icon} width={16} height={16} color={active ? '#fff' : '#94A3B8'} />
+                <span style={{ fontSize:10, fontWeight: active ? 700 : 500, color: active ? '#fff' : '#94A3B8', whiteSpace:'nowrap' }}>
+                  {tab.label}
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
