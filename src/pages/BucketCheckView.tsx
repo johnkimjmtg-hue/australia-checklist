@@ -609,7 +609,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             boxShadow:'0 -4px 24px rgba(0,0,0,0.15)',
           }}>
             <div style={{ width:40,height:4,borderRadius:2,background:'#E2E8F0',margin:'0 auto 16px'}}/>
-            <BusinessCard biz={detailBiz} />
+            <BusinessCard business={detailBiz} />
           </div>
         </>
       )}
