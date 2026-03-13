@@ -240,9 +240,19 @@ export default function BingoPage({ onBack, embedded = false }: Props) {
 
   const handleShare = async () => {
     setShowMoreMenu(false)
-    const text = `☕ 멜번 카페 도장깨기\n${checked.size}/25개 카페를 방문했어요!${bingoCount > 0 ? `\n🟢 ${bingoCount}빙고 달성!` : ''}\n\nhojugaja.com`
+    const isMelbourne = city === 'melbourne'
+    const cityName    = isMelbourne ? '멜번' : '시드니'
+    const link        = isMelbourne ? 'hojugaja.com/bingo/melbourne' : 'hojugaja.com/bingo/sydney'
+    const title       = `${cityName} 카페 도장깨기 빙고게임`
+    const lines: string[] = [
+      `☕ ${cityName} 카페 도장깨기 빙고게임, 지금 바로 시작하세요!`,
+      `${cityName}의 스페셜티 카페 25곳을 방문하고, 빙고를 완성하세요.`,
+    ]
+    if (checked.size > 0) lines.push(`나는 현재 ${checked.size}/25개 카페를 방문했어요!${bingoCount > 0 ? ` 🟢 ${bingoCount}빙고 달성!` : ''}`)
+    lines.push('', `👉 ${link}`)
+    const text = lines.join('\n')
     if (navigator.share) {
-      try { await navigator.share({ title: '호주가자 - 멜번 카페 빙고', text }) } catch {}
+      try { await navigator.share({ title, text }) } catch {}
     } else {
       await navigator.clipboard.writeText(text)
       alert('클립보드에 복사됐어요!')
