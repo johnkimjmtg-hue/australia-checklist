@@ -280,6 +280,9 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
+  const [showIntro, setShowIntro] = useState(() => {
+    return !localStorage.getItem('bingo-mel-intro-seen')
+  })
   const [orderMelbourne, setOrderMelbourne] = useState<number[]>(() => {
     try { return JSON.parse(localStorage.getItem('bingo-order-melbourne') ?? '[]') }
     catch { return [] }
@@ -411,6 +414,11 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       await navigator.clipboard.writeText(text)
       alert('클립보드에 복사됐어요!')
     }
+  }
+
+  const handleCloseIntro = () => {
+    localStorage.setItem('bingo-mel-intro-seen', '1')
+    setShowIntro(false)
   }
 
   const handleLogoTap = () => {
@@ -720,6 +728,59 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             </button>
           </div>
         </div>
+      )}
+
+      {/* ── 인트로 팝업 */}
+      {showIntro && city === 'melbourne' && (
+        <>
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:800, animation:'fadeIn 0.3s ease' }}
+            onClick={handleCloseIntro} />
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            zIndex:801, width:'calc(100% - 32px)', maxWidth:360,
+            background:'#0F172A', borderRadius:20,
+            overflow:'hidden',
+            boxShadow:'0 24px 48px rgba(0,0,0,0.4)',
+            animation:'scaleIn 0.25s ease',
+          }}>
+            {/* 표지 이미지 */}
+            <img src="/mel_coffee/mel.jpg" alt="멜번 판테온"
+              style={{ width:'100%', aspectRatio:'1', objectFit:'cover', display:'block' }} />
+            {/* 텍스트 */}
+            <div style={{ padding:'20px 20px 24px' }}>
+              <div style={{ fontSize:13, fontWeight:800, color:'#FFB800', letterSpacing:1, marginBottom:8 }}>
+                멜번 판테온: 창조의 연대기
+              </div>
+              <div style={{ fontSize:13, color:'#CBD5E1', lineHeight:1.7, marginBottom:16 }}>
+                태초의 정적을 깨고, 멜번을 완성할 <span style={{ color:'#FFB800', fontWeight:700 }}>'카페의 신'</span>이 바로 당신입니까?
+                25개의 성소(카페)에 봉인된 창조신들이 당신의 방문을 기다리고 있습니다.
+              </div>
+              <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:16 }}>
+                {[
+                  { icon:'ph:map-pin', text:'성소를 찾으세요: 지도에 표시된 25곳의 카페로 향하십시오.' },
+                  { icon:'ph:lock-open', text:'봉인을 푸세요: 커피를 즐긴 후 빙고 칸을 터치해 신들을 깨우십시오.' },
+                  { icon:'ph:crown', text:'세계를 완성하세요: 모든 신을 깨우는 순간, 당신은 멜번을 지배하는 궁극의 바리스타로 등극합니다.' },
+                ].map((item, i) => (
+                  <div key={i} style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
+                    <Icon icon={item.icon} width={14} height={14} color="#FFB800" style={{ marginTop:2, flexShrink:0 }} />
+                    <span style={{ fontSize:11, color:'#94A3B8', lineHeight:1.6 }}>{item.text}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ fontSize:12, color:'#64748B', fontStyle:'italic', textAlign:'center', marginBottom:16 }}>
+                "지금 첫 번째 원두의 향기를 따라 여정을 시작하십시오!"
+              </div>
+              <button onClick={handleCloseIntro} style={{
+                width:'100%', height:50, borderRadius:12, border:'none',
+                background:'linear-gradient(135deg, #FFB800, #FF8C00)',
+                color:'#0F172A', fontSize:15, fontWeight:800, cursor:'pointer',
+                boxShadow:'0 4px 16px rgba(255,184,0,0.4)',
+              }}>
+                ☕ 여정을 시작합니다
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* ── 전체 완료 모달 */}
