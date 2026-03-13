@@ -280,7 +280,12 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
-  const [showIntro, setShowIntro] = useState(true)
+  const [showIntro, setShowIntro] = useState(() => {
+    try {
+      const mel = JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')
+      return Array.isArray(mel) && mel.length === 0
+    } catch { return true }
+  })
   const [orderMelbourne, setOrderMelbourne] = useState<number[]>(() => {
     try { return JSON.parse(localStorage.getItem('bingo-order-melbourne') ?? '[]') }
     catch { return [] }
@@ -788,12 +793,11 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.60)', zIndex:700, animation:'fadeIn 0.2s ease' }}/>
           <div style={{
             position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-            background:'#fff', borderRadius:20, padding:'32px 24px 24px',
-            zIndex:701, width:'calc(100% - 48px)', maxWidth:320, textAlign:'center',
-            boxShadow:'0 20px 40px rgba(0,0,0,0.15)',
+            background:'#0F172A', borderRadius:20, padding:'32px 24px 24px',
+            zIndex:701, width:'calc(100% - 48px)', maxWidth:360, textAlign:'center',
+            boxShadow:'0 20px 60px rgba(0,0,0,0.5)',
             animation:'scaleIn 0.22s ease',
           }}>
-            <div style={{ fontSize:48, marginBottom:8 }}>🏆</div>
             <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', marginBottom:8 }}>멜번 카페 완전정복!</div>
             <div style={{ fontSize:13, color:'#64748B', marginBottom:4, lineHeight:1.6 }}>
               {PANTHEON_LORE[24]}
