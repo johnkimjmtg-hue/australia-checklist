@@ -390,16 +390,16 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         {/* 도시 선택 */}
         <div style={{ display:'flex', gap:8, marginBottom:10 }}>
           {([
-            { id:'melbourne', label:'🇦🇺 멜번' },
-            { id:'sydney',    label:'🌉 시드니' },
+            { id:'melbourne', label:'멜번' },
+            { id:'sydney',    label:'시드니' },
           ] as { id: 'melbourne'|'sydney'; label: string }[]).map(c => (
             <button key={c.id} onClick={() => { setCity(c.id); onCityChange?.(c.id) }} style={{
               flex:1, height:36, borderRadius:8, border:'none', cursor:'pointer',
               fontWeight: city===c.id ? 700 : 500,
               fontSize:13,
               color: city===c.id ? '#fff' : '#64748B',
-              background: city===c.id ? '#1B6EF3' : '#fff',
-              boxShadow: city===c.id ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 4px rgba(0,0,0,0.06)',
+              background: city===c.id ? '#6F4E37' : '#fff',
+              boxShadow: city===c.id ? '0 2px 8px rgba(111,78,55,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
               transition:'all 0.2s',
             }}>
               {c.label}
