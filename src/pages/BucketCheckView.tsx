@@ -391,6 +391,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
     <div ref={pageRef} style={{ minHeight:'100vh', background:'#F0F4F8', fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif', maxWidth:480, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         @keyframes confettiFall {
           0%   { transform:translateY(0) rotate(0deg); opacity:1; }
           100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
@@ -597,21 +598,30 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       )}
 
       {/* ── 관련업체 팝업 */}
-      {detailBizId && detailBiz && (
-        <>
+      {detailBizId && (
+        <div style={{ position:'fixed', inset:0, zIndex:800 }}>
           <div onClick={() => { setDetailBizId(null); setDetailBiz(null) }}
-            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:400 }}/>
+            style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:390, zIndex:401,
-            background:'#fff', borderRadius:'16px 16px 0 0',
-            padding:'16px 16px 32px',
-            boxShadow:'0 -4px 24px rgba(0,0,0,0.15)',
+            width:'100%', maxWidth:390, zIndex:801,
+            maxHeight:'85vh', overflowY:'auto',
+            borderRadius:'20px 20px 0 0',
+            background:'#F0F4F8',
+            padding:'12px 12px 32px',
+            boxSizing:'border-box',
+            animation:'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)',
           }}>
-            <div style={{ width:40,height:4,borderRadius:2,background:'#E2E8F0',margin:'0 auto 16px'}}/>
-            <BusinessCard business={detailBiz} />
+            <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:8 }}>
+              <button onClick={() => { setDetailBizId(null); setDetailBiz(null) }}
+                style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', color:'#94A3B8' }}>✕</button>
+            </div>
+            {detailBiz
+              ? <BusinessCard business={detailBiz} />
+              : <div style={{ textAlign:'center', padding:24, color:'#94A3B8', fontSize:14 }}>불러오는 중...</div>
+            }
           </div>
-        </>
+        </div>
       )}
     </div>
   )
