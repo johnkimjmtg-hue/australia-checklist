@@ -587,14 +587,14 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                     pointerEvents:'none',
                   }}>
                     <div style={{
-                      width:36, height:36,
-                      border:'3px solid rgba(27,110,243,0.7)',
+                      width:18, height:18,
+                      border:'2px solid rgba(255,255,255,0.9)',
                       borderRadius:'50%',
                       display:'flex', alignItems:'center', justifyContent:'center',
-                      background:'rgba(27,110,243,0.12)',
+                      background:'rgba(255,255,255,0.15)',
                       animation: isStamping ? 'stampIn 0.5s ease both' : 'none',
                     }}>
-                      <Icon icon="ph:check-bold" width={18} height={18} color="rgba(27,110,243,0.9)" />
+                      <Icon icon="ph:check-bold" width={10} height={10} color="rgba(255,255,255,1)" />
                     </div>
                   </div>
                 )}
