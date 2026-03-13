@@ -1,29 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import melImg1 from '../assets/mel_coffee/1.png'
-import melImg2 from '../assets/mel_coffee/2.png'
-import melImg3 from '../assets/mel_coffee/3.png'
-import melImg4 from '../assets/mel_coffee/4.png'
-import melImg5 from '../assets/mel_coffee/5.png'
-import melImg6 from '../assets/mel_coffee/6.png'
-import melImg7 from '../assets/mel_coffee/7.png'
-import melImg8 from '../assets/mel_coffee/8.png'
-import melImg9 from '../assets/mel_coffee/9.png'
-import melImg10 from '../assets/mel_coffee/10.png'
-import melImg11 from '../assets/mel_coffee/11.png'
-import melImg12 from '../assets/mel_coffee/12.png'
-import melImg13 from '../assets/mel_coffee/13.png'
-import melImg14 from '../assets/mel_coffee/14.png'
-import melImg15 from '../assets/mel_coffee/15.png'
-import melImg16 from '../assets/mel_coffee/16.png'
-import melImg17 from '../assets/mel_coffee/17.png'
-import melImg18 from '../assets/mel_coffee/18.png'
-import melImg19 from '../assets/mel_coffee/19.png'
-import melImg20 from '../assets/mel_coffee/20.png'
-import melImg21 from '../assets/mel_coffee/21.png'
-import melImg22 from '../assets/mel_coffee/22.png'
-import melImg23 from '../assets/mel_coffee/23.png'
-import melImg24 from '../assets/mel_coffee/24.png'
-import melImg25 from '../assets/mel_coffee/25.png'
 import { Icon } from '@iconify/react'
 
 
@@ -116,7 +91,7 @@ const PANTHEON_LORE: string[] = [
 ]
 
 // ── 멜번 판테온 이미지 (체크 시 표시)
-const MEL_IMGS = [melImg1, melImg2, melImg3, melImg4, melImg5, melImg6, melImg7, melImg8, melImg9, melImg10, melImg11, melImg12, melImg13, melImg14, melImg15, melImg16, melImg17, melImg18, melImg19, melImg20, melImg21, melImg22, melImg23, melImg24, melImg25]
+const MEL_IMGS = Array.from({ length: 25 }, (_, i) => `/mel_coffee/${i + 1}.png`)
 
 // ── 빙고 라인 체크 (5x5)
 function getBingoLines(checked: Set<number>): number[][] {
