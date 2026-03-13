@@ -313,6 +313,9 @@ export default function BingoPage({ onBack, embedded = false, initialCity }: Pro
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}>
             HOJUGAJA
           </span>
+          <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
+            {city === 'melbourne' ? '멜번' : '시드니'}
+          </span>
         </div>
         <div style={{ display:'flex', padding:'8px 8px 0', gap:2, overflowX:'auto', scrollbarWidth:'none' }}>
           {([
