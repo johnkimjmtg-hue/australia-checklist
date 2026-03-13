@@ -595,6 +595,24 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           onClose={() => setShowAllDone(false)}
         />
       )}
+
+      {/* ── 관련업체 팝업 */}
+      {detailBizId && detailBiz && (
+        <>
+          <div onClick={() => { setDetailBizId(null); setDetailBiz(null) }}
+            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:400 }}/>
+          <div style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:390, zIndex:401,
+            background:'#fff', borderRadius:'16px 16px 0 0',
+            padding:'16px 16px 32px',
+            boxShadow:'0 -4px 24px rgba(0,0,0,0.15)',
+          }}>
+            <div style={{ width:40,height:4,borderRadius:2,background:'#E2E8F0',margin:'0 auto 16px'}}/>
+            <BusinessCard biz={detailBiz} />
+          </div>
+        </>
+      )}
     </div>
   )
 }
