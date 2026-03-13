@@ -44,6 +44,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [issuedAt, setIssuedAt]       = useState('')
   const [shakeBtn, setShakeBtn]       = useState(false)
   const [customLabel, setCustomLabel] = useState('')
+  const [bingoCity, setBingoCity]     = useState<'melbourne'|'sydney'>('melbourne')
   const [mainTab, setMainTab]         = useState<MainTab>(
     searchParams.get('tab') === 'services' ? 'services' : 'bucketlist'
   )
@@ -385,7 +386,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
           <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
-            {mainTab === 'services' ? `${bizCount}개 업체` : mainTab === 'bucketlist' ? `${total}개 버킷리스트` : ''}
+            {mainTab === 'services' ? `${bizCount}개 업체` : mainTab === 'bucketlist' ? `${total}개 버킷리스트` : mainTab === 'bingo' ? (bingoCity === 'melbourne' ? '멜번' : '시드니') : ''}
           </span>
         </div>
         {/* 탭 */}
@@ -425,7 +426,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ fontSize:13, color:'#CBD5E1' }}>준비 중이에요 🛍</div>
         </div>
       ) : mainTab === 'bingo' ? (
-        <BingoPage embedded={true} />
+        <BingoPage embedded={true} initialCity={bingoCity} onCityChange={setBingoCity} />
       ) : mainTab === 'community' ? (
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'60vh', gap:12 }}>
           <Icon icon="ph:chats-circle" width={48} height={48} color="#CBD5E1" />

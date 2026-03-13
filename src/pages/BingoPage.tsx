@@ -190,10 +190,10 @@ function getStatusMsg(checked: number, bingo: number): { title: string; sub: str
   return { title: `${checked}개 카페 방문!`, sub: '멜번 카페 투어가 시작됐어요 ☕' }
 }
 
-type Props = { onBack?: () => void; embedded?: boolean; initialCity?: 'melbourne' | 'sydney' }
+type Props = { onBack?: () => void; embedded?: boolean; initialCity?: 'melbourne' | 'sydney'; onCityChange?: (city: 'melbourne'|'sydney') => void }
 export { Props as BingoProps }
 
-export default function BingoPage({ onBack, embedded = false, initialCity }: Props) {
+export default function BingoPage({ onBack, embedded = false, initialCity, onCityChange }: Props) {
   const [checked, setChecked] = useState<Set<number>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')) }
     catch { return new Set() }
