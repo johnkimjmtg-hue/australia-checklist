@@ -190,9 +190,10 @@ function getStatusMsg(checked: number, bingo: number): { title: string; sub: str
   return { title: `${checked}개 카페 방문!`, sub: '멜번 카페 투어가 시작됐어요 ☕' }
 }
 
-type Props = { onBack: () => void }
+type Props = { onBack?: () => void; embedded?: boolean }
+export { Props as BingoProps }
 
-export default function BingoPage({ onBack }: Props) {
+export default function BingoPage({ onBack, embedded = false }: Props) {
   const [checked, setChecked] = useState<Set<number>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')) }
     catch { return new Set() }
@@ -259,7 +260,7 @@ export default function BingoPage({ onBack }: Props) {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: embedded ? 'auto' : '100vh',
       background: '#F0F4F8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       display: 'flex', flexDirection: 'column',
@@ -296,7 +297,7 @@ export default function BingoPage({ onBack }: Props) {
       `}</style>
 
       {/* ── 헤더 */}
-      <div style={{ background:'#fff', flexShrink:0 }}>
+      {!embedded && <div style={{ background:'#fff', flexShrink:0 }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}>
@@ -328,7 +329,7 @@ export default function BingoPage({ onBack }: Props) {
             )
           })}
         </div>
-      </div>
+      </div>}
 
       {/* ── 상황판 */}
       <div style={{ position:'sticky', top:0, zIndex:30, background:'#F0F4F8', padding:'12px 16px 0' }}>
@@ -490,7 +491,7 @@ export default function BingoPage({ onBack }: Props) {
       </div>
 
       {/* ── 푸터 */}
-      <div style={{
+      {!embedded && <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430,
         padding:'18px 14px 28px',
@@ -517,7 +518,7 @@ export default function BingoPage({ onBack }: Props) {
         }}>
           <Icon icon="ph:arrow-counter-clockwise" width={20} height={20} color="#64748B" />
         </button>
-      </div>
+      </div>}
 
       {/* ── 더보기 바텀시트 */}
       {showMoreMenu && (

@@ -15,6 +15,7 @@ import {
 import ScheduleSheet from '../components/ScheduleSheet'
 import ReceiptModal from '../components/ReceiptModal'
 import Services from './Services'
+import BingoPage from './BingoPage'
 import BucketCheckView from './BucketCheckView'
 import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
@@ -424,11 +425,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ fontSize:13, color:'#CBD5E1' }}>준비 중이에요 🛍</div>
         </div>
       ) : mainTab === 'bingo' ? (
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'60vh', gap:12 }}>
-          <Icon icon="ph:coffee" width={48} height={48} color="#CBD5E1" />
-          <div style={{ fontSize:16, fontWeight:700, color:'#94A3B8' }}>카페 도장깨기</div>
-          <div style={{ fontSize:13, color:'#CBD5E1' }}>준비 중이에요 ☕</div>
-        </div>
+        <BingoPage embedded={true} />
       ) : mainTab === 'community' ? (
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'60vh', gap:12 }}>
           <Icon icon="ph:chats-circle" width={48} height={48} color="#CBD5E1" />
