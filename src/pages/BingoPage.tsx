@@ -790,33 +790,33 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       {showAllDone && (
         <>
           <div onClick={() => setShowAllDone(false)}
-            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.60)', zIndex:700, animation:'fadeIn 0.2s ease' }}/>
+            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:700, animation:'fadeIn 0.2s ease' }}/>
           <div style={{
             position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-            background:'#0F172A', borderRadius:20, padding:'32px 24px 24px',
-            zIndex:701, width:'calc(100% - 48px)', maxWidth:360, textAlign:'center',
+            background:'#0F172A', borderRadius:20, padding:'28px 20px 24px',
+            zIndex:701, width:'calc(100% - 32px)', maxWidth:360,
             boxShadow:'0 20px 60px rgba(0,0,0,0.5)',
-            animation:'scaleIn 0.22s ease',
+            animation:'scaleIn 0.22s ease', overflowY:'auto', maxHeight:'90vh',
           }}>
-            <div style={{ fontSize:15, fontWeight:800, color:'#FFB800', letterSpacing:1, marginBottom:10 }}>
+            <div style={{ fontSize:15, fontWeight:800, color:'#FFB800', letterSpacing:1, marginBottom:12, textAlign:'center' }}>
               🏆 멜번 판테온 완전정복!
             </div>
-            <div style={{ fontSize:12, color:'#CBD5E1', lineHeight:1.7, marginBottom:14 }}>
+            <div style={{ fontSize:12, color:'#CBD5E1', lineHeight:1.8, marginBottom:14, textAlign:'left' }}>
               마침내 25개의 성소를 모두 정복하고, 흩어져 있던 모든 신의 권능을 하나로 모았습니다. 차갑던 멜번의 거리는 당신이 뿜어내는 황금빛 커피 향기로 가득 찼으며, 잊혀진 판테온은 비로소 완전해졌습니다.
             </div>
-            <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:14 }}>
-              {[
+            <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:14 }}>
+              {([
                 { icon:'ph:seal-check', text:'증명된 자: 당신은 단순한 방문자를 넘어, 멜번의 서사를 완성한 유일한 창조자입니다.' },
                 { icon:'ph:scroll',     text:'불멸의 기록: 이제 당신의 이름은 멜번 커피 연대기에 영원히 기록될 것입니다.' },
                 { icon:'ph:crown',      text:"신의 권능: 모든 창조신이 당신 앞에 무릎을 꿇고, 당신을 최고의 '카페의 신(The Cafe God)'으로 추대합니다." },
-              ].map((item, i) => (
+              ] as {icon:string; text:string}[]).map((item, i) => (
                 <div key={i} style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
                   <Icon icon={item.icon} width={13} height={13} color="#FFB800" style={{ marginTop:2, flexShrink:0 }} />
                   <span style={{ fontSize:11, color:'#94A3B8', lineHeight:1.6, textAlign:'left' }}>{item.text}</span>
                 </div>
               ))}
             </div>
-            <div style={{ fontSize:11, color:'#64748B', fontStyle:'italic', textAlign:'center', marginBottom:16 }}>
+            <div style={{ fontSize:11, color:'#475569', fontStyle:'italic', textAlign:'center', marginBottom:18 }}>
               "당신이 창조한 이 세계는 영원히 당신의 전설을 노래할 것입니다!"
             </div>
             <div style={{ display:'flex', gap:8 }}>
@@ -829,6 +829,11 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                 background:'#DC2626', color:'#fff', fontWeight:700, fontSize:14, cursor:'pointer',
               }}>리셋하기</button>
             </div>
+          </div>
+        </>
+      )}
+
+      {/* ── 리셋 모달 */}
       {showReset && (
         <>
           <div onClick={() => setShowReset(false)}
