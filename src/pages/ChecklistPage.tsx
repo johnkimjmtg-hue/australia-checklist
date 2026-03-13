@@ -27,7 +27,7 @@ const CAT_ICON_MAP: Record<string,string> = {
 
 type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker'
-type MainTab = 'bucketlist' | 'services'
+type MainTab = 'bucketlist' | 'services' | 'shopping' | 'bingo' | 'community'
 
 export default function ChecklistPage({ state, setState, onLanding }: Props & { onLanding?: () => void }) {
   const [searchParams] = useSearchParams()
@@ -384,28 +384,57 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
           <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
-            {mainTab === 'services' ? `${bizCount}개 업체` : `${total}개 버킷리스트`}
+            {mainTab === 'services' ? `${bizCount}개 업체` : mainTab === 'bucketlist' ? `${total}개 버킷리스트` : ''}
           </span>
         </div>
         {/* 탭 */}
-        <div style={{ display:'flex', padding:'8px 20px 0', gap:4 }}>
-          {(['bucketlist','services'] as MainTab[]).map(tab => (
-            <button key={tab} className="tab-btn" onClick={() => setMainTab(tab)} style={{
-              flex:1, height:38, border:'none', cursor:'pointer',
-              borderRadius:'6px 6px 0 0',
-              fontSize:14, fontWeight: mainTab===tab ? 700 : 500,
-              color: mainTab===tab ? '#fff' : '#94A3B8',
-              background: mainTab===tab ? '#1B6EF3' : 'transparent',
-              borderBottom: mainTab===tab ? '2px solid #1B6EF3' : '2px solid transparent',
-            }}>
-              {tab==='bucketlist' ? '버킷리스트' : '업체/서비스 찾기'}
-            </button>
-          ))}
+        <div style={{ display:'flex', padding:'8px 8px 0', gap:2, overflowX:'auto', scrollbarWidth:'none' }}>
+          {([
+            { id:'bucketlist', icon:'ph:check-circle',  label:'버킷리스트' },
+            { id:'services',   icon:'ph:buildings',     label:'업체/서비스' },
+            { id:'shopping',   icon:'ph:shopping-bag',  label:'필수쇼핑' },
+            { id:'bingo',      icon:'ph:coffee',        label:'도장깨기' },
+            { id:'community',  icon:'ph:chats-circle',  label:'커뮤니티' },
+          ] as { id: MainTab; icon: string; label: string }[]).map(tab => {
+            const active = mainTab === tab.id
+            return (
+              <button key={tab.id} onClick={() => setMainTab(tab.id)} style={{
+                flex:1, minWidth:0, height:48, border:'none', cursor:'pointer',
+                borderRadius:'6px 6px 0 0',
+                display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2,
+                background: active ? '#1B6EF3' : 'transparent',
+                borderBottom: active ? '2px solid #1B6EF3' : '2px solid transparent',
+              }}>
+                <Icon icon={tab.icon} width={16} height={16} color={active ? '#fff' : '#94A3B8'} />
+                <span style={{ fontSize:10, fontWeight: active ? 700 : 500, color: active ? '#fff' : '#94A3B8', whiteSpace:'nowrap' }}>
+                  {tab.label}
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
       {mainTab === 'services' ? (
         <Services onSelectBusiness={() => {}} onBack={() => setMainTab('bucketlist')} />
+      ) : mainTab === 'shopping' ? (
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'60vh', gap:12 }}>
+          <Icon icon="ph:shopping-bag" width={48} height={48} color="#CBD5E1" />
+          <div style={{ fontSize:16, fontWeight:700, color:'#94A3B8' }}>필수 쇼핑 추천</div>
+          <div style={{ fontSize:13, color:'#CBD5E1' }}>준비 중이에요 🛍</div>
+        </div>
+      ) : mainTab === 'bingo' ? (
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'60vh', gap:12 }}>
+          <Icon icon="ph:coffee" width={48} height={48} color="#CBD5E1" />
+          <div style={{ fontSize:16, fontWeight:700, color:'#94A3B8' }}>카페 도장깨기</div>
+          <div style={{ fontSize:13, color:'#CBD5E1' }}>준비 중이에요 ☕</div>
+        </div>
+      ) : mainTab === 'community' ? (
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'60vh', gap:12 }}>
+          <Icon icon="ph:chats-circle" width={48} height={48} color="#CBD5E1" />
+          <div style={{ fontSize:16, fontWeight:700, color:'#94A3B8' }}>커뮤니티</div>
+          <div style={{ fontSize:13, color:'#CBD5E1' }}>준비 중이에요 💬</div>
+        </div>
       ) : (
         <>
           {/* ── SUB HEADER (버튼들) — 스크롤 시 사라짐 ── */}
@@ -616,7 +645,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                             {db?.description && (
                               <span style={{
                                 fontSize:11, color:'#94A3B8', fontWeight:400,
-                                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+                                overflow:'hidden', textOverflow:'ellipsis',
+                                display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
                               }}>{db.description}</span>
                             )}
                             {((db?.related_business_ids?.length ?? 0) > 0 || db?.related_business_id) && (
