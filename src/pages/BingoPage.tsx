@@ -243,7 +243,7 @@ function Fireworks() {
 // ── 상황 메시지
 function getStatusMsg(checked: number, bingo: number): { title: string; sub: string } {
   if (checked === 0)  return { title: '카페 도장깨기 시작!', sub: '카페를 방문하면 해당 칸을 눌러보세요 ☕' }
-  if (checked === 25) return { title: '🏆 완전정복! 대단해요!', sub: '카페 25곳을 모두 정복했어요!' }
+  if (checked === 25) return { title: '🏆 판테온 완전정복!', sub: '당신은 멜번을 지배하는 궁극의 카페의 신입니다!' }
   if (bingo >= 5)     return { title: `🎉 ${bingo}빙고 달성!`, sub: `${checked}개 카페를 방문했어요. 거의 다 왔어요!` }
   if (bingo >= 3)     return { title: `✨ ${bingo}빙고 달성!`, sub: `${checked}개 카페 완료! 계속 도전해봐요` }
   if (bingo >= 1)     return { title: `🎯 ${bingo}빙고 달성!`, sub: `와우! ${checked}개 카페를 깨셨어요` }
@@ -798,28 +798,37 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             boxShadow:'0 20px 60px rgba(0,0,0,0.5)',
             animation:'scaleIn 0.22s ease',
           }}>
-            <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', marginBottom:8 }}>멜번 카페 완전정복!</div>
-            <div style={{ fontSize:13, color:'#64748B', marginBottom:4, lineHeight:1.6 }}>
-              {PANTHEON_LORE[24]}
+            <div style={{ fontSize:15, fontWeight:800, color:'#FFB800', letterSpacing:1, marginBottom:10 }}>
+              🏆 멜번 판테온 완전정복!
             </div>
-            <div style={{ fontSize:13, color:'#64748B', marginBottom:24, lineHeight:1.6 }}>
-              25개 카페를 모두 방문했어요! 🎉
+            <div style={{ fontSize:12, color:'#CBD5E1', lineHeight:1.7, marginBottom:14 }}>
+              마침내 25개의 성소를 모두 정복하고, 흩어져 있던 모든 신의 권능을 하나로 모았습니다. 차갑던 멜번의 거리는 당신이 뿜어내는 황금빛 커피 향기로 가득 찼으며, 잊혀진 판테온은 비로소 완전해졌습니다.
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:14 }}>
+              {[
+                { icon:'ph:seal-check', text:'증명된 자: 당신은 단순한 방문자를 넘어, 멜번의 서사를 완성한 유일한 창조자입니다.' },
+                { icon:'ph:scroll',     text:'불멸의 기록: 이제 당신의 이름은 멜번 커피 연대기에 영원히 기록될 것입니다.' },
+                { icon:'ph:crown',      text:"신의 권능: 모든 창조신이 당신 앞에 무릎을 꿇고, 당신을 최고의 '카페의 신(The Cafe God)'으로 추대합니다." },
+              ].map((item, i) => (
+                <div key={i} style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
+                  <Icon icon={item.icon} width={13} height={13} color="#FFB800" style={{ marginTop:2, flexShrink:0 }} />
+                  <span style={{ fontSize:11, color:'#94A3B8', lineHeight:1.6, textAlign:'left' }}>{item.text}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize:11, color:'#64748B', fontStyle:'italic', textAlign:'center', marginBottom:16 }}>
+              "당신이 창조한 이 세계는 영원히 당신의 전설을 노래할 것입니다!"
             </div>
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={() => setShowAllDone(false)} style={{
-                flex:1, height:48, border:'1px solid #E2E8F0', borderRadius:10,
-                background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer',
-              }}>닫기</button>
+                flex:1, height:48, border:'1px solid #475569', borderRadius:10,
+                background:'transparent', color:'#94A3B8', fontWeight:600, fontSize:13, cursor:'pointer',
+              }}>취소</button>
               <button onClick={() => { setChecked(new Set()); setCheckOrder([]); setShowAllDone(false) }} style={{
                 flex:2, height:48, border:'none', borderRadius:10,
                 background:'#DC2626', color:'#fff', fontWeight:700, fontSize:14, cursor:'pointer',
               }}>리셋하기</button>
             </div>
-          </div>
-        </>
-      )}
-
-      {/* ── 리셋 모달 */}
       {showReset && (
         <>
           <div onClick={() => setShowReset(false)}
