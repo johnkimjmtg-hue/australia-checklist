@@ -296,6 +296,16 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const bingoCount = completedLines.length
   const isAllDone = checked.size === 25
 
+  // checkOrder 싱크 보정 — checked에 있는데 order에 없으면 뒤에 추가
+  useEffect(() => {
+    const missing = [...checkedMelbourne].filter(i => !orderMelbourne.includes(i))
+    if (missing.length > 0) setOrderMelbourne(prev => [...prev, ...missing])
+  }, [])
+  useEffect(() => {
+    const missing = [...checkedSydney].filter(i => !orderSydney.includes(i))
+    if (missing.length > 0) setOrderSydney(prev => [...prev, ...missing])
+  }, [])
+
   // 이미지 preload — 마운트 시 백그라운드에서 미리 다운로드
   useEffect(() => {
     MEL_IMGS.forEach(src => {
@@ -466,8 +476,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               fontWeight: city===c.id ? 700 : 500,
               fontSize:13,
               color: city===c.id ? '#fff' : '#64748B',
-              background: city===c.id ? '#6F4E37' : '#fff',
-              boxShadow: city===c.id ? '0 2px 8px rgba(111,78,55,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
+              background: city===c.id ? '#475569' : '#fff',
+              boxShadow: city===c.id ? '0 2px 8px rgba(71,85,105,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
               transition:'all 0.2s',
             }}>
               {c.label}
@@ -628,7 +638,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         width:'100%', maxWidth:430,
         padding:'18px 14px 28px',
         background:'#fff',
-        zIndex:20, boxSizing:'border-box',
+        zIndex:650, boxSizing:'border-box',
         display:'flex', gap:8,
         borderTop:'1px solid #E2E8F0',
       }}>
