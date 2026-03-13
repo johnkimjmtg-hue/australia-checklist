@@ -278,12 +278,16 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [orderMelbourne, setOrderMelbourne] = useState<number[]>(() => {
-    try { return JSON.parse(localStorage.getItem('bingo-order-melbourne') ?? '[]') }
-    catch { return [] }
+    try {
+      const v = JSON.parse(localStorage.getItem('bingo-order-melbourne') ?? '[]')
+      return Array.isArray(v) ? v : []
+    } catch { return [] }
   })
   const [orderSydney, setOrderSydney] = useState<number[]>(() => {
-    try { return JSON.parse(localStorage.getItem('bingo-order-sydney') ?? '[]') }
-    catch { return [] }
+    try {
+      const v = JSON.parse(localStorage.getItem('bingo-order-sydney') ?? '[]')
+      return Array.isArray(v) ? v : []
+    } catch { return [] }
   })
   const checkOrder    = city === 'melbourne' ? orderMelbourne : orderSydney
   const setCheckOrder = (val: number[]) => {
@@ -295,6 +299,16 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
   const isAllDone = checked.size === 25
+
+  // checkOrder 싱크 보정 — checked에 있는데 order에 없으면 뒤에 추가
+  useEffect(() => {
+    const missing = [...checkedMelbourne].filter(i => !orderMelbourne.includes(i))
+    if (missing.length > 0) setOrderMelbourne(prev => [...prev, ...missing])
+  }, [])
+  useEffect(() => {
+    const missing = [...checkedSydney].filter(i => !orderSydney.includes(i))
+    if (missing.length > 0) setOrderSydney(prev => [...prev, ...missing])
+  }, [])
 
   // 이미지 preload — 마운트 시 백그라운드에서 미리 다운로드
   useEffect(() => {
@@ -458,16 +472,16 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         {/* 도시 선택 */}
         <div style={{ display:'flex', gap:8, marginBottom:10 }}>
           {([
-            { id:'melbourne', label:'멜번' },
-            { id:'sydney',    label:'시드니' },
+            { id:'melbourne', label:'멜번 빙고' },
+            { id:'sydney',    label:'시드니 빙고' },
           ] as { id: 'melbourne'|'sydney'; label: string }[]).map(c => (
             <button key={c.id} onClick={() => { setCity(c.id); onCityChange?.(c.id) }} style={{
               flex:1, height:36, borderRadius:8, border:'none', cursor:'pointer',
               fontWeight: city===c.id ? 700 : 500,
               fontSize:13,
               color: city===c.id ? '#fff' : '#64748B',
-              background: city===c.id ? '#6F4E37' : '#fff',
-              boxShadow: city===c.id ? '0 2px 8px rgba(111,78,55,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
+              background: city===c.id ? '#475569' : '#fff',
+              boxShadow: city===c.id ? '0 2px 8px rgba(71,85,105,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
               transition:'all 0.2s',
             }}>
               {c.label}
@@ -628,7 +642,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         width:'100%', maxWidth:430,
         padding:'18px 14px 28px',
         background:'#fff',
-        zIndex:20, boxSizing:'border-box',
+        zIndex:10000, boxSizing:'border-box',
         display:'flex', gap:8,
         borderTop:'1px solid #E2E8F0',
       }}>
