@@ -491,7 +491,7 @@ export default function BingoPage({ onBack, embedded = false }: Props) {
       </div>
 
       {/* ── 푸터 */}
-      {!embedded && <div style={{
+      <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430,
         padding:'18px 14px 28px',
@@ -516,9 +516,9 @@ export default function BingoPage({ onBack, embedded = false }: Props) {
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
           boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
         }}>
-          <Icon icon="ph:arrow-counter-clockwise" width={20} height={20} color="#64748B" />
+          <Icon icon="ph:dots-three-vertical" width={20} height={20} color="#64748B" />
         </button>
-      </div>}
+      </div>
 
       {/* ── 더보기 바텀시트 */}
       {showMoreMenu && (
