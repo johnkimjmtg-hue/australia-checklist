@@ -317,6 +317,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           trip={trip}
           setState={setState}
           items={ITEMS}
+          dbItems={dbItems}
           onAchievedChange={setAchieved}
           onEdit={() => {
             setShowReceipt(false)

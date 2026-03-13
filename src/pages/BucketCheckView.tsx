@@ -1,8 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { CheckItem, ITEM_ICONS } from '../data/checklist'
+import { supabase } from '../lib/supabase'
+
+type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null }
 import { AppState, TripInfo, getTripDays, fmtMD, dow } from '../store/state'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
+import BusinessCard from '../components/BusinessCard'
+import type { Business } from '../lib/businessService'
 
 type Filter = 'all' | 'done' | 'todo'
 type Props = {
@@ -10,6 +15,7 @@ type Props = {
   trip:       TripInfo
   setState:   (s: AppState) => void
   items:      CheckItem[]
+  dbItems:    DBItem[]
   onAchievedChange?: (achieved: Record<string,boolean>) => void
   onEdit:     () => void
   onDelete:   () => void
@@ -159,7 +165,7 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=
 }
 
 /* ══ 메인 ══ */
-export default function BucketCheckView({ state, trip, setState, items, onAchievedChange, onEdit, onDelete, onShare, onServices, onLanding }: Props) {
+export default function BucketCheckView({ state, trip, setState, items, dbItems, onAchievedChange, onEdit, onDelete, onShare, onServices, onLanding }: Props) {
   const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
@@ -301,12 +307,15 @@ export default function BucketCheckView({ state, trip, setState, items, onAchiev
   ]
 
   /* ══ 체크 행 ══ */
+  const [detailBizId, setDetailBizId] = useState<string|null>(null)
+  const [detailBiz, setDetailBiz] = useState<any>(null)
+
   const CheckRow = ({ item, day }: { item: typeof checkedItems[0]; day?: number }) => {
     const key = day !== undefined ? `${item.id}_${day}` : item.id
     const isAchieved = !!achieved[key]
     return (
       <div style={{
-        display:'flex',alignItems:'center',gap:12,
+        display:'flex',alignItems:'flex-start',gap:12,
         padding:'12px 16px',margin:'0 16px',borderRadius:12,
         background: isAchieved ? '#fff8e4' : '#fff',
         border:'1px solid #E2E8F0',
@@ -328,7 +337,49 @@ export default function BucketCheckView({ state, trip, setState, items, onAchiev
           )}
         </div>
         <ItemIcon itemId={item.id} categoryId={(item as any).categoryId ?? 'custom'} color={isAchieved ? '#78716C' : '#94A3B8'} />
-        <span style={{ flex:1,fontSize:15,lineHeight:1.4,fontWeight:isAchieved?600:400,color:'#1E293B' }}>{item.label}</span>
+        <div style={{ flex:1, display:'flex', flexDirection:'column', gap:2, minWidth:0 }}>
+          <span style={{ fontSize:15,lineHeight:1.4,fontWeight:isAchieved?600:400,color:'#1E293B' }}>{item.label}</span>
+          {(() => {
+            const db = dbItems.find(d => d.id === item.id)
+            return (
+              <>
+                {db?.address && (
+                  <span onClick={e => { e.stopPropagation(); window.open(`https://maps.google.com/?q=${encodeURIComponent(db.address!)}`, '_blank') }}
+                    style={{ fontSize:11, color:'#1B6EF3', fontWeight:500, cursor:'pointer', textDecoration:'underline', textDecorationColor:'rgba(27,110,243,0.3)' }}>
+                    📍 {db.address}
+                  </span>
+                )}
+                {db?.description && (
+                  <span style={{ fontSize:11, color:'#94A3B8', fontWeight:400, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                    {db.description}
+                  </span>
+                )}
+                {((db?.related_business_ids?.length ?? 0) > 0 || db?.related_business_id) && (
+                  <div style={{ display:'flex', gap:4, flexWrap:'wrap', marginTop:2 }}>
+                    {(db?.related_business_ids?.length ? db.related_business_ids : db?.related_business_id ? [db.related_business_id] : []).map(bizId => (
+                      <button key={bizId}
+                        onClick={async e => {
+                          e.stopPropagation()
+                          setDetailBizId(bizId)
+                          const { data } = await supabase.from('businesses').select('*').eq('id', bizId).single()
+                          if (data) setDetailBiz(data)
+                        }}
+                        style={{
+                          display:'flex', alignItems:'center', gap:3,
+                          fontSize:10, fontWeight:700, color:'#1B6EF3',
+                          background:'rgba(27,110,243,0.08)', border:'none',
+                          borderRadius:4, padding:'2px 7px', cursor:'pointer',
+                        }}>
+                        <Icon icon="ph:buildings" width={11} height={11} color="#1B6EF3" />
+                        관련업체
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            )
+          })()}
+        </div>
         {isAchieved && (
           <span style={{ fontSize:11,fontWeight:600,color:'#44403C',background:'rgba(68,64,60,0.10)',padding:'3px 8px',borderRadius:4,flexShrink:0 }}>완료 ✓</span>
         )}
