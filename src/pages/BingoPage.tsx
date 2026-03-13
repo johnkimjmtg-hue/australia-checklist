@@ -527,7 +527,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
           <MiniGrid count={checked.size} />
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ fontSize:10, fontWeight:700, color:'#6F4E37', letterSpacing:1, marginBottom:2 }}>
-              멜버른 판테온: 창조의 연대기
+              멜번 판테온: 창조의 연대기
             </div>
             <div style={{ fontSize:15, fontWeight:800, color:'#1E293B', marginBottom:3, lineHeight:1.3 }}>
               {getStatusMsg(checked.size, bingoCount).title}
