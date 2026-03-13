@@ -279,6 +279,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const [stampAnim, setStampAnim] = useState<number|null>(null)
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [showAllDone, setShowAllDone] = useState(false)
   const [orderMelbourne, setOrderMelbourne] = useState<number[]>(() => {
     try { return JSON.parse(localStorage.getItem('bingo-order-melbourne') ?? '[]') }
     catch { return [] }
@@ -325,6 +326,11 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
     })
   }, [])
 
+  // 전체 완료 감지
+  useEffect(() => {
+    if (isAllDone) setShowAllDone(true)
+  }, [isAllDone])
+
   // 빙고 달성 감지 — 줄 하나 완성할 때마다 폭죽
   useEffect(() => {
     if (bingoCount > prevBingoCount) {
@@ -350,22 +356,40 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   }, [orderSydney])
 
   const handleCell = (idx: number) => {
-    if (!checked.has(idx)) {
+    const isChecked = checked.has(idx)
+    if (!isChecked) {
       setLastCheckedIdx(idx)
-      setCheckOrder([...checkOrder, idx])
+      if (city === 'melbourne') setOrderMelbourne(prev => prev.includes(idx) ? prev : [...prev, idx])
+      else setOrderSydney(prev => prev.includes(idx) ? prev : [...prev, idx])
     } else {
-      setCheckOrder(checkOrder.filter(i => i !== idx))
+      if (city === 'melbourne') setOrderMelbourne(prev => prev.filter(i => i !== idx))
+      else setOrderSydney(prev => prev.filter(i => i !== idx))
     }
-    const next = new Set(checked)
-    if (next.has(idx)) {
-      next.delete(idx)
+    if (city === 'melbourne') {
+      setCheckedMelbourne(prev => {
+        const next = new Set(prev)
+        if (next.has(idx)) { next.delete(idx) }
+        else {
+          next.add(idx)
+          setStampAnim(idx)
+          setTimeout(() => setStampAnim(null), 600)
+          setConfettiTrigger(v => v+1)
+        }
+        return next
+      })
     } else {
-      next.add(idx)
-      setStampAnim(idx)
-      setTimeout(() => setStampAnim(null), 600)
-      setConfettiTrigger(v => v+1)
+      setCheckedSydney(prev => {
+        const next = new Set(prev)
+        if (next.has(idx)) { next.delete(idx) }
+        else {
+          next.add(idx)
+          setStampAnim(idx)
+          setTimeout(() => setStampAnim(null), 600)
+          setConfettiTrigger(v => v+1)
+        }
+        return next
+      })
     }
-    setChecked(next)
   }
 
   const handleShare = async () => {
@@ -509,7 +533,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               {getStatusMsg(checked.size, bingoCount).title}
             </div>
             <div style={{ fontSize:11, color:'#64748B', fontWeight:500, marginBottom:8, lineHeight:1.5 }}>
-              {lastCheckedIdx !== null && checked.has(lastCheckedIdx) && checkOrder.indexOf(lastCheckedIdx) >= 0
+              {lastCheckedIdx !== null && checkOrder.includes(lastCheckedIdx)
                 ? PANTHEON_LORE[checkOrder.indexOf(lastCheckedIdx)]
                 : getStatusMsg(checked.size, bingoCount).sub}
             </div>
@@ -629,32 +653,21 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
           })}
         </div>
 
-        {/* 전체 완료 메시지 */}
-        {isAllDone && (
-          <div style={{
-            marginTop:16, padding:'16px', borderRadius:12,
-            background:'linear-gradient(135deg, #1B6EF3, #0ea5e9)',
-            textAlign:'center', animation:'fadeIn 0.5s ease',
-          }}>
-            <div style={{ fontSize:24, marginBottom:4 }}>🏆</div>
-            <div style={{ fontSize:15, fontWeight:800, color:'#fff' }}>멜번 카페 완전정복!</div>
-            <div style={{ fontSize:12, color:'rgba(255,255,255,0.8)', marginTop:4 }}>25개 카페를 모두 방문했어요!</div>
-          </div>
-        )}
+
       </div>
 
       {/* ── 푸터 */}
       <div style={{
         position:'fixed', bottom:0,
         left:'50%', transform:'translateX(-50%)',
-        width: footerWidth ?? '100%',
+        width:'min(100%, 430px)',
         padding:'18px 14px 28px',
         background:'#fff',
         zIndex:50, boxSizing:'border-box',
         display:'flex', gap:8,
         borderTop:'1px solid #E2E8F0',
       }}>
-        <button onClick={onBack} style={{
+        <button onClick={() => onBack?.()} style={{
           flex:1, height:54, borderRadius:8, border:'none',
           background:'#1B6EF3', color:'#fff',
           fontSize:15, fontWeight:700, cursor:'pointer',
@@ -707,6 +720,40 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             </button>
           </div>
         </div>
+      )}
+
+      {/* ── 전체 완료 모달 */}
+      {showAllDone && (
+        <>
+          <div onClick={() => setShowAllDone(false)}
+            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.60)', zIndex:700, animation:'fadeIn 0.2s ease' }}/>
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            background:'#fff', borderRadius:20, padding:'32px 24px 24px',
+            zIndex:701, width:'calc(100% - 48px)', maxWidth:320, textAlign:'center',
+            boxShadow:'0 20px 40px rgba(0,0,0,0.15)',
+            animation:'scaleIn 0.22s ease',
+          }}>
+            <div style={{ fontSize:48, marginBottom:8 }}>🏆</div>
+            <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', marginBottom:8 }}>멜번 카페 완전정복!</div>
+            <div style={{ fontSize:13, color:'#64748B', marginBottom:4, lineHeight:1.6 }}>
+              {PANTHEON_LORE[24]}
+            </div>
+            <div style={{ fontSize:13, color:'#64748B', marginBottom:24, lineHeight:1.6 }}>
+              25개 카페를 모두 방문했어요! 🎉
+            </div>
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={() => setShowAllDone(false)} style={{
+                flex:1, height:48, border:'1px solid #E2E8F0', borderRadius:10,
+                background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer',
+              }}>닫기</button>
+              <button onClick={() => { setShowAllDone(false); setShowReset(true) }} style={{
+                flex:2, height:48, border:'none', borderRadius:10,
+                background:'#DC2626', color:'#fff', fontWeight:700, fontSize:14, cursor:'pointer',
+              }}>리셋하기</button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* ── 리셋 모달 */}
