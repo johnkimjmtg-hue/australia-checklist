@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
 
+
 // ── 멜번 카페 25개 플레이스홀더 데이터
 const MELBOURNE_CAFES = [
   { id: 1,  name: 'Proud Mary',         img: '' },
@@ -90,9 +91,7 @@ const PANTHEON_LORE: string[] = [
 ]
 
 // ── 멜번 판테온 이미지 (체크 시 표시)
-const MEL_IMGS = Array.from({ length: 25 }, (_, i) =>
-  new URL(`../assets/mel_coffee/${i + 1}.png`, import.meta.url).href
-)
+const MEL_IMGS = Array.from({ length: 25 }, (_, i) => `/mel_coffee/${i + 1}.png`)
 
 // ── 빙고 라인 체크 (5x5)
 function getBingoLines(checked: Set<number>): number[][] {
@@ -488,13 +487,11 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             {/* 빙고 뱃지 */}
             <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
               {bingoCount > 0
-                ? Array.from({ length: bingoCount }).map((_, i) => (
-                    <span key={i} style={{
-                      fontSize:10, fontWeight:800, color:'#fff',
-                      background:'#16A34A', borderRadius:5, padding:'2px 8px',
-                      animation:'bingoFlash 1.5s ease infinite',
-                    }}>BINGO {i+1}</span>
-                  ))
+                ? <span style={{
+                    fontSize:10, fontWeight:800, color:'#fff',
+                    background:'#16A34A', borderRadius:5, padding:'2px 8px',
+                    animation:'bingoFlash 1.5s ease infinite',
+                  }}>{bingoCount} {bingoCount === 1 ? 'BINGO' : 'BINGOS'}</span>
                 : <span style={{ fontSize:11, color:'#CBD5E1', fontWeight:500 }}>빙고 도전 중...</span>
               }
             </div>
