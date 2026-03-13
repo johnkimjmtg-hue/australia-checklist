@@ -257,6 +257,8 @@ type Props = { onBack?: () => void; embedded?: boolean; initialCity?: 'melbourne
 export { Props as BingoProps }
 
 export default function BingoPage({ onBack, embedded = false, initialCity, onCityChange }: Props) {
+  const pageRef = useRef<HTMLDivElement>(null)
+  const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
   const [city, setCity] = useState<'melbourne'|'sydney'>(initialCity ?? 'melbourne')
   const [checkedMelbourne, setCheckedMelbourne] = useState<Set<number>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')) }
@@ -295,6 +297,15 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
   const isAllDone = checked.size === 25
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
+    }
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [])
 
   // checkOrder 싱크 보정 — checked에 있는데 order에 없으면 뒤에 추가
   useEffect(() => {
@@ -388,7 +399,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const cafe = city === 'melbourne' ? MELBOURNE_CAFES : SYDNEY_CAFES
 
   return (
-    <div style={{
+    <div ref={pageRef} style={{
       minHeight: embedded ? 'auto' : '100vh',
       background: '#F0F4F8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
@@ -523,7 +534,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       </div>
 
       {/* ── 5x5 빙고판 */}
-      <div style={{ flex:1, padding:'8px 12px 16px', overflowY:'auto' }}>
+      <div style={{ flex:1, padding:'8px 12px 120px', overflowY:'auto' }}>
         <div style={{
           display:'grid', gridTemplateColumns:'repeat(5, 1fr)',
           gap:6,
@@ -634,14 +645,14 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
 
       {/* ── 푸터 */}
       <div style={{
-        position:'sticky', bottom:0,
-        width:'100%',
+        position:'fixed', bottom:0,
+        left:'50%', transform:'translateX(-50%)',
+        width: footerWidth ?? '100%',
         padding:'18px 14px 28px',
         background:'#fff',
         zIndex:50, boxSizing:'border-box',
         display:'flex', gap:8,
         borderTop:'1px solid #E2E8F0',
-        flexShrink:0,
       }}>
         <button onClick={onBack} style={{
           flex:1, height:54, borderRadius:8, border:'none',
@@ -671,11 +682,10 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
           display:'flex', alignItems:'flex-end', justifyContent:'center',
         }} onClick={() => setShowMoreMenu(false)}>
           <div style={{
-            width:'100%', maxWidth:430,
+            width:'100%', maxWidth:390,
             background:'#fff', borderRadius:'20px 20px 0 0',
             padding:'20px 16px 36px',
             boxShadow:'0 -4px 24px rgba(0,0,0,0.15)',
-            animation:'slideUp 0.25s ease',
           }} onClick={e => e.stopPropagation()}>
             <div style={{ width:40, height:4, borderRadius:2, background:'#E2E8F0', margin:'0 auto 20px' }}/>
             <div style={{ fontSize:13, fontWeight:800, color:'#94A3B8', marginBottom:14, letterSpacing:0.5 }}>더보기</div>
