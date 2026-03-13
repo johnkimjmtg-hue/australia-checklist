@@ -30,6 +30,35 @@ const MELBOURNE_CAFES = [
   { id: 25, name: 'Fitzrovia',          img: '' },
 ]
 
+// ── 시드니 카페 25개 플레이스홀더 데이터
+const SYDNEY_CAFES = [
+  { id: 1,  name: 'Single O',              img: '' },
+  { id: 2,  name: 'Artificer Coffee',      img: '' },
+  { id: 3,  name: 'Room Ten',              img: '' },
+  { id: 4,  name: 'bills Darlinghurst',    img: '' },
+  { id: 5,  name: 'The Grounds',           img: '' },
+  { id: 6,  name: 'Toby's Estate',        img: '' },
+  { id: 7,  name: 'Paramount Coffee',      img: '' },
+  { id: 8,  name: 'Reuben Hills',          img: '' },
+  { id: 9,  name: 'Edition Roasters',      img: '' },
+  { id: 10, name: 'AP Bakery',             img: '' },
+  { id: 11, name: 'Skittle Lane',          img: '' },
+  { id: 12, name: 'Pablo & Rusty's',      img: '' },
+  { id: 13, name: 'Mecca Coffee',          img: '' },
+  { id: 14, name: 'Gumption',              img: '' },
+  { id: 15, name: 'Reformatory',           img: '' },
+  { id: 16, name: 'Campos Coffee',         img: '' },
+  { id: 17, name: 'Circa Espresso',        img: '' },
+  { id: 18, name: 'Sample Coffee',         img: '' },
+  { id: 19, name: 'Hive Espresso',         img: '' },
+  { id: 20, name: 'Three Williams',        img: '' },
+  { id: 21, name: 'Bourke Street Bakery',  img: '' },
+  { id: 22, name: 'Devon Cafe',            img: '' },
+  { id: 23, name: 'The Cornerstone',       img: '' },
+  { id: 24, name: 'Cuckoo Callay',         img: '' },
+  { id: 25, name: 'Penny Lane',            img: '' },
+]
+
 // ── 빙고 라인 체크 (5x5)
 function getBingoLines(checked: Set<number>): number[][] {
   const lines: number[][] = []
@@ -179,8 +208,8 @@ function Fireworks() {
 
 // ── 상황 메시지
 function getStatusMsg(checked: number, bingo: number): { title: string; sub: string } {
-  if (checked === 0)  return { title: '멜번 카페 도장깨기 시작!', sub: '카페를 방문하면 해당 칸을 눌러보세요 ☕' }
-  if (checked === 25) return { title: '🏆 완전정복! 대단해요!', sub: '멜번 카페 25곳을 모두 정복했어요!' }
+  if (checked === 0)  return { title: '카페 도장깨기 시작!', sub: '카페를 방문하면 해당 칸을 눌러보세요 ☕' }
+  if (checked === 25) return { title: '🏆 완전정복! 대단해요!', sub: '카페 25곳을 모두 정복했어요!' }
   if (bingo >= 5)     return { title: `🎉 ${bingo}빙고 달성!`, sub: `${checked}개 카페를 방문했어요. 거의 다 왔어요!` }
   if (bingo >= 3)     return { title: `✨ ${bingo}빙고 달성!`, sub: `${checked}개 카페 완료! 계속 도전해봐요` }
   if (bingo >= 1)     return { title: `🎯 ${bingo}빙고 달성!`, sub: `와우! ${checked}개 카페를 깨셨어요` }
@@ -194,10 +223,16 @@ type Props = { onBack?: () => void; embedded?: boolean; initialCity?: 'melbourne
 export { Props as BingoProps }
 
 export default function BingoPage({ onBack, embedded = false, initialCity, onCityChange }: Props) {
-  const [checked, setChecked] = useState<Set<number>>(() => {
+  const [checkedMelbourne, setCheckedMelbourne] = useState<Set<number>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')) }
     catch { return new Set() }
   })
+  const [checkedSydney, setCheckedSydney] = useState<Set<number>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('bingo-sydney') ?? '[]')) }
+    catch { return new Set() }
+  })
+  const checked    = city === 'melbourne' ? checkedMelbourne : checkedSydney
+  const setChecked = city === 'melbourne' ? setCheckedMelbourne : setCheckedSydney
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const [showFireworks, setShowFireworks] = useState(false)
   const [prevBingoCount, setPrevBingoCount] = useState(0)
@@ -222,8 +257,11 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
 
   // 로컬스토리지 저장
   useEffect(() => {
-    localStorage.setItem('bingo-melbourne', JSON.stringify([...checked]))
-  }, [checked])
+    localStorage.setItem('bingo-melbourne', JSON.stringify([...checkedMelbourne]))
+  }, [checkedMelbourne])
+  useEffect(() => {
+    localStorage.setItem('bingo-sydney', JSON.stringify([...checkedSydney]))
+  }, [checkedSydney])
 
   const handleCell = (idx: number) => {
     const next = new Set(checked)
@@ -266,7 +304,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   // 빙고 라인에 포함된 셀 인덱스
   const highlightedCells = new Set(completedLines.flat())
 
-  const cafe = MELBOURNE_CAFES
+  const cafe = city === 'melbourne' ? MELBOURNE_CAFES : SYDNEY_CAFES
 
   return (
     <div style={{
@@ -361,7 +399,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               boxShadow: city===c.id ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 4px rgba(0,0,0,0.06)',
               transition:'all 0.2s',
             }}>
-              {c.label}{c.id==='sydney' ? ' (준비중)' : ''}
+              {c.label}
             </button>
           ))}
         </div>
