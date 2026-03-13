@@ -523,7 +523,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       </div>
 
       {/* ── 5x5 빙고판 */}
-      <div style={{ flex:1, padding:'8px 12px 120px', overflowY:'auto' }}>
+      <div style={{ flex:1, padding:'8px 12px 16px', overflowY:'auto' }}>
         <div style={{
           display:'grid', gridTemplateColumns:'repeat(5, 1fr)',
           gap:6,
@@ -634,13 +634,14 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
 
       {/* ── 푸터 */}
       <div style={{
-        position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-        width:'100%', maxWidth:430,
+        position:'sticky', bottom:0,
+        width:'100%',
         padding:'18px 14px 28px',
         background:'#fff',
-        zIndex:650, boxSizing:'border-box',
+        zIndex:50, boxSizing:'border-box',
         display:'flex', gap:8,
         borderTop:'1px solid #E2E8F0',
+        flexShrink:0,
       }}>
         <button onClick={onBack} style={{
           flex:1, height:54, borderRadius:8, border:'none',
