@@ -223,6 +223,7 @@ type Props = { onBack?: () => void; embedded?: boolean; initialCity?: 'melbourne
 export { Props as BingoProps }
 
 export default function BingoPage({ onBack, embedded = false, initialCity, onCityChange }: Props) {
+  const [city, setCity] = useState<'melbourne'|'sydney'>(initialCity ?? 'melbourne')
   const [checkedMelbourne, setCheckedMelbourne] = useState<Set<number>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')) }
     catch { return new Set() }
@@ -231,15 +232,17 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
     try { return new Set(JSON.parse(localStorage.getItem('bingo-sydney') ?? '[]')) }
     catch { return new Set() }
   })
-  const checked    = city === 'melbourne' ? checkedMelbourne : checkedSydney
-  const setChecked = city === 'melbourne' ? setCheckedMelbourne : setCheckedSydney
+  const checked = city === 'melbourne' ? checkedMelbourne : checkedSydney
+  const setChecked = (val: Set<number> | ((prev: Set<number>) => Set<number>)) => {
+    if (city === 'melbourne') setCheckedMelbourne(val as any)
+    else setCheckedSydney(val as any)
+  }
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const [showFireworks, setShowFireworks] = useState(false)
   const [prevBingoCount, setPrevBingoCount] = useState(0)
   const [stampAnim, setStampAnim] = useState<number|null>(null)
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
-  const [city, setCity] = useState<'melbourne'|'sydney'>(initialCity ?? 'melbourne')
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
