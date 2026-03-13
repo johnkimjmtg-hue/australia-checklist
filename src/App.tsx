@@ -45,11 +45,11 @@ function AdminWrapper() {
 }
 
 // ── 빙고 페이지
-function BingoWrapper() {
+function BingoWrapper({ city }: { city?: 'melbourne' | 'sydney' }) {
   const navigate = useNavigate()
   return (
     <div className="app-shell">
-      <BingoPage onBack={() => navigate('/')} />
+      <BingoPage onBack={() => navigate('/')} initialCity={city} />
     </div>
   )
 }
@@ -62,7 +62,9 @@ export default function App() {
         <Route path="/"         element={<LandingWrapper />} />
         <Route path="/app"      element={<MainApp />} />
         <Route path="/admin"    element={<AdminWrapper />} />
-        <Route path="/bingo"    element={<BingoWrapper />} />
+        <Route path="/bingo"             element={<BingoWrapper />} />
+        <Route path="/bingo/melbourne"   element={<BingoWrapper city="melbourne" />} />
+        <Route path="/bingo/sydney"      element={<BingoWrapper city="sydney" />} />
         <Route path="*"         element={<LandingWrapper />} />
       </Routes>
       <Analytics />

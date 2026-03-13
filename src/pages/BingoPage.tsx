@@ -190,10 +190,10 @@ function getStatusMsg(checked: number, bingo: number): { title: string; sub: str
   return { title: `${checked}개 카페 방문!`, sub: '멜번 카페 투어가 시작됐어요 ☕' }
 }
 
-type Props = { onBack?: () => void; embedded?: boolean }
+type Props = { onBack?: () => void; embedded?: boolean; initialCity?: 'melbourne' | 'sydney' }
 export { Props as BingoProps }
 
-export default function BingoPage({ onBack, embedded = false }: Props) {
+export default function BingoPage({ onBack, embedded = false, initialCity }: Props) {
   const [checked, setChecked] = useState<Set<number>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')) }
     catch { return new Set() }
@@ -204,7 +204,7 @@ export default function BingoPage({ onBack, embedded = false }: Props) {
   const [stampAnim, setStampAnim] = useState<number|null>(null)
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
-  const [city, setCity] = useState<'melbourne'|'sydney'>('melbourne')
+  const [city, setCity] = useState<'melbourne'|'sydney'>(initialCity ?? 'melbourne')
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
