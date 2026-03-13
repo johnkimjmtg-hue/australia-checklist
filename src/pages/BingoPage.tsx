@@ -280,9 +280,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
-  const [showIntro, setShowIntro] = useState(() => {
-    return !localStorage.getItem('bingo-mel-intro-seen')
-  })
+  const [showIntro, setShowIntro] = useState(true)
   const [orderMelbourne, setOrderMelbourne] = useState<number[]>(() => {
     try { return JSON.parse(localStorage.getItem('bingo-order-melbourne') ?? '[]') }
     catch { return [] }
