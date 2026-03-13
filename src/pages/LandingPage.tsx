@@ -118,7 +118,7 @@ function loadGoogleMaps(): Promise<void> {
   _mapsPromise = new Promise((resolve, reject) => {
     if ((window as any).google?.maps) { resolve(); return }
     const s = document.createElement('script')
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_KEY}&libraries=places&v=weekly`
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_KEY}&libraries=places&v=weekly&loading=async`
     s.onload = () => setTimeout(() => resolve(), 100)
     s.onerror = () => reject(new Error('Google Maps load failed'))
     document.head.appendChild(s)
@@ -326,6 +326,7 @@ function SydneyMap() {
   const handleSpotClick = (filteredIdx: number) => {
     setSelected(filteredIdx)
     const spot = filteredSpots[filteredIdx]
+    if (!spot) return
     const map = mapInstanceRef.current
     if (!map) return
     map.panTo({ lat: spot.lat, lng: spot.lng })
@@ -409,6 +410,7 @@ function SydneyMap() {
         document.head.appendChild(style)
 
         const showInfo = (marker: any, spot: any) => {
+          if (!spot) return
           infoWindow.setContent(`
             <div style="font-family:'Pretendard',sans-serif;font-size:12px;font-weight:700;
                         color:#1E293B;padding:7px 12px;white-space:nowrap;">
