@@ -755,7 +755,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:16 }}>
                 {[
-                  { icon:'ph:map-pin', text:'성소를 찾으세요: 지도에 표시된 25곳의 카페로 향하십시오.' },
+                  { icon:'ph:map-pin', text:'성소를 찾으세요: 빙고맵에 표시된 25곳의 카페로 향하십시오.' },
                   { icon:'ph:lock-open', text:'봉인을 푸세요: 커피를 즐긴 후 빙고 칸을 터치해 신들을 깨우십시오.' },
                   { icon:'ph:crown', text:'세계를 완성하세요: 모든 신을 깨우는 순간, 당신은 멜번을 지배하는 궁극의 바리스타로 등극합니다.' },
                 ].map((item, i) => (
