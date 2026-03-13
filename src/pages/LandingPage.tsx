@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import { AppState } from '../store/state'
-import { ITEMS, CATEGORIES } from '../data/checklist'
+import { CATEGORIES } from '../data/checklist'
+import { supabase } from '../lib/supabase'
 import { CATEGORIES as BCATS, BUSINESSES } from '../data/businesses'
 
 // ── 이미지 import (src/assets/landing/ 폴더에 넣어주세요)
@@ -679,10 +680,17 @@ function ChatBubble() {
 // ══════════════════════════════════════════════════
 export default function LandingPage({ state, onStart, onServices }: Props) {
   const navigate = useNavigate()
+  const [dbItems, setDbItems] = useState<any[]>([])
+  useEffect(() => {
+    supabase.from('checklist_items').select('id,label,category_id').eq('is_active', true)
+      .then(({ data }) => { if (data) setDbItems(data) })
+  }, [])
+
   // BucketCheckView와 완전히 동일한 방식 (1아이템 N일 배정 → N개로 카운트)
-  const totalItems   = ITEMS.length  // 히어로 섹션용 전체 버킷리스트 개수
+  const totalItems   = dbItems.length || 0
   // 발행된 버킷리스트가 있을 때만 진행률 계산 (수정중/작성중이면 0/0)
   const isIssued     = !!state.meta?.lastIssuedAt
+  const ITEMS        = dbItems.map(i => ({ id: i.id, categoryId: i.category_id, label: i.label, emoji: '📌' }))
   const allItems     = [...ITEMS, ...(state.customItems ?? []).map((c: any) => ({ ...c, emoji:'📝' }))]
   const checkedItems = isIssued ? allItems.filter((i: any) => state.selected?.[i.id]) : []
   const allRows      = (() => {
