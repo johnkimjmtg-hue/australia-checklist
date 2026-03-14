@@ -10,7 +10,7 @@ import { supabase } from '../lib/supabase'
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'hojugaja2024'
 
 // ── 탭 타입
-type MainTab = 'business' | 'categories' | 'items' | 'requests' | 'suggestions'
+type MainTab = 'business' | 'categories' | 'items' | 'requests' | 'suggestions' | 'community'
 
 // ── 탭 메타
 const TAB_META: { id: MainTab; icon: string; label: string }[] = [
@@ -19,6 +19,7 @@ const TAB_META: { id: MainTab; icon: string; label: string }[] = [
   { id:'suggestions', icon:'ph:lightbulb',          label:'추천' },
   { id:'categories',  icon:'ph:folder-open',        label:'카테고리' },
   { id:'items',       icon:'ph:list-checks',        label:'체크리스트' },
+  { id:'community',   icon:'ph:chats-circle',       label:'커뮤니티' },
 ]
 
 
@@ -318,6 +319,7 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
         {tab==='suggestions' && <SuggestionsTab />}
         {tab==='categories'  && (clLoading ? <div style={{padding:32,textAlign:'center',color:'#aaa'}}>불러오는 중...</div> : <CategoriesTab cats={sharedCats} setCats={setSharedCats} />)}
         {tab==='items'       && (clLoading ? <div style={{padding:32,textAlign:'center',color:'#aaa'}}>불러오는 중...</div> : <ItemsTab cats={sharedCats} items={sharedItems} setItems={setSharedItems} />)}
+        {tab==='community'   && <CommunityTab />}
       </div>
 
       {/* 하단 네비바 */}
@@ -1673,6 +1675,185 @@ function SuggestionsTab() {
             </div>
           ))}
         </div>
+      )}
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════
+// TAB 6: 커뮤니티 관리
+// ════════════════════════════════════════════
+interface CommunityPost {
+  id: string
+  text: string
+  author_id: string
+  likes: number
+  created_at: string
+  comments?: { id: string; text: string; author_id: string; created_at: string }[]
+}
+
+function CommunityTab() {
+  const [posts, setPosts] = useState<CommunityPost[]>([])
+  const [loading, setLoading] = useState(true)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [confirmId, setConfirmId] = useState<string | null>(null)
+  const [confirmCommentId, setConfirmCommentId] = useState<{postId:string; commentId:string} | null>(null)
+
+  const fetchAll = async () => {
+    setLoading(true)
+    const { data: postsData } = await supabase
+      .from('community_posts').select('*').order('created_at', { ascending: false })
+    if (!postsData) { setLoading(false); return }
+
+    const { data: commentsData } = await supabase
+      .from('community_comments').select('*').in('post_id', postsData.map(p => p.id)).order('created_at', { ascending: true })
+    const { data: likesData } = await supabase
+      .from('community_likes').select('post_id').in('post_id', postsData.map(p => p.id))
+
+    const commentsByPost: Record<string, any[]> = {}
+    commentsData?.forEach(c => {
+      if (!commentsByPost[c.post_id]) commentsByPost[c.post_id] = []
+      commentsByPost[c.post_id].push(c)
+    })
+    const likeCount: Record<string, number> = {}
+    likesData?.forEach(l => { likeCount[l.post_id] = (likeCount[l.post_id] ?? 0) + 1 })
+
+    setPosts(postsData.map(p => ({ ...p, likes: likeCount[p.id] ?? 0, comments: commentsByPost[p.id] ?? [] })))
+    setLoading(false)
+  }
+
+  useEffect(() => { fetchAll() }, [])
+
+  const deletePost = async (id: string) => {
+    await supabase.from('community_posts').delete().eq('id', id)
+    setConfirmId(null)
+    await fetchAll()
+  }
+
+  const deleteComment = async (commentId: string) => {
+    await supabase.from('community_comments').delete().eq('id', commentId)
+    setConfirmCommentId(null)
+    await fetchAll()
+  }
+
+  const timeAgo = (ts: string) => {
+    const diff = Date.now() - new Date(ts).getTime()
+    const m = Math.floor(diff / 60000)
+    if (m < 1) return '방금 전'
+    if (m < 60) return `${m}분 전`
+    const h = Math.floor(m / 60)
+    if (h < 24) return `${h}시간 전`
+    return `${Math.floor(h / 24)}일 전`
+  }
+
+  if (loading) return <div style={{ padding:32, textAlign:'center', color:'#aaa' }}>불러오는 중...</div>
+
+  return (
+    <div>
+      <div style={{ fontSize:13, fontWeight:700, color:'#1E293B', marginBottom:12 }}>
+        커뮤니티 게시글 관리 <span style={{ color:'#94A3B8', fontWeight:500 }}>({posts.length}개)</span>
+      </div>
+
+      {posts.map(post => (
+        <div key={post.id} style={{
+          background:'#fff', borderRadius:12, marginBottom:10,
+          border:'1px solid #E2E8F0', overflow:'hidden',
+        }}>
+          {/* 글 헤더 */}
+          <div style={{ padding:'12px 14px' }}>
+            <div style={{ fontSize:13, color:'#1E293B', lineHeight:1.6, marginBottom:8 }}>
+              {post.text}
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+              <span style={{ fontSize:11, color:'#94A3B8' }}>{timeAgo(post.created_at)}</span>
+              <span style={{ fontSize:11, color:'#94A3B8' }}>❤️ {post.likes}</span>
+              <button onClick={() => setExpandedId(expandedId === post.id ? null : post.id)} style={{
+                fontSize:11, color:'#1B6EF3', background:'none', border:'none', cursor:'pointer', padding:0,
+              }}>
+                💬 댓글 {post.comments?.length ?? 0}개
+              </button>
+              <div style={{ flex:1 }} />
+              <button onClick={() => setConfirmId(post.id)} style={{
+                fontSize:11, color:'#DC2626', background:'#FFF5F5',
+                border:'1px solid #FECDD3', borderRadius:6,
+                padding:'3px 10px', cursor:'pointer', fontWeight:600,
+              }}>삭제</button>
+            </div>
+          </div>
+
+          {/* 댓글 목록 */}
+          {expandedId === post.id && (post.comments?.length ?? 0) > 0 && (
+            <div style={{ borderTop:'1px solid #F1F5F9', background:'#F8FAFC', padding:'10px 14px' }}>
+              {post.comments!.map(c => (
+                <div key={c.id} style={{
+                  display:'flex', gap:8, alignItems:'flex-start', marginBottom:8,
+                }}>
+                  <div style={{ width:5, height:5, borderRadius:'50%', background:'#CBD5E1', marginTop:6, flexShrink:0 }} />
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:12, color:'#334155', lineHeight:1.5 }}>{c.text}</div>
+                    <div style={{ fontSize:10, color:'#94A3B8', marginTop:1 }}>{timeAgo(c.created_at)}</div>
+                  </div>
+                  <button onClick={() => setConfirmCommentId({ postId: post.id, commentId: c.id })} style={{
+                    fontSize:10, color:'#DC2626', background:'none',
+                    border:'none', cursor:'pointer', padding:'2px 4px', flexShrink:0,
+                  }}>삭제</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+
+      {/* 글 삭제 확인 모달 */}
+      {confirmId && (
+        <>
+          <div onClick={() => setConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:900 }} />
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            background:'#fff', borderRadius:14, padding:'24px 20px',
+            zIndex:901, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+          }}>
+            <div style={{ fontSize:28, marginBottom:8 }}>🗑️</div>
+            <div style={{ fontSize:15, fontWeight:700, color:'#0F172A', marginBottom:6 }}>게시글을 삭제할까요?</div>
+            <div style={{ fontSize:12, color:'#64748B', marginBottom:20 }}>댓글도 함께 삭제됩니다.</div>
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={() => setConfirmId(null)} style={{
+                flex:1, height:44, border:'1px solid #E2E8F0', borderRadius:8,
+                background:'#fff', color:'#64748B', fontWeight:600, fontSize:13, cursor:'pointer',
+              }}>취소</button>
+              <button onClick={() => deletePost(confirmId)} style={{
+                flex:2, height:44, border:'none', borderRadius:8,
+                background:'#DC2626', color:'#fff', fontWeight:700, fontSize:14, cursor:'pointer',
+              }}>삭제하기</button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* 댓글 삭제 확인 모달 */}
+      {confirmCommentId && (
+        <>
+          <div onClick={() => setConfirmCommentId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:900 }} />
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            background:'#fff', borderRadius:14, padding:'24px 20px',
+            zIndex:901, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+          }}>
+            <div style={{ fontSize:28, marginBottom:8 }}>💬</div>
+            <div style={{ fontSize:15, fontWeight:700, color:'#0F172A', marginBottom:6 }}>댓글을 삭제할까요?</div>
+            <div style={{ fontSize:12, color:'#64748B', marginBottom:20 }}>삭제된 댓글은 복구되지 않습니다.</div>
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={() => setConfirmCommentId(null)} style={{
+                flex:1, height:44, border:'1px solid #E2E8F0', borderRadius:8,
+                background:'#fff', color:'#64748B', fontWeight:600, fontSize:13, cursor:'pointer',
+              }}>취소</button>
+              <button onClick={() => deleteComment(confirmCommentId.commentId)} style={{
+                flex:2, height:44, border:'none', borderRadius:8,
+                background:'#DC2626', color:'#fff', fontWeight:700, fontSize:14, cursor:'pointer',
+              }}>삭제하기</button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
