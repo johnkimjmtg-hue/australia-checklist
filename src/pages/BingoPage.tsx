@@ -541,7 +541,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트', action: onBack },
             { id:'services',   icon:'ph:buildings',    label:'업체/서비스', action: () => {} },
             { id:'shopping',   icon:'ph:shopping-bag', label:'필수쇼핑',   action: () => {} },
-            { id:'bingo',      icon:'ph:coffee',       label:'도장깨기',   action: () => {} },
+            { id:'bingo',      icon:'ph:coffee',       label:'카페도장깨기',   action: () => {} },
             { id:'community',  icon:'ph:chats-circle', label:'커뮤니티',   action: () => {} },
           ]).map(tab => {
             const active = tab.id === 'bingo'

@@ -398,7 +398,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             { id:'bucketlist', icon:'ph:check-circle',  label:'버킷리스트' },
             { id:'services',   icon:'ph:buildings',     label:'업체/서비스' },
             { id:'shopping',   icon:'ph:shopping-bag',  label:'필수쇼핑' },
-            { id:'bingo',      icon:'ph:coffee',        label:'도장깨기' },
+            { id:'bingo',      icon:'ph:coffee',        label:'카페도장깨기' },
             { id:'community',  icon:'ph:chats-circle',  label:'커뮤니티' },
           ] as { id: MainTab; icon: string; label: string }[]).map(tab => {
             const active = mainTab === tab.id

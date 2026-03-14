@@ -421,7 +421,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트', action: () => {} },
             { id:'services',   icon:'ph:buildings',    label:'업체/서비스', action: onServices },
             { id:'shopping',   icon:'ph:shopping-bag', label:'필수쇼핑',   action: onShopping },
-            { id:'bingo',      icon:'ph:coffee',       label:'도장깨기',   action: onBingo },
+            { id:'bingo',      icon:'ph:coffee',       label:'카페도장깨기',   action: onBingo },
             { id:'community',  icon:'ph:chats-circle', label:'커뮤니티',   action: onCommunity },
           ]).map(tab => {
             const active = tab.id === 'bucketlist'
