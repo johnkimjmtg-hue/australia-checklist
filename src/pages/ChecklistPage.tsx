@@ -17,6 +17,7 @@ import ReceiptModal from '../components/ReceiptModal'
 import Services from './Services'
 import BingoPage from './BingoPage'
 import BucketCheckView from './BucketCheckView'
+import Community from './Community'
 import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 
@@ -431,10 +432,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : mainTab === 'bingo' ? (
         <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
       ) : mainTab === 'community' ? (
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'60vh', gap:12 }}>
-          <Icon icon="ph:chats-circle" width={48} height={48} color="#CBD5E1" />
-          <div style={{ fontSize:16, fontWeight:700, color:'#94A3B8' }}>커뮤니티</div>
-          <div style={{ fontSize:13, color:'#CBD5E1' }}>준비 중이에요 💬</div>
+        <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 96px)' }}>
+          <Community />
         </div>
       ) : (
         <>
