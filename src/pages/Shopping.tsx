@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
+import imgShopping from '../assets/landing/shopping.png'
 
 interface Category {
   id: number
@@ -104,17 +105,28 @@ export default function Shopping() {
 
       {/* ── 히어로 배너 */}
       <div style={{
-        background:'linear-gradient(135deg, #1B6EF3 0%, #0ea5e9 100%)',
-        padding:'20px 16px 16px', marginBottom:0,
+        position:'relative', overflow:'hidden',
+        height:120, marginBottom:0,
       }}>
-        <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', fontWeight:600, letterSpacing:1, marginBottom:4 }}>
-          AUSTRALIA SHOPPING
-        </div>
-        <div style={{ fontSize:20, fontWeight:800, color:'#fff', marginBottom:2 }}>
-          호주 쇼핑 리스트 🛍
-        </div>
-        <div style={{ fontSize:12, color:'rgba(255,255,255,0.8)' }}>
-          호주에서 꼭 사가야 할 아이템을 모았어요
+        <div style={{
+          position:'absolute', inset:0,
+          backgroundImage:`url(${imgShopping})`,
+          backgroundSize:'cover', backgroundPosition:'center',
+        }}/>
+        <div style={{
+          position:'absolute', inset:0,
+          background:'linear-gradient(90deg, rgba(0,20,80,0.75) 0%, rgba(0,20,80,0.45) 60%, rgba(0,20,80,0.15) 100%)',
+        }}/>
+        <div style={{ position:'absolute', inset:0, padding:'20px 16px', display:'flex', flexDirection:'column', justifyContent:'center' }}>
+          <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', fontWeight:600, letterSpacing:1, marginBottom:4 }}>
+            AUSTRALIA SHOPPING
+          </div>
+          <div style={{ fontSize:20, fontWeight:800, color:'#fff', marginBottom:2 }}>
+            호주 쇼핑 리스트 🛍
+          </div>
+          <div style={{ fontSize:12, color:'rgba(255,255,255,0.8)' }}>
+            호주에서 꼭 사가야 할 아이템을 모았어요
+          </div>
         </div>
       </div>
 
