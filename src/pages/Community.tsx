@@ -163,7 +163,6 @@ export default function Community() {
       lines.push('')
       comments.forEach(c => lines.push(`  └ ${c.text}`))
     }
-    lines.push('', '👉 hojugaja.com')
     const shareText = lines.join('\n')
     if (navigator.share) {
       try { await navigator.share({ text: shareText }) } catch {}
