@@ -105,8 +105,7 @@ export default function Shopping() {
       {/* ── 히어로 배너 */}
       <div style={{
         background:'linear-gradient(135deg, #1B6EF3 0%, #0ea5e9 100%)',
-        padding:'20px 16px 32px', marginBottom:0,
-        borderRadius:'0 0 28px 28px',
+        padding:'20px 16px 16px', marginBottom:0,
       }}>
         <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', fontWeight:600, letterSpacing:1, marginBottom:4 }}>
           AUSTRALIA SHOPPING
