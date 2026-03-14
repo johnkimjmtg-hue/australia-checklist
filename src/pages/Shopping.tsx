@@ -282,7 +282,7 @@ export default function Shopping() {
           }} />
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'min(100%, 430px)', background:'#fff',
+            width:'100%', maxWidth:390, background:'#fff',
             borderRadius:'20px 20px 0 0', zIndex:501,
             animation:'slideUp 0.3s ease',
             maxHeight:'85vh', overflowY:'auto',
