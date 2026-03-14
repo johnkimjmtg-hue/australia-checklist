@@ -101,6 +101,44 @@ const PANTHEON_LORE: string[] = [
 // ── 멜번 판테온 이미지 (체크 시 표시)
 const MEL_IMGS = Array.from({ length: 25 }, (_, i) => `/mel_coffee/${i + 1}.jpg`)
 
+// ── 시드니 이미지 (체크 시 표시)
+const SYD_IMGS = Array.from({ length: 25 }, (_, i) => `/syd_coffee/${i + 1}.jpg`)
+// ── 시드니 소제목 (1~25)
+const SYDNEY_TITLE: string[] = [
+  '육분의와 지도', '요람의 탐험가', '모형 배를 깎는 소년', '지도를 그리는 소년', '깃발 꽂는 소년',
+  '양피지 지도', '쌍검의 청년 탐험가', '보물상자를 발견한 전사', '정글의 원시 전사', '해안을 내려다보는 제왕',
+  '망원경 속의 도시', '숲속의 궁수', '나침반을 든 손', '성을 지키는 기사', '성소의 황금 열쇠',
+  '천문기구를 든 손', '기마 대장', '사막의 곡도 전사', '선상 위 결투', '황금 술잔을 든 손',
+  '룬이 새겨진 단검', '황금 갑옷의 국왕', '빛의 팔라딘', '성검을 쥔 손', '태양의 제왕',
+]
+// ── 시드니 멘트 (1~25)
+const SYDNEY_LORE: string[] = [
+  '미지의 바다를 향한 첫 좌표가 찍혔습니다. 전설적인 항해의 시작입니다.',
+  '운명의 파도가 당신을 시드니의 해안으로 인도했습니다. 당신은 선택받은 아이입니다.',
+  '당신은 거친 바다를 정복하기 위해 자신만의 전설적인 돛을 빚기 시작했습니다.',
+  '아직 누구도 가보지 못한 세상을 상상하며 당신은 첫 번째 지도를 그렸습니다.',
+  '첫 번째 섬에 상륙했습니다! 당신의 깃발이 시드니의 바람에 펄럭이기 시작합니다.',
+  '개척의 기록이 시작되었습니다. 이제 당신의 발자국이 시드니의 지도가 됩니다.',
+  '안개 뚫린 낯선 해변, 당신은 양손에 검을 쥐고 미지의 섬으로 뛰어들었습니다.',
+  '숨겨진 성소에서 잠들어 있던 고대의 지혜와 보물을 손에 넣었습니다.',
+  '당신은 거친 야생의 시련을 뚫고 대자연의 힘을 다스리는 법을 배웠습니다.',
+  '높은 절벽 위에서 광활한 시드니의 바다를 바라보며 영토의 주권을 선포했습니다.',
+  '안개 너머, 마침내 당신이 세울 위대한 도시의 실루엣이 보이기 시작합니다.',
+  '보이지 않는 위협조차 꿰뚫는 날카로운 감각으로 시드니의 내륙을 정복했습니다.',
+  '당신의 의지가 곧 나침반의 방향입니다. 이제 당신은 절대 길을 잃지 않습니다.',
+  '당신은 스스로 시드니의 방패가 되어, 당신이 일군 문명을 지키기로 맹세했습니다.',
+  '닫혀 있던 고대의 문을 열었습니다. 이제 도시의 모든 비밀이 당신 앞에 드러납니다.',
+  '당신은 하늘의 별자리를 읽어 운명의 흐름을 완벽히 통제하게 되었습니다.',
+  '당신을 따르는 수많은 추종자와 함께 시드니의 거친 평원을 가로지릅니다.',
+  '타는 듯한 태양과 모래바람 속에서도 당신의 개척 의지는 꺾이지 않았습니다.',
+  '거친 파도 위에서 위협적인 적들을 제압하고 바다의 진정한 지배자가 되었습니다.',
+  '수많은 시련 끝에 얻은 승리의 만찬, 당신의 명성은 온 대륙에 울려 퍼집니다.',
+  '당신은 무기에 깃든 고대의 마법을 깨워, 인간을 초월한 힘을 얻었습니다.',
+  '모든 섬을 통일한 당신은 마침내 시드니를 호령하는 위대한 국왕이 되었습니다.',
+  '당신의 존재 자체가 시드니의 빛이 되어 모든 어둠과 혼돈을 몰아냅니다.',
+  '마지막 시련을 끝낼 전설의 검을 뽑았습니다. 대륙의 모든 전율이 멈춥니다.',
+  '축하합니다! 25개의 신대륙을 모두 정복한 당신은 이제 '시드니의 제왕'입니다.',
+]
 // ── 빙고 라인 체크 (5x5)
 function getBingoLines(checked: Set<number>): number[][] {
   const lines: number[][] = []
@@ -288,10 +326,17 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
+  const [showSydAllDone, setShowSydAllDone] = useState(false)
   const [showIntro, setShowIntro] = useState(() => {
     try {
       const mel = JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')
       return Array.isArray(mel) && mel.length === 0
+    } catch { return true }
+  })
+  const [showSydIntro, setShowSydIntro] = useState(() => {
+    try {
+      const syd = JSON.parse(localStorage.getItem('bingo-sydney') ?? '[]')
+      return Array.isArray(syd) && syd.length === 0
     } catch { return true }
   })
   const [orderMelbourne, setOrderMelbourne] = useState<number[]>(() => {
@@ -334,15 +379,16 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
 
   // 이미지 preload — 마운트 시 백그라운드에서 미리 다운로드
   useEffect(() => {
-    MEL_IMGS.forEach(src => {
-      const img = new Image()
-      img.src = src
-    })
+    MEL_IMGS.forEach(src => { const img = new Image(); img.src = src })
+    SYD_IMGS.forEach(src => { const img = new Image(); img.src = src })
   }, [])
 
   // 전체 완료 감지
   useEffect(() => {
-    if (isAllDone) setShowAllDone(true)
+    if (isAllDone) {
+      if (city === 'melbourne') setShowAllDone(true)
+      else setShowSydAllDone(true)
+    }
   }, [isAllDone])
 
   // 빙고 달성 감지 — 줄 하나 완성할 때마다 폭죽
@@ -545,20 +591,24 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         }}>
           <MiniGrid count={checked.size} />
           <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize:10, fontWeight:700, color:'#6F4E37', letterSpacing:1, marginBottom:2 }}>
-              멜번 판테온: 창조의 연대기
+            <div style={{ fontSize:10, fontWeight:700, color: city === 'melbourne' ? '#6F4E37' : '#1B4F7A', letterSpacing:1, marginBottom:2 }}>
+              {city === 'melbourne' ? '멜번 판테온: 창조의 연대기' : '태양의 항해: 시드니 개척 연대기'}
             </div>
             <div style={{ fontSize:15, fontWeight:800, color:'#1E293B', marginBottom:3, lineHeight:1.3 }}>
               {getStatusMsg(checked.size, bingoCount).title}
             </div>
             {lastCheckedIdx !== null && checkOrder.includes(lastCheckedIdx) && (
-              <div style={{ fontSize:10, fontWeight:800, color:'#B45309', letterSpacing:0.5, marginBottom:2 }}>
-                {PANTHEON_TITLE[checkOrder.indexOf(lastCheckedIdx)]}
+              <div style={{ fontSize:10, fontWeight:800, color: city === 'melbourne' ? '#B45309' : '#1B6EF3', letterSpacing:0.5, marginBottom:2 }}>
+                {city === 'melbourne'
+                  ? PANTHEON_TITLE[checkOrder.indexOf(lastCheckedIdx)]
+                  : SYDNEY_TITLE[checkOrder.indexOf(lastCheckedIdx)]}
               </div>
             )}
             <div style={{ fontSize:11, color:'#64748B', fontWeight:500, marginBottom:8, lineHeight:1.5 }}>
               {lastCheckedIdx !== null && checkOrder.includes(lastCheckedIdx)
-                ? PANTHEON_LORE[checkOrder.indexOf(lastCheckedIdx)]
+                ? (city === 'melbourne'
+                    ? PANTHEON_LORE[checkOrder.indexOf(lastCheckedIdx)]
+                    : SYDNEY_LORE[checkOrder.indexOf(lastCheckedIdx)])
                 : getStatusMsg(checked.size, bingoCount).sub}
             </div>
 
@@ -616,7 +666,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                   overflow:'hidden', position:'relative',
                 }}>
                   {isChecked && imgNum !== null ? (
-                    <img src={MEL_IMGS[imgNum - 1]} alt={`pantheon-${imgNum}`}
+                    <img src={city === 'melbourne' ? MEL_IMGS[imgNum - 1] : SYD_IMGS[imgNum - 1]} alt={`stamp-${imgNum}`}
                       style={{ width:'100%', height:'100%', objectFit:'cover', transition:'opacity 0.3s' }}
                       onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
                     />
@@ -789,6 +839,56 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         </>
       )}
 
+      {/* ── 시드니 인트로 팝업 */}
+      {showSydIntro && city === 'sydney' && (
+        <>
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:800, animation:'fadeIn 0.3s ease' }}
+            onClick={() => setShowSydIntro(false)} />
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            zIndex:801, width:'calc(100% - 32px)', maxWidth:360,
+            background:'#0A1628', borderRadius:20,
+            overflow:'hidden',
+            boxShadow:'0 24px 48px rgba(0,0,0,0.4)',
+            animation:'scaleIn 0.25s ease', overflowY:'auto', maxHeight:'90vh',
+          }}>
+            <img src="/syd_coffee/syd.jpg" alt="태양의 항해"
+              style={{ width:'100%', aspectRatio:'1', objectFit:'cover', display:'block' }} />
+            <div style={{ padding:'20px 20px 24px' }}>
+              <div style={{ fontSize:13, fontWeight:800, color:'#38BDF8', letterSpacing:1, marginBottom:4 }}>
+                ⛵ 태양의 항해: 25개의 신대륙
+              </div>
+              <div style={{ fontSize:11, color:'#38BDF8', marginBottom:12, fontStyle:'italic' }}>
+                "미지의 바다를 향해 전설의 돛을 올려라!"
+              </div>
+              <div style={{ fontSize:12, color:'#CBD5E1', lineHeight:1.8, marginBottom:10 }}>
+                당신은 태양의 인도를 받는 전설적인 탐험가입니다. 당신의 눈앞에 펼쳐진 시드니는 아직 그 누구도 발을 들이지 못한, 신비로운 25개의 섬으로 이루어진 '미개척의 땅'입니다.
+              </div>
+              <div style={{ fontSize:12, color:'#94A3B8', lineHeight:1.8, marginBottom:10 }}>
+                이 섬들은 거친 파도와 안개 속에 몸을 숨긴 채, 자신들을 정복하고 가치를 알아봐 줄 '위대한 개척자'를 기다리고 있습니다.
+              </div>
+              <div style={{ fontSize:12, color:'#94A3B8', lineHeight:1.8, marginBottom:10 }}>
+                당신의 미션은 명확합니다. 거친 바다를 뚫고 25개의 섬(카페)에 차례로 상륙하여 당신의 표식(깃발)을 꽂는 것입니다. 첫 번째 섬에 상륙하여 커피 향기를 만끽하는 순간, 당신의 위대한 항해는 시작됩니다.
+              </div>
+              <div style={{ fontSize:12, color:'#94A3B8', lineHeight:1.8, marginBottom:10 }}>
+                섬을 하나씩 정복할 때마다 당신의 지도 위에는 새로운 대륙이 그려지고, 당신의 이름은 시드니의 역사에 새겨질 것입니다. 25개의 모든 섬에 깃발이 펄럭이는 날, 시드니의 모든 바다와 땅은 당신의 영토가 되며 당신은 마침내 <span style={{ color:'#38BDF8', fontWeight:700 }}>'시드니의 제왕'</span>의 칭호를 얻게 될 것입니다.
+              </div>
+              <div style={{ fontSize:12, color:'#38BDF8', fontStyle:'italic', textAlign:'center', marginBottom:18 }}>
+                "자, 이제 닻을 올리십시오. 당신만의 새로운 세계가 기다리고 있습니다!"
+              </div>
+              <button onClick={() => setShowSydIntro(false)} style={{
+                width:'100%', height:50, borderRadius:12, border:'none',
+                background:'linear-gradient(135deg, #1B6EF3, #0ea5e9)',
+                color:'#fff', fontSize:15, fontWeight:800, cursor:'pointer',
+                boxShadow:'0 4px 16px rgba(27,110,243,0.4)',
+              }}>
+                ⛵ 항해를 시작합니다
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* ── 전체 완료 모달 */}
       {showAllDone && (
         <>
@@ -833,6 +933,51 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                 flex:2, height:48, border:'none', borderRadius:10,
                 background:'#DC2626', color:'#fff', fontWeight:700, fontSize:14, cursor:'pointer',
               }}>리셋하기</button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── 시드니 완료 모달 */}
+      {showSydAllDone && (
+        <>
+          <div onClick={() => setShowSydAllDone(false)}
+            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:700, animation:'fadeIn 0.2s ease' }}/>
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            background:'#0A1628', borderRadius:20, padding:'0 0 24px',
+            zIndex:701, width:'calc(100% - 32px)', maxWidth:360,
+            boxShadow:'0 20px 60px rgba(0,0,0,0.5)',
+            animation:'scaleIn 0.22s ease', overflowY:'auto', maxHeight:'90vh',
+          }}>
+            <img src="/syd_coffee/syd_final.jpg" alt="시드니 완전정복"
+              style={{ width:'100%', borderRadius:'20px 20px 0 0', display:'block', objectFit:'cover' }} />
+            <div style={{ padding:'20px 20px 0' }}>
+              <div style={{ fontSize:15, fontWeight:800, color:'#38BDF8', letterSpacing:1, marginBottom:12, textAlign:'center' }}>
+                🎉 시드니 25개 섬 완전정복!
+              </div>
+              <div style={{ fontSize:12, color:'#CBD5E1', lineHeight:1.8, marginBottom:8, textAlign:'left' }}>
+                위대한 항해의 마침표가 찍혔습니다!
+              </div>
+              <div style={{ fontSize:12, color:'#94A3B8', lineHeight:1.8, marginBottom:8, textAlign:'left' }}>
+                당신은 거친 파도와 보이지 않는 안개를 뚫고, 시드니라는 거대한 지도를 당신의 이름으로 가득 채웠습니다.
+              </div>
+              <div style={{ fontSize:12, color:'#94A3B8', lineHeight:1.8, marginBottom:8, textAlign:'left' }}>
+                25개의 모든 섬에 펄럭이는 당신의 깃발은 영원히 지지 않는 태양처럼 시드니를 비출 것입니다.
+              </div>
+              <div style={{ fontSize:12, color:'#94A3B8', lineHeight:1.8, marginBottom:16, textAlign:'left' }}>
+                모든 개척자가 당신의 발자취를 우러러보며, 당신을 이 땅의 진정한 주인인 <span style={{ color:'#38BDF8', fontWeight:700 }}>'시드니의 제왕'</span>으로 선포합니다!
+              </div>
+              <div style={{ display:'flex', gap:8 }}>
+                <button onClick={() => setShowSydAllDone(false)} style={{
+                  flex:1, height:48, border:'1px solid #1E3A5F', borderRadius:10,
+                  background:'transparent', color:'#94A3B8', fontWeight:600, fontSize:13, cursor:'pointer',
+                }}>취소</button>
+                <button onClick={() => { setChecked(new Set()); setCheckOrder([]); setShowSydAllDone(false) }} style={{
+                  flex:2, height:48, border:'none', borderRadius:10,
+                  background:'#DC2626', color:'#fff', fontWeight:700, fontSize:14, cursor:'pointer',
+                }}>리셋하기</button>
+              </div>
             </div>
           </div>
         </>
