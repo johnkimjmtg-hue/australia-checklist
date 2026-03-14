@@ -115,7 +115,7 @@ export default function Shopping() {
         }}/>
         <div style={{
           position:'absolute', inset:0,
-          background:'linear-gradient(90deg, rgba(0,20,80,0.75) 0%, rgba(0,20,80,0.45) 60%, rgba(0,20,80,0.15) 100%)',
+          background:'linear-gradient(90deg, rgba(0,20,80,0.55) 0%, rgba(0,20,80,0.30) 60%, rgba(0,20,80,0.05) 100%)',
         }}/>
         <div style={{ position:'absolute', inset:0, padding:'20px 16px', display:'flex', flexDirection:'column', justifyContent:'center' }}>
           <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', fontWeight:600, letterSpacing:1, marginBottom:4 }}>
