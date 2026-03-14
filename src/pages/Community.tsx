@@ -109,16 +109,25 @@ export default function Community() {
   const handleLike = async (postId: string) => {
     const key = `post_${postId}`
     const newLiked = new Set(liked)
-    if (newLiked.has(key)) {
+    const isAlreadyLiked = newLiked.has(key)
+
+    // 낙관적 업데이트 — UI 먼저 반영
+    if (isAlreadyLiked) {
       newLiked.delete(key)
-      await supabase.from('community_likes').delete().eq('post_id', postId).eq('author_id', MY_ID)
+      setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: Math.max(0, p.likes - 1) } : p))
     } else {
       newLiked.add(key)
-      await supabase.from('community_likes').insert({ post_id: postId, author_id: MY_ID })
+      setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p))
     }
     setLiked(newLiked)
     saveLiked(newLiked)
-    await fetchPosts()
+
+    // DB 업데이트
+    if (isAlreadyLiked) {
+      await supabase.from('community_likes').delete().eq('post_id', postId).eq('author_id', MY_ID)
+    } else {
+      await supabase.from('community_likes').insert({ post_id: postId, author_id: MY_ID })
+    }
   }
 
   const handleComment = async (postId: string) => {
