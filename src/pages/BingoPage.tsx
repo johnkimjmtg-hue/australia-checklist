@@ -853,7 +853,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             animation:'scaleIn 0.25s ease', overflowY:'auto', maxHeight:'90vh',
           }}>
             <img src="/syd_coffee/syd.jpg" alt="태양의 항해"
-              style={{ width:'100%', aspectRatio:'1', objectFit:'cover', display:'block' }} />
+              style={{ width:'100%', aspectRatio:'16/9', objectFit:'cover', display:'block' }} />
             <div style={{ padding:'20px 20px 24px' }}>
               <div style={{ fontSize:13, fontWeight:800, color:'#38BDF8', letterSpacing:1, marginBottom:4 }}>
                 ⛵ 태양의 항해: 25개의 신대륙
