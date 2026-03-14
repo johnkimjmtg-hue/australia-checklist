@@ -18,6 +18,7 @@ import Services from './Services'
 import BingoPage from './BingoPage'
 import BucketCheckView from './BucketCheckView'
 import Community from './Community'
+import Shopping from './Shopping'
 import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 
@@ -424,11 +425,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {mainTab === 'services' ? (
         <Services onSelectBusiness={() => {}} onBack={() => setMainTab('bucketlist')} />
       ) : mainTab === 'shopping' ? (
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'60vh', gap:12 }}>
-          <Icon icon="ph:shopping-bag" width={48} height={48} color="#CBD5E1" />
-          <div style={{ fontSize:16, fontWeight:700, color:'#94A3B8' }}>필수 쇼핑 추천</div>
-          <div style={{ fontSize:13, color:'#CBD5E1' }}>준비 중이에요 🛍</div>
-        </div>
+        <Shopping />
       ) : mainTab === 'bingo' ? (
         <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
       ) : mainTab === 'community' ? (
