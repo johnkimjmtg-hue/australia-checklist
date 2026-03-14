@@ -66,11 +66,11 @@ export default function Community() {
     if (!postsData) return
 
     const postIds = postsData.map(p => p.id)
-    const { data: commentsData } = await supabase
-      .from('community_comments')
-      .select('*')
-      .in('post_id', postIds)
-      .order('created_at', { ascending: true })
+
+    const [{ data: commentsData }, { data: likesData }] = await Promise.all([
+      supabase.from('community_comments').select('*').in('post_id', postIds).order('created_at', { ascending: true }),
+      supabase.from('community_likes').select('post_id').in('post_id', postIds),
+    ])
 
     const commentsByPost: Record<string, Comment[]> = {}
     commentsData?.forEach(c => {
@@ -78,7 +78,16 @@ export default function Community() {
       commentsByPost[c.post_id].push(c)
     })
 
-    setPosts(postsData.map(p => ({ ...p, comments: commentsByPost[p.id] ?? [] })))
+    const likeCountByPost: Record<string, number> = {}
+    likesData?.forEach(l => {
+      likeCountByPost[l.post_id] = (likeCountByPost[l.post_id] ?? 0) + 1
+    })
+
+    setPosts(postsData.map(p => ({
+      ...p,
+      likes: likeCountByPost[p.id] ?? 0,
+      comments: commentsByPost[p.id] ?? [],
+    })))
     setLoading(false)
   }, [])
 
