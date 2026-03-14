@@ -61,6 +61,14 @@ const SYDNEY_CAFES = [
 ]
 
 
+// ── 멜번 판테온 소제목 (1~25)
+const PANTHEON_TITLE: string[] = [
+  '빛의 여신', '어둠의 군주', '시간의 지배자', '공간의 창조자', '공허의 감시자',
+  '물의 여신', '불의 거인', '대지의 신', '바람의 정령', '생명의 여신',
+  '기억의 사서', '꿈의 무희', '지혜의 현자', '감정의 신', '예술의 무희',
+  '언어의 여신', '조화의 원소', '투쟁의 전사', '커피의 기원', '제작의 기술자',
+  '멜버른의 수호자', '게이샤의 영수', '융합의 혼합', '추출의 달인', '궁극의 창조신',
+]
 // ── 멜번 판테온 멘트 (1~25)
 const PANTHEON_LORE: string[] = [
   '당신은 혼돈의 공허 속에 첫 번째 빛을 선언했습니다.',
@@ -543,22 +551,17 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             <div style={{ fontSize:15, fontWeight:800, color:'#1E293B', marginBottom:3, lineHeight:1.3 }}>
               {getStatusMsg(checked.size, bingoCount).title}
             </div>
+            {lastCheckedIdx !== null && checkOrder.includes(lastCheckedIdx) && (
+              <div style={{ fontSize:10, fontWeight:800, color:'#B45309', letterSpacing:0.5, marginBottom:2 }}>
+                {PANTHEON_TITLE[checkOrder.indexOf(lastCheckedIdx)]}
+              </div>
+            )}
             <div style={{ fontSize:11, color:'#64748B', fontWeight:500, marginBottom:8, lineHeight:1.5 }}>
               {lastCheckedIdx !== null && checkOrder.includes(lastCheckedIdx)
                 ? PANTHEON_LORE[checkOrder.indexOf(lastCheckedIdx)]
                 : getStatusMsg(checked.size, bingoCount).sub}
             </div>
-            {/* 빙고 뱃지 */}
-            <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
-              {bingoCount > 0
-                ? <span style={{
-                    fontSize:10, fontWeight:800, color:'#fff',
-                    background:'#16A34A', borderRadius:5, padding:'2px 8px',
-                    animation:'bingoFlash 1.5s ease infinite',
-                  }}>{bingoCount} {bingoCount === 1 ? 'BINGO' : 'BINGOS'}</span>
-                : <span style={{ fontSize:11, color:'#CBD5E1', fontWeight:500 }}>빙고 도전 중...</span>
-              }
-            </div>
+
           </div>
           {/* 카운터 */}
           <div style={{ textAlign:'center', flexShrink:0 }}>
