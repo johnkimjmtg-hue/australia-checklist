@@ -90,7 +90,16 @@ export default function Shopping() {
         .prod-card{transition:transform 0.15s ease, box-shadow 0.15s ease;}
         .cat-btn{transition:all 0.15s ease;}
         .sort-btn{transition:all 0.15s ease;}
-        ::-webkit-scrollbar{display:none}
+        .featured-scroll{overflow-x:auto;}
+        @media (max-width:768px){
+          .featured-scroll{scrollbar-width:none;-ms-overflow-style:none;}
+          .featured-scroll::-webkit-scrollbar{display:none;}
+        }
+        @media (min-width:769px){
+          .featured-scroll::-webkit-scrollbar{height:4px;}
+          .featured-scroll::-webkit-scrollbar-track{background:#F0F4F8;border-radius:2px;}
+          .featured-scroll::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:2px;}
+        }
       `}</style>
 
       {/* ── 히어로 배너 */}
@@ -141,7 +150,7 @@ export default function Shopping() {
               <span>⭐ 강력 추천</span>
               <div style={{ flex:1, height:1, background:'#E2E8F0' }} />
             </div>
-            <div style={{ display:'flex', gap:10, overflowX:'auto', paddingBottom:4 }}>
+            <div className="featured-scroll" style={{ display:'flex', gap:10, paddingBottom:4 }}>
               {featured.map(p => (
                 <div key={p.id} className="prod-card" onClick={() => setSelProduct(p)} style={{
                   flexShrink:0, width:160,
