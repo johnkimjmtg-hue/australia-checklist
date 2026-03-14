@@ -57,6 +57,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const logoTapTimer = useRef<any>(null)
 
   const [bizCount, setBizCount] = useState(0)
+  const [shopCount, setShopCount] = useState(0)
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
   const [detailBiz, setDetailBiz] = useState<Business|null>(null)
 
@@ -72,6 +73,20 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       } catch {}
     }
     fetchBizCount()
+  }, [])
+
+  useEffect(() => {
+    async function fetchShopCount() {
+      try {
+        const { supabase } = await import('../lib/supabase')
+        const { count } = await supabase
+          .from('shopping_products')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true)
+        if (count !== null) setShopCount(count)
+      } catch {}
+    }
+    fetchShopCount()
   }, [])
 
   useEffect(() => {
@@ -391,7 +406,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
           <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
-            {mainTab === 'services' ? `${bizCount}개 업체` : mainTab === 'bucketlist' ? `${total}개 버킷리스트` : mainTab === 'bingo' ? (bingoCity === 'melbourne' ? '멜번' : '시드니') : ''}
+            {mainTab === 'services' ? `${bizCount}개 업체` : mainTab === 'bucketlist' ? `${total}개 버킷리스트` : mainTab === 'shopping' ? `${shopCount}개 상품` : mainTab === 'bingo' ? (bingoCity === 'melbourne' ? '멜번' : '시드니') : ''}
           </span>
         </div>
         {/* 탭 */}
