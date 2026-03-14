@@ -139,6 +139,15 @@ export default function Community() {
     setCommentText(prev => ({ ...prev, [postId]: '' }))
   }
 
+  const handleShare = async (text: string) => {
+    if (navigator.share) {
+      try { await navigator.share({ text }) } catch {}
+    } else {
+      await navigator.clipboard.writeText(text)
+      alert('클립보드에 복사됐어요!')
+    }
+  }
+
   const handleDelete = (postId: string) => {
     setPosts(prev => prev.filter(p => p.id !== postId))
   }
@@ -216,6 +225,14 @@ export default function Community() {
                         {post.comments.length}
                       </span>
                     )}
+                  </button>
+
+                  {/* 공유 버튼 */}
+                  <button onClick={() => handleShare(post.text)} style={{
+                    display: 'flex', alignItems: 'center',
+                    background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                  }}>
+                    <Icon icon="ph:export" width={18} height={18} color="#94A3B8" />
                   </button>
 
                   {/* 좋아요 버튼 */}
