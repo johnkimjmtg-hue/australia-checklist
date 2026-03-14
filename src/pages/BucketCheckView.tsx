@@ -20,8 +20,11 @@ type Props = {
   onEdit:     () => void
   onDelete:   () => void
   onShare:    () => void
-  onServices: () => void
-  onLanding:  () => void
+  onServices:  () => void
+  onShopping:  () => void
+  onBingo:     () => void
+  onCommunity: () => void
+  onLanding:   () => void
 }
 
 /* ══ 아이템별 아이코니파이 단색 아이콘 매핑 ══ */
@@ -165,7 +168,7 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=
 }
 
 /* ══ 메인 ══ */
-export default function BucketCheckView({ state, trip, setState, items, dbItems, onAchievedChange, onEdit, onDelete, onShare, onServices, onLanding }: Props) {
+export default function BucketCheckView({ state, trip, setState, items, dbItems, onAchievedChange, onEdit, onDelete, onShare, onServices, onShopping, onBingo, onCommunity, onLanding }: Props) {
   const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
@@ -417,9 +420,9 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           {([
             { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트', action: () => {} },
             { id:'services',   icon:'ph:buildings',    label:'업체/서비스', action: onServices },
-            { id:'shopping',   icon:'ph:shopping-bag', label:'필수쇼핑',   action: () => {} },
-            { id:'bingo',      icon:'ph:coffee',       label:'도장깨기',   action: () => {} },
-            { id:'community',  icon:'ph:chats-circle', label:'커뮤니티',   action: () => {} },
+            { id:'shopping',   icon:'ph:shopping-bag', label:'필수쇼핑',   action: onShopping },
+            { id:'bingo',      icon:'ph:coffee',       label:'도장깨기',   action: onBingo },
+            { id:'community',  icon:'ph:chats-circle', label:'커뮤니티',   action: onCommunity },
           ]).map(tab => {
             const active = tab.id === 'bucketlist'
             return (
