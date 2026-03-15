@@ -217,7 +217,7 @@ export default function Community() {
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }}
             placeholder="글·댓글 검색..."
-            style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: '#1E293B', background: 'transparent', fontFamily: 'inherit' }}
+            style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: '#1E293B', background: '#fff', fontFamily: 'inherit' }}
           />
           {search && (
             <button onClick={() => { setSearch(''); setPage(1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
