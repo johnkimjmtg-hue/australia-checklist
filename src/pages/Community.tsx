@@ -299,7 +299,7 @@ export default function Community() {
         <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '10px 14px 0', paddingBottom: 80 }}>
 
           {/* ── 검색창 */}
-          <div style={{ marginBottom: 8 }}>
+          <div style={{ position: 'sticky', top: 0, zIndex: 20, marginBottom: 8, background: '#F0F4F8', paddingBottom: 4 }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8,
               background: '#fff', borderRadius: 12, padding: '0 12px',
