@@ -210,7 +210,8 @@ export default function Community() {
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
           background: '#fff', borderRadius: 12, padding: '0 12px',
-          height: 40,
+          height: 40, border: '1px solid #D1D9E3',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
         }}>
           <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
           <input
