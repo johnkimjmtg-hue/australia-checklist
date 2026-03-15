@@ -10,7 +10,7 @@ import { supabase } from '../lib/supabase'
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'hojugaja2024'
 
 // ── 탭 타입
-type MainTab = 'business' | 'categories' | 'items' | 'requests' | 'suggestions' | 'community' | 'shopping'
+type MainTab = 'business' | 'categories' | 'items' | 'requests' | 'suggestions' | 'community' | 'shopping' | 'bingo'
 
 // ── 탭 메타
 const TAB_META: { id: MainTab; icon: string; label: string }[] = [
@@ -21,6 +21,7 @@ const TAB_META: { id: MainTab; icon: string; label: string }[] = [
   { id:'items',       icon:'ph:list-checks',        label:'체크리스트' },
   { id:'community',   icon:'ph:chats-circle',       label:'커뮤니티' },
   { id:'shopping',    icon:'ph:shopping-bag',        label:'쇼핑' },
+  { id:'bingo',       icon:'ph:coffee',              label:'빙고' },
 ]
 
 
@@ -322,6 +323,7 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
         {tab==='items'       && (clLoading ? <div style={{padding:32,textAlign:'center',color:'#aaa'}}>불러오는 중...</div> : <ItemsTab cats={sharedCats} items={sharedItems} setItems={setSharedItems} />)}
         {tab==='community'   && <CommunityTab />}
         {tab==='shopping'    && <ShoppingTab />}
+        {tab==='bingo'       && <BingoTab />}
       </div>
 
       {/* 하단 네비바 */}
@@ -2160,6 +2162,112 @@ function ShoppingTab() {
           </div>
         </>
       )}
+    </div>
+  )
+}
+
+// ── 빙고 탭
+function BingoTab() {
+  const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+  type BingoCafe = { id: string; city: string; sort_order: number; name: string; business_id: string | null; is_active: boolean }
+  type Business  = { id: string; name: string }
+
+  const [cafes, setCafes]         = useState<BingoCafe[]>([])
+  const [businesses, setBusinesses] = useState<Business[]>([])
+  const [loading, setLoading]     = useState(true)
+  const [city, setCity]           = useState<'melbourne'|'sydney'>('melbourne')
+  const [saving, setSaving]       = useState<string | null>(null)
+
+  useEffect(() => {
+    const load = async () => {
+      const [{ data: cafeData }, { data: bizData }] = await Promise.all([
+        supabase.from('bingo_cafes').select('*').order('city').order('sort_order'),
+        supabase.from('businesses').select('id, name').eq('is_active', true).order('name'),
+      ])
+      if (cafeData) setCafes(cafeData)
+      if (bizData)  setBusinesses(bizData)
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  const handleBusinessLink = async (cafeId: string, businessId: string) => {
+    setSaving(cafeId)
+    const val = businessId === '' ? null : businessId
+    await supabase.from('bingo_cafes').update({ business_id: val }).eq('id', cafeId)
+    setCafes(prev => prev.map(c => c.id === cafeId ? { ...c, business_id: val } : c))
+    setSaving(null)
+  }
+
+  const filtered = cafes.filter(c => c.city === city)
+
+  if (loading) return (
+    <div style={{ textAlign:'center', padding:40, color:'#94A3B8', fontFamily:ff }}>불러오는 중...</div>
+  )
+
+  return (
+    <div style={{ fontFamily: ff }}>
+      {/* 도시 탭 */}
+      <div style={{ display:'flex', gap:8, marginBottom:16 }}>
+        {(['melbourne', 'sydney'] as const).map(c => (
+          <button key={c} onClick={() => setCity(c)} style={{
+            height:34, padding:'0 16px', borderRadius:20, border:'none', cursor:'pointer',
+            background: city === c ? '#1B6EF3' : '#F1F5F9',
+            color: city === c ? '#fff' : '#475569',
+            fontSize:13, fontWeight:700,
+          }}>{c === 'melbourne' ? '멜번' : '시드니'}</button>
+        ))}
+      </div>
+
+      {/* 카페 리스트 */}
+      <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+        {filtered.map(cafe => (
+          <div key={cafe.id} style={{
+            background:'#fff', borderRadius:12, padding:'12px 14px',
+            boxShadow:'0 1px 4px rgba(0,0,0,0.06)',
+            border:'1px solid #F1F5F9',
+          }}>
+            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+              {/* 번호 + 이름 */}
+              <div style={{
+                width:28, height:28, borderRadius:8, background:'#EFF6FF',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:12, fontWeight:800, color:'#1B6EF3', flexShrink:0,
+              }}>{cafe.sort_order}</div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:13, fontWeight:700, color:'#0F172A' }}>{cafe.name}</div>
+                {cafe.business_id && (
+                  <div style={{ fontSize:11, color:'#16A34A', marginTop:2 }}>
+                    ✓ {businesses.find(b => b.id === cafe.business_id)?.name ?? '연결됨'}
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* 업체 연결 선택 */}
+            <div style={{ marginTop:10 }}>
+              <select
+                value={cafe.business_id ?? ''}
+                onChange={e => handleBusinessLink(cafe.id, e.target.value)}
+                disabled={saving === cafe.id}
+                style={{
+                  width:'100%', height:36, borderRadius:8,
+                  border:'1px solid #E2E8F0', padding:'0 10px',
+                  fontSize:12, color:'#1E293B', background:'#F8FAFC',
+                  fontFamily:ff,
+                }}
+              >
+                <option value=''>업체 연결 안 함</option>
+                {businesses.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+              {saving === cafe.id && (
+                <div style={{ fontSize:11, color:'#94A3B8', marginTop:4 }}>저장 중...</div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

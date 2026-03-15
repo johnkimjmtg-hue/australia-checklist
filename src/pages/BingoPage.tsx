@@ -1,64 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
+import { supabase } from '../lib/supabase'
 
+interface BingoCafe {
+  id: string
+  city: string
+  sort_order: number
+  name: string
+  business_id: string | null
+  is_active: boolean
+}
 
-// ── 멜번 카페 25개 플레이스홀더 데이터
-const MELBOURNE_CAFES = [
-  { id: 1,  name: 'St. Ali',             address: '12-18 Yarra St, South Melbourne',            img: '/mel_coffee/mel_image/1.jpg' },
-  { id: 2,  name: 'Puzzle Coffee',       address: '133 Swanston St, Melbourne',                 img: '/mel_coffee/mel_image/2.jpg' },
-  { id: 3,  name: 'Maker Coffee',        address: '387 Little Bourke St, Melbourne',            img: '/mel_coffee/mel_image/3.jpg' },
-  { id: 4,  name: 'Little Rogue',        address: '12 Drewery Ln, Melbourne',                   img: '/mel_coffee/mel_image/4.jpg' },
-  { id: 5,  name: 'Market Lane',         address: '83-85 Victoria St, Melbourne',               img: '/mel_coffee/mel_image/5.jpg' },
-  { id: 6,  name: 'Ona Coffee',          address: '22 Ovens St, Brunswick',                     img: '/mel_coffee/mel_image/6.jpg' },
-  { id: 7,  name: 'Seven Seeds',         address: '114 Berkeley St, Carlton',                   img: '/mel_coffee/mel_image/7.jpg' },
-  { id: 8,  name: 'Small Batch',         address: '3-9 Little Howard St, North Melbourne',      img: '/mel_coffee/mel_image/8.jpg' },
-  { id: 9,  name: 'Shortstop',           address: '12 Sutherland St, Melbourne',                img: '/mel_coffee/mel_image/9.jpg' },
-  { id: 10, name: 'Brick Lane',          address: '33 Guildford Ln, Melbourne',                 img: '/mel_coffee/mel_image/10.jpg' },
-  { id: 11, name: 'Industry Beans',      address: '345 Little Collins St, Melbourne',           img: '/mel_coffee/mel_image/11.jpg' },
-  { id: 12, name: 'Regulars',            address: '126 Franklin St, Melbourne',                 img: '/mel_coffee/mel_image/12.jpg' },
-  { id: 13, name: 'Good Measure',        address: '193 Lygon St, Carlton',                      img: '/mel_coffee/mel_image/13.jpg' },
-  { id: 14, name: 'Padre Coffee',        address: '16 Oliver Ln, Melbourne',                    img: '/mel_coffee/mel_image/14.jpg' },
-  { id: 15, name: 'Brother Baba Budan',  address: '359 Little Bourke St, Melbourne',            img: '/mel_coffee/mel_image/15.jpg' },
-  { id: 16, name: 'Patricia Coffee',     address: '493-495 Little Bourke St, Melbourne',        img: '/mel_coffee/mel_image/16.jpg' },
-  { id: 17, name: 'Palace Coffee',       address: '486 City Rd, South Melbourne',               img: '/mel_coffee/mel_image/17.jpg' },
-  { id: 18, name: 'Tone Coffee',         address: '199 High St, Prahran',                       img: '/mel_coffee/mel_image/18.jpg' },
-  { id: 19, name: 'Mork Chocolate',      address: '150 Errol St, North Melbourne',              img: '/mel_coffee/mel_image/19.jpg' },
-  { id: 20, name: 'Dukes Coffee',        address: '247 Flinders Ln, Melbourne',                 img: '/mel_coffee/mel_image/20.jpg' },
-  { id: 21, name: 'Campos Coffee',       address: '572 Chapel St, South Yarra',                 img: '/mel_coffee/mel_image/21.jpg' },
-  { id: 22, name: 'Ini Studio',          address: '225 Queensberry St, Carlton',                img: '/mel_coffee/mel_image/22.jpg' },
-  { id: 23, name: 'Acoffee',             address: '30 Sackville St, Collingwood',               img: '/mel_coffee/mel_image/23.jpg' },
-  { id: 24, name: 'Code Black',          address: '360 Collins St, Melbourne',                  img: '/mel_coffee/mel_image/24.jpg' },
-  { id: 25, name: 'Overlay',             address: '320 Victoria St, North Melbourne',           img: '/mel_coffee/mel_image/25.jpg' },
-]
-
-// ── 시드니 카페 25개 플레이스홀더 데이터
-const SYDNEY_CAFES = [
-  { id: 1,  name: 'Single O',                      address: '60-64 Reservoir St, Surry Hills',                          img: '/syd_coffee/syd_image/1.jpg' },
-  { id: 2,  name: 'Artificer Coffee',              address: '547 Bourke St, Surry Hills',                               img: '/syd_coffee/syd_image/2.jpg' },
-  { id: 3,  name: 'Room Ten',                      address: '10 Llankelly Pl, Potts Point',                             img: '/syd_coffee/syd_image/3.jpg' },
-  { id: 4,  name: 'bills Darlinghurst',            address: '433 Liverpool St, Darlinghurst',                           img: '/syd_coffee/syd_image/4.jpg' },
-  { id: 5,  name: 'The Grounds',                   address: '7a/2 Huntley St, Alexandria',                              img: '/syd_coffee/syd_image/5.jpg' },
-  { id: 6,  name: "Toby's Estate",                address: '32-36 City Rd, Chippendale',                               img: '/syd_coffee/syd_image/6.jpg' },
-  { id: 7,  name: 'Paramount Coffee',              address: '80 Commonwealth St, Surry Hills',                          img: '/syd_coffee/syd_image/7.jpg' },
-  { id: 8,  name: 'Reuben Hills',                  address: '61 Albion St, Surry Hills',                                img: '/syd_coffee/syd_image/8.jpg' },
-  { id: 9,  name: 'Edition Roasters',              address: '60 Darling Dr, Haymarket',                                 img: '/syd_coffee/syd_image/9.jpg' },
-  { id: 10, name: 'AP Bakery',                     address: '80 Commonwealth St, Surry Hills',                          img: '/syd_coffee/syd_image/10.jpg' },
-  { id: 11, name: 'Skittle Lane',                  address: '40 King St, Sydney',                                       img: '/syd_coffee/syd_image/11.jpg' },
-  { id: 12, name: "Pablo & Rusty's",              address: '161 Castlereagh St, Sydney',                               img: '/syd_coffee/syd_image/12.jpg' },
-  { id: 13, name: 'Mecca Coffee',                  address: '67-272 Cleveland St, Alexandria',                          img: '/syd_coffee/syd_image/13.jpg' },
-  { id: 14, name: 'Gumption',                      address: '19-21/412-414 George St, Sydney',                          img: '/syd_coffee/syd_image/14.jpg' },
-  { id: 15, name: 'Reformatory',                   address: '17-51 Foveaux St, Surry Hills',                            img: '/syd_coffee/syd_image/15.jpg' },
-  { id: 16, name: 'Campos Coffee',                 address: '193 Missenden Rd, Newtown',                                img: '/syd_coffee/syd_image/16.jpg' },
-  { id: 17, name: 'Circa Espresso',                address: '21 Wentworth St, Parramatta',                              img: '/syd_coffee/syd_image/17.jpg' },
-  { id: 18, name: 'Sample Coffee',                 address: 'Suite 1.03, 75 Mary St, St Peters',                        img: '/syd_coffee/syd_image/18.jpg' },
-  { id: 19, name: 'ONA Coffee Sydney',             address: '58 Smith St, Marrickville',                                img: '/syd_coffee/syd_image/19.jpg' },
-  { id: 20, name: 'Three Williams',                address: '613 Elizabeth St, Redfern',                                img: '/syd_coffee/syd_image/20.jpg' },
-  { id: 21, name: 'Normcore Coffee',               address: '126 Devonshire St, Surry Hills',                           img: '/syd_coffee/syd_image/21.jpg' },
-  { id: 22, name: 'Devon Cafe',                    address: '19/200 Barangaroo Ave, Barangaroo',                        img: '/syd_coffee/syd_image/22.jpg' },
-  { id: 23, name: 'Speedos Cafe',                  address: '126 Ramsgate Ave, North Bondi',                            img: '/syd_coffee/syd_image/23.jpg' },
-  { id: 24, name: 'Cuckoo Callay',                 address: '324A King St, Newtown',                                    img: '/syd_coffee/syd_image/24.jpg' },
-  { id: 25, name: 'Coffee Alchemy',                address: '2/87 Sydenham Rd, Marrickville',                           img: '/syd_coffee/syd_image/25.jpg' },
-]
 
 
 // ── 멜번 판테온 소제목 (1~25)
@@ -306,6 +258,9 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const pageRef = useRef<HTMLDivElement>(null)
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
   const [city, setCity] = useState<'melbourne'|'sydney'>(initialCity ?? 'melbourne')
+  const [melbourneCafes, setMelbourneCafes] = useState<BingoCafe[]>([])
+  const [sydneyCafes, setSydneyCafes] = useState<BingoCafe[]>([])
+  const [cafesLoading, setCafesLoading] = useState(true)
   const [checkedMelbourne, setCheckedMelbourne] = useState<Set<number>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')) }
     catch { return new Set() }
@@ -353,6 +308,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
     else setOrderSydney(val)
   }
   const [lastCheckedIdx, setLastCheckedIdx] = useState<number|null>(null)
+  const [selectedCafe, setSelectedCafe] = useState<BingoCafe | null>(null)
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
@@ -485,7 +441,23 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   // 빙고 라인에 포함된 셀 인덱스
   const highlightedCells = new Set(completedLines.flat())
 
-  const cafe = city === 'melbourne' ? MELBOURNE_CAFES : SYDNEY_CAFES
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from('bingo_cafes')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order')
+      if (data) {
+        setMelbourneCafes(data.filter(c => c.city === 'melbourne'))
+        setSydneyCafes(data.filter(c => c.city === 'sydney'))
+      }
+      setCafesLoading(false)
+    }
+    load()
+  }, [])
+
+  const cafe = (city === 'melbourne' ? melbourneCafes : sydneyCafes)
 
   return (
     <div ref={pageRef} style={{
@@ -637,7 +609,6 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               <div
                 key={c.id}
                 onClick={() => handleCell(idx)}
-                onDoubleClick={() => c.address && window.open(`https://maps.google.com/?q=${encodeURIComponent(c.address)}`, '_blank')}
                 style={{
                   position:'relative',
                   borderRadius:10,
@@ -671,15 +642,12 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                       style={{ width:'100%', height:'100%', objectFit:'cover', transition:'opacity 0.3s' }}
                       onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
                     />
-                  ) : c.img ? (
-                    <img src={c.img} alt={c.name}
-                      style={{ width:'100%', height:'100%', objectFit:'cover' }}
-                    />
                   ) : (
-                    <Icon
-                      icon="ph:coffee"
-                      width={22} height={22}
-                      color={isChecked ? 'rgba(255,255,255,0.5)' : '#CBD5E1'}
+                    <img
+                      src={city === 'melbourne' ? `/mel_coffee/mel_image/${c.sort_order}.jpg` : `/syd_coffee/syd_image/${c.sort_order}.jpg`}
+                      alt={c.name}
+                      style={{ width:'100%', height:'100%', objectFit:'cover' }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
                     />
                   )}
                 </div>
@@ -693,6 +661,20 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                   background:'#fff',
                   whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
                 }}>{c.name}</div>
+
+                {/* 정보 아이콘 */}
+                <button
+                  onClick={e => { e.stopPropagation(); setSelectedCafe(c) }}
+                  style={{
+                    position:'absolute', top:3, right:3,
+                    width:18, height:18, borderRadius:'50%',
+                    background:'rgba(0,0,0,0.35)', border:'none',
+                    cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+                    zIndex:2,
+                  }}
+                >
+                  <Icon icon="ph:info" width={11} height={11} color="#fff" />
+                </button>
 
                 {/* 도장 오버레이 */}
                 {isChecked && (
@@ -720,6 +702,38 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
 
 
       </div>
+
+      {/* ── 카페 정보 팝업 */}
+      {selectedCafe && (
+        <>
+          <div onClick={() => setSelectedCafe(null)} style={{
+            position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:800,
+          }} />
+          <div style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:480, background:'#fff',
+            borderRadius:'20px 20px 0 0', zIndex:801,
+            padding:'20px 20px 40px',
+          }}>
+            <div style={{ width:36, height:4, background:'#E2E8F0', borderRadius:2, margin:'0 auto 16px' }} />
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+              <div style={{ fontSize:17, fontWeight:800, color:'#0F172A' }}>{selectedCafe.name}</div>
+              <button onClick={() => setSelectedCafe(null)} style={{ background:'none', border:'none', cursor:'pointer' }}>
+                <Icon icon="ph:x" width={20} height={20} color="#94A3B8" />
+              </button>
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              {selectedCafe.business_id ? (
+                <CafeBusinessInfo businessId={selectedCafe.business_id} />
+              ) : (
+                <div style={{ fontSize:13, color:'#94A3B8', textAlign:'center', padding:'20px 0' }}>
+                  업체 정보가 아직 연결되지 않았어요
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ── 푸터 */}
       <div style={{
@@ -1016,6 +1030,75 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       {/* ── 효과 */}
       <Confetti trigger={confettiTrigger} />
       {showFireworks && <Fireworks />}
+    </div>
+  )
+}
+
+// ── 업체 정보 컴포넌트
+function CafeBusinessInfo({ businessId }: { businessId: string }) {
+  const [biz, setBiz] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('id', businessId)
+        .single()
+      setBiz(data)
+      setLoading(false)
+    }
+    load()
+  }, [businessId])
+
+  if (loading) return (
+    <div style={{ textAlign:'center', padding:'20px 0', color:'#94A3B8', fontSize:13 }}>불러오는 중...</div>
+  )
+  if (!biz) return (
+    <div style={{ textAlign:'center', padding:'20px 0', color:'#94A3B8', fontSize:13 }}>업체 정보를 찾을 수 없어요</div>
+  )
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+      {biz.description && (
+        <div style={{ fontSize:13, color:'#475569', lineHeight:1.7 }}>{biz.description}</div>
+      )}
+      {biz.address && (
+        <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#64748B' }}>
+          <Icon icon="ph:map-pin" width={14} height={14} color="#1B6EF3" />
+          {biz.address}, {biz.city}
+        </div>
+      )}
+      {biz.phone && (
+        <a href={`tel:${biz.phone}`} style={{
+          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+          background:'#1B6EF3', color:'#fff', borderRadius:12,
+          padding:'12px', fontSize:14, fontWeight:700, textDecoration:'none',
+        }}>
+          <Icon icon="ph:phone" width={16} height={16} color="#fff" />
+          전화하기 · {biz.phone}
+        </a>
+      )}
+      {biz.kakao && (
+        <a href={`https://open.kakao.com/o/${biz.kakao}`} target="_blank" rel="noreferrer" style={{
+          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+          background:'#FEE500', color:'#3C1E1E', borderRadius:12,
+          padding:'12px', fontSize:14, fontWeight:700, textDecoration:'none',
+        }}>
+          💬 카카오톡 문의
+        </a>
+      )}
+      {biz.website && (
+        <a href={biz.website} target="_blank" rel="noreferrer" style={{
+          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+          background:'#F1F5F9', color:'#1B6EF3', borderRadius:12,
+          padding:'12px', fontSize:14, fontWeight:700, textDecoration:'none',
+        }}>
+          <Icon icon="ph:globe" width={16} height={16} color="#1B6EF3" />
+          웹사이트 방문
+        </a>
+      )}
     </div>
   )
 }
