@@ -444,10 +444,15 @@ export default function Community() {
                         value={commentText[post.id] ?? ''}
                         onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
                         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id) } }}
-                        onFocus={e => setTimeout(() => {
-                          e.target.scrollIntoView({ behavior: 'smooth', block: 'end' })
-                          window.scrollBy({ top: 80, behavior: 'smooth' })
-                        }, 300)}
+                        onFocus={e => {
+                          setTimeout(() => {
+                            const rect = e.target.getBoundingClientRect()
+                            const footerH = 80
+                            const gap = 16
+                            const overlapBy = rect.bottom - (window.innerHeight - footerH - gap)
+                            if (overlapBy > 0) window.scrollBy({ top: overlapBy, behavior: 'smooth' })
+                          }, 300)
+                        }}
                         placeholder="댓글 달기..."
                         style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', fontFamily: 'inherit', color: '#1E293B' }}
                       />
