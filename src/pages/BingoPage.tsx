@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
+import BusinessCard from '../components/BusinessCard'
 
 interface BingoCafe {
   id: string
@@ -705,35 +706,27 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
 
       {/* ── 카페 정보 팝업 */}
       {selectedCafe && (
-        <>
-          <div onClick={() => setSelectedCafe(null)} style={{
-            position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:800,
-          }} />
+        <div style={{ position:'fixed', inset:0, zIndex:800 }}>
+          <div onClick={() => setSelectedCafe(null)} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:390, background:'#fff',
-            borderRadius:'20px 20px 0 0', zIndex:801,
-            padding:'20px 20px 40px',
-            maxHeight:'85vh', overflowY:'auto', boxSizing:'border-box',
+            width:'100%', maxWidth:390,
+            maxHeight:'85vh', overflowY:'auto',
+            borderRadius:'20px 20px 0 0',
+            background:'#F0F4F8',
+            padding:'12px 12px 32px',
+            boxSizing:'border-box',
           }}>
-            <div style={{ width:36, height:4, background:'#E2E8F0', borderRadius:2, margin:'0 auto 16px' }} />
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
-              <div style={{ fontSize:17, fontWeight:800, color:'#0F172A' }}>{selectedCafe.name}</div>
-              <button onClick={() => setSelectedCafe(null)} style={{ background:'none', border:'none', cursor:'pointer' }}>
-                <Icon icon="ph:x" width={20} height={20} color="#94A3B8" />
-              </button>
+            <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:8 }}>
+              <button onClick={() => setSelectedCafe(null)}
+                style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', color:'#94A3B8' }}>✕</button>
             </div>
-            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-              {selectedCafe.business_id ? (
-                <CafeBusinessInfo businessId={selectedCafe.business_id} />
-              ) : (
-                <div style={{ fontSize:13, color:'#94A3B8', textAlign:'center', padding:'20px 0' }}>
-                  업체 정보가 아직 연결되지 않았어요
-                </div>
-              )}
-            </div>
+            {selectedCafe.business_id
+              ? <CafeBusinessInfo businessId={selectedCafe.business_id} />
+              : <div style={{ textAlign:'center', padding:24, color:'#94A3B8', fontSize:14 }}>업체 정보가 아직 연결되지 않았어요</div>
+            }
           </div>
-        </>
+        </div>
       )}
 
       {/* ── 푸터 */}
@@ -1054,52 +1047,11 @@ function CafeBusinessInfo({ businessId }: { businessId: string }) {
   }, [businessId])
 
   if (loading) return (
-    <div style={{ textAlign:'center', padding:'20px 0', color:'#94A3B8', fontSize:13 }}>불러오는 중...</div>
+    <div style={{ textAlign:'center', padding:'24px 0', color:'#94A3B8', fontSize:14 }}>불러오는 중...</div>
   )
   if (!biz) return (
-    <div style={{ textAlign:'center', padding:'20px 0', color:'#94A3B8', fontSize:13 }}>업체 정보를 찾을 수 없어요</div>
+    <div style={{ textAlign:'center', padding:'24px 0', color:'#94A3B8', fontSize:14 }}>업체 정보를 찾을 수 없어요</div>
   )
 
-  return (
-    <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-      {biz.description && (
-        <div style={{ fontSize:13, color:'#475569', lineHeight:1.7 }}>{biz.description}</div>
-      )}
-      {biz.address && (
-        <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#64748B' }}>
-          <Icon icon="ph:map-pin" width={14} height={14} color="#1B6EF3" />
-          {biz.address}, {biz.city}
-        </div>
-      )}
-      {biz.phone && (
-        <a href={`tel:${biz.phone}`} style={{
-          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-          background:'#1B6EF3', color:'#fff', borderRadius:12,
-          padding:'12px', fontSize:14, fontWeight:700, textDecoration:'none',
-        }}>
-          <Icon icon="ph:phone" width={16} height={16} color="#fff" />
-          전화하기 · {biz.phone}
-        </a>
-      )}
-      {biz.kakao && (
-        <a href={`https://open.kakao.com/o/${biz.kakao}`} target="_blank" rel="noreferrer" style={{
-          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-          background:'#FEE500', color:'#3C1E1E', borderRadius:12,
-          padding:'12px', fontSize:14, fontWeight:700, textDecoration:'none',
-        }}>
-          💬 카카오톡 문의
-        </a>
-      )}
-      {biz.website && (
-        <a href={biz.website} target="_blank" rel="noreferrer" style={{
-          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-          background:'#F1F5F9', color:'#1B6EF3', borderRadius:12,
-          padding:'12px', fontSize:14, fontWeight:700, textDecoration:'none',
-        }}>
-          <Icon icon="ph:globe" width={16} height={16} color="#1B6EF3" />
-          웹사이트 방문
-        </a>
-      )}
-    </div>
-  )
+  return <BusinessCard business={biz} />
 }
