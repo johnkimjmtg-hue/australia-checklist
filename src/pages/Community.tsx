@@ -450,7 +450,7 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ position: 'sticky', bottom: 0, background: '#F0F4F8', padding: '12px 14px 20px' }}>
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
         {/* 이모티콘 피커 */}
         {showEmoji && (
           <div ref={emojiPickerRef} style={{
