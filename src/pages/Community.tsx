@@ -204,8 +204,8 @@ export default function Community() {
   useEffect(() => {
     if (!loading) {
       setTimeout(() => {
-        const top = pageRef.current?.getBoundingClientRect().top ?? 0
-        window.scrollTo({ top: document.body.scrollHeight - window.innerHeight + top })
+        const tabBarH = 96
+        window.scrollTo({ top: document.body.scrollHeight - window.innerHeight + tabBarH })
       }, 100)
     }
   }, [loading])
