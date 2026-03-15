@@ -202,6 +202,15 @@ export default function Community() {
   }, [fetchPosts])
 
   useEffect(() => {
+    if (!loading) {
+      setTimeout(() => {
+        const tabBarH = 96
+        window.scrollTo({ top: document.body.scrollHeight - window.innerHeight + tabBarH })
+      }, 100)
+    }
+  }, [loading])
+
+  useEffect(() => {
     if (!expandedId) return
     setTimeout(() => {
       const el = document.getElementById(`comment-box-${expandedId}`)
