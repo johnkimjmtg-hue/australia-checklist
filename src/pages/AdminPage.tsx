@@ -2172,11 +2172,12 @@ function BingoTab() {
   type BingoCafe = { id: string; city: string; sort_order: number; name: string; business_id: string | null; is_active: boolean }
   type Business  = { id: string; name: string }
 
-  const [cafes, setCafes]         = useState<BingoCafe[]>([])
+  const [cafes, setCafes]           = useState<BingoCafe[]>([])
   const [businesses, setBusinesses] = useState<Business[]>([])
-  const [loading, setLoading]     = useState(true)
-  const [city, setCity]           = useState<'melbourne'|'sydney'>('melbourne')
-  const [saving, setSaving]       = useState<string | null>(null)
+  const [loading, setLoading]       = useState(true)
+  const [city, setCity]             = useState<'melbourne'|'sydney'>('melbourne')
+  const [saving, setSaving]         = useState<string | null>(null)
+  const [editName, setEditName]     = useState<Record<string, string>>({})
 
   useEffect(() => {
     const load = async () => {
@@ -2196,6 +2197,16 @@ function BingoTab() {
     const val = businessId === '' ? null : businessId
     await supabase.from('bingo_cafes').update({ business_id: val }).eq('id', cafeId)
     setCafes(prev => prev.map(c => c.id === cafeId ? { ...c, business_id: val } : c))
+    setSaving(null)
+  }
+
+  const handleNameSave = async (cafeId: string) => {
+    const newName = editName[cafeId]?.trim()
+    if (!newName) return
+    setSaving(cafeId)
+    await supabase.from('bingo_cafes').update({ name: newName }).eq('id', cafeId)
+    setCafes(prev => prev.map(c => c.id === cafeId ? { ...c, name: newName } : c))
+    setEditName(prev => { const n = { ...prev }; delete n[cafeId]; return n })
     setSaving(null)
   }
 
@@ -2227,24 +2238,43 @@ function BingoTab() {
             boxShadow:'0 1px 4px rgba(0,0,0,0.06)',
             border:'1px solid #F1F5F9',
           }}>
-            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-              {/* 번호 + 이름 */}
+            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:10 }}>
+              {/* 번호 */}
               <div style={{
                 width:28, height:28, borderRadius:8, background:'#EFF6FF',
                 display:'flex', alignItems:'center', justifyContent:'center',
                 fontSize:12, fontWeight:800, color:'#1B6EF3', flexShrink:0,
               }}>{cafe.sort_order}</div>
-              <div style={{ flex:1 }}>
-                <div style={{ fontSize:13, fontWeight:700, color:'#0F172A' }}>{cafe.name}</div>
-                {cafe.business_id && (
-                  <div style={{ fontSize:11, color:'#16A34A', marginTop:2 }}>
-                    ✓ {businesses.find(b => b.id === cafe.business_id)?.name ?? '연결됨'}
-                  </div>
-                )}
-              </div>
+              {/* 이름 편집 */}
+              <input
+                value={editName[cafe.id] ?? cafe.name}
+                onChange={e => setEditName(prev => ({ ...prev, [cafe.id]: e.target.value }))}
+                style={{
+                  flex:1, height:32, border:'1px solid #E2E8F0', borderRadius:8,
+                  padding:'0 10px', fontSize:13, fontWeight:700, color:'#0F172A',
+                  background:'#F8FAFC', fontFamily:ff,
+                }}
+              />
+              {/* 저장 버튼 - 수정된 경우에만 표시 */}
+              {editName[cafe.id] !== undefined && editName[cafe.id] !== cafe.name && (
+                <button
+                  onClick={() => handleNameSave(cafe.id)}
+                  disabled={saving === cafe.id}
+                  style={{
+                    height:32, padding:'0 10px', borderRadius:8, border:'none',
+                    background:'#1B6EF3', color:'#fff', fontSize:12, fontWeight:700,
+                    cursor:'pointer', flexShrink:0,
+                  }}
+                >{saving === cafe.id ? '...' : '저장'}</button>
+              )}
             </div>
             {/* 업체 연결 선택 */}
-            <div style={{ marginTop:10 }}>
+            <div>
+              {cafe.business_id && (
+                <div style={{ fontSize:11, color:'#16A34A', marginBottom:4 }}>
+                  ✓ {businesses.find(b => b.id === cafe.business_id)?.name ?? '연결됨'}
+                </div>
+              )}
               <select
                 value={cafe.business_id ?? ''}
                 onChange={e => handleBusinessLink(cafe.id, e.target.value)}
@@ -2261,9 +2291,6 @@ function BingoTab() {
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
               </select>
-              {saving === cafe.id && (
-                <div style={{ fontSize:11, color:'#94A3B8', marginTop:4 }}>저장 중...</div>
-              )}
             </div>
           </div>
         ))}

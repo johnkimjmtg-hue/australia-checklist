@@ -711,9 +711,10 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
           }} />
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:480, background:'#fff',
+            width:'100%', maxWidth:390, background:'#fff',
             borderRadius:'20px 20px 0 0', zIndex:801,
             padding:'20px 20px 40px',
+            maxHeight:'85vh', overflowY:'auto', boxSizing:'border-box',
           }}>
             <div style={{ width:36, height:4, background:'#E2E8F0', borderRadius:2, margin:'0 auto 16px' }} />
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
