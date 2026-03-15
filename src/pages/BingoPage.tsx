@@ -669,12 +669,12 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                   style={{
                     position:'absolute', top:3, right:3,
                     width:18, height:18, borderRadius:'50%',
-                    background:'rgba(0,0,0,0.45)', border:'none',
+                    background:'#FFB800', border:'none',
                     cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
                     zIndex:2,
                   }}
                 >
-                  <Icon icon="ph:map-pin-fill" width={12} height={12} color="#FFB800" />
+                  <Icon icon="ph:map-pin-fill" width={12} height={12} color="#fff" />
                 </button>
 
                 {/* 도장 오버레이 */}
