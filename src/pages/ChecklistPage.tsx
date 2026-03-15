@@ -429,7 +429,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : mainTab === 'bingo' ? (
         <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
       ) : mainTab === 'community' ? (
-        <Community />
+        <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 96px)' }}>
+          <Community />
+        </div>
       ) : (
         <>
           {/* ── SUB HEADER (버튼들) — 스크롤 시 사라짐 ── */}
