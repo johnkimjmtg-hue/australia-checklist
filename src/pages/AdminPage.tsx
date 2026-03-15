@@ -2178,6 +2178,7 @@ function BingoTab() {
   const [city, setCity]             = useState<'melbourne'|'sydney'>('melbourne')
   const [saving, setSaving]         = useState<string | null>(null)
   const [editName, setEditName]     = useState<Record<string, string>>({})
+  const [bizSearch, setBizSearch]   = useState<Record<string, string>>({})
 
   useEffect(() => {
     const load = async () => {
@@ -2268,29 +2269,59 @@ function BingoTab() {
                 >{saving === cafe.id ? '...' : '저장'}</button>
               )}
             </div>
-            {/* 업체 연결 선택 */}
+            {/* 업체 연결 */}
             <div>
-              {cafe.business_id && (
-                <div style={{ fontSize:11, color:'#16A34A', marginBottom:4 }}>
-                  ✓ {businesses.find(b => b.id === cafe.business_id)?.name ?? '연결됨'}
+              {/* 현재 연결된 업체 + 해제 버튼 */}
+              {cafe.business_id ? (
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8, padding:'6px 10px', background:'#DCFCE7', borderRadius:8 }}>
+                  <div style={{ fontSize:12, color:'#16A34A', fontWeight:700 }}>
+                    ✓ {businesses.find(b => b.id === cafe.business_id)?.name ?? '연결됨'}
+                  </div>
+                  <button
+                    onClick={() => { handleBusinessLink(cafe.id, ''); setBizSearch(prev => ({ ...prev, [cafe.id]: '' })) }}
+                    disabled={saving === cafe.id}
+                    style={{ background:'none', border:'none', cursor:'pointer', color:'#DC2626', fontSize:11, fontWeight:700 }}
+                  >연결 해제</button>
                 </div>
+              ) : (
+                <div style={{ fontSize:11, color:'#94A3B8', marginBottom:6 }}>업체 미연결</div>
               )}
-              <select
-                value={cafe.business_id ?? ''}
-                onChange={e => handleBusinessLink(cafe.id, e.target.value)}
-                disabled={saving === cafe.id}
+              {/* 검색 input */}
+              <input
+                value={bizSearch[cafe.id] ?? ''}
+                onChange={e => setBizSearch(prev => ({ ...prev, [cafe.id]: e.target.value }))}
+                placeholder="업체 검색..."
                 style={{
-                  width:'100%', height:36, borderRadius:8,
+                  width:'100%', height:34, borderRadius:8,
                   border:'1px solid #E2E8F0', padding:'0 10px',
                   fontSize:12, color:'#1E293B', background:'#F8FAFC',
-                  fontFamily:ff,
+                  fontFamily:ff, boxSizing:'border-box',
                 }}
-              >
-                <option value=''>업체 연결 안 함</option>
-                {businesses.map(b => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
+              />
+              {/* 검색 결과 */}
+              {bizSearch[cafe.id]?.trim() && (
+                <div style={{ border:'1px solid #E2E8F0', borderRadius:8, marginTop:4, maxHeight:160, overflowY:'auto', background:'#fff' }}>
+                  {businesses
+                    .filter(b => b.name.toLowerCase().includes((bizSearch[cafe.id] ?? '').toLowerCase()))
+                    .map(b => (
+                      <div
+                        key={b.id}
+                        onClick={() => { handleBusinessLink(cafe.id, b.id); setBizSearch(prev => ({ ...prev, [cafe.id]: '' })) }}
+                        style={{
+                          padding:'8px 12px', fontSize:12, color:'#1E293B', cursor:'pointer',
+                          borderBottom:'1px solid #F1F5F9',
+                          background: cafe.business_id === b.id ? '#EFF6FF' : '#fff',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = '#F1F5F9')}
+                        onMouseLeave={e => (e.currentTarget.style.background = cafe.business_id === b.id ? '#EFF6FF' : '#fff')}
+                      >{b.name}</div>
+                    ))
+                  }
+                  {businesses.filter(b => b.name.toLowerCase().includes((bizSearch[cafe.id] ?? '').toLowerCase())).length === 0 && (
+                    <div style={{ padding:'10px 12px', fontSize:12, color:'#94A3B8' }}>검색 결과 없음</div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         ))}
