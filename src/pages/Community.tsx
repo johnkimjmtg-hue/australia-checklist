@@ -130,10 +130,6 @@ export default function Community() {
   ]
 
   const insertEmoji = (emoji: string) => {
-    if (expandedId) {
-      setCommentText(prev => ({ ...prev, [expandedId]: (prev[expandedId] ?? '') + emoji }))
-      return
-    }
     const ta = textareaRef.current
     if (!ta) { setNewText(prev => prev + emoji); return }
     const start = ta.selectionStart ?? newText.length
@@ -483,7 +479,7 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: footerWidth ?? '100%', background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
+      <div style={{ display: expandedId ? 'none' : 'block', position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: footerWidth ?? '100%', background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
         {/* 이모티콘 피커 */}
         {showEmoji && (
           <div ref={emojiPickerRef} style={{
