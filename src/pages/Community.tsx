@@ -205,6 +205,19 @@ export default function Community() {
     if (!loading) scrollToBottom()
   }, [loading])
 
+  useEffect(() => {
+    if (!expandedId) return
+    setTimeout(() => {
+      const el = document.getElementById(`comment-box-${expandedId}`)
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const footerH = 80
+      const gap = 16
+      const overlapBy = rect.bottom - (window.innerHeight - footerH - gap)
+      if (overlapBy > 0) window.scrollBy({ top: overlapBy, behavior: 'smooth' })
+    }, 350)
+  }, [expandedId])
+
   // 검색 필터링
   const filteredPosts = search.trim()
     ? allPosts.filter(p =>
@@ -434,7 +447,7 @@ export default function Community() {
                         )}
                       </div>
                     ))}
-                    <div style={{
+                    <div id={`comment-box-${post.id}`} style={{
                       display: 'flex', gap: 8, alignItems: 'center',
                       background: '#fff', borderRadius: 10,
                       border: '1px solid #E2E8F0', padding: '8px 10px',
@@ -444,15 +457,6 @@ export default function Community() {
                         value={commentText[post.id] ?? ''}
                         onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
                         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id) } }}
-                        onFocus={e => {
-                          setTimeout(() => {
-                            const rect = e.target.getBoundingClientRect()
-                            const footerH = 80
-                            const gap = 16
-                            const overlapBy = rect.bottom - (window.innerHeight - footerH - gap)
-                            if (overlapBy > 0) window.scrollBy({ top: overlapBy, behavior: 'smooth' })
-                          }, 300)
-                        }}
                         placeholder="댓글 달기..."
                         style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', fontFamily: 'inherit', color: '#1E293B' }}
                       />
