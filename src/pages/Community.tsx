@@ -190,7 +190,7 @@ export default function Community() {
 
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', height: '100%',
+      position: 'relative', height: '100%',
       background: '#F0F4F8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
     }}>
@@ -205,8 +205,8 @@ export default function Community() {
         .like-btn { transition: transform 0.15s ease; }
       `}</style>
 
-      {/* ── 검색창 */}
-      <div style={{ padding: '10px 14px 8px', background: '#fff', borderBottom: '1px solid #E2E8F0', flexShrink: 0 }}>
+      {/* ── 검색창 (상단 고정) */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '10px 14px 8px', background: '#fff', borderBottom: '1px solid #E2E8F0' }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
           background: '#F8FAFC', borderRadius: 12, padding: '0 12px',
@@ -233,7 +233,7 @@ export default function Community() {
             style={{ animation:'spin 0.8s linear infinite' }} />
         </div>
       ) : (
-        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 0' }}>
+        <div style={{ overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 100 }}>
 
           {/* ── 더보기 버튼 (글 목록 위) */}
           {hasMore && (
@@ -364,7 +364,7 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ background: '#fff', borderTop: '1px solid #E2E8F0', padding: '12px 14px 28px', flexShrink: 0 }}>
+      <div style={{ position: 'sticky', bottom: 0, background: '#fff', borderTop: '1px solid #E2E8F0', padding: '12px 14px 28px' }}>
         <div style={{
           display: 'flex', gap: 10, alignItems: 'flex-end',
           background: '#F8FAFC', borderRadius: 14,
