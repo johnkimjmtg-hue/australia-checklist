@@ -58,8 +58,52 @@ export default function Community() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [showEmoji, setShowEmoji] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const emojiPickerRef = useRef<HTMLDivElement>(null)
+
+  const EMOJIS = [
+    '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
+    '🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚',
+    '😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔',
+    '🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥',
+    '😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧',
+    '🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐',
+    '😭','😢','😥','😓','😩','😫','🥱','😤','😠','😡',
+    '🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻',
+    '👍','👎','👏','🙌','🤝','🙏','✌️','🤞','👌','🤙',
+    '❤️','🧡','💛','💚','💙','💜','🖤','🤍','💔','💕',
+    '🔥','✨','⭐','🎉','🎊','🎈','🎁','🏆','🥇','💯',
+    '😺','😸','😹','😻','😼','😽','🙀','😿','😾','🐶',
+  ]
+
+  const insertEmoji = (emoji: string) => {
+    const ta = textareaRef.current
+    if (!ta) { setNewText(prev => prev + emoji); return }
+    const start = ta.selectionStart ?? newText.length
+    const end = ta.selectionEnd ?? newText.length
+    const next = newText.slice(0, start) + emoji + newText.slice(end)
+    setNewText(next)
+    setTimeout(() => {
+      ta.focus()
+      const pos = start + emoji.length
+      ta.setSelectionRange(pos, pos)
+      ta.style.height = 'auto'
+      ta.style.height = Math.min(ta.scrollHeight, 120) + 'px'
+    }, 0)
+  }
+
+  // 피커 외부 클릭 시 닫기
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target as Node)) {
+        setShowEmoji(false)
+      }
+    }
+    if (showEmoji) document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showEmoji])
 
   const fetchPosts = useCallback(async () => {
     const { data: postsData } = await supabase
@@ -365,13 +409,41 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ position: 'sticky', bottom: 0, background: '#fff', borderTop: '1px solid #E2E8F0', padding: '12px 14px 20px' }}>
+      <div style={{ position: 'sticky', bottom: 0, background: '#F0F4F8', padding: '12px 14px 20px' }}>
+        {/* 이모티콘 피커 */}
+        {showEmoji && (
+          <div ref={emojiPickerRef} style={{
+            position: 'absolute', bottom: '100%', left: 14, right: 14,
+            background: '#fff', borderRadius: 14, padding: 12,
+            boxShadow: '0 -4px 20px rgba(0,0,0,0.12)',
+            border: '1px solid #E2E8F0', marginBottom: 6,
+            display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4,
+            maxHeight: 200, overflowY: 'auto',
+          }}>
+            {EMOJIS.map((emoji, i) => (
+              <button key={i} onClick={() => insertEmoji(emoji)} style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: 20, padding: 4, borderRadius: 6,
+                lineHeight: 1,
+              }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#F1F5F9')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+              >{emoji}</button>
+            ))}
+          </div>
+        )}
         <div style={{
           display: 'flex', gap: 8, alignItems: 'center',
           background: '#fff', borderRadius: 12, padding: '0 12px',
           border: '1px solid #D1D9E3', height: 44,
           boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
         }}>
+          <button onClick={() => setShowEmoji(v => !v)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0,
+            fontSize: 18, opacity: showEmoji ? 1 : 0.45,
+            transition: 'opacity 0.15s',
+          }}>🙂</button>
           <textarea
             ref={textareaRef}
             value={newText}

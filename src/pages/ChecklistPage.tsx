@@ -705,6 +705,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             background:'#fff',
             zIndex:20, boxSizing:'border-box',
             padding:'12px 14px 20px',
+            borderTop:'1px solid #E2E8F0',
           }}>
             {unscheduledCount>0 && done>0 && (
               <div style={{ fontSize:11, color:'#92620a', textAlign:'center', marginBottom:8, fontWeight:700,
