@@ -59,6 +59,7 @@ export default function Community() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [showEmoji, setShowEmoji] = useState(false)
+  const [commentFocused, setCommentFocused] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
@@ -461,11 +462,13 @@ export default function Community() {
                       <input
                         value={commentText[post.id] ?? ''}
                         onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
-                        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id) } }}
+                        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id); setCommentFocused(false) } }}
+                        onFocus={() => setCommentFocused(true)}
+                        onBlur={() => setCommentFocused(false)}
                         placeholder="댓글 달기..."
                         style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', fontFamily: 'inherit', color: '#1E293B' }}
                       />
-                      <button onClick={() => handleComment(post.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
+                      <button onClick={() => { handleComment(post.id); setCommentFocused(false) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
                         <Icon icon="ph:paper-plane-right-fill" width={18} height={18}
                           color={(commentText[post.id] ?? '').trim() ? '#1B6EF3' : '#CBD5E1'} />
                       </button>
@@ -479,7 +482,7 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ display: expandedId ? 'none' : 'block', position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: footerWidth ?? '100%', background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
+      <div style={{ display: commentFocused ? 'none' : 'block', position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: footerWidth ?? '100%', background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
         {/* 이모티콘 피커 */}
         {showEmoji && (
           <div ref={emojiPickerRef} style={{
