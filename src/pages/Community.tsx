@@ -130,6 +130,10 @@ export default function Community() {
   ]
 
   const insertEmoji = (emoji: string) => {
+    if (expandedId) {
+      setCommentText(prev => ({ ...prev, [expandedId]: (prev[expandedId] ?? '') + emoji }))
+      return
+    }
     const ta = textareaRef.current
     if (!ta) { setNewText(prev => prev + emoji); return }
     const start = ta.selectionStart ?? newText.length
