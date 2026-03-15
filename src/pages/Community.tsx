@@ -206,7 +206,7 @@ export default function Community() {
       `}</style>
 
       {/* ── 검색창 (상단 고정) */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '10px 14px 8px', background: '#fff', borderBottom: '1px solid #E2E8F0' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '10px 14px 8px', background: '#F0F4F8', borderBottom: '1px solid #E2E8F0' }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
           background: '#F8FAFC', borderRadius: 12, padding: '0 12px',
