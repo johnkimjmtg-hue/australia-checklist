@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 
+const PAGE_SIZE = 50
+
 interface Comment {
   id: string
   text: string
@@ -48,12 +50,14 @@ function saveLiked(liked: Set<string>) {
 
 export default function Community() {
   const MY_ID = getMyId()
-  const [posts, setPosts] = useState<Post[]>([])
+  const [allPosts, setAllPosts] = useState<Post[]>([])
   const [liked, setLiked] = useState<Set<string>>(getLiked)
   const [newText, setNewText] = useState('')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [commentText, setCommentText] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -83,7 +87,7 @@ export default function Community() {
       likeCountByPost[l.post_id] = (likeCountByPost[l.post_id] ?? 0) + 1
     })
 
-    setPosts(postsData.map(p => ({
+    setAllPosts(postsData.map(p => ({
       ...p,
       likes: likeCountByPost[p.id] ?? 0,
       comments: commentsByPost[p.id] ?? [],
@@ -106,6 +110,20 @@ export default function Community() {
     if (!loading) setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
   }, [loading])
 
+  // 검색 필터링
+  const filteredPosts = search.trim()
+    ? allPosts.filter(p =>
+        p.text.toLowerCase().includes(search.trim().toLowerCase()) ||
+        p.comments.some(c => c.text.toLowerCase().includes(search.trim().toLowerCase()))
+      )
+    : allPosts
+
+  // 최신 50개씩: 전체에서 뒤에서부터 page*PAGE_SIZE개
+  const totalFiltered = filteredPosts.length
+  const startIdx = Math.max(0, totalFiltered - page * PAGE_SIZE)
+  const visiblePosts = filteredPosts.slice(startIdx)
+  const hasMore = startIdx > 0
+
   const handlePost = async () => {
     const text = newText.trim()
     if (!text) return
@@ -120,18 +138,16 @@ export default function Community() {
     const newLiked = new Set(liked)
     const isAlreadyLiked = newLiked.has(key)
 
-    // 낙관적 업데이트 — UI 먼저 반영
     if (isAlreadyLiked) {
       newLiked.delete(key)
-      setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: Math.max(0, p.likes - 1) } : p))
+      setAllPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: Math.max(0, p.likes - 1) } : p))
     } else {
       newLiked.add(key)
-      setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p))
+      setAllPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p))
     }
     setLiked(newLiked)
     saveLiked(newLiked)
 
-    // DB 업데이트
     if (isAlreadyLiked) {
       await supabase.from('community_likes').delete().eq('post_id', postId).eq('author_id', MY_ID)
     } else {
@@ -189,6 +205,28 @@ export default function Community() {
         .like-btn { transition: transform 0.15s ease; }
       `}</style>
 
+      {/* ── 검색창 */}
+      <div style={{ padding: '10px 14px 8px', background: '#fff', borderBottom: '1px solid #E2E8F0', flexShrink: 0 }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          background: '#F8FAFC', borderRadius: 12, padding: '0 12px',
+          border: '1.5px solid #E2E8F0', height: 40,
+        }}>
+          <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
+          <input
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(1) }}
+            placeholder="글·댓글 검색..."
+            style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: '#1E293B', background: 'transparent', fontFamily: 'inherit' }}
+          />
+          {search && (
+            <button onClick={() => { setSearch(''); setPage(1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+              <Icon icon="ph:x-circle" width={16} height={16} color="#94A3B8" />
+            </button>
+          )}
+        </div>
+      </div>
+
       {loading ? (
         <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
           <Icon icon="ph:circle-notch" width={28} height={28} color="#1B6EF3"
@@ -196,7 +234,33 @@ export default function Community() {
         </div>
       ) : (
         <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 0' }}>
-          {posts.map(post => {
+
+          {/* ── 더보기 버튼 (글 목록 위) */}
+          {hasMore && (
+            <button
+              onClick={() => setPage(p => p + 1)}
+              style={{
+                width: '100%', marginBottom: 12, padding: '10px',
+                background: '#fff', border: '1px solid #E2E8F0',
+                borderRadius: 12, cursor: 'pointer',
+                fontSize: 13, fontWeight: 700, color: '#1B6EF3',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}
+            >
+              <Icon icon="ph:arrow-up" width={14} height={14} color="#1B6EF3" />
+              이전 글 더보기 ({startIdx}개)
+            </button>
+          )}
+
+          {/* 검색 결과 없음 */}
+          {search.trim() && filteredPosts.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: '#94A3B8', fontSize: 13 }}>
+              <Icon icon="ph:magnifying-glass" width={32} height={32} color="#CBD5E1" />
+              <div style={{ marginTop: 8 }}>검색 결과가 없어요</div>
+            </div>
+          )}
+
+          {visiblePosts.map(post => {
             const isExpanded = expandedId === post.id
             const isLiked = liked.has(`post_${post.id}`)
             const isMine = post.author_id === MY_ID
