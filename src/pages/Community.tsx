@@ -202,10 +202,6 @@ export default function Community() {
   }, [fetchPosts])
 
   useEffect(() => {
-    if (!loading) scrollToBottom()
-  }, [loading])
-
-  useEffect(() => {
     if (!expandedId) return
     setTimeout(() => {
       const el = document.getElementById(`comment-box-${expandedId}`)
