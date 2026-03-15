@@ -289,7 +289,7 @@ export default function Community() {
 
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', height: '100vh',
+      display: 'flex', flexDirection: 'column', height: '100%',
       background: '#F0F4F8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
     }}>
@@ -333,7 +333,7 @@ export default function Community() {
             style={{ animation:'spin 0.8s linear infinite' }} />
         </div>
       ) : (
-        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 12 }}>
+        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 80 }}>
 
           {/* ── 더보기 버튼 (글 목록 위) */}
           {hasMore && (
