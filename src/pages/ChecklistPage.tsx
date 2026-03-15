@@ -704,7 +704,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             width:'100%', maxWidth:430,
             background:'#fff',
             zIndex:20, boxSizing:'border-box',
-            padding:'18px 14px 28px',
+            padding:'12px 14px 20px',
           }}>
             {unscheduledCount>0 && done>0 && (
               <div style={{ fontSize:11, color:'#92620a', textAlign:'center', marginBottom:8, fontWeight:700,
@@ -714,14 +714,14 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             )}
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={handleIssue} style={{
-                flex:4, height:54,
+                flex:4, height:44,
                 background:'#1B6EF3', color:'#fff',
                 border:'none', borderRadius:8, fontSize:15, fontWeight:700, cursor:'pointer',
                 animation: shakeBtn ? 'shake 0.5s ease' : 'none',
                 boxShadow:'0 4px 12px rgba(27,110,243,0.25)',
               }}>버킷리스트 발행하기</button>
               <button onClick={() => setModal('confirmReset')} style={{
-                flex:2, height:54,
+                flex:2, height:44,
                 background:'#fff', color:'#64748B',
                 border:'1px solid #E2E8F0', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer',
               }}>↻ 초기화</button>

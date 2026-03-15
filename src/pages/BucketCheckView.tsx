@@ -530,13 +530,13 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         position:'fixed', bottom:0,
         left:'50%', transform:'translateX(-50%)',
         width: footerWidth ?? '100%',
-        padding:'18px 14px 28px',
+        padding:'12px 14px 20px',
         background:'#fff',
         zIndex:20, boxSizing:'border-box',
         display:'flex', gap:8,
       }}>
         <button onClick={onLanding} style={{
-          flex:1, height:54, borderRadius:8, border:'none',
+          flex:1, height:44, borderRadius:8, border:'none',
           background:'#1B6EF3', color:'#fff',
           fontSize:15, fontWeight:700, cursor:'pointer',
           boxShadow:'0 4px 12px rgba(27,110,243,0.25)',
@@ -546,7 +546,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           저장하고 나가기
         </button>
         <button onClick={() => setShowMoreMenu(true)} style={{
-          width:54, height:54, borderRadius:12, flexShrink:0,
+          width:44, height:44, borderRadius:12, flexShrink:0,
           border:'1px solid #E2E8F0', background:'#fff',
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
           boxShadow:'0 2px 8px rgba(0,0,0,0.06)',

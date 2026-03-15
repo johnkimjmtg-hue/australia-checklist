@@ -365,7 +365,7 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ position: 'sticky', bottom: 0, background: '#fff', borderTop: '1px solid #E2E8F0', padding: '12px 14px 28px' }}>
+      <div style={{ position: 'sticky', bottom: 0, background: '#fff', borderTop: '1px solid #E2E8F0', padding: '8px 14px 20px' }}>
         <div style={{
           display: 'flex', gap: 10, alignItems: 'flex-end',
           background: '#F8FAFC', borderRadius: 14,
