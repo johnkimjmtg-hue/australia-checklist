@@ -464,10 +464,11 @@ export default function Community() {
                         onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
                         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id); setCommentFocused(false) } }}
                         onFocus={() => setCommentFocused(true)}
+                        onBlur={() => setCommentFocused(false)}
                         placeholder="댓글 달기..."
                         style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', fontFamily: 'inherit', color: '#1E293B' }}
                       />
-                      <button onClick={() => { handleComment(post.id); setCommentFocused(false) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
+                      <button onMouseDown={e => { e.preventDefault(); handleComment(post.id); setCommentFocused(false) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
                         <Icon icon="ph:paper-plane-right-fill" width={18} height={18}
                           color={(commentText[post.id] ?? '').trim() ? '#1B6EF3' : '#CBD5E1'} />
                       </button>
