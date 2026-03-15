@@ -60,6 +60,7 @@ export default function Community() {
   const [page, setPage] = useState(1)
   const [showEmoji, setShowEmoji] = useState(false)
   const [commentFocused, setCommentFocused] = useState(false)
+  const [showCommentEmoji, setShowCommentEmoji] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
@@ -212,7 +213,7 @@ export default function Community() {
   }, [loading])
 
   useEffect(() => {
-    if (!expandedId) { setCommentFocused(false); return }
+    if (!expandedId) { setCommentFocused(false); setShowCommentEmoji(false); return }
     setTimeout(() => {
       const el = document.getElementById(`comment-box-${expandedId}`)
       if (!el) return
@@ -453,25 +454,50 @@ export default function Community() {
                         )}
                       </div>
                     ))}
-                    <div id={`comment-box-${post.id}`} style={{
-                      display: 'flex', gap: 8, alignItems: 'center',
-                      background: '#fff', borderRadius: 10,
-                      border: '1px solid #E2E8F0', padding: '8px 10px',
-                      marginTop: post.comments.length > 0 ? 8 : 0,
-                    }}>
-                      <input
-                        value={commentText[post.id] ?? ''}
-                        onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
-                        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id); setCommentFocused(false) } }}
-                        onFocus={() => setCommentFocused(true)}
-                        onBlur={() => setCommentFocused(false)}
-                        placeholder="댓글 달기..."
-                        style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', fontFamily: 'inherit', color: '#1E293B' }}
-                      />
-                      <button onMouseDown={e => { e.preventDefault(); handleComment(post.id); setCommentFocused(false) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
-                        <Icon icon="ph:paper-plane-right-fill" width={18} height={18}
-                          color={(commentText[post.id] ?? '').trim() ? '#1B6EF3' : '#CBD5E1'} />
-                      </button>
+                    <div id={`comment-box-${post.id}`} style={{ position: 'relative' }}>
+                      {showCommentEmoji && expandedId === post.id && (
+                        <div style={{
+                          position: 'absolute', bottom: '100%', left: 0, right: 0,
+                          background: '#fff', borderRadius: 14, padding: 12,
+                          boxShadow: '0 -4px 20px rgba(0,0,0,0.12)',
+                          border: '1px solid #E2E8F0', marginBottom: 6,
+                          display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4,
+                          maxHeight: 200, overflowY: 'auto', zIndex: 100,
+                        }}>
+                          {EMOJIS.map((emoji, i) => (
+                            <button key={i} onMouseDown={e => { e.preventDefault(); setCommentText(prev => ({ ...prev, [post.id]: (prev[post.id] ?? '') + emoji })) }} style={{
+                              background: 'none', border: 'none', cursor: 'pointer',
+                              fontSize: 20, padding: 4, borderRadius: 6, lineHeight: 1,
+                            }}>{emoji}</button>
+                          ))}
+                        </div>
+                      )}
+                      <div style={{
+                        display: 'flex', gap: 8, alignItems: 'center',
+                        background: '#fff', borderRadius: 10,
+                        border: '1px solid #E2E8F0', padding: '8px 10px',
+                        marginTop: post.comments.length > 0 ? 8 : 0,
+                      }}>
+                        <button onMouseDown={e => { e.preventDefault(); setShowCommentEmoji(v => !v) }} style={{
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0,
+                          fontSize: 16, opacity: showCommentEmoji && expandedId === post.id ? 1 : 0.45,
+                          transition: 'opacity 0.15s',
+                        }}>🙂</button>
+                        <input
+                          value={commentText[post.id] ?? ''}
+                          onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
+                          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id); setCommentFocused(false); setShowCommentEmoji(false) } }}
+                          onFocus={() => setCommentFocused(true)}
+                          onBlur={() => setCommentFocused(false)}
+                          placeholder="댓글 달기..."
+                          style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', fontFamily: 'inherit', color: '#1E293B' }}
+                        />
+                        <button onMouseDown={e => { e.preventDefault(); handleComment(post.id); setCommentFocused(false); setShowCommentEmoji(false) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
+                          <Icon icon="ph:paper-plane-right-fill" width={18} height={18}
+                            color={(commentText[post.id] ?? '').trim() ? '#1B6EF3' : '#CBD5E1'} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
