@@ -212,7 +212,7 @@ export default function Community() {
   }, [loading])
 
   useEffect(() => {
-    if (!expandedId) return
+    if (!expandedId) { setCommentFocused(false); return }
     setTimeout(() => {
       const el = document.getElementById(`comment-box-${expandedId}`)
       if (!el) return
@@ -464,7 +464,6 @@ export default function Community() {
                         onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
                         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id); setCommentFocused(false) } }}
                         onFocus={() => setCommentFocused(true)}
-                        onBlur={() => setCommentFocused(false)}
                         placeholder="댓글 달기..."
                         style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', fontFamily: 'inherit', color: '#1E293B' }}
                       />
