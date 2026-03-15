@@ -66,8 +66,7 @@ export default function Community() {
 
   const scrollToBottom = () => {
     setTimeout(() => {
-      const el = scrollContainerRef.current
-      if (el) el.scrollTop = el.scrollHeight
+      window.scrollTo({ top: document.body.scrollHeight })
     }, 100)
   }
 
@@ -275,9 +274,10 @@ export default function Community() {
 
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', height: '100%',
       background: '#F0F4F8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
+      minHeight: '100%',
+      paddingBottom: 80,
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -290,7 +290,7 @@ export default function Community() {
         .like-btn { transition: transform 0.15s ease; }
       `}</style>
 
-      {/* ── 검색창 (상단 고정) */}
+      {/* ── 검색창 */}
       <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '10px 14px 8px', background: '#F0F4F8' }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
@@ -314,12 +314,12 @@ export default function Community() {
       </div>
 
       {loading ? (
-        <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding: '60px 0' }}>
           <Icon icon="ph:circle-notch" width={28} height={28} color="#1B6EF3"
             style={{ animation:'spin 0.8s linear infinite' }} />
         </div>
       ) : (
-        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 80 }}>
+        <div ref={scrollContainerRef} style={{ padding: '12px 14px 0' }}>
 
           {/* ── 더보기 버튼 (글 목록 위) */}
           {hasMore && (
