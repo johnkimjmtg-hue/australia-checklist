@@ -62,6 +62,14 @@ export default function Community() {
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      const el = scrollContainerRef.current
+      if (el) el.scrollTop = el.scrollHeight
+    }, 100)
+  }
 
   const EMOJIS = [
     '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
@@ -151,7 +159,7 @@ export default function Community() {
   }, [fetchPosts])
 
   useEffect(() => {
-    if (!loading) setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
+    if (!loading) scrollToBottom()
   }, [loading])
 
   // 검색 필터링
@@ -174,7 +182,7 @@ export default function Community() {
     setNewText('')
     await supabase.from('community_posts').insert({ text, author_id: MY_ID })
     await fetchPosts()
-    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
+    scrollToBottom()
   }
 
   const handleLike = async (postId: string) => {
@@ -278,7 +286,7 @@ export default function Community() {
             style={{ animation:'spin 0.8s linear infinite' }} />
         </div>
       ) : (
-        <div style={{ overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 100 }}>
+        <div ref={scrollContainerRef} style={{ overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 100 }}>
 
           {/* ── 더보기 버튼 (글 목록 위) */}
           {hasMore && (
