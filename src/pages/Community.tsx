@@ -205,8 +205,8 @@ export default function Community() {
         .like-btn { transition: transform 0.15s ease; }
       `}</style>
 
-      {/* ── 검색창 (상단 고정) */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '10px 14px 8px', background: '#F0F4F8', borderBottom: '1px solid #E2E8F0' }}>
+      {/* ── 검색창 (헤더 아래 고정) */}
+      <div style={{ position: 'fixed', top: 96, left: 0, right: 0, zIndex: 29, padding: '10px 14px 8px', background: '#F0F4F8', borderBottom: '1px solid #E2E8F0' }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
           background: '#F8FAFC', borderRadius: 12, padding: '0 12px',
@@ -233,7 +233,7 @@ export default function Community() {
             style={{ animation:'spin 0.8s linear infinite' }} />
         </div>
       ) : (
-        <div style={{ overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 100 }}>
+        <div style={{ overflowY: 'auto', padding: '12px 14px 0', paddingTop: 70, paddingBottom: 100 }}>
 
           {/* ── 더보기 버튼 (글 목록 위) */}
           {hasMore && (
