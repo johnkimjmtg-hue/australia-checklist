@@ -206,7 +206,7 @@ export default function Community() {
       `}</style>
 
       {/* ── 검색창 (헤더 아래 고정) */}
-      <div style={{ position: 'fixed', top: 96, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 480, zIndex: 29, padding: '8px 14px', background: '#F0F4F8' }}>
+      <div style={{ position: 'fixed', top: 89, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 480, boxSizing: 'border-box', zIndex: 29, padding: '8px 14px', background: '#F0F4F8' }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
           background: '#F8FAFC', borderRadius: 12, padding: '0 12px',
