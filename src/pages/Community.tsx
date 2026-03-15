@@ -65,19 +65,20 @@ export default function Community() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
-  const [selfTop, setSelfTop] = useState(0)
 
   const scrollToBottom = () => {
     setTimeout(() => {
-      const el = scrollContainerRef.current
-      if (el) el.scrollTop = el.scrollHeight
+      window.scrollTo({ top: document.body.scrollHeight })
     }, 100)
   }
 
   useEffect(() => {
-    if (pageRef.current) {
-      setSelfTop(pageRef.current.getBoundingClientRect().top)
+    const updateWidth = () => {
+      if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
     }
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
   }, [])
 
   const EMOJIS = [
@@ -201,20 +202,24 @@ export default function Community() {
   }, [fetchPosts])
 
   useEffect(() => {
-    if (!loading) scrollToBottom()
+    if (!loading) {
+      setTimeout(() => {
+        const tabBarH = 96
+        window.scrollTo({ top: document.body.scrollHeight - window.innerHeight + tabBarH })
+      }, 100)
+    }
   }, [loading])
 
   useEffect(() => {
     if (!expandedId) return
     setTimeout(() => {
       const el = document.getElementById(`comment-box-${expandedId}`)
-      if (!el || !scrollContainerRef.current) return
-      const container = scrollContainerRef.current
-      const containerRect = container.getBoundingClientRect()
-      const elRect = el.getBoundingClientRect()
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const footerH = 80
       const gap = 16
-      const overlapBy = elRect.bottom - (containerRect.bottom - gap)
-      if (overlapBy > 0) container.scrollBy({ top: overlapBy, behavior: 'smooth' })
+      const overlapBy = rect.bottom - (window.innerHeight - footerH - gap)
+      if (overlapBy > 0) window.scrollBy({ top: overlapBy, behavior: 'smooth' })
     }, 350)
   }, [expandedId])
 
@@ -298,10 +303,10 @@ export default function Community() {
 
   return (
     <div ref={pageRef} style={{
-      display: 'flex', flexDirection: 'column',
-      height: selfTop ? `calc(100vh - ${selfTop}px)` : '100vh',
       background: '#F0F4F8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
+      minHeight: '100%',
+      paddingBottom: 80,
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -338,12 +343,12 @@ export default function Community() {
       </div>
 
       {loading ? (
-        <div style={{ flex: 1, display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding: '60px 0' }}>
           <Icon icon="ph:circle-notch" width={28} height={28} color="#1B6EF3"
             style={{ animation:'spin 0.8s linear infinite' }} />
         </div>
       ) : (
-        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 80 }}>
+        <div ref={scrollContainerRef} style={{ padding: '12px 14px 0' }}>
 
           {/* ── 더보기 버튼 (글 목록 위) */}
           {hasMore && (
@@ -474,7 +479,7 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ position: 'sticky', bottom: 0, background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
+      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: footerWidth ?? '100%', background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
         {/* 이모티콘 피커 */}
         {showEmoji && (
           <div ref={emojiPickerRef} style={{
