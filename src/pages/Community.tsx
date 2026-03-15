@@ -433,6 +433,7 @@ export default function Community() {
                         value={commentText[post.id] ?? ''}
                         onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
                         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id) } }}
+                        onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)}
                         placeholder="댓글 달기..."
                         style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', fontFamily: 'inherit', color: '#1E293B' }}
                       />
@@ -450,7 +451,7 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
+      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 480, background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
         {/* 이모티콘 피커 */}
         {showEmoji && (
           <div ref={emojiPickerRef} style={{
