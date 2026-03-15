@@ -286,7 +286,7 @@ export default function Community() {
             style={{ animation:'spin 0.8s linear infinite' }} />
         </div>
       ) : (
-        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 20 }}>
+        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 80 }}>
 
           {/* ── 더보기 버튼 (글 목록 위) */}
           {hasMore && (
