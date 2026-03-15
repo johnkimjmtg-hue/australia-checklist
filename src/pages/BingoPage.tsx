@@ -4,31 +4,31 @@ import { Icon } from '@iconify/react'
 
 // ── 멜번 카페 25개 플레이스홀더 데이터
 const MELBOURNE_CAFES = [
-  { id: 1,  name: 'Proud Mary',         img: '/mel_coffee/mel_image/1.jpg' },
-  { id: 2,  name: 'ST. ALi',            img: '/mel_coffee/mel_image/2.jpg' },
-  { id: 3,  name: 'Dukes Coffee',       img: '/mel_coffee/mel_image/3.jpg' },
-  { id: 4,  name: 'Axil Coffee',        img: '/mel_coffee/mel_image/4.jpg' },
-  { id: 5,  name: 'Seven Seeds',        img: '/mel_coffee/mel_image/5.jpg' },
-  { id: 6,  name: 'Brother Baba Budan', img: '/mel_coffee/mel_image/6.jpg' },
-  { id: 7,  name: 'Market Lane',        img: '/mel_coffee/mel_image/7.jpg' },
-  { id: 8,  name: 'Ona Coffee',         img: '/mel_coffee/mel_image/8.jpg' },
-  { id: 9,  name: 'Padre Coffee',       img: '/mel_coffee/mel_image/9.jpg' },
-  { id: 10, name: 'Code Black',         img: '/mel_coffee/mel_image/10.jpg' },
-  { id: 11, name: 'Allpress',           img: '/mel_coffee/mel_image/11.jpg' },
-  { id: 12, name: 'Patricia Coffee',    img: '/mel_coffee/mel_image/12.jpg' },
-  { id: 13, name: 'Sensory Lab',        img: '/mel_coffee/mel_image/13.jpg' },
-  { id: 14, name: 'Geppetto',           img: '/mel_coffee/mel_image/14.jpg' },
-  { id: 15, name: 'Mecca Coffee',       img: '/mel_coffee/mel_image/15.jpg' },
-  { id: 16, name: 'Convoy',             img: '/mel_coffee/mel_image/16.jpg' },
-  { id: 17, name: 'Wide Open Road',     img: '/mel_coffee/mel_image/17.jpg' },
-  { id: 18, name: 'Pellegrini\'s',      img: '/mel_coffee/mel_image/18.jpg' },
-  { id: 19, name: 'Cibi',               img: '/mel_coffee/mel_image/19.jpg' },
-  { id: 20, name: 'Monk Bodhi',         img: '/mel_coffee/mel_image/20.jpg' },
-  { id: 21, name: 'Everyday Coffee',    img: '/mel_coffee/mel_image/21.jpg' },
-  { id: 22, name: 'Industry Beans',     img: '/mel_coffee/mel_image/22.jpg' },
-  { id: 23, name: 'Small Batch',        img: '/mel_coffee/mel_image/23.jpg' },
-  { id: 24, name: 'Aunty Peg\'s',       img: '/mel_coffee/mel_image/24.jpg' },
-  { id: 25, name: 'Fitzrovia',          img: '/mel_coffee/mel_image/25.jpg' },
+  { id: 1,  name: 'St. Ali',             address: '12-18 Yarra St, South Melbourne',            img: '/mel_coffee/mel_image/1.jpg' },
+  { id: 2,  name: 'Puzzle Coffee',       address: '133 Swanston St, Melbourne',                 img: '/mel_coffee/mel_image/2.jpg' },
+  { id: 3,  name: 'Maker Coffee',        address: '387 Little Bourke St, Melbourne',            img: '/mel_coffee/mel_image/3.jpg' },
+  { id: 4,  name: 'Little Rogue',        address: '12 Drewery Ln, Melbourne',                   img: '/mel_coffee/mel_image/4.jpg' },
+  { id: 5,  name: 'Market Lane',         address: '83-85 Victoria St, Melbourne',               img: '/mel_coffee/mel_image/5.jpg' },
+  { id: 6,  name: 'Ona Coffee',          address: '22 Ovens St, Brunswick',                     img: '/mel_coffee/mel_image/6.jpg' },
+  { id: 7,  name: 'Seven Seeds',         address: '114 Berkeley St, Carlton',                   img: '/mel_coffee/mel_image/7.jpg' },
+  { id: 8,  name: 'Small Batch',         address: '3-9 Little Howard St, North Melbourne',      img: '/mel_coffee/mel_image/8.jpg' },
+  { id: 9,  name: 'Shortstop',           address: '12 Sutherland St, Melbourne',                img: '/mel_coffee/mel_image/9.jpg' },
+  { id: 10, name: 'Brick Lane',          address: '33 Guildford Ln, Melbourne',                 img: '/mel_coffee/mel_image/10.jpg' },
+  { id: 11, name: 'Industry Beans',      address: '345 Little Collins St, Melbourne',           img: '/mel_coffee/mel_image/11.jpg' },
+  { id: 12, name: 'Regulars',            address: '126 Franklin St, Melbourne',                 img: '/mel_coffee/mel_image/12.jpg' },
+  { id: 13, name: 'Good Measure',        address: '193 Lygon St, Carlton',                      img: '/mel_coffee/mel_image/13.jpg' },
+  { id: 14, name: 'Padre Coffee',        address: '16 Oliver Ln, Melbourne',                    img: '/mel_coffee/mel_image/14.jpg' },
+  { id: 15, name: 'Brother Baba Budan',  address: '359 Little Bourke St, Melbourne',            img: '/mel_coffee/mel_image/15.jpg' },
+  { id: 16, name: 'Patricia Coffee',     address: '493-495 Little Bourke St, Melbourne',        img: '/mel_coffee/mel_image/16.jpg' },
+  { id: 17, name: 'Palace Coffee',       address: '486 City Rd, South Melbourne',               img: '/mel_coffee/mel_image/17.jpg' },
+  { id: 18, name: 'Tone Coffee',         address: '199 High St, Prahran',                       img: '/mel_coffee/mel_image/18.jpg' },
+  { id: 19, name: 'Mork Chocolate',      address: '150 Errol St, North Melbourne',              img: '/mel_coffee/mel_image/19.jpg' },
+  { id: 20, name: 'Dukes Coffee',        address: '247 Flinders Ln, Melbourne',                 img: '/mel_coffee/mel_image/20.jpg' },
+  { id: 21, name: 'Campos Coffee',       address: '572 Chapel St, South Yarra',                 img: '/mel_coffee/mel_image/21.jpg' },
+  { id: 22, name: 'Ini Studio',          address: '225 Queensberry St, Carlton',                img: '/mel_coffee/mel_image/22.jpg' },
+  { id: 23, name: 'Acoffee',             address: '30 Sackville St, Collingwood',               img: '/mel_coffee/mel_image/23.jpg' },
+  { id: 24, name: 'Code Black',          address: '360 Collins St, Melbourne',                  img: '/mel_coffee/mel_image/24.jpg' },
+  { id: 25, name: 'Overlay',             address: '320 Victoria St, North Melbourne',           img: '/mel_coffee/mel_image/25.jpg' },
 ]
 
 // ── 시드니 카페 25개 플레이스홀더 데이터
@@ -637,6 +637,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               <div
                 key={c.id}
                 onClick={() => handleCell(idx)}
+                onDoubleClick={() => c.address && window.open(`https://maps.google.com/?q=${encodeURIComponent(c.address)}`, '_blank')}
                 style={{
                   position:'relative',
                   borderRadius:10,
