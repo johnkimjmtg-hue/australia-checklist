@@ -290,36 +290,36 @@ export default function Community() {
         .like-btn { transition: transform 0.15s ease; }
       `}</style>
 
-      {/* ── 검색창 (상단 고정) */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '10px 14px 8px', background: '#F0F4F8' }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          background: '#fff', borderRadius: 12, padding: '0 12px',
-          height: 40, border: '1px solid #D1D9E3',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-        }}>
-          <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
-          <input
-            value={search}
-            onChange={e => { setSearch(e.target.value); setPage(1) }}
-            placeholder="글·댓글 검색..."
-            style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: '#1E293B', background: '#fff', fontFamily: 'inherit' }}
-          />
-          {search && (
-            <button onClick={() => { setSearch(''); setPage(1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-              <Icon icon="ph:x-circle" width={16} height={16} color="#94A3B8" />
-            </button>
-          )}
-        </div>
-      </div>
-
       {loading ? (
         <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
           <Icon icon="ph:circle-notch" width={28} height={28} color="#1B6EF3"
             style={{ animation:'spin 0.8s linear infinite' }} />
         </div>
       ) : (
-        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 0', paddingBottom: 80 }}>
+        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '10px 14px 0', paddingBottom: 80 }}>
+
+          {/* ── 검색창 */}
+          <div style={{ marginBottom: 8 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: '#fff', borderRadius: 12, padding: '0 12px',
+              height: 40, border: '1px solid #D1D9E3',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            }}>
+              <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
+              <input
+                value={search}
+                onChange={e => { setSearch(e.target.value); setPage(1) }}
+                placeholder="글·댓글 검색..."
+                style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: '#1E293B', background: '#fff', fontFamily: 'inherit' }}
+              />
+              {search && (
+                <button onClick={() => { setSearch(''); setPage(1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                  <Icon icon="ph:x-circle" width={16} height={16} color="#94A3B8" />
+                </button>
+              )}
+            </div>
+          </div>
 
           {/* ── 더보기 버튼 (글 목록 위) */}
           {hasMore && (
