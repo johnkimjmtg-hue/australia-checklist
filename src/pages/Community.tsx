@@ -63,12 +63,23 @@ export default function Community() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const pageRef = useRef<HTMLDivElement>(null)
+  const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
 
   const scrollToBottom = () => {
     setTimeout(() => {
       window.scrollTo({ top: document.body.scrollHeight })
     }, 100)
   }
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
+    }
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [])
 
   const EMOJIS = [
     // 얼굴/감정
@@ -273,7 +284,7 @@ export default function Community() {
   }
 
   return (
-    <div style={{
+    <div ref={pageRef} style={{
       background: '#F0F4F8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       minHeight: '100%',
@@ -433,7 +444,10 @@ export default function Community() {
                         value={commentText[post.id] ?? ''}
                         onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
                         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id) } }}
-                        onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)}
+                        onFocus={e => setTimeout(() => {
+                          e.target.scrollIntoView({ behavior: 'smooth', block: 'end' })
+                          window.scrollBy({ top: 80, behavior: 'smooth' })
+                        }, 300)}
                         placeholder="댓글 달기..."
                         style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', fontFamily: 'inherit', color: '#1E293B' }}
                       />
@@ -451,7 +465,7 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 480, background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
+      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: footerWidth ?? '100%', background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
         {/* 이모티콘 피커 */}
         {showEmoji && (
           <div ref={emojiPickerRef} style={{
