@@ -365,11 +365,12 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ position: 'sticky', bottom: 0, background: '#fff', borderTop: '1px solid #E2E8F0', padding: '8px 14px 20px' }}>
+      <div style={{ position: 'sticky', bottom: 0, background: '#fff', borderTop: '1px solid #E2E8F0', padding: '12px 14px 20px' }}>
         <div style={{
-          display: 'flex', gap: 10, alignItems: 'flex-end',
-          background: '#F8FAFC', borderRadius: 14,
-          border: '1.5px solid #E2E8F0', padding: '10px 12px',
+          display: 'flex', gap: 8, alignItems: 'center',
+          background: '#fff', borderRadius: 12, padding: '0 12px',
+          border: '1px solid #D1D9E3', height: 44,
+          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
         }}>
           <textarea
             ref={textareaRef}
@@ -383,16 +384,16 @@ export default function Community() {
             placeholder="자유롭게 글을 남겨보세요 ✍️"
             rows={1}
             className="community-textarea"
-            style={{ flex: 1, fontSize: 14, color: '#1E293B', lineHeight: 1.6, minHeight: 24, maxHeight: 120 }}
+            style={{ flex: 1, fontSize: 14, color: '#1E293B', lineHeight: 1.6, minHeight: 24, maxHeight: 120, background: '#fff' }}
           />
           <button onClick={handlePost} style={{
-            width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
             background: newText.trim() ? '#1B6EF3' : '#E2E8F0', border: 'none',
             cursor: newText.trim() ? 'pointer' : 'default',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'background 0.2s',
           }}>
-            <Icon icon="ph:paper-plane-right-fill" width={18} height={18} color={newText.trim() ? '#fff' : '#94A3B8'} />
+            <Icon icon="ph:paper-plane-right-fill" width={16} height={16} color={newText.trim() ? '#fff' : '#94A3B8'} />
           </button>
         </div>
       </div>
