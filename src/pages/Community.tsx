@@ -304,7 +304,7 @@ export default function Community() {
         .like-btn { transition: transform 0.15s ease; }
       `}</style>
 
-      {/* ── 검색창 */}
+      {/* ── 검색창 (상단 고정) */}
       <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '10px 14px 8px', background: '#F0F4F8' }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
