@@ -704,7 +704,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
           const willCheck = !isChecked
           handleCell(idx)
           if (willCheck) {
-            setTimeout(() => setSelectedCafe(null), 800)
+            setTimeout(() => setSelectedCafe(null), 500)
           }
         }
 
@@ -767,14 +767,14 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                     >
                       <div style={{
                         width:22, height:22, borderRadius:6, flexShrink:0,
-                        border:`2px solid #6F4E37`,
-                        background: isChecked ? '#6F4E37' : '#fff',
+                        border:`2px solid ${themeColor}`,
+                        background: isChecked ? themeColor : '#fff',
                         display:'flex', alignItems:'center', justifyContent:'center',
                         transition:'all 0.2s',
                       }}>
                         {isChecked && <Icon icon="ph:check-bold" width={13} height={13} color="#fff" />}
                       </div>
-                      <span style={{ fontSize:14, fontWeight:700, color: isChecked ? '#6F4E37' : '#64748B' }}>
+                      <span style={{ fontSize:14, fontWeight:700, color: isChecked ? themeColor : '#64748B' }}>
                         {isChecked ? '이 카페를 정복하셨습니다!' : '이 카페를 정복하세요'}
                       </span>
                     </div>
