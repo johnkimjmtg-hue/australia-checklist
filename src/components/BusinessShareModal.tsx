@@ -1,23 +1,18 @@
 import { useState } from 'react'
 import { Icon } from '@iconify/react'
-import { Business, VOTE_TAGS } from '../lib/businessService'
+import { Business } from '../lib/businessService'
 
-type Props = { business: Business; counts: Record<string, number>; onClose: () => void }
+type Props = { business: Business; onClose: () => void }
 
 const ff = '-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif'
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
 
-export default function BusinessShareModal({ business, counts, onClose }: Props) {
+export default function BusinessShareModal({ business, onClose }: Props) {
   const [saving, setSaving]   = useState(false)
   const [sharing, setSharing] = useState(false)
 
   const { name, description, phone, website, kakao, address, city, is_featured, tags } = business
   const fullAddress = [address, city].filter(Boolean).join(', ')
-  const maxCount    = Math.max(...VOTE_TAGS.map(t => counts[t] ?? 0), 1)
-  const topVotes    = VOTE_TAGS
-    .map(t => [t, counts[t] ?? 0] as [string, number])
-    .filter(([, v]) => v > 0)
-    .sort((a, b) => b[1] - a[1])
 
   const capture = async () => {
     const el = document.getElementById('business-share-card')
@@ -142,28 +137,6 @@ export default function BusinessShareModal({ business, counts, onClose }: Props)
               </div>
             </div>
           </div>
-
-          {/* 한줄평 카드 */}
-          {topVotes.length > 0 && (
-            <div style={{ background:'#fff', borderRadius:14, padding:'14px 18px', marginBottom:8, boxShadow:'0 4px 16px rgba(0,0,0,0.10)', border:'1px solid #E2E8F0' }}>
-              <div style={{ fontSize:11, fontWeight:800, color:'#94A3B8', marginBottom:10, letterSpacing:0.5 }}>한줄평</div>
-              <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
-                {topVotes.map(([tag, count]) => (
-                  <div key={tag}>
-                    <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
-                      <span style={{ fontSize:12, fontWeight:600, color:'#334155', display:'flex', alignItems:'center', gap:5 }}>
-                        <Icon icon="ph:thumbs-up" width={12} height={12} color="#94A3B8" />{tag}
-                      </span>
-                      <span style={{ fontSize:11, fontWeight:700, color:'#94A3B8' }}>{count}</span>
-                    </div>
-                    <div style={{ height:7, borderRadius:4, background:'#E2E8F0' }}>
-                      <div style={{ height:'100%', borderRadius:4, width:`${Math.round((count/maxCount)*100)}%`, background:'#FCA5A5' }}/>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* 홍보 카드 */}
           <div style={{ background:'linear-gradient(135deg, #1B6EF3, #1565C0)', borderRadius:14, padding:'12px 18px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>

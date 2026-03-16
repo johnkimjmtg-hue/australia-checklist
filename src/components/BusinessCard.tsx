@@ -85,7 +85,7 @@ export default function BusinessCard({ business }: Props) {
   return (
     <>
       {showShareModal && (
-        <BusinessShareModal business={business} counts={counts ?? {}} onClose={() => setShowShareModal(false)} />
+        <BusinessShareModal business={business} onClose={() => setShowShareModal(false)} />
       )}
 
       <div style={{
