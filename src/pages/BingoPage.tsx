@@ -309,7 +309,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
     else setOrderSydney(val)
   }
   const [lastCheckedIdx, setLastCheckedIdx] = useState<number|null>(null)
-  const [selectedCafe, setSelectedCafe] = useState<BingoCafe | null>(null)
+  const [selectedCafe, setSelectedCafe] = useState<{ cafe: BingoCafe; idx: number } | null>(null)
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
@@ -609,7 +609,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             return (
               <div
                 key={c.id}
-                onClick={() => handleCell(idx)}
+                onClick={() => setSelectedCafe({ cafe: c, idx })}
                 style={{
                   position:'relative',
                   borderRadius:10,
@@ -628,7 +628,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                   justifyContent:'center',
                 }}
               >
-                {/* 이미지 or 플레이스홀더 */}
+                {/* 이미지 */}
                 <div style={{
                   width:'100%', flex:1,
                   background: isChecked
@@ -663,20 +663,6 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                   whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
                 }}>{c.name}</div>
 
-                {/* 정보 아이콘 */}
-                <button
-                  onClick={e => { e.stopPropagation(); setSelectedCafe(c) }}
-                  style={{
-                    position:'absolute', top:3, right:3,
-                    width:18, height:18, borderRadius:'50%',
-                    background:'#FFB800', border:'none',
-                    cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-                    zIndex:2,
-                  }}
-                >
-                  <Icon icon="ph:map-pin-fill" width={12} height={12} color="#fff" />
-                </button>
-
                 {/* 도장 오버레이 */}
                 {isChecked && (
                   <div style={{
@@ -705,29 +691,94 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       </div>
 
       {/* ── 카페 정보 팝업 */}
-      {selectedCafe && (
-        <div style={{ position:'fixed', inset:0, zIndex:800 }}>
-          <div onClick={() => setSelectedCafe(null)} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
-          <div style={{
-            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:390,
-            maxHeight:'85vh', overflowY:'auto',
-            borderRadius:'20px 20px 0 0',
-            background:'#F0F4F8',
-            padding:'12px 12px 32px',
-            boxSizing:'border-box',
-          }}>
-            <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:8 }}>
-              <button onClick={() => setSelectedCafe(null)}
-                style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', color:'#94A3B8' }}>✕</button>
+      {selectedCafe && (() => {
+        const { cafe: c, idx } = selectedCafe
+        const isChecked = checked.has(idx)
+        const orderIdx  = checkOrder.indexOf(idx)
+        const imgNum    = orderIdx >= 0 ? orderIdx + 1 : checkOrder.length + 1
+        const stampSrc  = city === 'melbourne' ? MEL_IMGS[imgNum - 1] : SYD_IMGS[imgNum - 1]
+        const lore      = city === 'melbourne' ? PANTHEON_LORE[imgNum - 1] : SYDNEY_LORE[imgNum - 1]
+        const title     = city === 'melbourne' ? PANTHEON_TITLE[imgNum - 1] : SYDNEY_TITLE[imgNum - 1]
+
+        const handleToggle = () => {
+          handleCell(idx)
+          setSelectedCafe(null)
+        }
+
+        return (
+          <div style={{ position:'fixed', inset:0, zIndex:800 }}>
+            <div onClick={() => setSelectedCafe(null)} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
+            <div style={{
+              position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+              width:'100%', maxWidth:390,
+              maxHeight:'85vh', overflowY:'auto',
+              borderRadius:'20px 20px 0 0',
+              background:'#F0F4F8',
+              padding:'12px 12px 32px',
+              boxSizing:'border-box',
+            }}>
+              {/* 닫기 */}
+              <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:8 }}>
+                <button onClick={() => setSelectedCafe(null)}
+                  style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', color:'#94A3B8' }}>✕</button>
+              </div>
+
+              {/* 상단: 스탬프 이미지 + 멘트 + 체크 */}
+              <div style={{
+                background:'#fff', borderRadius:16, padding:'16px',
+                marginBottom:10, display:'flex', alignItems:'center', gap:14,
+                boxShadow:'0 2px 10px rgba(0,0,0,0.07)',
+              }}>
+                {/* 원형 스탬프 이미지 */}
+                <div style={{
+                  width:72, height:72, borderRadius:'50%', flexShrink:0,
+                  overflow:'hidden', border:'3px solid #FFB800',
+                  background:'linear-gradient(135deg,#6F4E37,#a0522d)',
+                }}>
+                  <img
+                    src={stampSrc}
+                    alt={`stamp-${imgNum}`}
+                    style={{ width:'100%', height:'100%', objectFit:'cover' }}
+                    onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                </div>
+                {/* 멘트 */}
+                <div style={{ flex:1 }}>
+                  {title && <div style={{ fontSize:12, fontWeight:800, color:'#1B6EF3', marginBottom:4 }}>{title}</div>}
+                  {lore  && <div style={{ fontSize:11, color:'#64748B', lineHeight:1.6 }}>{lore}</div>}
+                </div>
+              </div>
+
+              {/* 정복완료 체크 버튼 */}
+              <button
+                onClick={handleToggle}
+                style={{
+                  width:'100%', height:48, borderRadius:12, border:'none',
+                  background: isChecked ? '#F1F5F9' : 'linear-gradient(135deg,#FFB800,#F59E0B)',
+                  color: isChecked ? '#64748B' : '#fff',
+                  fontSize:15, fontWeight:800, cursor:'pointer',
+                  display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+                  marginBottom:12,
+                  boxShadow: isChecked ? 'none' : '0 4px 14px rgba(255,184,0,0.4)',
+                }}
+              >
+                <Icon
+                  icon={isChecked ? 'ph:x-circle' : 'ph:check-circle-fill'}
+                  width={20} height={20}
+                  color={isChecked ? '#94A3B8' : '#fff'}
+                />
+                {isChecked ? '정복 취소하기' : '정복 완료! ☕'}
+              </button>
+
+              {/* 업체 정보 */}
+              {c.business_id
+                ? <CafeBusinessInfo businessId={c.business_id} />
+                : <div style={{ textAlign:'center', padding:24, color:'#94A3B8', fontSize:14 }}>업체 정보가 아직 연결되지 않았어요</div>
+              }
             </div>
-            {selectedCafe.business_id
-              ? <CafeBusinessInfo businessId={selectedCafe.business_id} />
-              : <div style={{ textAlign:'center', padding:24, color:'#94A3B8', fontSize:14 }}>업체 정보가 아직 연결되지 않았어요</div>
-            }
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* ── 푸터 */}
       <div style={{
