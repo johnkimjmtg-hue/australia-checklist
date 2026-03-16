@@ -16,6 +16,8 @@ export type Business = {
   is_active: boolean
   tags: string[]
   google_place_id?: string
+  google_rating?: number
+  google_review_count?: number
   created_at?: string
   updated_at?: string
 }

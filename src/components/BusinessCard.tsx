@@ -104,7 +104,7 @@ export default function BusinessCard({ business }: Props) {
             <div style={{ fontSize:17, fontWeight:800, color:'#0F172A', flex:1, paddingRight:8 }}>{name}</div>
             <div style={{ display:'flex', alignItems:'center', gap:2, flexShrink:0 }}>
               <button
-                onClick={() => { setExpanded(v => !v); if (expanded) setShowVotes(false) }}
+                onClick={() => { setExpanded(v => !v) }}
                 style={{
                   background:'none', border:'none', cursor:'pointer', padding:'4px 6px', borderRadius:8,
                   display:'flex', alignItems:'center', justifyContent:'center',
@@ -122,6 +122,17 @@ export default function BusinessCard({ business }: Props) {
               </button>
             </div>
           </div>
+
+          {/* 구글 별점 */}
+          {business.google_rating && (
+            <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+              <StarRating rating={business.google_rating} />
+              <span style={{ fontSize:12, fontWeight:700, color:'#0F172A' }}>{business.google_rating.toFixed(1)}</span>
+              {business.google_review_count && (
+                <span style={{ fontSize:11, color:'#94A3B8' }}>({business.google_review_count.toLocaleString()})</span>
+              )}
+            </div>
+          )}
 
           {/* 주소 */}
           {fullAddress && (
@@ -164,4 +175,26 @@ export default function BusinessCard({ business }: Props) {
       </div>
     </>
   )
+}
+
+// ── 별점 컴포넌트
+function StarRating({ rating }: { rating: number }) {
+  const stars = []
+  for (let i = 1; i <= 5; i++) {
+    const fill = Math.min(1, Math.max(0, rating - (i - 1)))
+    const pct = Math.round(fill * 100)
+    stars.push(
+      <div key={i} style={{ position:'relative', width:14, height:14, flexShrink:0 }}>
+        {/* 회색 별 (배경) */}
+        <svg width="14" height="14" viewBox="0 0 24 24" style={{ position:'absolute', top:0, left:0 }}>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#E2E8F0" />
+        </svg>
+        {/* 노란 별 (채움) */}
+        <svg width="14" height="14" viewBox="0 0 24 24" style={{ position:'absolute', top:0, left:0, clipPath:`inset(0 ${100 - pct}% 0 0)` }}>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#FFB800" />
+        </svg>
+      </div>
+    )
+  }
+  return <div style={{ display:'flex', gap:2 }}>{stars}</div>
 }
