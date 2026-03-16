@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
-import { Business, VOTE_TAGS, getMyVote, getVoteCounts, addVote } from '../lib/businessService'
+import { Business } from '../lib/businessService'
 import { isBookmarked, toggleBookmark } from '../lib/businessBookmarks'
 import BusinessShareModal from './BusinessShareModal'
 
@@ -16,36 +16,10 @@ export default function BusinessCard({ business }: Props) {
     : null
 
   const [expanded, setExpanded]             = useState(false)
-  const [showVotes, setShowVotes]           = useState(false)
-  const [counts, setCounts]                 = useState<Record<string, number> | null>(null)
-  const [loading, setLoading]               = useState(false)
-  const [myVote, setMyVote]                 = useState<string | null>(() => getMyVote(business.id))
-  const [showResult, setShowResult]         = useState(true)
   const [showPhone, setShowPhone]           = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
   const [bookmarked, setBookmarked]         = useState(() => isBookmarked(business.id))
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-
-  useEffect(() => { getVoteCounts(business.id).then(setCounts) }, [business.id])
-
-  const handleToggleVotes = async () => {
-    if (!showVotes && counts === null) {
-      setLoading(true)
-      setCounts(await getVoteCounts(business.id))
-      setLoading(false)
-    }
-    setShowVotes(v => !v)
-  }
-
-  const handleVote = async (e: React.MouseEvent, tag: string) => {
-    e.stopPropagation()
-    if (myVote) return
-    const ok = await addVote(business.id, tag)
-    if (ok) {
-      setMyVote(tag)
-      setCounts(prev => prev ? { ...prev, [tag]: (prev[tag] ?? 0) + 1 } : prev)
-    }
-  }
 
   const btnBase: React.CSSProperties = {
     display:'flex', alignItems:'center', justifyContent:'center', gap:5,
@@ -62,7 +36,7 @@ export default function BusinessCard({ business }: Props) {
     boxShadow:'0 2px 8px rgba(27,110,243,0.25)',
   }
 
-  // 버튼 순서: 전화, 경로, 웹사이트, 카톡, 한줄평, 공유 (없는건 스킵)
+  // 버튼 순서: 전화, 경로, 웹사이트, 카톡, 구글리뷰, 공유 (없는건 스킵)
   const allButtons = [
     phone ? (
       isMobile ? (
@@ -96,7 +70,11 @@ export default function BusinessCard({ business }: Props) {
         <Icon icon="ph:chat-circle" width={13} height={13} color="#3C1E1E" />카톡
       </a>
     ) : null,
-
+    business.google_place_id ? (
+      <a key="google" href={`https://search.google.com/local/reviews?placeid=${business.google_place_id}`} target="_blank" rel="noreferrer" style={{ ...btnBase, textDecoration:'none' }}>
+        <Icon icon="ph:star" width={13} height={13} color="#475569" />구글 리뷰
+      </a>
+    ) : null,
     <button key="share" onClick={() => setShowShareModal(true)} style={{ ...btnBase }}>
       <Icon icon="ph:share-network" width={13} height={13} color="#475569" />공유
     </button>,
@@ -183,67 +161,6 @@ export default function BusinessCard({ business }: Props) {
             {visibleButtons}
           </div>
         </div>
-
-        {/* 펼친 상태에서 한줄평 자동 표시 */}
-        {expanded && (
-          <div style={{ borderTop:'1.5px solid #D1D9E3', background:'#F1F5F9', padding:'14px 16px' }}>
-            {loading ? (
-              <div style={{ textAlign:'center', padding:'12px 0', color:'#94A3B8', fontSize:13 }}>불러오는 중...</div>
-            ) : (
-              <>
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
-                  <div style={{ fontSize:12, fontWeight:700, color:'#64748B' }}>
-                    {myVote ? `내 한줄평: ${myVote}` : showResult ? '다른 분들의 한줄평이에요!' : '이 업체 어떠셨나요?'}
-                  </div>
-                  {!myVote && (
-                    <button onClick={() => setShowResult(v => !v)} style={{
-                      background: showResult ? '#1B6EF3' : 'none',
-                      border: showResult ? 'none' : '1px solid #E2E8F0',
-                      cursor:'pointer', fontSize:11, fontWeight:700,
-                      color: showResult ? '#fff' : '#64748B',
-                      padding:'4px 10px', borderRadius:6,
-                    }}>{showResult ? '투표하기' : '결과 보기'}</button>
-                  )}
-                </div>
-                {(() => {
-                  const maxCount = Math.max(...VOTE_TAGS.map(t => counts?.[t] ?? 0), 1)
-                  return (
-                    <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-                      {VOTE_TAGS.map(tag => {
-                        const count  = counts?.[tag] ?? 0
-                        const isMine = myVote === tag
-                        const pct    = Math.round((count / maxCount) * 100)
-                        return (myVote || showResult) ? (
-                          <div key={tag}>
-                            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
-                              <span style={{ fontSize:12, fontWeight: isMine ? 800 : 500, color: isMine ? '#FCA5A5' : '#1E293B', display:'flex', alignItems:'center', gap:4 }}>
-                                <Icon icon="ph:thumbs-up" width={12} height={12} color={isMine ? '#FCA5A5' : '#94A3B8'} />{tag}
-                              </span>
-                              <span style={{ fontSize:11, fontWeight:700, color: isMine ? '#FCA5A5' : '#94A3B8' }}>{count}</span>
-                            </div>
-                            <div style={{ height:7, borderRadius:4, background:'#E2E8F0', overflow:'hidden' }}>
-                              <div style={{ height:'100%', borderRadius:4, width:`${pct}%`, background:'#FCA5A5', transition:'width 0.4s ease', minWidth: count > 0 ? 8 : 0 }}/>
-                            </div>
-                          </div>
-                        ) : (
-                          <button key={tag} onClick={(e) => handleVote(e, tag)} style={{
-                            display:'flex', alignItems:'center', gap:8, padding:'10px 12px', borderRadius:9,
-                            border:'1px solid #E2E8F0', background:'#fff',
-                            cursor:'pointer', textAlign:'left', fontFamily:ff,
-                            boxShadow:'0 1px 3px rgba(0,0,0,0.05)',
-                          }}>
-                            <Icon icon="ph:thumbs-up" width={14} height={14} color="#94A3B8" />
-                            <span style={{ fontSize:13, fontWeight:500, color:'#1E293B' }}>{tag}</span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )
-                })()}
-              </>
-            )}
-          </div>
-        )}
       </div>
     </>
   )

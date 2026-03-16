@@ -15,6 +15,7 @@ export type Business = {
   is_featured: boolean
   is_active: boolean
   tags: string[]
+  google_place_id?: string
   created_at?: string
   updated_at?: string
 }
@@ -28,37 +29,8 @@ export type Review = {
   created_at?: string
 }
 
-// 한줄평 태그 목록
-export const VOTE_TAGS = [
-  '엄청 친절하세요.',
-  '가격이 정말 합리적이에요.',
-  '정말 깨끗하고 맛있어요.',
-  '완전 전문가 실력 짱!',
-  '찾기가 너무 쉬워요.',
-  '정말 바로 대답주세요.',
-]
-
-const votedKey = (businessId: string) => `voted_${businessId}`
-
-export function getMyVote(businessId: string): string | null {
-  try {
-    const v = localStorage.getItem(votedKey(businessId))
-    if (!v) return null
-    try { const p = JSON.parse(v); return Array.isArray(p) ? p[0] : p } catch { return v }
-  } catch { return null }
-}
-
-function saveMyVote(businessId: string, tag: string) {
-  try { localStorage.setItem(votedKey(businessId), tag) } catch {}
-}
-
-// getMyVotes 구버전 호환용
-export function getMyVotes(businessId: string): string[] {
-  const v = getMyVote(businessId)
-  return v ? [v] : []
-}
-
-export async function getBusinesses(category?: string): Promise<Business[]> {
+// 리뷰 (숨김 — 내부용)
+export async function getReviews(businessId: string): Promise<Review[]> {export async function getBusinesses(category?: string): Promise<Business[]> {
   let query = supabase.from('businesses').select('*').eq('is_active', true)
     .order('is_featured', { ascending: false }).order('rating', { ascending: false })
   if (category && category !== 'all') query = query.eq('category', category)
@@ -119,26 +91,4 @@ export async function addReview(review: Omit<Review, 'id' | 'created_at'>): Prom
   return data as Review
 }
 
-// 한줄평 카운트 조회
-export async function getVoteCounts(businessId: string): Promise<Record<string, number>> {
-  const { data, error } = await supabase.from('reviews').select('content')
-    .eq('business_id', businessId).eq('author_name', '__vote__')
-  if (error) { console.error('getVoteCounts error:', error); return {} }
-  const counts: Record<string, number> = {}
-  VOTE_TAGS.forEach(t => counts[t] = 0)
-  ;(data as { content: string }[]).forEach(r => {
-    if (r.content && counts[r.content] !== undefined) counts[r.content]++
-  })
-  return counts
-}
 
-// 한줄평 투표 (1회)
-export async function addVote(businessId: string, tag: string): Promise<boolean> {
-  if (getMyVote(businessId)) return false
-  const { error } = await supabase.from('reviews').insert({
-    business_id: businessId, author_name: '__vote__', rating: 1, content: tag,
-  })
-  if (error) { console.error('addVote error:', error); return false }
-  saveMyVote(businessId, tag)
-  return true
-}

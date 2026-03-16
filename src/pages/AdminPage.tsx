@@ -10,7 +10,7 @@ import { supabase } from '../lib/supabase'
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'hojugaja2024'
 
 // ── 탭 타입
-type MainTab = 'business' | 'categories' | 'items' | 'requests' | 'suggestions' | 'community' | 'shopping' | 'bingo'
+type MainTab = 'business' | 'categories' | 'items' | 'requests' | 'suggestions' | 'community' | 'shopping' | 'bingo' | 'google'
 
 // ── 탭 메타
 const TAB_META: { id: MainTab; icon: string; label: string }[] = [
@@ -22,6 +22,7 @@ const TAB_META: { id: MainTab; icon: string; label: string }[] = [
   { id:'community',   icon:'ph:chats-circle',       label:'커뮤니티' },
   { id:'shopping',    icon:'ph:shopping-bag',        label:'쇼핑' },
   { id:'bingo',       icon:'ph:coffee',              label:'빙고' },
+  { id:'google',      icon:'ph:magnifying-glass',    label:'구글매핑' },
 ]
 
 
@@ -29,7 +30,7 @@ const TAB_META: { id: MainTab; icon: string; label: string }[] = [
 const EMPTY_FORM = {
   id:'', name:'', category:'realestate', description:'',
   phone:'', website:'', kakao:'', address:'', city:'',
-  is_featured:false, is_active:true, tags:'',
+  is_featured:false, is_active:true, tags:'', google_place_id:'',
 }
 
 // ── 체크리스트 타입 (DB 기반)
@@ -324,6 +325,7 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
         {tab==='community'   && <CommunityTab />}
         {tab==='shopping'    && <ShoppingTab />}
         {tab==='bingo'       && <BingoTab />}
+        {tab==='google'      && <GoogleMappingTab />}
       </div>
 
       {/* 하단 네비바 */}
@@ -366,6 +368,23 @@ function BusinessTab() {
   const [toast, setToast]           = useState('')
   const [bizSearch, setBizSearch]   = useState('')
   const [bizCat, setBizCat]         = useState('all')
+  const [mapping, setMapping]       = useState(false)
+  const [mapResult, setMapResult]   = useState<{ total:number; matched:number; failed:{id:string;name:string;reason:string}[] } | null>(null)
+
+  async function handleAutoMap() {
+    if (!confirm(`google_place_id가 없는 업체를 자동 매핑할까요?\n(Google Places API 호출)`)) return
+    setMapping(true)
+    setMapResult(null)
+    try {
+      const { data, error } = await supabase.functions.invoke('match-place-ids')
+      if (error) throw error
+      setMapResult(data)
+      await load()
+    } catch (e) {
+      showToast('자동 매핑 실패: ' + String(e))
+    }
+    setMapping(false)
+  }
 
   useEffect(() => { load() }, [])
 
@@ -389,6 +408,7 @@ function BusinessTab() {
       address:b.address||'', city:b.city,
       is_featured:b.is_featured, is_active:b.is_active,
       tags:b.tags?.join(', ')||'',
+      google_place_id:b.google_place_id||'',
     })
     setEditTarget(b); setShowForm(true)
   }
@@ -454,12 +474,12 @@ function BusinessTab() {
               />
             </Field>
             <Field label="업체 소개"><textarea value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} style={{...inputStyle,resize:'none'}} rows={3} /></Field>
-            <Field label="태그 (쉼표 구분)"><input value={form.tags} onChange={e=>setForm(f=>({...f,tags:e.target.value}))} style={inputStyle} placeholder="예: 부동산 구매, 투자 상담" /></Field>
-            <Grid2>
+            <Field label="태그 (쉼표 구분)"><input value={form.tags} onChange={e=>setForm(f=>({...f,tags:e.target.value}))} style={inputStyle} placeholder="예: 부동산 구매, 투자 상담" /></Field>            <Grid2>
               <Field label="전화번호"><input value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} style={inputStyle} placeholder="+61 2 1234 5678" /></Field>
               <Field label="카카오 ID"><input value={form.kakao} onChange={e=>setForm(f=>({...f,kakao:e.target.value}))} style={inputStyle} /></Field>
             </Grid2>
             <Field label="웹사이트"><input value={form.website} onChange={e=>setForm(f=>({...f,website:e.target.value}))} style={inputStyle} placeholder="https://..." /></Field>
+            <Field label="Google Place ID"><input value={form.google_place_id} onChange={e=>setForm(f=>({...f,google_place_id:e.target.value}))} style={inputStyle} placeholder="ChIJ..." /></Field>
             <div style={{ display:'flex', gap:20, marginTop:8 }}>
               <label style={checkLabel}><input type="checkbox" checked={form.is_featured} onChange={e=>setForm(f=>({...f,is_featured:e.target.checked}))} /> ⭐ 추천 업체</label>
               <label style={checkLabel}><input type="checkbox" checked={form.is_active} onChange={e=>setForm(f=>({...f,is_active:e.target.checked}))} /> ✅ 활성화</label>
@@ -2166,166 +2186,107 @@ function ShoppingTab() {
   )
 }
 
-// ── 빙고 탭
-function BingoTab() {
+// ── 구글 Place ID 자동 매핑 탭
+function GoogleMappingTab() {
   const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
-  type BingoCafe = { id: string; city: string; sort_order: number; name: string; business_id: string | null; is_active: boolean }
-  type Business  = { id: string; name: string }
+  const [running, setRunning]   = useState(false)
+  const [results, setResults]   = useState<{ id: string; name: string; place_id: string | null; status: string }[]>([])
+  const [total, setTotal]       = useState<number | null>(null)
+  const [error, setError]       = useState<string | null>(null)
 
-  const [cafes, setCafes]           = useState<BingoCafe[]>([])
-  const [businesses, setBusinesses] = useState<Business[]>([])
-  const [loading, setLoading]       = useState(true)
-  const [city, setCity]             = useState<'melbourne'|'sydney'>('melbourne')
-  const [saving, setSaving]         = useState<string | null>(null)
-  const [editName, setEditName]     = useState<Record<string, string>>({})
-  const [bizSearch, setBizSearch]   = useState<Record<string, string>>({})
-
-  useEffect(() => {
-    const load = async () => {
-      const [{ data: cafeData }, { data: bizData }] = await Promise.all([
-        supabase.from('bingo_cafes').select('*').order('city').order('sort_order'),
-        supabase.from('businesses').select('id, name').eq('is_active', true).order('name'),
-      ])
-      if (cafeData) setCafes(cafeData)
-      if (bizData)  setBusinesses(bizData)
-      setLoading(false)
+  const handleRun = async () => {
+    setRunning(true)
+    setResults([])
+    setError(null)
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/match-google-places`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+        }
+      )
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      setTotal(data.total)
+      setResults(data.results)
+    } catch (e: any) {
+      setError(String(e?.message ?? e))
     }
-    load()
-  }, [])
-
-  const handleBusinessLink = async (cafeId: string, businessId: string) => {
-    setSaving(cafeId)
-    const val = businessId === '' ? null : businessId
-    await supabase.from('bingo_cafes').update({ business_id: val }).eq('id', cafeId)
-    setCafes(prev => prev.map(c => c.id === cafeId ? { ...c, business_id: val } : c))
-    setSaving(null)
+    setRunning(false)
   }
 
-  const handleNameSave = async (cafeId: string) => {
-    const newName = editName[cafeId]?.trim()
-    if (!newName) return
-    setSaving(cafeId)
-    await supabase.from('bingo_cafes').update({ name: newName }).eq('id', cafeId)
-    setCafes(prev => prev.map(c => c.id === cafeId ? { ...c, name: newName } : c))
-    setEditName(prev => { const n = { ...prev }; delete n[cafeId]; return n })
-    setSaving(null)
-  }
-
-  const filtered = cafes.filter(c => c.city === city)
-
-  if (loading) return (
-    <div style={{ textAlign:'center', padding:40, color:'#94A3B8', fontFamily:ff }}>불러오는 중...</div>
-  )
+  const matched   = results.filter(r => r.place_id).length
+  const unmatched = results.filter(r => !r.place_id).length
 
   return (
     <div style={{ fontFamily: ff }}>
-      {/* 도시 탭 */}
-      <div style={{ display:'flex', gap:8, marginBottom:16 }}>
-        {(['melbourne', 'sydney'] as const).map(c => (
-          <button key={c} onClick={() => setCity(c)} style={{
-            height:34, padding:'0 16px', borderRadius:20, border:'none', cursor:'pointer',
-            background: city === c ? '#1B6EF3' : '#F1F5F9',
-            color: city === c ? '#fff' : '#475569',
-            fontSize:13, fontWeight:700,
-          }}>{c === 'melbourne' ? '멜번' : '시드니'}</button>
-        ))}
+      <div style={{ background:'#EFF6FF', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
+        <div style={{ fontWeight:800, color:'#1B6EF3', marginBottom:4 }}>🔍 구글 Place ID 자동 매핑</div>
+        google_place_id가 없는 업체를 Google Places API로 자동 매핑합니다.<br />
+        업체명 + 주소로 검색하며, 찾지 못한 업체는 수동으로 입력해 주세요.
       </div>
 
-      {/* 카페 리스트 */}
-      <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-        {filtered.map(cafe => (
-          <div key={cafe.id} style={{
-            background:'#fff', borderRadius:12, padding:'12px 14px',
-            boxShadow:'0 1px 4px rgba(0,0,0,0.06)',
-            border:'1px solid #F1F5F9',
-          }}>
-            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:10 }}>
-              {/* 번호 */}
-              <div style={{
-                width:28, height:28, borderRadius:8, background:'#EFF6FF',
-                display:'flex', alignItems:'center', justifyContent:'center',
-                fontSize:12, fontWeight:800, color:'#1B6EF3', flexShrink:0,
-              }}>{cafe.sort_order}</div>
-              {/* 이름 편집 */}
-              <input
-                value={editName[cafe.id] ?? cafe.name}
-                onChange={e => setEditName(prev => ({ ...prev, [cafe.id]: e.target.value }))}
-                style={{
-                  flex:1, height:32, border:'1px solid #E2E8F0', borderRadius:8,
-                  padding:'0 10px', fontSize:13, fontWeight:700, color:'#0F172A',
-                  background:'#F8FAFC', fontFamily:ff,
-                }}
-              />
-              {/* 저장 버튼 - 수정된 경우에만 표시 */}
-              {editName[cafe.id] !== undefined && editName[cafe.id] !== cafe.name && (
-                <button
-                  onClick={() => handleNameSave(cafe.id)}
-                  disabled={saving === cafe.id}
-                  style={{
-                    height:32, padding:'0 10px', borderRadius:8, border:'none',
-                    background:'#1B6EF3', color:'#fff', fontSize:12, fontWeight:700,
-                    cursor:'pointer', flexShrink:0,
-                  }}
-                >{saving === cafe.id ? '...' : '저장'}</button>
-              )}
-            </div>
-            {/* 업체 연결 */}
-            <div>
-              {/* 현재 연결된 업체 + 해제 버튼 */}
-              {cafe.business_id ? (
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8, padding:'6px 10px', background:'#DCFCE7', borderRadius:8 }}>
-                  <div style={{ fontSize:12, color:'#16A34A', fontWeight:700 }}>
-                    ✓ {businesses.find(b => b.id === cafe.business_id)?.name ?? '연결됨'}
-                  </div>
-                  <button
-                    onClick={() => { handleBusinessLink(cafe.id, ''); setBizSearch(prev => ({ ...prev, [cafe.id]: '' })) }}
-                    disabled={saving === cafe.id}
-                    style={{ background:'none', border:'none', cursor:'pointer', color:'#DC2626', fontSize:11, fontWeight:700 }}
-                  >연결 해제</button>
-                </div>
-              ) : (
-                <div style={{ fontSize:11, color:'#94A3B8', marginBottom:6 }}>업체 미연결</div>
-              )}
-              {/* 검색 input */}
-              <input
-                value={bizSearch[cafe.id] ?? ''}
-                onChange={e => setBizSearch(prev => ({ ...prev, [cafe.id]: e.target.value }))}
-                placeholder="업체 검색..."
-                style={{
-                  width:'100%', height:34, borderRadius:8,
-                  border:'1px solid #E2E8F0', padding:'0 10px',
-                  fontSize:12, color:'#1E293B', background:'#F8FAFC',
-                  fontFamily:ff, boxSizing:'border-box',
-                }}
-              />
-              {/* 검색 결과 */}
-              {bizSearch[cafe.id]?.trim() && (
-                <div style={{ border:'1px solid #E2E8F0', borderRadius:8, marginTop:4, maxHeight:160, overflowY:'auto', background:'#fff' }}>
-                  {businesses
-                    .filter(b => b.name.toLowerCase().includes((bizSearch[cafe.id] ?? '').toLowerCase()))
-                    .map(b => (
-                      <div
-                        key={b.id}
-                        onClick={() => { handleBusinessLink(cafe.id, b.id); setBizSearch(prev => ({ ...prev, [cafe.id]: '' })) }}
-                        style={{
-                          padding:'8px 12px', fontSize:12, color:'#1E293B', cursor:'pointer',
-                          borderBottom:'1px solid #F1F5F9',
-                          background: cafe.business_id === b.id ? '#EFF6FF' : '#fff',
-                        }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#F1F5F9')}
-                        onMouseLeave={e => (e.currentTarget.style.background = cafe.business_id === b.id ? '#EFF6FF' : '#fff')}
-                      >{b.name}</div>
-                    ))
-                  }
-                  {businesses.filter(b => b.name.toLowerCase().includes((bizSearch[cafe.id] ?? '').toLowerCase())).length === 0 && (
-                    <div style={{ padding:'10px 12px', fontSize:12, color:'#94A3B8' }}>검색 결과 없음</div>
-                  )}
-                </div>
-              )}
-            </div>
+      <button
+        onClick={handleRun}
+        disabled={running}
+        style={{
+          width:'100%', height:48, borderRadius:12, border:'none',
+          background: running ? '#94A3B8' : '#1B6EF3',
+          color:'#fff', fontSize:15, fontWeight:700,
+          cursor: running ? 'default' : 'pointer',
+          marginBottom:16,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+        }}
+      >
+        {running ? '매핑 중... (잠시 기다려 주세요)' : '🚀 자동 매핑 시작'}
+      </button>
+
+      {error && (
+        <div style={{ background:'#FEE2E2', borderRadius:10, padding:'12px 14px', marginBottom:16, fontSize:13, color:'#DC2626' }}>
+          ❌ 오류: {error}
+        </div>
+      )}
+
+      {total !== null && (
+        <div style={{ display:'flex', gap:8, marginBottom:16 }}>
+          <div style={{ flex:1, background:'#DCFCE7', borderRadius:10, padding:'12px', textAlign:'center' }}>
+            <div style={{ fontSize:22, fontWeight:800, color:'#16A34A' }}>{matched}</div>
+            <div style={{ fontSize:12, color:'#16A34A', fontWeight:600 }}>매핑 완료</div>
           </div>
-        ))}
-      </div>
+          <div style={{ flex:1, background:'#FEE2E2', borderRadius:10, padding:'12px', textAlign:'center' }}>
+            <div style={{ fontSize:22, fontWeight:800, color:'#DC2626' }}>{unmatched}</div>
+            <div style={{ fontSize:12, color:'#DC2626', fontWeight:600 }}>찾지 못함</div>
+          </div>
+          <div style={{ flex:1, background:'#F1F5F9', borderRadius:10, padding:'12px', textAlign:'center' }}>
+            <div style={{ fontSize:22, fontWeight:800, color:'#475569' }}>{total}</div>
+            <div style={{ fontSize:12, color:'#475569', fontWeight:600 }}>전체</div>
+          </div>
+        </div>
+      )}
+
+      {results.length > 0 && (
+        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+          {results.map(r => (
+            <div key={r.id} style={{
+              background:'#fff', borderRadius:10, padding:'10px 14px',
+              border:`1px solid ${r.place_id ? '#DCFCE7' : '#FEE2E2'}`,
+              display:'flex', alignItems:'center', justifyContent:'space-between',
+            }}>
+              <div>
+                <div style={{ fontSize:13, fontWeight:700, color:'#0F172A' }}>{r.name}</div>
+                {r.place_id && <div style={{ fontSize:11, color:'#94A3B8', marginTop:2 }}>{r.place_id}</div>}
+              </div>
+              <div style={{ fontSize:12, fontWeight:700, color: r.place_id ? '#16A34A' : '#DC2626', flexShrink:0 }}>
+                {r.status}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
