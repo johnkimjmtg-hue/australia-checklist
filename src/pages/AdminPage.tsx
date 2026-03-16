@@ -2199,6 +2199,148 @@ function ShoppingTab() {
   )
 }
 
+// ── 빙고 탭
+function BingoTab() {
+  const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+  type BingoCafe = { id: string; city: string; sort_order: number; name: string; business_id: string | null; is_active: boolean }
+  type Business  = { id: string; name: string }
+
+  const [cafes, setCafes]           = useState<BingoCafe[]>([])
+  const [businesses, setBusinesses] = useState<Business[]>([])
+  const [loading, setLoading]       = useState(true)
+  const [city, setCity]             = useState<'melbourne'|'sydney'>('melbourne')
+  const [saving, setSaving]         = useState<string | null>(null)
+  const [editName, setEditName]     = useState<Record<string, string>>({})
+  const [bizSearch, setBizSearch]   = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const load = async () => {
+      const [{ data: cafeData }, { data: bizData }] = await Promise.all([
+        supabase.from('bingo_cafes').select('*').order('city').order('sort_order'),
+        supabase.from('businesses').select('id, name').eq('is_active', true).order('name'),
+      ])
+      if (cafeData) setCafes(cafeData)
+      if (bizData)  setBusinesses(bizData)
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  const handleBusinessLink = async (cafeId: string, businessId: string) => {
+    setSaving(cafeId)
+    const val = businessId === '' ? null : businessId
+    await supabase.from('bingo_cafes').update({ business_id: val }).eq('id', cafeId)
+    setCafes(prev => prev.map(c => c.id === cafeId ? { ...c, business_id: val } : c))
+    setSaving(null)
+  }
+
+  const handleNameSave = async (cafeId: string) => {
+    const newName = editName[cafeId]?.trim()
+    if (!newName) return
+    setSaving(cafeId)
+    await supabase.from('bingo_cafes').update({ name: newName }).eq('id', cafeId)
+    setCafes(prev => prev.map(c => c.id === cafeId ? { ...c, name: newName } : c))
+    setEditName(prev => { const n = { ...prev }; delete n[cafeId]; return n })
+    setSaving(null)
+  }
+
+  const filtered = cafes.filter(c => c.city === city)
+
+  if (loading) return (
+    <div style={{ textAlign:'center', padding:40, color:'#94A3B8', fontFamily:ff }}>불러오는 중...</div>
+  )
+
+  return (
+    <div style={{ fontFamily: ff }}>
+      <div style={{ display:'flex', gap:8, marginBottom:16 }}>
+        {(['melbourne', 'sydney'] as const).map(c => (
+          <button key={c} onClick={() => setCity(c)} style={{
+            height:34, padding:'0 16px', borderRadius:20, border:'none', cursor:'pointer',
+            background: city === c ? '#1B6EF3' : '#F1F5F9',
+            color: city === c ? '#fff' : '#475569',
+            fontSize:13, fontWeight:700,
+          }}>{c === 'melbourne' ? '멜번' : '시드니'}</button>
+        ))}
+      </div>
+
+      <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+        {filtered.map(cafe => (
+          <div key={cafe.id} style={{
+            background:'#fff', borderRadius:12, padding:'12px 14px',
+            boxShadow:'0 1px 4px rgba(0,0,0,0.06)', border:'1px solid #F1F5F9',
+          }}>
+            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:10 }}>
+              <div style={{
+                width:28, height:28, borderRadius:8, background:'#EFF6FF',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:12, fontWeight:800, color:'#1B6EF3', flexShrink:0,
+              }}>{cafe.sort_order}</div>
+              <input
+                value={editName[cafe.id] ?? cafe.name}
+                onChange={e => setEditName(prev => ({ ...prev, [cafe.id]: e.target.value }))}
+                style={{
+                  flex:1, height:32, border:'1px solid #E2E8F0', borderRadius:8,
+                  padding:'0 10px', fontSize:13, fontWeight:700, color:'#0F172A',
+                  background:'#F8FAFC', fontFamily:ff,
+                }}
+              />
+              {editName[cafe.id] !== undefined && editName[cafe.id] !== cafe.name && (
+                <button onClick={() => handleNameSave(cafe.id)} disabled={saving === cafe.id} style={{
+                  height:32, padding:'0 10px', borderRadius:8, border:'none',
+                  background:'#1B6EF3', color:'#fff', fontSize:12, fontWeight:700,
+                  cursor:'pointer', flexShrink:0,
+                }}>{saving === cafe.id ? '...' : '저장'}</button>
+              )}
+            </div>
+            <div>
+              {cafe.business_id && (
+                <div style={{ fontSize:11, color:'#16A34A', marginBottom:4 }}>
+                  ✓ {businesses.find(b => b.id === cafe.business_id)?.name ?? '연결됨'}
+                </div>
+              )}
+              {!cafe.business_id && (
+                <div style={{ fontSize:11, color:'#94A3B8', marginBottom:4 }}>업체 미연결</div>
+              )}
+              <input
+                value={bizSearch[cafe.id] ?? ''}
+                onChange={e => setBizSearch(prev => ({ ...prev, [cafe.id]: e.target.value }))}
+                placeholder="업체 검색..."
+                style={{
+                  width:'100%', height:34, borderRadius:8,
+                  border:'1px solid #E2E8F0', padding:'0 10px',
+                  fontSize:12, color:'#1E293B', background:'#F8FAFC',
+                  fontFamily:ff, boxSizing:'border-box',
+                }}
+              />
+              {bizSearch[cafe.id]?.trim() && (
+                <div style={{ border:'1px solid #E2E8F0', borderRadius:8, marginTop:4, maxHeight:160, overflowY:'auto', background:'#fff' }}>
+                  {businesses.filter(b => b.name.toLowerCase().includes((bizSearch[cafe.id] ?? '').toLowerCase())).map(b => (
+                    <div key={b.id} onClick={() => { handleBusinessLink(cafe.id, b.id); setBizSearch(prev => ({ ...prev, [cafe.id]: '' })) }}
+                      style={{ padding:'8px 12px', fontSize:12, color:'#1E293B', cursor:'pointer', borderBottom:'1px solid #F1F5F9' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#F1F5F9')}
+                      onMouseLeave={e => (e.currentTarget.style.background = '#fff')}
+                    >{b.name}</div>
+                  ))}
+                  {businesses.filter(b => b.name.toLowerCase().includes((bizSearch[cafe.id] ?? '').toLowerCase())).length === 0 && (
+                    <div style={{ padding:'10px 12px', fontSize:12, color:'#94A3B8' }}>검색 결과 없음</div>
+                  )}
+                </div>
+              )}
+              {cafe.business_id && (
+                <button onClick={() => { handleBusinessLink(cafe.id, ''); setBizSearch(prev => ({ ...prev, [cafe.id]: '' })) }}
+                  disabled={saving === cafe.id}
+                  style={{ marginTop:6, background:'none', border:'none', cursor:'pointer', color:'#DC2626', fontSize:11, fontWeight:700 }}>
+                  연결 해제
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── 구글 Place ID 자동 매핑 탭
 function GoogleMappingTab() {
   const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
