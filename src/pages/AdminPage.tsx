@@ -479,7 +479,20 @@ function BusinessTab() {
               <Field label="카카오 ID"><input value={form.kakao} onChange={e=>setForm(f=>({...f,kakao:e.target.value}))} style={inputStyle} /></Field>
             </Grid2>
             <Field label="웹사이트"><input value={form.website} onChange={e=>setForm(f=>({...f,website:e.target.value}))} style={inputStyle} placeholder="https://..." /></Field>
-            <Field label="Google Place ID"><input value={form.google_place_id} onChange={e=>setForm(f=>({...f,google_place_id:e.target.value}))} style={inputStyle} placeholder="ChIJ..." /></Field>
+            <Field label="Google Place ID">
+              <div style={{ display:'flex', gap:8 }}>
+                <input value={form.google_place_id} onChange={e=>setForm(f=>({...f,google_place_id:e.target.value}))} style={{ ...inputStyle, flex:1, margin:0 }} placeholder="ChIJ..." />
+                {editTarget && (
+                  <button
+                    onClick={async () => {
+                      await supabase.from('businesses').update({ google_rating: null, google_review_count: null }).eq('id', editTarget.id)
+                      showToast('별점 초기화 완료')
+                    }}
+                    style={{ height:40, padding:'0 12px', borderRadius:8, border:'1px solid #E2E8F0', background:'#FFF7ED', color:'#D97706', fontSize:12, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}
+                  >⭐ 별점 초기화</button>
+                )}
+              </div>
+            </Field>
             <div style={{ display:'flex', gap:20, marginTop:8 }}>
               <label style={checkLabel}><input type="checkbox" checked={form.is_featured} onChange={e=>setForm(f=>({...f,is_featured:e.target.checked}))} /> ⭐ 추천 업체</label>
               <label style={checkLabel}><input type="checkbox" checked={form.is_active} onChange={e=>setForm(f=>({...f,is_active:e.target.checked}))} /> ✅ 활성화</label>

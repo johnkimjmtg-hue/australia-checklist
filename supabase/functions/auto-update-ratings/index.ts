@@ -32,18 +32,16 @@ Deno.serve(async (req) => {
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-    // google_rating 없는 업체 100개 처리 (어드민 버튼용)
+    // 오래된 순으로 100개씩 순환 업데이트
     const { data: businesses, error } = await supabase
       .from('businesses')
-      .select('id, name, google_place_id')
+      .select('id, name, google_place_id, updated_at')
       .eq('is_active', true)
       .not('google_place_id', 'is', null)
-      .is('google_rating', null)
+      .order('updated_at', { ascending: true })
       .limit(100)
 
     if (error) throw error
-
-    const results: { name: string; rating: number | null; status: string }[] = []
 
     for (const biz of businesses) {
       await new Promise(r => setTimeout(r, 100))
@@ -52,22 +50,12 @@ Deno.serve(async (req) => {
         await supabase.from('businesses').update({
           google_rating: result.rating,
           google_review_count: result.reviewCount,
+          updated_at: new Date().toISOString(),
         }).eq('id', biz.id)
-        results.push({ name: biz.name, rating: result.rating, status: '✅ 업데이트' })
-      } else {
-        results.push({ name: biz.name, rating: null, status: '❌ 실패' })
       }
     }
 
-    // 남은 업체 수 확인
-    const { count: remaining } = await supabase
-      .from('businesses')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_active', true)
-      .not('google_place_id', 'is', null)
-      .is('google_rating', null)
-
-    return new Response(JSON.stringify({ total: businesses.length, remaining: Math.max(0, (remaining ?? 0) - businesses.length), results }), {
+    return new Response(JSON.stringify({ processed: businesses.length }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     })
   } catch (e) {
