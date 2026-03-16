@@ -701,7 +701,11 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         const title     = city === 'melbourne' ? PANTHEON_TITLE[imgNum - 1] : SYDNEY_TITLE[imgNum - 1]
 
         const handleToggle = () => {
+          const willCheck = !isChecked
           handleCell(idx)
+          if (willCheck) {
+            setTimeout(() => setSelectedCafe(null), 800)
+          }
         }
 
         return (
