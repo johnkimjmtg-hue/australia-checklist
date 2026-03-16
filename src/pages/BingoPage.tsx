@@ -769,7 +769,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                         transition:'all 0.2s',
                       }} />
                       <span style={{ fontSize:14, fontWeight:700, color: isChecked ? '#16A34A' : '#64748B' }}>
-                        {isChecked ? '✅ 정복 완료!' : '정복 완료'}
+                        {isChecked ? '정복 완료!' : '정복 완료'}
                       </span>
                     </div>
                   </div>
