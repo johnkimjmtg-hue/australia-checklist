@@ -384,7 +384,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'#fff' }}>
+      <div style={{ background:'#fff', ...(mainTab === 'community' ? { position:'sticky' as const, top:0, zIndex:100 } : {}) }}>
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
@@ -398,10 +398,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <div style={{ display:'flex', padding:'8px 8px 0', gap:2, overflowX:'auto', scrollbarWidth:'none' }}>
           {([
             { id:'bucketlist', icon:'ph:check-circle',  label:'버킷리스트' },
+            { id:'services',   icon:'ph:buildings',     label:'업체/서비스' },
             { id:'shopping',   icon:'ph:shopping-bag',  label:'호주쇼핑리스트' },
             { id:'bingo',      icon:'ph:coffee',        label:'카페도장깨기' },
             { id:'community',  icon:'ph:chats-circle',  label:'커뮤니티' },
-            { id:'services',   icon:'ph:buildings',     label:'업체/서비스' },
           ] as { id: MainTab; icon: string; label: string }[]).map(tab => {
             const active = mainTab === tab.id
             return (
