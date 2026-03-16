@@ -764,14 +764,14 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                     >
                       <div style={{
                         width:22, height:22, borderRadius:6, flexShrink:0,
-                        border:`2px solid ${themeColor}`,
-                        background: isChecked ? themeColor : '#fff',
+                        border:`2px solid ${isChecked ? '#16A34A' : themeColor}`,
+                        background: isChecked ? '#16A34A' : '#fff',
                         display:'flex', alignItems:'center', justifyContent:'center',
                         transition:'all 0.2s',
                       }}>
                         {isChecked && <Icon icon="ph:check-bold" width={13} height={13} color="#fff" />}
                       </div>
-                      <span style={{ fontSize:14, fontWeight:700, color: isChecked ? themeColor : '#64748B' }}>
+                      <span style={{ fontSize:14, fontWeight:700, color: isChecked ? '#16A34A' : '#64748B' }}>
                         {isChecked ? '✅ 정복 완료!' : '정복 완료'}
                       </span>
                     </div>
