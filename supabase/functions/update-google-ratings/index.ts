@@ -58,7 +58,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ total: businesses.length, results }), {
+    // 남은 업체 수 확인
+    const { count: remaining } = await supabase
+      .from('businesses')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', true)
+      .not('google_place_id', 'is', null)
+
+    return new Response(JSON.stringify({ total: businesses.length, remaining: Math.max(0, (remaining ?? 0) - businesses.length), results }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     })
   } catch (e) {
