@@ -776,7 +776,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                         {isChecked && <Icon icon="ph:check-bold" width={13} height={13} color="#fff" />}
                       </div>
                       <span style={{ fontSize:14, fontWeight:700, color: isChecked ? themeColor : '#64748B' }}>
-                        {isChecked ? '이 카페를 정복하셨습니다!' : '이 카페를 정복하세요'}
+                        {isChecked ? '이 카페를 정복하셨습니다.' : '이 카페를 정복합니다'}
                       </span>
                     </div>
                   </div>
