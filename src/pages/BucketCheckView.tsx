@@ -227,39 +227,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
     try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} }
   })
 
-  const playTing = () => {
-    try {
-      const ctx = new (window.AudioContext||(window as any).webkitAudioContext)()
-      const osc = ctx.createOscillator(); const gain = ctx.createGain()
-      osc.connect(gain); gain.connect(ctx.destination)
-      osc.type='sine'; osc.frequency.setValueAtTime(880,ctx.currentTime)
-      osc.frequency.exponentialRampToValueAtTime(1320,ctx.currentTime+0.1)
-      gain.gain.setValueAtTime(0.3,ctx.currentTime)
-      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4)
-      osc.start(); osc.stop(ctx.currentTime+0.4)
-    } catch {}
-  }
-
-  const playFanfare = () => {
-    try {
-      const ctx = new (window.AudioContext||(window as any).webkitAudioContext)()
-      const notes = [523, 659, 784, 1047]
-      const times = [0, 0.18, 0.36, 0.54]
-      notes.forEach((freq, i) => {
-        const osc  = ctx.createOscillator()
-        const gain = ctx.createGain()
-        osc.connect(gain); gain.connect(ctx.destination)
-        osc.type = 'triangle'
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + times[i])
-        gain.gain.setValueAtTime(0, ctx.currentTime + times[i])
-        gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + times[i] + 0.04)
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + times[i] + 0.35)
-        osc.start(ctx.currentTime + times[i])
-        osc.stop(ctx.currentTime + times[i] + 0.35)
-      })
-    } catch {}
-  }
-
   const getKey = (id: string, day?: number) => day !== undefined ? `${id}_${day}` : id
 
   const toggleAchieved = (id: string, day?: number) => {
@@ -274,7 +241,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       const newCount = allRows.filter(r => !!next[getKey(r.id, r.day)]).length
       const isLast = newCount === total
       if (!isLast) {
-        playTing()
         setConfettiTrigger(t => t+1)
       }
     }
@@ -292,7 +258,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   useEffect(() => {
     if (total > 0 && achievedCount === total && prevAchieved.current < total) {
       setTimeout(() => {
-        playFanfare()
         setConfettiTrigger(t => t+1)
         setShowAllDone(true)
       }, 400)

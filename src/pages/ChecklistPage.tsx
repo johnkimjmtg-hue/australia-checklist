@@ -216,57 +216,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     toastTimer.current = setTimeout(() => setToast(null), 2000)
   }
 
-  const playFireworksSound = () => {
-    try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
-
-      const boom = (time: number, freq: number, vol: number) => {
-        // 터지는 쿵 소리
-        const buf = ctx.createBuffer(1, ctx.sampleRate * 0.5, ctx.sampleRate)
-        const data = buf.getChannelData(0)
-        for (let i = 0; i < data.length; i++) {
-          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.08))
-        }
-        const src = ctx.createBufferSource()
-        src.buffer = buf
-        const gain = ctx.createGain()
-        const filter = ctx.createBiquadFilter()
-        filter.type = 'lowpass'
-        filter.frequency.setValueAtTime(freq, time)
-        filter.frequency.exponentialRampToValueAtTime(80, time + 0.4)
-        gain.gain.setValueAtTime(vol, time)
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.5)
-        src.connect(filter); filter.connect(gain); gain.connect(ctx.destination)
-        src.start(time)
-      }
-
-      const sparkle = (time: number, freq: number, delay: number) => {
-        // 반짝이는 고음
-        const osc = ctx.createOscillator()
-        const gain = ctx.createGain()
-        osc.type = 'sine'
-        osc.frequency.setValueAtTime(freq, time + delay)
-        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, time + delay + 0.3)
-        gain.gain.setValueAtTime(0.15, time + delay)
-        gain.gain.exponentialRampToValueAtTime(0.001, time + delay + 0.3)
-        osc.connect(gain); gain.connect(ctx.destination)
-        osc.start(time + delay); osc.stop(time + delay + 0.3)
-      }
-
-      const now = ctx.currentTime
-      // 1차 폭발
-      boom(now, 300, 0.8)
-      // 2차 폭발
-      boom(now + 0.35, 200, 0.6)
-      // 3차 작은 폭발
-      boom(now + 0.65, 150, 0.4)
-      // 반짝임 소리들
-      const freqs = [1200, 1500, 1800, 2100, 900, 1350, 1650]
-      freqs.forEach((f, i) => sparkle(now, f, 0.1 + i * 0.08))
-      freqs.forEach((f, i) => sparkle(now, f * 0.75, 0.5 + i * 0.06))
-    } catch {}
-  }
-
   const handleDateSelect = (val: string) => {
     if (pickerStep === 'start') {
       setStartDate(val)
@@ -277,7 +226,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       saveTrip(t); setTrip(t)
       setModal('none')
       setShowScheduleView(true)  // 일정 입력 시 일정보기 자동 활성화
-      playFireworksSound()
       setShowFireworks(true)
       setTimeout(() => setShowFireworks(false), 2800)
     }
