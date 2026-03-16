@@ -767,7 +767,9 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                         background: isChecked ? '#6F4E37' : '#fff',
                         display:'flex', alignItems:'center', justifyContent:'center',
                         transition:'all 0.2s',
-                      }} />
+                      }}>
+                        {isChecked && <Icon icon="ph:check-bold" width={13} height={13} color="#fff" />}
+                      </div>
                       <span style={{ fontSize:14, fontWeight:700, color: isChecked ? '#6F4E37' : '#64748B' }}>
                         {isChecked ? '이 카페를 정복하셨습니다!' : '이 카페를 정복하세요'}
                       </span>
