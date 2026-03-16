@@ -71,8 +71,8 @@ export default function BusinessCard({ business }: Props) {
       </a>
     ) : null,
     business.google_place_id ? (
-      <a key="google" href={`https://search.google.com/local/reviews?placeid=${business.google_place_id}`} target="_blank" rel="noreferrer" style={{ ...btnBase, textDecoration:'none', background:'#FFB800', color:'#fff', border:'none' }}>
-        <Icon icon="ph:star" width={13} height={13} color="#fff" />구글 리뷰
+      <a key="google" href={`https://search.google.com/local/reviews?placeid=${business.google_place_id}`} target="_blank" rel="noreferrer" style={{ ...btnBase, textDecoration:'none' }}>
+        <Icon icon="ph:star-fill" width={13} height={13} color="#FFB800" />구글 리뷰
       </a>
     ) : null,
     <button key="share" onClick={() => setShowShareModal(true)} style={{ ...btnBase }}>
