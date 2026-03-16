@@ -2206,13 +2206,17 @@ function GoogleMappingTab() {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
           },
         }
       )
-      const data = await res.json()
+      const text = await res.text()
+      let data: any
+      try { data = JSON.parse(text) } catch { throw new Error(`응답 파싱 실패: ${text}`) }
+      if (!res.ok) throw new Error(data?.error ?? `HTTP ${res.status}`)
       if (data.error) throw new Error(data.error)
-      setTotal(data.total)
-      setResults(data.results)
+      setTotal(data.total ?? 0)
+      setResults(Array.isArray(data.results) ? data.results : [])
     } catch (e: any) {
       setError(String(e?.message ?? e))
     }
