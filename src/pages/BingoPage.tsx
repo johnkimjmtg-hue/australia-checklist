@@ -702,7 +702,6 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
 
         const handleToggle = () => {
           handleCell(idx)
-          setSelectedCafe(null)
         }
 
         return (
