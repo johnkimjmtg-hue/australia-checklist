@@ -368,6 +368,23 @@ function BusinessTab() {
   const [toast, setToast]           = useState('')
   const [bizSearch, setBizSearch]   = useState('')
   const [bizCat, setBizCat]         = useState('all')
+  const [mapping, setMapping]       = useState(false)
+  const [mapResult, setMapResult]   = useState<{ total:number; matched:number; failed:{id:string;name:string;reason:string}[] } | null>(null)
+
+  async function handleAutoMap() {
+    if (!confirm(`google_place_id가 없는 업체를 자동 매핑할까요?\n(Google Places API 호출)`)) return
+    setMapping(true)
+    setMapResult(null)
+    try {
+      const { data, error } = await supabase.functions.invoke('match-place-ids')
+      if (error) throw error
+      setMapResult(data)
+      await load()
+    } catch (e) {
+      showToast('자동 매핑 실패: ' + String(e))
+    }
+    setMapping(false)
+  }
 
   useEffect(() => { load() }, [])
 
@@ -391,7 +408,7 @@ function BusinessTab() {
       address:b.address||'', city:b.city,
       is_featured:b.is_featured, is_active:b.is_active,
       tags:b.tags?.join(', ')||'',
-      google_place_id:(b as any).google_place_id||'',
+      google_place_id:b.google_place_id||'',
     })
     setEditTarget(b); setShowForm(true)
   }
@@ -457,8 +474,7 @@ function BusinessTab() {
               />
             </Field>
             <Field label="업체 소개"><textarea value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} style={{...inputStyle,resize:'none'}} rows={3} /></Field>
-            <Field label="태그 (쉼표 구분)"><input value={form.tags} onChange={e=>setForm(f=>({...f,tags:e.target.value}))} style={inputStyle} placeholder="예: 부동산 구매, 투자 상담" /></Field>
-            <Grid2>
+            <Field label="태그 (쉼표 구분)"><input value={form.tags} onChange={e=>setForm(f=>({...f,tags:e.target.value}))} style={inputStyle} placeholder="예: 부동산 구매, 투자 상담" /></Field>            <Grid2>
               <Field label="전화번호"><input value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} style={inputStyle} placeholder="+61 2 1234 5678" /></Field>
               <Field label="카카오 ID"><input value={form.kakao} onChange={e=>setForm(f=>({...f,kakao:e.target.value}))} style={inputStyle} /></Field>
             </Grid2>
@@ -2183,159 +2199,8 @@ function ShoppingTab() {
   )
 }
 
-// ── 구글 Place ID 자동 매핑 탭
-function GoogleMappingTab() {
-  const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
-  const [running, setRunning]     = useState(false)
-  const [results, setResults]     = useState<{ id: string; name: string; place_id: string | null; status: string }[]>([])
-  const [total, setTotal]         = useState<number | null>(null)
-  const [remaining, setRemaining] = useState<number | null>(null)
-  const [error, setError]         = useState<string | null>(null)
-
-  const handleRun = async () => {
-    setRunning(true)
-    setError(null)
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/match-google-places`,
-        { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` } }
-      )
-      const text = await res.text()
-      let data: any
-      try { data = JSON.parse(text) } catch { throw new Error(`응답 파싱 실패: ${text}`) }
-      if (!res.ok) throw new Error(data?.error ?? `HTTP ${res.status}`)
-      setTotal(data.total ?? 0)
-      setRemaining(data.remaining ?? 0)
-      setResults(prev => [...prev, ...(Array.isArray(data.results) ? data.results : [])])
-    } catch (e: any) { setError(String(e?.message ?? e)) }
-    setRunning(false)
-  }
-
-  const matched   = results.filter(r => r.place_id).length
-  const unmatched = results.filter(r => !r.place_id).length
-
-  return (
-    <div style={{ fontFamily: ff }}>
-      <div style={{ background:'#EFF6FF', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
-        <div style={{ fontWeight:800, color:'#1B6EF3', marginBottom:4 }}>🔍 구글 Place ID 자동 매핑</div>
-        google_place_id가 없는 업체를 Google Places API로 자동 매핑합니다.<br />
-        업체명 + 주소로 검색하며, 찾지 못한 업체는 수동으로 입력해 주세요.
-      </div>
-      <button onClick={handleRun} disabled={running} style={{
-        width:'100%', height:48, borderRadius:12, border:'none',
-        background: running ? '#94A3B8' : '#1B6EF3', color:'#fff', fontSize:15, fontWeight:700,
-        cursor: running ? 'default' : 'pointer', marginBottom:16,
-        display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-      }}>
-        {running ? '매핑 중...' : remaining !== null && remaining > 0 ? `🚀 다음 20개 매핑 (${remaining}개 남음)` : '🚀 자동 매핑 시작'}
-      </button>
-      {error && <div style={{ background:'#FEE2E2', borderRadius:10, padding:'12px 14px', marginBottom:16, fontSize:13, color:'#DC2626' }}>❌ 오류: {error}</div>}
-      {total !== null && (
-        <div style={{ display:'flex', gap:8, marginBottom:16 }}>
-          <div style={{ flex:1, background:'#DCFCE7', borderRadius:10, padding:'12px', textAlign:'center' }}>
-            <div style={{ fontSize:22, fontWeight:800, color:'#16A34A' }}>{matched}</div>
-            <div style={{ fontSize:12, color:'#16A34A', fontWeight:600 }}>매핑 완료</div>
-          </div>
-          <div style={{ flex:1, background:'#FEE2E2', borderRadius:10, padding:'12px', textAlign:'center' }}>
-            <div style={{ fontSize:22, fontWeight:800, color:'#DC2626' }}>{unmatched}</div>
-            <div style={{ fontSize:12, color:'#DC2626', fontWeight:600 }}>찾지 못함</div>
-          </div>
-          <div style={{ flex:1, background:'#F1F5F9', borderRadius:10, padding:'12px', textAlign:'center' }}>
-            <div style={{ fontSize:22, fontWeight:800, color:'#475569' }}>{total}</div>
-            <div style={{ fontSize:12, color:'#475569', fontWeight:600 }}>전체</div>
-          </div>
-        </div>
-      )}
-      {results.length > 0 && (
-        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-          {results.map(r => (
-            <div key={r.id} style={{ background:'#fff', borderRadius:10, padding:'10px 14px', border:`1px solid ${r.place_id ? '#DCFCE7' : '#FEE2E2'}`, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-              <div>
-                <div style={{ fontSize:13, fontWeight:700, color:'#0F172A' }}>{r.name}</div>
-                {r.place_id && <div style={{ fontSize:11, color:'#94A3B8', marginTop:2 }}>{r.place_id}</div>}
-              </div>
-              <div style={{ fontSize:12, fontWeight:700, color: r.place_id ? '#16A34A' : '#DC2626', flexShrink:0 }}>{r.status}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 별점 업데이트 섹션 */}
-      <RatingUpdateSection ff={ff} />
-    </div>
-  )
-}
-
-function RatingUpdateSection({ ff }: { ff: string }) {
-  const [running, setRunning]     = useState(false)
-  const [results, setResults]     = useState<{ name: string; rating: number | null; status: string }[]>([])
-  const [remaining, setRemaining] = useState<number | null>(null)
-  const [error, setError]         = useState<string | null>(null)
-
-  const handleRun = async () => {
-    setRunning(true)
-    setError(null)
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/update-google-ratings`,
-        { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` } }
-      )
-      const text = await res.text()
-      let data: any
-      try { data = JSON.parse(text) } catch { throw new Error(`응답 파싱 실패: ${text}`) }
-      if (!res.ok) throw new Error(data?.error ?? `HTTP ${res.status}`)
-      setRemaining(data.remaining ?? 0)
-      setResults(prev => [...prev, ...(Array.isArray(data.results) ? data.results : [])])
-    } catch (e: any) { setError(String(e?.message ?? e)) }
-    setRunning(false)
-  }
-
-  const updated = results.filter(r => r.rating !== null).length
-  const failed  = results.filter(r => r.rating === null).length
-
-  return (
-    <div style={{ marginTop:24, fontFamily: ff }}>
-      <div style={{ background:'#FFF7ED', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
-        <div style={{ fontWeight:800, color:'#D97706', marginBottom:4 }}>⭐ 구글 별점 업데이트</div>
-        google_rating이 없는 업체의 별점을 가져옵니다.<br />
-        100개씩 처리되며, 매일 오전 9시에 자동 업데이트됩니다.
-      </div>
-      <button onClick={handleRun} disabled={running} style={{
-        width:'100%', height:48, borderRadius:12, border:'none',
-        background: running ? '#94A3B8' : '#FFB800', color:'#fff', fontSize:15, fontWeight:700,
-        cursor: running ? 'default' : 'pointer', marginBottom:16,
-        display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-      }}>
-        {running ? '업데이트 중...' : remaining !== null && remaining > 0 ? `⭐ 다음 100개 업데이트 (${remaining}개 남음)` : '⭐ 별점 업데이트 시작'}
-      </button>
-      {error && <div style={{ background:'#FEE2E2', borderRadius:10, padding:'12px 14px', marginBottom:16, fontSize:13, color:'#DC2626' }}>❌ 오류: {error}</div>}
-      {results.length > 0 && (
-        <>
-          <div style={{ display:'flex', gap:8, marginBottom:12 }}>
-            <div style={{ flex:1, background:'#DCFCE7', borderRadius:10, padding:'10px', textAlign:'center' }}>
-              <div style={{ fontSize:20, fontWeight:800, color:'#16A34A' }}>{updated}</div>
-              <div style={{ fontSize:11, color:'#16A34A', fontWeight:600 }}>업데이트 완료</div>
-            </div>
-            <div style={{ flex:1, background:'#FEE2E2', borderRadius:10, padding:'10px', textAlign:'center' }}>
-              <div style={{ fontSize:20, fontWeight:800, color:'#DC2626' }}>{failed}</div>
-              <div style={{ fontSize:11, color:'#DC2626', fontWeight:600 }}>실패</div>
-            </div>
-          </div>
-          <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-            {results.map((r, i) => (
-              <div key={i} style={{ background:'#fff', borderRadius:10, padding:'10px 14px', border:`1px solid ${r.rating !== null ? '#DCFCE7' : '#FEE2E2'}`, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                <div style={{ fontSize:13, fontWeight:700, color:'#0F172A' }}>{r.name}</div>
-                <div style={{ fontSize:12, fontWeight:700, color: r.rating !== null ? '#16A34A' : '#DC2626' }}>
-                  {r.rating !== null ? `⭐ ${r.rating}` : r.status}
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  )
-}
+// ── 빙고 탭
+function BingoTab() {
   const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
   type BingoCafe = { id: string; city: string; sort_order: number; name: string; business_id: string | null; is_active: boolean }
   type Business  = { id: string; name: string }
@@ -2494,6 +2359,215 @@ function RatingUpdateSection({ ff }: { ff: string }) {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+// ── 구글 Place ID 자동 매핑 탭
+function GoogleMappingTab() {
+  const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+  const [running, setRunning]   = useState(false)
+  const [results, setResults]   = useState<{ id: string; name: string; place_id: string | null; status: string }[]>([])
+  const [total, setTotal]       = useState<number | null>(null)
+  const [remaining, setRemaining] = useState<number | null>(null)
+  const [error, setError]       = useState<string | null>(null)
+
+  const handleRun = async () => {
+    setRunning(true)
+    setResults([])
+    setError(null)
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/match-google-places`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+        }
+      )
+      const text = await res.text()
+      let data: any
+      try { data = JSON.parse(text) } catch { throw new Error(`응답 파싱 실패: ${text}`) }
+      if (!res.ok) throw new Error(data?.error ?? `HTTP ${res.status}`)
+      if (data.error) throw new Error(data.error)
+      setTotal(data.total ?? 0)
+      setRemaining(data.remaining ?? 0)
+      setResults(prev => [...prev, ...(Array.isArray(data.results) ? data.results : [])])
+    } catch (e: any) {
+      setError(String(e?.message ?? e))
+    }
+    setRunning(false)
+  }
+
+  const matched   = results.filter(r => r.place_id).length
+  const unmatched = results.filter(r => !r.place_id).length
+
+  return (
+    <div style={{ fontFamily: ff }}>
+      <div style={{ background:'#EFF6FF', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
+        <div style={{ fontWeight:800, color:'#1B6EF3', marginBottom:4 }}>🔍 구글 Place ID 자동 매핑</div>
+        google_place_id가 없는 업체를 Google Places API로 자동 매핑합니다.<br />
+        업체명 + 주소로 검색하며, 찾지 못한 업체는 수동으로 입력해 주세요.
+      </div>
+
+      <button
+        onClick={handleRun}
+        disabled={running}
+        style={{
+          width:'100%', height:48, borderRadius:12, border:'none',
+          background: running ? '#94A3B8' : '#1B6EF3',
+          color:'#fff', fontSize:15, fontWeight:700,
+          cursor: running ? 'default' : 'pointer',
+          marginBottom:16,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+        }}
+      >
+        {running ? '매핑 중... (잠시 기다려 주세요)' : remaining !== null && remaining > 0 ? `🚀 다음 20개 매핑 (${remaining}개 남음)` : '🚀 자동 매핑 시작'}
+      </button>
+
+      {error && (
+        <div style={{ background:'#FEE2E2', borderRadius:10, padding:'12px 14px', marginBottom:16, fontSize:13, color:'#DC2626' }}>
+          ❌ 오류: {error}
+        </div>
+      )}
+
+      {total !== null && (
+        <div style={{ display:'flex', gap:8, marginBottom:16 }}>
+          <div style={{ flex:1, background:'#DCFCE7', borderRadius:10, padding:'12px', textAlign:'center' }}>
+            <div style={{ fontSize:22, fontWeight:800, color:'#16A34A' }}>{matched}</div>
+            <div style={{ fontSize:12, color:'#16A34A', fontWeight:600 }}>매핑 완료</div>
+          </div>
+          <div style={{ flex:1, background:'#FEE2E2', borderRadius:10, padding:'12px', textAlign:'center' }}>
+            <div style={{ fontSize:22, fontWeight:800, color:'#DC2626' }}>{unmatched}</div>
+            <div style={{ fontSize:12, color:'#DC2626', fontWeight:600 }}>찾지 못함</div>
+          </div>
+          <div style={{ flex:1, background:'#F1F5F9', borderRadius:10, padding:'12px', textAlign:'center' }}>
+            <div style={{ fontSize:22, fontWeight:800, color:'#475569' }}>{total}</div>
+            <div style={{ fontSize:12, color:'#475569', fontWeight:600 }}>전체</div>
+          </div>
+        </div>
+      )}
+
+      {results.length > 0 && (
+        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+          {results.map(r => (
+            <div key={r.id} style={{
+              background:'#fff', borderRadius:10, padding:'10px 14px',
+              border:`1px solid ${r.place_id ? '#DCFCE7' : '#FEE2E2'}`,
+              display:'flex', alignItems:'center', justifyContent:'space-between',
+            }}>
+              <div>
+                <div style={{ fontSize:13, fontWeight:700, color:'#0F172A' }}>{r.name}</div>
+                {r.place_id && <div style={{ fontSize:11, color:'#94A3B8', marginTop:2 }}>{r.place_id}</div>}
+              </div>
+              <div style={{ fontSize:12, fontWeight:700, color: r.place_id ? '#16A34A' : '#DC2626', flexShrink:0 }}>
+                {r.status}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── 별점 업데이트 섹션 */}
+      <RatingUpdateSection ff={ff} />
+    </div>
+  )
+}
+
+function RatingUpdateSection({ ff }: { ff: string }) {
+  const [running, setRunning] = useState(false)
+  const [results, setResults] = useState<{ name: string; rating: number | null; status: string }[]>([])
+  const [remaining, setRemaining] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleRun = async () => {
+    setRunning(true)
+    setError(null)
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/update-google-ratings`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+        }
+      )
+      const text = await res.text()
+      let data: any
+      try { data = JSON.parse(text) } catch { throw new Error(`응답 파싱 실패: ${text}`) }
+      if (!res.ok) throw new Error(data?.error ?? `HTTP ${res.status}`)
+      setRemaining(data.remaining ?? 0)
+      setResults(prev => [...prev, ...(Array.isArray(data.results) ? data.results : [])])
+    } catch (e: any) {
+      setError(String(e?.message ?? e))
+    }
+    setRunning(false)
+  }
+
+  const updated = results.filter(r => r.rating !== null).length
+  const failed  = results.filter(r => r.rating === null).length
+
+  return (
+    <div style={{ marginTop:24, fontFamily: ff }}>
+      <div style={{ background:'#FFF7ED', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
+        <div style={{ fontWeight:800, color:'#D97706', marginBottom:4 }}>⭐ 구글 별점 업데이트</div>
+        google_place_id가 없는 업체의 별점을 가져옵니다.<br />
+        100개씩 처리되며, 매일 오전 9시에 자동 업데이트됩니다.
+      </div>
+
+      <button
+        onClick={handleRun}
+        disabled={running}
+        style={{
+          width:'100%', height:48, borderRadius:12, border:'none',
+          background: running ? '#94A3B8' : '#FFB800',
+          color:'#fff', fontSize:15, fontWeight:700,
+          cursor: running ? 'default' : 'pointer',
+          marginBottom:16,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+        }}
+      >
+        {running ? '업데이트 중...' : remaining !== null && remaining > 0 ? `⭐ 다음 100개 업데이트 (${remaining}개 남음)` : '⭐ 별점 업데이트 시작'}
+      </button>
+
+      {error && (
+        <div style={{ background:'#FEE2E2', borderRadius:10, padding:'12px 14px', marginBottom:16, fontSize:13, color:'#DC2626' }}>
+          ❌ 오류: {error}
+        </div>
+      )}
+
+      {results.length > 0 && (
+        <>
+          <div style={{ display:'flex', gap:8, marginBottom:12 }}>
+            <div style={{ flex:1, background:'#DCFCE7', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#16A34A' }}>{updated}</div>
+              <div style={{ fontSize:11, color:'#16A34A', fontWeight:600 }}>업데이트 완료</div>
+            </div>
+            <div style={{ flex:1, background:'#FEE2E2', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#DC2626' }}>{failed}</div>
+              <div style={{ fontSize:11, color:'#DC2626', fontWeight:600 }}>실패</div>
+            </div>
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+            {results.map((r, i) => (
+              <div key={i} style={{
+                background:'#fff', borderRadius:10, padding:'10px 14px',
+                border:`1px solid ${r.rating !== null ? '#DCFCE7' : '#FEE2E2'}`,
+                display:'flex', alignItems:'center', justifyContent:'space-between',
+              }}>
+                <div style={{ fontSize:13, fontWeight:700, color:'#0F172A' }}>{r.name}</div>
+                <div style={{ fontSize:12, fontWeight:700, color: r.rating !== null ? '#16A34A' : '#DC2626' }}>
+                  {r.rating !== null ? `⭐ ${r.rating}` : r.status}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }
