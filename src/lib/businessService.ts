@@ -30,7 +30,13 @@ export type Review = {
 }
 
 // 리뷰 (숨김 — 내부용)
-export async function getReviews(businessId: string): Promise<Review[]> {export async function getBusinesses(category?: string): Promise<Business[]> {
+export async function getReviews(businessId: string): Promise<Review[]> {
+  const { data, error } = await supabase.from('reviews').select('*').eq('business_id', businessId).order('created_at', { ascending: false })
+  if (error) { console.error('getReviews error:', error); return [] }
+  return data as Review[]
+}
+
+export async function getBusinesses(category?: string): Promise<Business[]> {
   let query = supabase.from('businesses').select('*').eq('is_active', true)
     .order('is_featured', { ascending: false }).order('rating', { ascending: false })
   if (category && category !== 'all') query = query.eq('category', category)
