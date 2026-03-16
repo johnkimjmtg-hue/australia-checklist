@@ -724,51 +724,60 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               </div>
 
               {/* 상단: 스탬프 이미지 + 멘트 + 체크 */}
-              <div style={{
-                background:'#fff', borderRadius:16, padding:'16px',
-                marginBottom:10, display:'flex', alignItems:'center', gap:14,
-                boxShadow:'0 2px 10px rgba(0,0,0,0.07)',
-              }}>
-                {/* 원형 스탬프 이미지 */}
-                <div style={{
-                  width:72, height:72, borderRadius:'50%', flexShrink:0,
-                  overflow:'hidden', border:'3px solid #FFB800',
-                  background:'linear-gradient(135deg,#6F4E37,#a0522d)',
-                }}>
-                  <img
-                    src={stampSrc}
-                    alt={`stamp-${imgNum}`}
-                    style={{ width:'100%', height:'100%', objectFit:'cover' }}
-                    onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
-                  />
-                </div>
-                {/* 멘트 */}
-                <div style={{ flex:1 }}>
-                  {title && <div style={{ fontSize:12, fontWeight:800, color:'#1B6EF3', marginBottom:4 }}>{title}</div>}
-                  {lore  && <div style={{ fontSize:11, color:'#64748B', lineHeight:1.6 }}>{lore}</div>}
-                </div>
-              </div>
-
-              {/* 정복완료 체크 버튼 */}
-              <button
-                onClick={handleToggle}
-                style={{
-                  width:'100%', height:48, borderRadius:12, border:'none',
-                  background: isChecked ? '#F1F5F9' : 'linear-gradient(135deg,#FFB800,#F59E0B)',
-                  color: isChecked ? '#64748B' : '#fff',
-                  fontSize:15, fontWeight:800, cursor:'pointer',
-                  display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-                  marginBottom:12,
-                  boxShadow: isChecked ? 'none' : '0 4px 14px rgba(255,184,0,0.4)',
-                }}
-              >
-                <Icon
-                  icon={isChecked ? 'ph:x-circle' : 'ph:check-circle-fill'}
-                  width={20} height={20}
-                  color={isChecked ? '#94A3B8' : '#fff'}
-                />
-                {isChecked ? '정복 취소하기' : '정복 완료! ☕'}
-              </button>
+              {(() => {
+                const themeColor = city === 'melbourne' ? '#6F4E37' : '#1B6EF3'
+                const themeBg    = city === 'melbourne' ? 'rgba(111,78,55,0.08)' : 'rgba(27,110,243,0.08)'
+                return (
+                  <div style={{
+                    background:'#fff', borderRadius:16, padding:'16px',
+                    marginBottom:12, boxShadow:'0 2px 10px rgba(0,0,0,0.07)',
+                  }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:14 }}>
+                      {/* 원형 스탬프 이미지 */}
+                      <div style={{
+                        width:80, height:80, borderRadius:'50%', flexShrink:0,
+                        overflow:'hidden', border:`3px solid ${themeColor}`,
+                        background:'linear-gradient(135deg,#6F4E37,#a0522d)',
+                      }}>
+                        <img
+                          src={stampSrc}
+                          alt={`stamp-${imgNum}`}
+                          style={{ width:'100%', height:'100%', objectFit:'cover' }}
+                          onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                        />
+                      </div>
+                      {/* 멘트 */}
+                      <div style={{ flex:1 }}>
+                        {title && <div style={{ fontSize:14, fontWeight:800, color:themeColor, marginBottom:6 }}>{title}</div>}
+                        {lore  && <div style={{ fontSize:12, color:'#475569', lineHeight:1.7 }}>{lore}</div>}
+                      </div>
+                    </div>
+                    {/* 체크박스 */}
+                    <div
+                      onClick={handleToggle}
+                      style={{
+                        display:'flex', alignItems:'center', gap:10,
+                        background: themeBg, borderRadius:10,
+                        padding:'12px 14px', cursor:'pointer',
+                        border:`1.5px solid ${isChecked ? themeColor : '#E2E8F0'}`,
+                      }}
+                    >
+                      <div style={{
+                        width:22, height:22, borderRadius:6, flexShrink:0,
+                        border:`2px solid ${themeColor}`,
+                        background: isChecked ? themeColor : '#fff',
+                        display:'flex', alignItems:'center', justifyContent:'center',
+                        transition:'all 0.2s',
+                      }}>
+                        {isChecked && <Icon icon="ph:check-bold" width={13} height={13} color="#fff" />}
+                      </div>
+                      <span style={{ fontSize:14, fontWeight:700, color: isChecked ? themeColor : '#64748B' }}>
+                        {isChecked ? '✅ 정복 완료!' : '정복 완료'}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })()}
 
               {/* 업체 정보 */}
               {c.business_id
