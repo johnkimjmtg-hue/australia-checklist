@@ -384,7 +384,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'#fff', ...(mainTab === 'community' ? { position:'sticky' as const, top:0, zIndex:100 } : {}) }}>
+      <div style={{ background:'#fff' }}>
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
