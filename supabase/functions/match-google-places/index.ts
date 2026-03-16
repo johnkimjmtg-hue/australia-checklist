@@ -35,15 +35,16 @@ async function findPlaceId(name: string, address: string, city: string): Promise
   return raw.startsWith('places/') ? raw.replace('places/', '') : raw
 }
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, content-type, apikey, x-client-info',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
+
 Deno.serve(async (req) => {
   // CORS
   if (req.method === 'OPTIONS') {
-    return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, content-type',
-      },
-    })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
@@ -82,18 +83,12 @@ Deno.serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ total: businesses.length, results }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
     })
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
     })
   }
 })
