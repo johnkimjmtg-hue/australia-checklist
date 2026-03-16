@@ -84,13 +84,6 @@ export async function toggleFeatured(id: string, isFeatured: boolean): Promise<b
   return true
 }
 
-// 리뷰 (숨김 — 내부용)
-export async function getReviews(businessId: string): Promise<Review[]> {
-  const { data, error } = await supabase.from('reviews').select('*').eq('business_id', businessId).order('created_at', { ascending: false })
-  if (error) { console.error('getReviews error:', error); return [] }
-  return data as Review[]
-}
-
 export async function addReview(review: Omit<Review, 'id' | 'created_at'>): Promise<Review | null> {
   const { data, error } = await supabase.from('reviews').insert(review).select().single()
   if (error) { console.error('addReview error:', error); return null }
