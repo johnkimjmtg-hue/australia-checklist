@@ -2351,8 +2351,8 @@ function RatingUpdateSection({ ff }: { ff: string }) {
     <div style={{ marginTop:24, fontFamily: ff }}>
       <div style={{ background:'#FFF7ED', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
         <div style={{ fontWeight:800, color:'#D97706', marginBottom:4 }}>⭐ 구글 별점 업데이트</div>
-        google_place_id가 있는 업체의 별점을 가져옵니다.<br />
-        20개씩 처리되며, 4일마다 자동 업데이트됩니다.
+        google_place_id가 없는 업체의 별점을 가져옵니다.<br />
+        100개씩 처리되며, 매일 오전 9시에 자동 업데이트됩니다.
       </div>
 
       <button
@@ -2367,7 +2367,7 @@ function RatingUpdateSection({ ff }: { ff: string }) {
           display:'flex', alignItems:'center', justifyContent:'center', gap:8,
         }}
       >
-        {running ? '업데이트 중...' : remaining !== null && remaining > 0 ? `⭐ 다음 20개 업데이트 (${remaining}개 남음)` : '⭐ 별점 업데이트 시작'}
+        {running ? '업데이트 중...' : remaining !== null && remaining > 0 ? `⭐ 다음 100개 업데이트 (${remaining}개 남음)` : '⭐ 별점 업데이트 시작'}
       </button>
 
       {error && (
