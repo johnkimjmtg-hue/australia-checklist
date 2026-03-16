@@ -2192,6 +2192,7 @@ function GoogleMappingTab() {
   const [running, setRunning]   = useState(false)
   const [results, setResults]   = useState<{ id: string; name: string; place_id: string | null; status: string }[]>([])
   const [total, setTotal]       = useState<number | null>(null)
+  const [remaining, setRemaining] = useState<number | null>(null)
   const [error, setError]       = useState<string | null>(null)
 
   const handleRun = async () => {
@@ -2215,7 +2216,8 @@ function GoogleMappingTab() {
       if (!res.ok) throw new Error(data?.error ?? `HTTP ${res.status}`)
       if (data.error) throw new Error(data.error)
       setTotal(data.total ?? 0)
-      setResults(Array.isArray(data.results) ? data.results : [])
+      setRemaining(data.remaining ?? 0)
+      setResults(prev => [...prev, ...(Array.isArray(data.results) ? data.results : [])])
     } catch (e: any) {
       setError(String(e?.message ?? e))
     }
@@ -2245,7 +2247,7 @@ function GoogleMappingTab() {
           display:'flex', alignItems:'center', justifyContent:'center', gap:8,
         }}
       >
-        {running ? '매핑 중... (잠시 기다려 주세요)' : '🚀 자동 매핑 시작'}
+        {running ? '매핑 중... (잠시 기다려 주세요)' : remaining !== null && remaining > 0 ? `🚀 다음 20개 매핑 (${remaining}개 남음)` : '🚀 자동 매핑 시작'}
       </button>
 
       {error && (

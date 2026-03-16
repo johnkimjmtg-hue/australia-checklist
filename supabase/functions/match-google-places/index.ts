@@ -50,12 +50,13 @@ Deno.serve(async (req) => {
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-    // 전체 업체 가져오기 (google_place_id 없는 것만)
+    // 전체 업체 가져오기 (google_place_id 없는 것만, 20개씩)
     const { data: businesses, error } = await supabase
       .from('businesses')
       .select('id, name, address, city, google_place_id')
       .eq('is_active', true)
       .is('google_place_id', null)
+      .limit(20)
 
     if (error) throw error
 
@@ -82,7 +83,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ total: businesses.length, results }), {
+    // 남은 업체 수 확인
+    const { count: remaining } = await supabase
+      .from('businesses')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', true)
+      .is('google_place_id', null)
+
+    return new Response(JSON.stringify({ total: businesses.length, remaining: (remaining ?? 0) - businesses.length < 0 ? 0 : (remaining ?? 0) - businesses.length, results }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     })
   } catch (e) {
