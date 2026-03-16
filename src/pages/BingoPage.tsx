@@ -240,16 +240,17 @@ function Fireworks() {
 
 
 // ── 상황 메시지
-function getStatusMsg(checked: number, bingo: number): { title: string; sub: string } {
+function getStatusMsg(checked: number, bingo: number, city: 'melbourne'|'sydney'): { title: string; sub: string } {
+  const isMel = city === 'melbourne'
   if (checked === 0)  return { title: '카페 도장깨기 시작!', sub: '카페를 방문하면 해당 칸을 눌러보세요 ☕' }
-  if (checked === 25) return { title: '🏆 판테온 완전정복!', sub: '당신은 멜번을 지배하는 궁극의 카페의 신입니다!' }
+  if (checked === 25) return { title: '🏆 판테온 완전정복!', sub: isMel ? '당신은 멜번을 지배하는 궁극의 카페의 신입니다!' : '당신은 시드니를 지배하는 궁극의 카페의 신입니다!' }
   if (bingo >= 5)     return { title: `🎉 ${bingo}빙고 달성!`, sub: `${checked}개 카페를 방문했어요. 거의 다 왔어요!` }
   if (bingo >= 3)     return { title: `✨ ${bingo}빙고 달성!`, sub: `${checked}개 카페 완료! 계속 도전해봐요` }
   if (bingo >= 1)     return { title: `🎯 ${bingo}빙고 달성!`, sub: `와우! ${checked}개 카페를 깨셨어요` }
   if (checked >= 15)  return { title: `${checked}개 카페 방문 완료!`, sub: '빙고까지 얼마 안 남았어요 💪' }
   if (checked >= 10)  return { title: `${checked}개 카페 방문!`, sub: '반 이상 왔어요! 계속 달려봐요 🔥' }
   if (checked >= 5)   return { title: `${checked}개 카페 방문!`, sub: '좋은 출발이에요. 더 많이 도전해봐요!' }
-  return { title: `${checked}개 카페 방문!`, sub: '멜번 카페 투어가 시작됐어요 ☕' }
+  return { title: `${checked}개 카페 방문!`, sub: isMel ? '멜번 카페 투어가 시작됐어요 ☕' : '시드니 카페 투어가 시작됐어요 ☕' }
 }
 
 type Props = { onBack?: () => void; embedded?: boolean; initialCity?: 'melbourne' | 'sydney'; onCityChange?: (city: 'melbourne'|'sydney') => void }
@@ -568,7 +569,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               {city === 'melbourne' ? '멜번 판테온: 창조의 연대기' : '태양의 항해: 시드니 개척 연대기'}
             </div>
             <div style={{ fontSize:15, fontWeight:800, color:'#1E293B', marginBottom:3, lineHeight:1.3 }}>
-              {getStatusMsg(checked.size, bingoCount).title}
+              {getStatusMsg(checked.size, bingoCount, city).title}
             </div>
             {lastCheckedIdx !== null && checkOrder.includes(lastCheckedIdx) && (
               <div style={{ fontSize:10, fontWeight:800, color: city === 'melbourne' ? '#B45309' : '#1B6EF3', letterSpacing:0.5, marginBottom:2 }}>
@@ -582,7 +583,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                 ? (city === 'melbourne'
                     ? PANTHEON_LORE[checkOrder.indexOf(lastCheckedIdx)]
                     : SYDNEY_LORE[checkOrder.indexOf(lastCheckedIdx)])
-                : getStatusMsg(checked.size, bingoCount).sub}
+                : getStatusMsg(checked.size, bingoCount, city).sub}
             </div>
 
           </div>
