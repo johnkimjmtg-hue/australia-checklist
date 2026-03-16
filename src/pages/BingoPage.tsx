@@ -768,8 +768,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                         display:'flex', alignItems:'center', justifyContent:'center',
                         transition:'all 0.2s',
                       }} />
-                      <span style={{ fontSize:14, fontWeight:700, color: isChecked ? '#16A34A' : '#64748B' }}>
-                        {isChecked ? '정복 완료!' : '정복 완료'}
+                      <span style={{ fontSize:14, fontWeight:700, color: isChecked ? '#6F4E37' : '#64748B' }}>
+                        {isChecked ? '이 카페를 정복하셨습니다!' : '이 카페를 정복하세요'}
                       </span>
                     </div>
                   </div>
