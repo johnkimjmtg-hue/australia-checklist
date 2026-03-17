@@ -369,18 +369,15 @@ export default function Shopping() {
                       const hasBold = colonIdx > 0 && colonIdx < 20
                       return (
                         <div key={i} style={{
-                          display: 'flex', gap: 8, alignItems: 'flex-start',
-                          padding: '2px 4px 2px 8px', marginBottom: 2,
+                          fontSize: 13, color: '#334155', lineHeight: 1.65,
+                          marginBottom: 4,
                         }}>
-                          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#94A3B8', marginTop: 7, flexShrink: 0 }} />
-                          <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.65 }}>
-                            {hasBold ? (
-                              <>
-                                <span style={{ fontWeight: 400, color: '#1E293B' }}>{content.slice(0, colonIdx)}</span>
-                                <span>{content.slice(colonIdx)}</span>
-                              </>
-                            ) : content}
-                          </div>
+                          {hasBold ? (
+                            <>
+                              <span style={{ fontWeight: 400, color: '#1E293B' }}>{content.slice(0, colonIdx)}</span>
+                              <span>{content.slice(colonIdx)}</span>
+                            </>
+                          ) : content}
                         </div>
                       )
                     }
