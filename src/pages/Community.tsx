@@ -125,10 +125,14 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
     <div style={{
       position: 'fixed', inset: 0, zIndex: 999,
       background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '0 24px',
+      overflowY: 'auto',
       fontFamily: ff,
     }}>
+      <div style={{
+        minHeight: '100%',
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+        padding: '60px 24px 40px',
+      }}>
       <div style={{
         background: '#fff', borderRadius: 20, padding: '28px 24px',
         width: '100%', maxWidth: 360,
@@ -187,6 +191,7 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
           }}
         >{checking ? '확인 중...' : '입장하기 →'}</button>
       </div>
+      </div>
     </div>
   )
 }
@@ -203,6 +208,7 @@ export default function Community() {
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Message[]>([])
+  const [onlineCount, setOnlineCount] = useState(1)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
@@ -258,14 +264,15 @@ export default function Community() {
   const channelRef = useRef<any>(null)
 
   const setupChannel = useCallback(() => {
-    // 기존 채널 제거
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current)
       channelRef.current = null
     }
 
     const channel = supabase
-      .channel('chat-realtime-' + Date.now())
+      .channel('chat-realtime-' + Date.now(), {
+        config: { presence: { key: MY_ID } }
+      })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, () => {
         fetchMessages().then(() => scrollToBottom())
       })
@@ -275,15 +282,21 @@ export default function Community() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'community_likes' }, () => {
         fetchMessages()
       })
-      .subscribe((status: string) => {
-        // 연결 끊기면 3초 후 자동 재연결
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState()
+        setOnlineCount(Object.keys(state).length)
+      })
+      .subscribe(async (status: string) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({ online_at: new Date().toISOString() })
+        }
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
           setTimeout(() => setupChannel(), 3000)
         }
       })
 
     channelRef.current = channel
-  }, [fetchMessages])
+  }, [fetchMessages, MY_ID])
 
   useEffect(() => {
     fetchMessages()
@@ -458,7 +471,10 @@ export default function Community() {
             </div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 채팅방</div>
-              <div style={{ fontSize: 11, color: '#94A3B8' }}>호주 교민·여행자 모두 환영</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981' }} />
+                <div style={{ fontSize: 11, color: '#10B981', fontWeight: 600 }}>{onlineCount}명 접속 중</div>
+              </div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
