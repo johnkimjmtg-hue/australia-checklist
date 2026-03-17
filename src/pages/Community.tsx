@@ -213,21 +213,16 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
     onSet(name)
   }
 
-  return (
+  return createPortal(
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 999,
+      position: 'fixed', inset: 0, zIndex: 9999,
       background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
-      overflowY: 'auto',
       fontFamily: ff,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       <div style={{
-        minHeight: '100%',
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-        padding: '60px 24px 40px',
-      }}>
-      <div style={{
         background: '#fff', borderRadius: 20, padding: '28px 24px',
-        width: '100%', maxWidth: 360,
+        width: 'calc(100% - 48px)', maxWidth: 360,
         boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
       }}>
         <div style={{ fontSize: 32, textAlign: 'center', marginBottom: 12 }}>💬</div>
@@ -283,8 +278,8 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
           }}
         >{checking ? '확인 중...' : '입장하기 →'}</button>
       </div>
-      </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
