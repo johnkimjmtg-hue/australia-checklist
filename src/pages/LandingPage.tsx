@@ -611,11 +611,11 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {/* ── 계산기 섹션 ── */}
       <div style={{
         background:'#e8e8e8',
-        padding:'0',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
+        padding: '40px 0',
       }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;700&display=swap');
