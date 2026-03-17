@@ -611,7 +611,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {/* ── 계산기 섹션 ── */}
       <div style={{
         background:'#e8e8e8',
-        minHeight: '100vh',
+        minHeight: '100dvh',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
