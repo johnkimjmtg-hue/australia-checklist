@@ -424,7 +424,7 @@ export default function Community() {
               background: 'linear-gradient(135deg, #1B6EF3, #6366F1)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <span style={{ fontSize: 18 }}>🦘</span>
+              <Icon icon="mdi:kangaroo" width={22} height={22} color="#fff" />
             </div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 채팅방</div>
