@@ -292,19 +292,19 @@ export default function Community() {
 
   // Presence 채널은 고정 이름으로 별도 운영
   useEffect(() => {
-    // 탭마다 고유한 세션 키 생성
-    const sessionKey = MY_ID + '_' + Date.now()
-    const presenceChannel = supabase.channel('hojugaja-chat-room', {
-      config: { presence: { key: sessionKey } }
-    })
+    const sessionKey = MY_ID + '_' + Math.random().toString(36).slice(2, 8)
+    const presenceChannel = supabase.channel('hojugaja-chat-room')
     presenceChannel
       .on('presence', { event: 'sync' }, () => {
         const state = presenceChannel.presenceState()
-        setOnlineCount(Object.keys(state).length)
+        // track된 모든 presence 합산
+        let total = 0
+        Object.values(state).forEach((arr: any) => { total += arr.length })
+        setOnlineCount(total)
       })
       .subscribe(async (status: string) => {
         if (status === 'SUBSCRIBED') {
-          await presenceChannel.track({ user_id: MY_ID, online_at: new Date().toISOString() })
+          await presenceChannel.track({ session_key: sessionKey, online_at: new Date().toISOString() })
         }
       })
     return () => { supabase.removeChannel(presenceChannel) }
