@@ -10,6 +10,9 @@ interface Message {
   author_id: string
   author_name: string
   likes: number
+  reply_to_id?: string | null
+  reply_to_text?: string | null
+  reply_to_name?: string | null
 }
 
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
@@ -297,6 +300,7 @@ export default function Community() {
   const [searchResults, setSearchResults] = useState<Message[]>([])
   const [onlineCount, setOnlineCount] = useState(1)
   const [showNameChange, setShowNameChange] = useState(false)
+  const [replyTo, setReplyTo] = useState<Message | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
@@ -467,7 +471,11 @@ export default function Community() {
       text,
       author_id: MY_ID,
       author_name: myName,
+      reply_to_id: replyTo?.id ?? null,
+      reply_to_text: replyTo?.text ?? null,
+      reply_to_name: replyTo?.author_name ?? null,
     })
+    setReplyTo(null)
     await fetchMessages()
     scrollToBottom()
   }
@@ -761,6 +769,28 @@ export default function Community() {
                         wordBreak: 'break-word',
                         whiteSpace: 'pre-wrap',
                       }}>
+                        {/* 인용 메시지 */}
+                        {msg.reply_to_id && (
+                          <div
+                            onClick={() => scrollToMessage(msg.reply_to_id!)}
+                            style={{
+                              background: isMine ? 'rgba(255,255,255,0.2)' : '#F1F5F9',
+                              borderLeft: `3px solid ${isMine ? 'rgba(255,255,255,0.6)' : BLUE}`,
+                              borderRadius: 8, padding: '6px 10px',
+                              marginBottom: 8, cursor: 'pointer',
+                            }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: isMine ? 'rgba(255,255,255,0.8)' : BLUE, marginBottom: 2 }}>
+                              {msg.reply_to_name}
+                            </div>
+                            <div style={{
+                              fontSize: 12, color: isMine ? 'rgba(255,255,255,0.7)' : '#64748B',
+                              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                              maxWidth: 180,
+                            }}>
+                              {msg.reply_to_text}
+                            </div>
+                          </div>
+                        )}
                         {msg.text}
                       </div>
 
@@ -790,6 +820,18 @@ export default function Community() {
                     display: 'flex', flexDirection: 'column', gap: 4,
                     alignSelf: 'center',
                   }}>
+                    {/* 답장 버튼 */}
+                    <button onClick={() => {
+                      setReplyTo(msg)
+                      textareaRef.current?.focus()
+                    }} style={{
+                      background: '#fff', border: '1px solid #E2E8F0',
+                      borderRadius: '50%', width: 28, height: 28,
+                      cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                    }}>
+                      <Icon icon="ph:arrow-bend-up-left" width={13} height={13} color="#64748B" />
+                    </button>
                     {msg.likes === 0 && (
                       <button onClick={() => handleLike(msg.id)} style={{
                         background: '#fff', border: '1px solid #E2E8F0',
@@ -829,6 +871,30 @@ export default function Community() {
         padding: '6px 14px 16px',
         zIndex: 40, boxSizing: 'border-box',
       }}>
+        {/* 답장 미리보기 */}
+        {replyTo && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: '#F1F5F9', borderRadius: 10,
+            padding: '8px 12px', marginBottom: 6,
+            borderLeft: `3px solid ${BLUE}`,
+          }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: BLUE, marginBottom: 1 }}>
+                {replyTo.author_name}에게 답장
+              </div>
+              <div style={{ fontSize: 12, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {replyTo.text}
+              </div>
+            </div>
+            <button onClick={() => setReplyTo(null)} style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              padding: 2, flexShrink: 0,
+            }}>
+              <Icon icon="ph:x" width={14} height={14} color="#94A3B8" />
+            </button>
+          </div>
+        )}
         {/* 이모지 피커 */}
         {showEmoji && (
           <div ref={emojiPickerRef} style={{
