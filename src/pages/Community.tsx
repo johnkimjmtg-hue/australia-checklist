@@ -294,17 +294,15 @@ export default function Community() {
   useEffect(() => {
     const presenceChannel = supabase.channel('hojugaja-chat-room')
     presenceChannel
-      .on('presence', { event: 'join' }, () => {
-        setOnlineCount(prev => prev + 1)
-      })
-      .on('presence', { event: 'leave' }, () => {
-        setOnlineCount(prev => Math.max(1, prev - 1))
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState()
+        console.log('Presence state:', JSON.stringify(state))
+        // key 개수 = 접속자 수
+        setOnlineCount(Object.keys(state).length)
       })
       .subscribe(async (status: string) => {
         if (status === 'SUBSCRIBED') {
-          await presenceChannel.track({
-            t: Date.now(),
-          })
+          await presenceChannel.track({ t: Date.now() })
         }
       })
     return () => { supabase.removeChannel(presenceChannel) }
