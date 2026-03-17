@@ -297,7 +297,8 @@ export default function Shopping() {
             width:'100%', maxWidth:390, background:'#fff',
             borderRadius:'20px 20px 0 0', zIndex:501,
             animation:'slideUp 0.3s ease',
-            maxHeight:'85vh', overflowY:'auto',
+            maxHeight:'92vh', overflowY:'auto',
+            paddingBottom: 'env(safe-area-inset-bottom)',
           }}>
             <style>{`@keyframes slideUp{from{transform:translateX(-50%) translateY(100%)}to{transform:translateX(-50%) translateY(0)}}
             @keyframes fadeIn{from{opacity:0}to{opacity:1}}`}</style>
@@ -317,7 +318,7 @@ export default function Shopping() {
               }
             </div>
 
-            <div style={{ padding:'16px 18px 40px' }}>
+            <div style={{ padding:'16px 18px 32px' }}>
               {/* 태그들 */}
               <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
                 {selProduct.tags.map(tag => (
