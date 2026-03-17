@@ -357,7 +357,7 @@ export default function Shopping() {
                     const isHeader = /^[\u{1F300}-\u{1F9FF}\u{2600}-\u{27BF}✨🎁💡🔥⭐💎🌟]/u.test(trimmed)
                     if (isHeader) return (
                       <div key={i} style={{
-                        fontSize: 13, fontWeight: 400, color: '#1E293B',
+                        fontSize: 13, fontWeight: 700, color: '#1E293B',
                         marginBottom: 4, marginTop: i === 0 ? 0 : 10,
                       }}>{trimmed}</div>
                     )
@@ -387,7 +387,7 @@ export default function Shopping() {
                       return (
                         <div key={i} style={{
                           fontSize: 13, color: '#334155', lineHeight: 1.6,
-                          marginTop: 8, fontWeight: 400,
+                          marginTop: 8, fontWeight: 700,
                         }}>{trimmed}</div>
                       )
                     }
