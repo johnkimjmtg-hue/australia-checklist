@@ -133,7 +133,7 @@ export default function Shopping() {
       {/* ── 카테고리 탭 */}
       <div style={{
         background:'#fff', borderBottom:'1px solid #E2E8F0',
-        position:'sticky', top:89, zIndex:10,
+        position:'sticky', top:0, zIndex:20,
       }}>
         <div style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto' }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
@@ -297,8 +297,7 @@ export default function Shopping() {
             width:'100%', maxWidth:390, background:'#fff',
             borderRadius:'20px 20px 0 0', zIndex:501,
             animation:'slideUp 0.3s ease',
-            maxHeight:'92vh', overflowY:'auto',
-            paddingBottom: 'env(safe-area-inset-bottom)',
+            maxHeight:'85vh', overflowY:'auto',
           }}>
             <style>{`@keyframes slideUp{from{transform:translateX(-50%) translateY(100%)}to{transform:translateX(-50%) translateY(0)}}
             @keyframes fadeIn{from{opacity:0}to{opacity:1}}`}</style>
@@ -318,7 +317,7 @@ export default function Shopping() {
               }
             </div>
 
-            <div style={{ padding:'16px 18px 32px' }}>
+            <div style={{ padding:'16px 18px 40px' }}>
               {/* 태그들 */}
               <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
                 {selProduct.tags.map(tag => (
@@ -348,57 +347,8 @@ export default function Shopping() {
 
               {/* 설명 */}
               {selProduct.description && (
-                <div style={{ marginBottom:16 }}>
-                  {selProduct.description.split('\n').map((line, i) => {
-                    const trimmed = line.trim()
-                    if (!trimmed) return <div key={i} style={{ height: 6 }} />
-
-                    // 섹션 헤더: 이모지로 시작하는 줄
-                    const isHeader = /^[✅🎁📌🔑💊⭐🏆🔥💎🌟✨]/u.test(trimmed)
-                    if (isHeader) return (
-                      <div key={i} style={{
-                        fontSize: 13, fontWeight: 700, color: '#1E293B',
-                        marginBottom: 4, marginTop: i === 0 ? 0 : 10,
-                      }}>{trimmed}</div>
-                    )
-
-                    // 불릿 항목: * 로 시작
-                    if (trimmed.startsWith('* ')) {
-                      const content = trimmed.slice(2)
-                      const colonIdx = content.indexOf(':')
-                      const hasBold = colonIdx > 0 && colonIdx < 20
-                      return (
-                        <div key={i} style={{
-                          fontSize: 13, color: '#334155', lineHeight: 1.65,
-                          marginBottom: 4,
-                        }}>
-                          {hasBold ? (
-                            <>
-                              <span style={{ fontWeight: 400, color: '#1E293B' }}>{content.slice(0, colonIdx)}</span>
-                              <span>{content.slice(colonIdx)}</span>
-                            </>
-                          ) : content}
-                        </div>
-                      )
-                    }
-
-                    // 팁: 📌로 시작
-                    if (trimmed.startsWith('📌')) {
-                      return (
-                        <div key={i} style={{
-                          fontSize: 13, color: '#334155', lineHeight: 1.6,
-                          marginTop: 8, fontWeight: 700,
-                        }}>{trimmed}</div>
-                      )
-                    }
-
-                    // 일반 텍스트
-                    return (
-                      <div key={i} style={{ fontSize: 13, color: '#334155', lineHeight: 1.7, padding: '2px 0' }}>
-                        {trimmed}
-                      </div>
-                    )
-                  })}
+                <div style={{ fontSize:13, color:'#334155', lineHeight:1.7, marginBottom:16 }}>
+                  {selProduct.description}
                 </div>
               )}
 
