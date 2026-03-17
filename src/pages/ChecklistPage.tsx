@@ -382,19 +382,31 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         @keyframes toastIn  { from{opacity:0;transform:translateX(-50%) translateY(-8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
         @keyframes fwShoot  { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(1);opacity:0} }
         @keyframes fwBurst  { 0%{transform:translate(-50%,-50%) scale(0) rotate(var(--r));opacity:1} 80%{opacity:0.8} 100%{transform:translate(var(--tx),var(--ty)) scale(1) rotate(var(--r));opacity:0} }
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
         .tab-btn { transition: color .15s; }
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .list-item { transition: background .1s; }
         .list-item:active { background: #F1F5F9 !important; }
+        .prod-card:active{transform:scale(0.97)}
+        .prod-card{transition:transform 0.15s ease, box-shadow 0.15s ease;}
+        .cat-btn{transition:all 0.15s ease;}
+        .sort-btn{transition:all 0.15s ease;}
+        .featured-scroll{overflow-x:auto;}
         .cat-scroll { overflow-x:auto; }
         @media (max-width:768px) {
           .cat-scroll { scrollbar-width:none; -ms-overflow-style:none; }
           .cat-scroll::-webkit-scrollbar { display:none; }
+          .featured-scroll{scrollbar-width:none;-ms-overflow-style:none;}
+          .featured-scroll::-webkit-scrollbar{display:none;}
         }
         @media (min-width:769px) {
           .cat-scroll::-webkit-scrollbar { height:4px; }
           .cat-scroll::-webkit-scrollbar-track { background:#F0F4F8; border-radius:2px; }
           .cat-scroll::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:2px; }
+          .featured-scroll::-webkit-scrollbar{height:4px;}
+          .featured-scroll::-webkit-scrollbar-track{background:#F0F4F8;border-radius:2px;}
+          .featured-scroll::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:2px;}
         }
       `}</style>
 
@@ -426,8 +438,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2,
                 background: active ? '#1B6EF3' : 'transparent',
                 borderBottom: active ? '2px solid #1B6EF3' : '2px solid transparent',
-                touchAction: 'manipulation',
+                touchAction: 'auto',
                 WebkitTapHighlightColor: 'transparent',
+                position: 'relative',
+                zIndex: 100,
               }}>
                 <Icon icon={tab.icon} width={16} height={16} color={active ? '#fff' : '#475569'} />
                 <span style={{ fontSize:10, fontWeight: active ? 700 : 500, color: active ? '#fff' : '#475569', whiteSpace:'nowrap' }}>
