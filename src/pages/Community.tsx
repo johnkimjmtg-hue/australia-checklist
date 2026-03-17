@@ -441,7 +441,8 @@ export default function Community() {
     setSearchQuery(q)
     if (!q.trim()) { setSearchResults([]); return }
     const results = messages.filter(m =>
-      m.text.toLowerCase().includes(q.trim().toLowerCase())
+      m.text.toLowerCase().includes(q.trim().toLowerCase()) ||
+      (m.reply_to_text ?? '').toLowerCase().includes(q.trim().toLowerCase())
     )
     setSearchResults(results)
   }
@@ -778,18 +779,13 @@ export default function Community() {
                             onClick={() => scrollToMessage(msg.reply_to_id!)}
                             style={{
                               background: isMine ? 'rgba(255,255,255,0.2)' : '#F1F5F9',
-                              borderLeft: `3px solid ${isMine ? 'rgba(255,255,255,0.6)' : BLUE}`,
                               borderRadius: 8, padding: '6px 10px',
                               marginBottom: 8, cursor: 'pointer',
                             }}>
                             <div style={{ fontSize: 11, fontWeight: 700, color: isMine ? 'rgba(255,255,255,0.8)' : BLUE, marginBottom: 2 }}>
                               {msg.reply_to_name}
                             </div>
-                            <div style={{
-                              fontSize: 12, color: isMine ? 'rgba(255,255,255,0.7)' : '#64748B',
-                              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                              maxWidth: 180,
-                            }}>
+                            <div style={{ fontSize: 12, color: isMine ? 'rgba(255,255,255,0.7)' : '#64748B', lineHeight: 1.5 }}>
                               {msg.reply_to_text}
                             </div>
                           </div>
