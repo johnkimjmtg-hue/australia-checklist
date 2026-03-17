@@ -79,7 +79,7 @@ export default function Shopping() {
 
   return (
     <div style={{
-      background:'#F0F4F8', minHeight:'100%',
+      background:'#F0F4F8', minHeight:'auto',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       paddingBottom: 80,
     }}>
@@ -133,7 +133,7 @@ export default function Shopping() {
       {/* ── 카테고리 탭 */}
       <div style={{
         background:'#fff', borderBottom:'1px solid #E2E8F0',
-        position:'sticky', top:0, zIndex:10,
+        position:'sticky', top:0, zIndex:20,
       }}>
         <div style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto' }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
