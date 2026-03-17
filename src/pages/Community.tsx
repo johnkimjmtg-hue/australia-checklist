@@ -296,8 +296,6 @@ export default function Community() {
     presenceChannel
       .on('presence', { event: 'sync' }, () => {
         const state = presenceChannel.presenceState()
-        console.log('Presence state:', JSON.stringify(state))
-        // key 개수 = 접속자 수
         setOnlineCount(Object.keys(state).length)
       })
       .subscribe(async (status: string) => {
