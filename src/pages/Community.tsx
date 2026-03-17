@@ -669,6 +669,15 @@ export default function Community() {
                       <div style={{ fontSize: 11, fontWeight: 700, color: BLUE, marginBottom: 2 }}>
                         {r.author_name} · {formatTime(r.created_at)}
                       </div>
+                      {r.reply_to_text && (
+                        <div style={{
+                          fontSize: 11, color: '#94A3B8', background: '#F1F5F9',
+                          borderRadius: 6, padding: '3px 8px', marginBottom: 4,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>
+                          ↩ {r.reply_to_name}: {r.reply_to_text}
+                        </div>
+                      )}
                       <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.5,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
                       }}>
