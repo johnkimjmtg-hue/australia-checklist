@@ -1094,7 +1094,11 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {/* ── 계산기 섹션 ── */}
       <div style={{
         background:'#e8e8e8',
-        padding:'28px 20px 32px',
+        padding:'0',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
       }}>
         <style>{`
           .calc-btn {
@@ -1133,25 +1137,38 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         {/* 계산기 본체 */}
         <div style={{
           background:'#e8e8e8',
-          borderRadius: 20,
-          padding: '20px 16px',
+          borderRadius: 24,
+          padding: '20px 20px 24px',
           boxShadow: '8px 8px 16px #c5c5c5, -8px -8px 16px #ffffff',
           maxWidth: 380,
+          width: '100%',
           margin: '0 auto',
+          boxSizing: 'border-box' as any,
         }}>
+          {/* 타이틀 */}
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#333', letterSpacing: 1 }}>호주가자</div>
+          </div>
+
           {/* 디스플레이 */}
           <div style={{
             background:'#c8d4b8',
-            borderRadius: 10,
-            padding: '14px 16px',
+            borderRadius: 12,
+            padding: '20px 16px',
             marginBottom: 20,
             boxShadow: 'inset 3px 3px 8px #a8b498, inset -2px -2px 6px #e8f4d8',
             textAlign: 'center',
+            minHeight: 100,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: '#2d3e1f', letterSpacing: 1 }}>
-              호주가자 🦘
+            <div style={{ fontSize: 22, marginBottom: 8 }}>🦘</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#2d3e1f', letterSpacing: 0.5 }}>
+              호주여행/이민 필수 앱
             </div>
-            <div style={{ fontSize: 10, color: '#4a5e32', marginTop: 2 }}>
+            <div style={{ fontSize: 12, color: '#4a5e32', marginTop: 6, lineHeight: 1.6 }}>
               호주 정보, 한 번에 연결됩니다
             </div>
           </div>
@@ -1159,23 +1176,23 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           {/* 버튼 그리드 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {/* 1행 */}
-            <button className="calc-btn" onClick={onStart} style={{ height: 52 }}>버킷리스트</button>
-            <button className="calc-btn" onClick={() => navigate('/app?tab=shopping')} style={{ height: 52 }}>쇼핑 리스트</button>
-            <button className="calc-btn" onClick={() => navigate('/app?tab=bingo')} style={{ height: 52 }}>카페 빙고</button>
+            <button className="calc-btn" onClick={onStart} style={{ height: 48 }}>버킷리스트</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=shopping')} style={{ height: 48 }}>쇼핑 리스트</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=bingo')} style={{ height: 48 }}>카페 빙고</button>
             {/* 2행 */}
-            <button className="calc-btn" onClick={() => navigate('/app?tab=community')} style={{ height: 52 }}>채팅방</button>
-            <button className="calc-btn" onClick={onServices} style={{ height: 52 }}>업체 리스트</button>
-            <button className="calc-btn" style={{ height: 52, color: '#94A3B8' }}>준비중</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=community')} style={{ height: 48 }}>채팅방</button>
+            <button className="calc-btn" onClick={onServices} style={{ height: 48 }}>업체 리스트</button>
+            <button className="calc-btn" style={{ height: 48, color: '#94A3B8' }}>준비중</button>
             {/* 3행 */}
-            <button className="calc-btn" style={{ height: 52, color: '#94A3B8' }}>준비중</button>
-            <button className="calc-btn" style={{ height: 52, color: '#94A3B8' }}>준비중</button>
-            <button className="calc-btn" style={{ height: 52, color: '#94A3B8' }}>준비중</button>
-            {/* 4행 - 넓은 버튼 2개 */}
+            <button className="calc-btn" style={{ height: 48, color: '#94A3B8' }}>준비중</button>
+            <button className="calc-btn" style={{ height: 48, color: '#94A3B8' }}>준비중</button>
+            <button className="calc-btn" style={{ height: 48, color: '#94A3B8' }}>준비중</button>
+            {/* 4행 */}
             <button className="calc-btn calc-btn-accent" onClick={() => setShowSuggestion(true)}
-              style={{ height: 52, gridColumn: 'span 1', fontSize: 10 }}>★ 버킷리스트 추천</button>
-            <button className="calc-btn" style={{ height: 52, color: '#94A3B8' }}></button>
+              style={{ height: 48, fontSize: 10 }}>★ 버킷리스트 추천</button>
+            <button className="calc-btn" style={{ height: 48, color: '#94A3B8' }}></button>
             <button className="calc-btn calc-btn-accent" onClick={() => setShowForm(true)}
-              style={{ height: 52, fontSize: 10 }}># 업체 등록 신청</button>
+              style={{ height: 48, fontSize: 10 }}># 업체 등록 신청</button>
           </div>
         </div>
       </div>
