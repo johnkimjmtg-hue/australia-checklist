@@ -1091,6 +1091,95 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         </div>
       </div>
 
+      {/* ── 계산기 섹션 ── */}
+      <div style={{
+        background:'#e8e8e8',
+        padding:'28px 20px 32px',
+      }}>
+        <style>{`
+          .calc-btn {
+            background-color: #e8e8e8;
+            border: none;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.3;
+            padding: 4px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+          }
+          .calc-btn:active {
+            box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff;
+            transform: scale(0.97);
+          }
+          .calc-btn-accent {
+            background-color: #1B6EF3;
+            color: #fff;
+            box-shadow: 3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff;
+          }
+          .calc-btn-accent:active {
+            box-shadow: inset 3px 3px 6px #1558c0, inset -3px -3px 6px #2080ff;
+          }
+        `}</style>
+
+        {/* 계산기 본체 */}
+        <div style={{
+          background:'#e8e8e8',
+          borderRadius: 20,
+          padding: '20px 16px',
+          boxShadow: '8px 8px 16px #c5c5c5, -8px -8px 16px #ffffff',
+          maxWidth: 380,
+          margin: '0 auto',
+        }}>
+          {/* 디스플레이 */}
+          <div style={{
+            background:'#c8d4b8',
+            borderRadius: 10,
+            padding: '14px 16px',
+            marginBottom: 20,
+            boxShadow: 'inset 3px 3px 8px #a8b498, inset -2px -2px 6px #e8f4d8',
+            textAlign: 'center',
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#2d3e1f', letterSpacing: 1 }}>
+              호주가자 🦘
+            </div>
+            <div style={{ fontSize: 10, color: '#4a5e32', marginTop: 2 }}>
+              호주 정보, 한 번에 연결됩니다
+            </div>
+          </div>
+
+          {/* 버튼 그리드 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            {/* 1행 */}
+            <button className="calc-btn" onClick={onStart} style={{ height: 52 }}>버킷리스트</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=shopping')} style={{ height: 52 }}>쇼핑 리스트</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=bingo')} style={{ height: 52 }}>카페 빙고</button>
+            {/* 2행 */}
+            <button className="calc-btn" onClick={() => navigate('/app?tab=community')} style={{ height: 52 }}>채팅방</button>
+            <button className="calc-btn" onClick={onServices} style={{ height: 52 }}>업체 리스트</button>
+            <button className="calc-btn" style={{ height: 52, color: '#94A3B8' }}>준비중</button>
+            {/* 3행 */}
+            <button className="calc-btn" style={{ height: 52, color: '#94A3B8' }}>준비중</button>
+            <button className="calc-btn" style={{ height: 52, color: '#94A3B8' }}>준비중</button>
+            <button className="calc-btn" style={{ height: 52, color: '#94A3B8' }}>준비중</button>
+            {/* 4행 - 넓은 버튼 2개 */}
+            <button className="calc-btn calc-btn-accent" onClick={() => setShowSuggestion(true)}
+              style={{ height: 52, gridColumn: 'span 1', fontSize: 10 }}>★ 버킷리스트 추천</button>
+            <button className="calc-btn" style={{ height: 52, color: '#94A3B8' }}></button>
+            <button className="calc-btn calc-btn-accent" onClick={() => setShowForm(true)}
+              style={{ height: 52, fontSize: 10 }}># 업체 등록 신청</button>
+          </div>
+        </div>
+      </div>
+
       {/* ── 푸터 ── */}
       <div style={{ background:'#fff', borderTop:'1px solid #F1F5F9', padding:'20px 20px 40px', textAlign:'center' }}>
         <div style={{ fontSize:14, fontWeight:900, color:BLUE, marginBottom:4 }}>호주가자</div>
