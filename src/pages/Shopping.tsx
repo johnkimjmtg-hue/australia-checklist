@@ -356,10 +356,8 @@ export default function Shopping() {
                     const isHeader = /^[\u{1F300}-\u{1F9FF}\u{2600}-\u{27BF}✨🎁💡🔥⭐💎🌟]/u.test(trimmed)
                     if (isHeader) return (
                       <div key={i} style={{
-                        fontSize: 13, fontWeight: 800, color: '#1E293B',
-                        background: '#F1F5F9', borderRadius: 8,
-                        padding: '7px 12px', marginBottom: 6, marginTop: i === 0 ? 0 : 8,
-                        display: 'flex', alignItems: 'center', gap: 4,
+                        fontSize: 13, fontWeight: 400, color: '#1E293B',
+                        marginBottom: 4, marginTop: i === 0 ? 0 : 10,
                       }}>{trimmed}</div>
                     )
 
@@ -371,13 +369,13 @@ export default function Shopping() {
                       return (
                         <div key={i} style={{
                           display: 'flex', gap: 8, alignItems: 'flex-start',
-                          padding: '3px 4px 3px 12px', marginBottom: 2,
+                          padding: '2px 4px 2px 8px', marginBottom: 2,
                         }}>
                           <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#94A3B8', marginTop: 7, flexShrink: 0 }} />
                           <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.65 }}>
                             {hasBold ? (
                               <>
-                                <span style={{ fontWeight: 700, color: '#1E293B' }}>{content.slice(0, colonIdx)}</span>
+                                <span style={{ fontWeight: 400, color: '#1E293B' }}>{content.slice(0, colonIdx)}</span>
                                 <span>{content.slice(colonIdx)}</span>
                               </>
                             ) : content}
@@ -386,13 +384,12 @@ export default function Shopping() {
                       )
                     }
 
-                    // 팁 박스: 💡로 시작
+                    // 팁: 💡로 시작
                     if (trimmed.startsWith('💡')) {
                       return (
                         <div key={i} style={{
-                          background: '#FFFBEB', border: '1px solid #FDE68A',
-                          borderRadius: 8, padding: '8px 12px', marginTop: 8,
-                          fontSize: 12, color: '#92400E', lineHeight: 1.6,
+                          fontSize: 13, color: '#334155', lineHeight: 1.6,
+                          marginTop: 8, fontWeight: 400,
                         }}>{trimmed}</div>
                       )
                     }
