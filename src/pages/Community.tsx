@@ -97,7 +97,29 @@ const EMOJIS = [
 // ── 닉네임 설정 화면
 function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
   const [input, setInput] = useState('')
+  const [checking, setChecking] = useState(false)
+  const [error, setError] = useState('')
   const examples = ['호주사랑', '시드니거주', '멜번이민자', '브리즈번사람', '캥거루팬']
+
+  const handleSubmit = async () => {
+    const name = input.trim()
+    if (!name) return
+    setChecking(true)
+    setError('')
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    const { data } = await supabase
+      .from('community_posts')
+      .select('id')
+      .eq('author_name', name)
+      .gte('created_at', since)
+      .limit(1)
+    setChecking(false)
+    if (data && data.length > 0) {
+      setError('이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해주세요.')
+      return
+    }
+    onSet(name)
+  }
 
   return (
     <div style={{
@@ -122,23 +144,29 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
 
         <input
           value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter' && input.trim()) onSet(input.trim()) }}
+          onChange={e => { setInput(e.target.value); setError('') }}
+          onKeyDown={e => { if (e.key === 'Enter' && input.trim()) handleSubmit() }}
           placeholder="닉네임 입력 (최대 10자)"
           maxLength={10}
           autoFocus
           style={{
-            width: '100%', height: 48, border: '1.5px solid #D1D9E3',
+            width: '100%', height: 48,
+            border: `1.5px solid ${error ? '#EF4444' : '#D1D9E3'}`,
             borderRadius: 12, padding: '0 14px', fontSize: 15,
             color: '#0F172A', fontFamily: ff, outline: 'none',
             boxSizing: 'border-box',
           }}
         />
 
-        {/* 예시 닉네임 */}
+        {error && (
+          <div style={{ fontSize: 12, color: '#EF4444', marginTop: 6, fontWeight: 600 }}>
+            ⚠️ {error}
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10, marginBottom: 20 }}>
           {examples.map(ex => (
-            <button key={ex} onClick={() => setInput(ex)} style={{
+            <button key={ex} onClick={() => { setInput(ex); setError('') }} style={{
               fontSize: 11, fontWeight: 600, padding: '4px 10px',
               borderRadius: 20, border: '1px solid #E2E8F0',
               background: '#F8FAFC', color: '#64748B', cursor: 'pointer',
@@ -147,16 +175,17 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
         </div>
 
         <button
-          onClick={() => input.trim() && onSet(input.trim())}
-          disabled={!input.trim()}
+          onClick={handleSubmit}
+          disabled={!input.trim() || checking}
           style={{
             width: '100%', height: 50, borderRadius: 12, border: 'none',
-            background: input.trim() ? BLUE : '#E2E8F0',
-            color: input.trim() ? '#fff' : '#94A3B8',
-            fontSize: 15, fontWeight: 700, cursor: input.trim() ? 'pointer' : 'default',
+            background: input.trim() && !checking ? BLUE : '#E2E8F0',
+            color: input.trim() && !checking ? '#fff' : '#94A3B8',
+            fontSize: 15, fontWeight: 700,
+            cursor: input.trim() && !checking ? 'pointer' : 'default',
             fontFamily: ff, transition: 'all 0.2s',
           }}
-        >입장하기 →</button>
+        >{checking ? '확인 중...' : '입장하기 →'}</button>
       </div>
     </div>
   )
@@ -448,28 +477,30 @@ export default function Community() {
                   marginBottom: continuous ? 2 : 10,
                   marginTop: continuous ? 0 : (idx > 0 && !shouldShowDate(idx) ? 4 : 0),
                 }}>
-                  {/* 아바타 (상대방만, 연속이면 숨김) */}
+                  {/* 아바타 + 닉네임 (상대방만, 연속이면 숨김) */}
                   {!isMine && (
-                    <div style={{ width: 34, flexShrink: 0, display: 'flex', alignItems: 'flex-end' }}>
+                    <div style={{ width: 44, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 3 }}>
                       {!continuous && (
-                        <div style={{
-                          width: 34, height: 34, borderRadius: '50%',
-                          background: color,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 14, fontWeight: 800, color: '#fff',
-                          flexShrink: 0,
-                        }}>{msg.author_name[0]}</div>
+                        <>
+                          <div style={{
+                            fontSize: 10, fontWeight: 700, color: '#64748B',
+                            whiteSpace: 'nowrap', maxWidth: 44,
+                            overflow: 'hidden', textOverflow: 'ellipsis',
+                            textAlign: 'center',
+                          }}>{msg.author_name}</div>
+                          <div style={{
+                            width: 34, height: 34, borderRadius: '50%',
+                            background: color,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 14, fontWeight: 800, color: '#fff',
+                            flexShrink: 0,
+                          }}>{msg.author_name[0]}</div>
+                        </>
                       )}
                     </div>
                   )}
 
                   <div style={{ maxWidth: '72%', display: 'flex', flexDirection: 'column', alignItems: isMine ? 'flex-end' : 'flex-start' }}>
-                    {/* 닉네임 (상대방만, 연속이면 숨김) */}
-                    {!isMine && !continuous && (
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', marginBottom: 3, paddingLeft: 2 }}>
-                        {msg.author_name}
-                      </div>
-                    )}
 
                     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, flexDirection: isMine ? 'row-reverse' : 'row' }}>
                       {/* 말풍선 */}
