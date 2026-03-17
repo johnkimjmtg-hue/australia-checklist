@@ -691,8 +691,8 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
               호주 여행/이민 필수 정보 어플
             </div>
             <div style={{ fontSize: 12, color: '#4a5e32', marginTop: 8, lineHeight: 1.7 }}>
-              호주의 모든 정보 한번에 연결됩니다.<br/>
-              계속 업데이트 중...
+              호주의 모든 정보가 한곳으로 연결됩니다.<br/>
+              열심히 업데이트 중...
             </div>
           </div>
 
@@ -718,12 +718,6 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
               style={{ height: 72, fontSize: 12 }}>#<br/>업체등록신청</button>
           </div>
         </div>
-      </div>
-
-      {/* ── 푸터 ── */}
-      <div style={{ background:'#fff', borderTop:'1px solid #F1F5F9', padding:'20px 20px 40px', textAlign:'center' }}>
-        <div style={{ fontSize:14, fontWeight:900, color:BLUE, marginBottom:4 }}>호주가자</div>
-        <div style={{ fontSize:11, color:'#94A3B8' }}>www.hojugaja.com · 무료 호주 버킷리스트</div>
       </div>
 
       {/* ── 모달: 버킷리스트 추천 ── */}
