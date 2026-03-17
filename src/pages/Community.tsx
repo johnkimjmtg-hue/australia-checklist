@@ -269,9 +269,8 @@ export default function Community() {
       channelRef.current = null
     }
 
-    // Realtime DB 변경 감지 채널 (재연결 시 새 채널명)
     const channel = supabase
-      .channel('chat-db-' + Date.now())
+      .channel('hojugaja-chat-db')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, () => {
         fetchMessages().then(() => scrollToBottom())
       })
@@ -283,6 +282,7 @@ export default function Community() {
       })
       .subscribe((status: string) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          channelRef.current = null
           setTimeout(() => setupChannel(), 3000)
         }
       })
@@ -290,7 +290,7 @@ export default function Community() {
     channelRef.current = channel
   }, [fetchMessages])
 
-  // Presence 채널은 고정 이름으로 별도 운영
+  // Presence 채널 - 고정 이름
   useEffect(() => {
     const presenceChannel = supabase.channel('hojugaja-chat-room')
     presenceChannel
@@ -310,11 +310,12 @@ export default function Community() {
     fetchMessages()
     setupChannel()
 
-    // 백그라운드에서 돌아올 때 재연결 + 최신 메시지 로드
+    // 백그라운드에서 돌아올 때 메시지만 새로 로드 (채널 재생성 X)
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
         fetchMessages()
-        setupChannel()
+        // 채널이 끊겼을 때만 재연결
+        if (!channelRef.current) setupChannel()
       }
     }
     document.addEventListener('visibilitychange', handleVisibility)
