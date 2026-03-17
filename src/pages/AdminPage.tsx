@@ -2061,7 +2061,7 @@ function ShoppingTab() {
         <div>
           <span style={labelStyle}>설명</span>
           <textarea value={form.description} onChange={e => setForm(f => ({...f, description:e.target.value}))}
-            style={{...inputStyle, height:80, resize:'none'}} placeholder="상품 설명" />
+            style={{...inputStyle, height:200, resize:'vertical'}} placeholder="상품 설명" />
         </div>
 
         {/* 가격대 */}
