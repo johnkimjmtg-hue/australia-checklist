@@ -292,7 +292,11 @@ export default function Community() {
 
   // Presence 채널은 고정 이름으로 별도 운영
   useEffect(() => {
-    const presenceChannel = supabase.channel('hojugaja-chat-room')
+    // 탭마다 고유한 세션 키 생성
+    const sessionKey = MY_ID + '_' + Date.now()
+    const presenceChannel = supabase.channel('hojugaja-chat-room', {
+      config: { presence: { key: sessionKey } }
+    })
     presenceChannel
       .on('presence', { event: 'sync' }, () => {
         const state = presenceChannel.presenceState()
