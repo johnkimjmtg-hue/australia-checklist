@@ -347,8 +347,63 @@ export default function Shopping() {
 
               {/* 설명 */}
               {selProduct.description && (
-                <div style={{ fontSize:13, color:'#334155', lineHeight:1.7, marginBottom:16 }}>
-                  {selProduct.description}
+                <div style={{ marginBottom:16 }}>
+                  {selProduct.description.split('\n').map((line, i) => {
+                    const trimmed = line.trim()
+                    if (!trimmed) return <div key={i} style={{ height: 6 }} />
+
+                    // 섹션 헤더: 이모지로 시작하는 줄
+                    const isHeader = /^[\u{1F300}-\u{1F9FF}\u{2600}-\u{27BF}✨🎁💡🔥⭐💎🌟]/u.test(trimmed)
+                    if (isHeader) return (
+                      <div key={i} style={{
+                        fontSize: 13, fontWeight: 800, color: '#1E293B',
+                        background: '#F1F5F9', borderRadius: 8,
+                        padding: '7px 12px', marginBottom: 6, marginTop: i === 0 ? 0 : 8,
+                        display: 'flex', alignItems: 'center', gap: 4,
+                      }}>{trimmed}</div>
+                    )
+
+                    // 불릿 항목: * 로 시작
+                    if (trimmed.startsWith('* ')) {
+                      const content = trimmed.slice(2)
+                      const colonIdx = content.indexOf(':')
+                      const hasBold = colonIdx > 0 && colonIdx < 20
+                      return (
+                        <div key={i} style={{
+                          display: 'flex', gap: 8, alignItems: 'flex-start',
+                          padding: '3px 4px 3px 12px', marginBottom: 2,
+                        }}>
+                          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#94A3B8', marginTop: 7, flexShrink: 0 }} />
+                          <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.65 }}>
+                            {hasBold ? (
+                              <>
+                                <span style={{ fontWeight: 700, color: '#1E293B' }}>{content.slice(0, colonIdx)}</span>
+                                <span>{content.slice(colonIdx)}</span>
+                              </>
+                            ) : content}
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    // 팁 박스: 💡로 시작
+                    if (trimmed.startsWith('💡')) {
+                      return (
+                        <div key={i} style={{
+                          background: '#FFFBEB', border: '1px solid #FDE68A',
+                          borderRadius: 8, padding: '8px 12px', marginTop: 8,
+                          fontSize: 12, color: '#92400E', lineHeight: 1.6,
+                        }}>{trimmed}</div>
+                      )
+                    }
+
+                    // 일반 텍스트
+                    return (
+                      <div key={i} style={{ fontSize: 13, color: '#334155', lineHeight: 1.7, padding: '2px 0' }}>
+                        {trimmed}
+                      </div>
+                    )
+                  })}
                 </div>
               )}
 
