@@ -292,23 +292,26 @@ export default function Community() {
 
   // Presence 채널은 고정 이름으로 별도 운영
   useEffect(() => {
-    const sessionKey = MY_ID + '_' + Math.random().toString(36).slice(2, 8)
+    // 매 접속마다 완전히 새로운 랜덤 키 (localStorage 무관)
+    const sessionKey = 'sess_' + Math.random().toString(36).slice(2) + '_' + Date.now()
     const presenceChannel = supabase.channel('hojugaja-chat-room')
     presenceChannel
       .on('presence', { event: 'sync' }, () => {
         const state = presenceChannel.presenceState()
-        // track된 모든 presence 합산
         let total = 0
         Object.values(state).forEach((arr: any) => { total += arr.length })
-        setOnlineCount(total)
+        setOnlineCount(total || 1)
       })
       .subscribe(async (status: string) => {
         if (status === 'SUBSCRIBED') {
-          await presenceChannel.track({ session_key: sessionKey, online_at: new Date().toISOString() })
+          await presenceChannel.track({
+            session_key: sessionKey,
+            online_at: new Date().toISOString(),
+          })
         }
       })
     return () => { supabase.removeChannel(presenceChannel) }
-  }, [MY_ID])
+  }, [])
 
   useEffect(() => {
     fetchMessages()
