@@ -225,14 +225,21 @@ export default function Community() {
   useEffect(() => {
     fetchMessages()
     const channel = supabase
-      .channel('chat-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_posts' }, () => {
+      .channel('chat-realtime-' + Date.now())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, () => {
         fetchMessages().then(() => scrollToBottom())
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_likes' }, fetchMessages)
-      .subscribe()
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'community_posts' }, () => {
+        fetchMessages()
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_likes' }, () => {
+        fetchMessages()
+      })
+      .subscribe((status) => {
+        console.log('Realtime status:', status)
+      })
     return () => { supabase.removeChannel(channel) }
-  }, [fetchMessages])
+  }, [])
 
   // 최초 로드 시 맨 아래로
   useEffect(() => {
