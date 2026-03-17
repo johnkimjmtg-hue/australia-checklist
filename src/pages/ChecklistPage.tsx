@@ -386,20 +386,30 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .list-item { transition: background .1s; }
         .list-item:active { background: #F1F5F9 !important; }
+        .prod-card:active{transform:scale(0.97)}
+        .prod-card{transition:transform 0.15s ease, box-shadow 0.15s ease;}
+        .cat-btn{transition:all 0.15s ease;}
+        .sort-btn{transition:all 0.15s ease;}
+        .featured-scroll{overflow-x:auto;}
         .cat-scroll { overflow-x:auto; }
         @media (max-width:768px) {
           .cat-scroll { scrollbar-width:none; -ms-overflow-style:none; }
           .cat-scroll::-webkit-scrollbar { display:none; }
+          .featured-scroll{scrollbar-width:none;-ms-overflow-style:none;}
+          .featured-scroll::-webkit-scrollbar{display:none;}
         }
         @media (min-width:769px) {
           .cat-scroll::-webkit-scrollbar { height:4px; }
           .cat-scroll::-webkit-scrollbar-track { background:#F0F4F8; border-radius:2px; }
           .cat-scroll::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:2px; }
+          .featured-scroll::-webkit-scrollbar{height:4px;}
+          .featured-scroll::-webkit-scrollbar-track{background:#F0F4F8;border-radius:2px;}
+          .featured-scroll::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:2px;}
         }
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'#fff' }}>
+      <div style={{ background:'#fff', position:'relative', zIndex:10 }}>
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
