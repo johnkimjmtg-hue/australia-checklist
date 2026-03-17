@@ -1171,33 +1171,34 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           }}>
             <div style={{ fontSize: 22, marginBottom: 8 }}>🦘</div>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#2d3e1f', letterSpacing: 0.5 }}>
-              호주여행/이민 필수 앱
+              호주 여행/이민 필수 정보 어플
             </div>
-            <div style={{ fontSize: 12, color: '#4a5e32', marginTop: 6, lineHeight: 1.6 }}>
-              호주 정보, 한 번에 연결됩니다
+            <div style={{ fontSize: 12, color: '#4a5e32', marginTop: 8, lineHeight: 1.7 }}>
+              호주의 모든 정보 한번에 연결됩니다.<br/>
+              계속 업데이트 중...
             </div>
           </div>
 
           {/* 버튼 그리드 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {/* 1행 */}
-            <button className="calc-btn" onClick={onStart} style={{ height: 72 }}>버킷리스트</button>
-            <button className="calc-btn" onClick={() => navigate('/app?tab=shopping')} style={{ height: 72 }}>쇼핑 리스트</button>
-            <button className="calc-btn" onClick={() => navigate('/app?tab=bingo')} style={{ height: 72 }}>카페 빙고</button>
+            <button className="calc-btn" onClick={onStart} style={{ height: 72 }}>1<br/>버킷리스트</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=shopping')} style={{ height: 72 }}>2<br/>쇼핑리스트</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=bingo')} style={{ height: 72 }}>3<br/>카페빙고게임</button>
             {/* 2행 */}
-            <button className="calc-btn" onClick={() => navigate('/app?tab=community')} style={{ height: 72 }}>채팅방</button>
-            <button className="calc-btn" onClick={onServices} style={{ height: 72 }}>업체 리스트</button>
-            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>준비중</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=community')} style={{ height: 72 }}>4<br/>채팅방</button>
+            <button className="calc-btn" onClick={onServices} style={{ height: 72 }}>5<br/>업체리스트</button>
+            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>6<br/>준비중</button>
             {/* 3행 */}
-            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>준비중</button>
-            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>준비중</button>
-            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>준비중</button>
+            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>7<br/>준비중</button>
+            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>8<br/>준비중</button>
+            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>9<br/>준비중</button>
             {/* 4행 */}
             <button className="calc-btn calc-btn-accent" onClick={() => setShowSuggestion(true)}
-              style={{ height: 72, fontSize: 10 }}>★ 버킷리스트 추천</button>
-            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}></button>
+              style={{ height: 72, fontSize: 10 }}>*<br/>버킷리스트 추천</button>
+            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>0<br/>준비중</button>
             <button className="calc-btn calc-btn-accent" onClick={() => setShowForm(true)}
-              style={{ height: 72, fontSize: 10 }}># 업체 등록 신청</button>
+              style={{ height: 72, fontSize: 10 }}>#<br/>업체등록신청</button>
           </div>
         </div>
       </div>
