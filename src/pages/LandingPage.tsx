@@ -1106,7 +1106,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             background-color: #e8e8e8;
             border: none;
             border-radius: 10px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             color: #333;
             cursor: pointer;
@@ -1195,10 +1195,10 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>9<br/>준비중</button>
             {/* 4행 */}
             <button className="calc-btn calc-btn-accent" onClick={() => setShowSuggestion(true)}
-              style={{ height: 72, fontSize: 10 }}>*<br/>버킷리스트 추천</button>
+              style={{ height: 72, fontSize: 12 }}>*<br/>버킷리스트 추천</button>
             <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>0<br/>준비중</button>
             <button className="calc-btn calc-btn-accent" onClick={() => setShowForm(true)}
-              style={{ height: 72, fontSize: 10 }}>#<br/>업체등록신청</button>
+              style={{ height: 72, fontSize: 12 }}>#<br/>업체등록신청</button>
           </div>
         </div>
       </div>
