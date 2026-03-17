@@ -611,12 +611,14 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {/* ── 계산기 섹션 ── */}
       <div style={{
         background:'#e8e8e8',
-        minHeight: '100dvh',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
+        alignItems: 'center',
         padding: '40px 0',
-      }}>
+        boxSizing: 'border-box' as any,
+        height: '100vh',
+      }} ref={(el) => { if (el) el.style.setProperty('min-height', '100dvh') }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;700&display=swap');
           .calc-btn {
