@@ -82,40 +82,31 @@ export default function Shopping() {
       background:'#F0F4F8', minHeight:'100vh',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       paddingBottom: 80,
-      position: 'relative', zIndex: 0,
     }}>
-
-      {/* ── 히어로 배너 */}
-      <div style={{
-        position:'relative', overflow:'hidden',
-        height:120, marginBottom:0,
-      }}>
-        <div style={{
-          position:'absolute', inset:0,
-          backgroundImage:`url(${imgShopping})`,
-          backgroundSize:'cover', backgroundPosition:'center',
-        }}/>
-        <div style={{
-          position:'absolute', inset:0,
-          background:'linear-gradient(90deg, rgba(0,20,80,0.55) 0%, rgba(0,20,80,0.30) 60%, rgba(0,20,80,0.05) 100%)',
-        }}/>
-        <div style={{ position:'absolute', inset:0, padding:'20px 16px', display:'flex', flexDirection:'column', justifyContent:'center' }}>
-          <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', fontWeight:600, letterSpacing:1, marginBottom:4 }}>
-            AUSTRALIA SHOPPING
-          </div>
-          <div style={{ fontSize:20, fontWeight:800, color:'#fff', marginBottom:2 }}>
-            호주 쇼핑 리스트 🛍
-          </div>
-          <div style={{ fontSize:12, color:'rgba(255,255,255,0.8)' }}>
-            호주에서 꼭 사가야 할 아이템을 모았어요
-          </div>
-        </div>
-      </div>
+      <style>{`
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .prod-card:active{transform:scale(0.97)}
+        .prod-card{transition:transform 0.15s ease, box-shadow 0.15s ease;}
+        .cat-btn{transition:all 0.15s ease;}
+        .sort-btn{transition:all 0.15s ease;}
+        .featured-scroll{overflow-x:auto;}
+        @media (max-width:768px){
+          .featured-scroll{scrollbar-width:none;-ms-overflow-style:none;}
+          .featured-scroll::-webkit-scrollbar{display:none;}
+        }
+        @media (min-width:769px){
+          .featured-scroll::-webkit-scrollbar{height:4px;}
+          .featured-scroll::-webkit-scrollbar-track{background:#F0F4F8;border-radius:2px;}
+          .featured-scroll::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:2px;}
+        }
+      `}</style>
 
       {/* ── 카테고리 탭 */}
       <div style={{
         background:'#fff', borderBottom:'1px solid #E2E8F0',
-        position:'sticky', top:0, zIndex:1,
+        position:'sticky', top:0, zIndex:20,
       }}>
         <div style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto' }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
@@ -135,7 +126,7 @@ export default function Shopping() {
         </div>
       </div>
 
-      <div style={{ padding:'14px 14px 0', position:'relative', zIndex:1 }}>
+      <div style={{ padding:'14px 14px 0' }}>
 
         {/* ── 추천 상품 (전체 탭일 때만) */}
         {!selCat && featured.length > 0 && (
