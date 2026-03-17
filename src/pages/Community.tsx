@@ -409,14 +409,21 @@ export default function Community() {
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
         fetchMessages()
-        // 채널이 끊겼을 때만 재연결
         if (!channelRef.current) setupChannel()
       }
     }
     document.addEventListener('visibilitychange', handleVisibility)
 
+    // 페이지 보일 때만 10초마다 폴링 (Realtime 백업)
+    const pollInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchMessages()
+      }
+    }, 10000)
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibility)
+      clearInterval(pollInterval)
       if (channelRef.current) supabase.removeChannel(channelRef.current)
     }
   }, [setupChannel])
