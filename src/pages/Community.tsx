@@ -2,32 +2,45 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 
-const PAGE_SIZE = 50
-
-interface Comment {
+interface Message {
   id: string
   text: string
   created_at: string
   author_id: string
-}
-
-interface Post {
-  id: string
-  text: string
-  created_at: string
-  author_id: string
+  author_name: string
   likes: number
-  comments: Comment[]
 }
+
+const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+const BLUE = '#1B6EF3'
 
 function timeAgo(ts: string): string {
   const diff = Date.now() - new Date(ts).getTime()
   const m = Math.floor(diff / 60000)
-  if (m < 1) return '방금 전'
-  if (m < 60) return `${m}분 전`
+  if (m < 1) return '방금'
+  if (m < 60) return `${m}분`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h}시간 전`
-  return `${Math.floor(h / 24)}일 전`
+  if (h < 24) return `${h}시간`
+  return `${Math.floor(h / 24)}일`
+}
+
+function formatTime(ts: string): string {
+  const d = new Date(ts)
+  const h = d.getHours()
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  return `${h >= 12 ? '오후' : '오전'} ${h > 12 ? h - 12 : h}:${mm}`
+}
+
+function formatDateLabel(ts: string): string {
+  const d = new Date(ts)
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`
+}
+
+function isSameDay(a: string, b: string): boolean {
+  const da = new Date(a), db = new Date(b)
+  return da.getFullYear() === db.getFullYear() &&
+    da.getMonth() === db.getMonth() &&
+    da.getDate() === db.getDate()
 }
 
 function getMyId(): string {
@@ -39,6 +52,10 @@ function getMyId(): string {
   return id
 }
 
+function getMyName(): string | null {
+  return localStorage.getItem('community-my-name')
+}
+
 function getLiked(): Set<string> {
   try { return new Set(JSON.parse(localStorage.getItem('community-liked') ?? '[]')) }
   catch { return new Set() }
@@ -48,31 +65,117 @@ function saveLiked(liked: Set<string>) {
   localStorage.setItem('community-liked', JSON.stringify([...liked]))
 }
 
+// 닉네임으로 아바타 색상 결정
+function avatarColor(name: string): string {
+  const colors = ['#1B6EF3','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316']
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  return colors[Math.abs(hash) % colors.length]
+}
+
+const EMOJIS = [
+  '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
+  '🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚',
+  '😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔',
+  '🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥',
+  '😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧',
+  '🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐',
+  '😭','😢','😥','😓','😩','😫','🥱','😤','😠','😡',
+  '👍','👎','👏','🙌','🤝','🙏','✌️','🤞','👌','🤙',
+  '👋','💪','❤️','🧡','💛','💚','💙','💜','🖤','💔',
+  '💕','💞','💓','💗','💖','💘','💝','✈️','🛫','🛬',
+  '☕','🍵','🧋','🥤','🍺','🍻','🥂','🍷','🍸','🍹',
+  '🍕','🍔','🍟','🌭','🍿','🥚','🍳','🧇','🥞','🍞',
+  '🍜','🍝','🍛','🍲','🍣','🍱','🥟','🍙','🍚','🧁',
+  '🐶','🐱','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🦘',
+  '🌸','🌺','🌻','🌹','🌷','🌼','💐','🍀','🌿','🌱',
+  '✅','❌','⭕','🔴','🟢','🔵','💯','🔥','✨','⭐',
+  '🌟','💫','⚡','❄️','🌈','🎉','🎊','🎈','🎁','🏆',
+  '📱','💻','📷','📸','💡','💰','💎','🔑','📝','📖',
+]
+
+// ── 닉네임 설정 화면
+function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
+  const [input, setInput] = useState('')
+  const examples = ['호주사랑', '시드니거주', '멜번이민자', '브리즈번사람', '캥거루팬']
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 999,
+      background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '0 24px',
+      fontFamily: ff,
+    }}>
+      <div style={{
+        background: '#fff', borderRadius: 20, padding: '28px 24px',
+        width: '100%', maxWidth: 360,
+        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+      }}>
+        <div style={{ fontSize: 32, textAlign: 'center', marginBottom: 12 }}>💬</div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', textAlign: 'center', marginBottom: 6 }}>
+          채팅방 입장
+        </div>
+        <div style={{ fontSize: 13, color: '#64748B', textAlign: 'center', marginBottom: 20, lineHeight: 1.6 }}>
+          호주에 사는 사람들과 자유롭게 대화해요.<br/>사용할 닉네임을 입력해주세요.
+        </div>
+
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter' && input.trim()) onSet(input.trim()) }}
+          placeholder="닉네임 입력 (최대 10자)"
+          maxLength={10}
+          autoFocus
+          style={{
+            width: '100%', height: 48, border: '1.5px solid #D1D9E3',
+            borderRadius: 12, padding: '0 14px', fontSize: 15,
+            color: '#0F172A', fontFamily: ff, outline: 'none',
+            boxSizing: 'border-box',
+          }}
+        />
+
+        {/* 예시 닉네임 */}
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10, marginBottom: 20 }}>
+          {examples.map(ex => (
+            <button key={ex} onClick={() => setInput(ex)} style={{
+              fontSize: 11, fontWeight: 600, padding: '4px 10px',
+              borderRadius: 20, border: '1px solid #E2E8F0',
+              background: '#F8FAFC', color: '#64748B', cursor: 'pointer',
+            }}>{ex}</button>
+          ))}
+        </div>
+
+        <button
+          onClick={() => input.trim() && onSet(input.trim())}
+          disabled={!input.trim()}
+          style={{
+            width: '100%', height: 50, borderRadius: 12, border: 'none',
+            background: input.trim() ? BLUE : '#E2E8F0',
+            color: input.trim() ? '#fff' : '#94A3B8',
+            fontSize: 15, fontWeight: 700, cursor: input.trim() ? 'pointer' : 'default',
+            fontFamily: ff, transition: 'all 0.2s',
+          }}
+        >입장하기 →</button>
+      </div>
+    </div>
+  )
+}
+
 export default function Community() {
   const MY_ID = getMyId()
-  const [allPosts, setAllPosts] = useState<Post[]>([])
+  const [myName, setMyName] = useState<string | null>(getMyName)
+  const [messages, setMessages] = useState<Message[]>([])
   const [liked, setLiked] = useState<Set<string>>(getLiked)
   const [newText, setNewText] = useState('')
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [commentText, setCommentText] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-  const [page, setPage] = useState(1)
   const [showEmoji, setShowEmoji] = useState(false)
-  const [commentFocused, setCommentFocused] = useState(false)
-  const [showCommentEmoji, setShowCommentEmoji] = useState(false)
+  const [likedAnim, setLikedAnim] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      window.scrollTo({ top: document.body.scrollHeight })
-    }, 100)
-  }
 
   useEffect(() => {
     const updateWidth = () => {
@@ -83,53 +186,114 @@ export default function Community() {
     return () => window.removeEventListener('resize', updateWidth)
   }, [])
 
-  const EMOJIS = [
-    // 얼굴/감정
-    '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇',
-    '🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚',
-    '😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔',
-    '🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥',
-    '😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧',
-    '🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐',
-    '😭','😢','😥','😓','😩','😫','🥱','😤','😠','😡',
-    '🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻',
-    // 손/사람
-    '👍','👎','👏','🙌','🤝','🙏','✌️','🤞','👌','🤙',
-    '👋','🤚','🖐️','✋','🖖','💪','🦾','👶','🧒','👦',
-    // 하트/감정
-    '❤️','🧡','💛','💚','💙','💜','🖤','🤍','💔','💕',
-    '💞','💓','💗','💖','💘','💝','💟','☮️','✝️','☯️',
-    // 여행/교통
-    '✈️','🛫','🛬','🛩️','🚀','🛸','🚁','🚂','🚄','🚅',
-    '🚇','🚌','🚗','🚕','🚙','🛻','🚢','⛵','🚤','⚓',
-    '🗺️','🧭','🏔️','⛰️','🌋','🏕️','🏖️','🏝️','🗼','🗽',
-    // 음식/음료
-    '☕','🍵','🧋','🥤','🧃','🍺','🍻','🥂','🍷','🥃',
-    '🍸','🍹','🧉','🍾','🥛','🍼','🫖','🍫','🍬','🍭',
-    '🍕','🍔','🍟','🌭','🍿','🥓','🥚','🍳','🧇','🥞',
-    '🍞','🥐','🥖','🧀','🥗','🍜','🍝','🍛','🍲','🍣',
-    '🍱','🥟','🍤','🍙','🍚','🍘','🍥','🥮','🍡','🧁',
-    // 자연/동물
-    '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
-    '🦁','🐮','🐷','🐸','🐵','🙈','🙉','🙊','🐔','🐧',
-    '🦆','🦅','🦉','🦇','🐺','🐴','🦄','🐝','🦋','🐛',
-    '🌸','🌺','🌻','🌹','🌷','🌼','💐','🍀','🌿','🌱',
-    // 활동/스포츠
-    '⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱','🏓','🏸',
-    '🥊','🥋','🎯','🏹','🎣','🤿','🎽','🎿','🛷','⛷️',
-    // 장소/건물
-    '🏠','🏡','🏢','🏥','🏦','🏨','🏪','🏫','🏬','🏭',
-    '⛪','🕌','🛕','🕍','⛩️','🎌','🏔️','🌄','🌅','🌆',
-    // 기호/특수
-    '✅','☑️','✔️','❌','❎','⭕','🔴','🟠','🟡','🟢',
-    '🔵','🟣','⚫','⚪','🟤','🔶','🔷','🔸','🔹','🔺',
-    '💯','🔥','✨','⭐','🌟','💫','⚡','❄️','🌈','☁️',
-    '🎉','🎊','🎈','🎁','🏆','🥇','🥈','🥉','🎖️','🏅',
-    '📱','💻','🖥️','📷','📸','📹','🎥','📡','💡','🔦',
-    '💰','💳','💎','🔑','🗝️','🔒','🔓','🛒','🎒','👜',
-    '📝','📖','📚','📋','📌','📍','✏️','🖊️','📎','📏',
-    '🕐','⏰','⏱️','⌚','📅','📆','🗓️','⏳','⌛','🔔',
-  ]
+  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
+    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior }), 80)
+  }
+
+  const fetchMessages = useCallback(async () => {
+    const { data: postsData } = await supabase
+      .from('community_posts')
+      .select('*')
+      .order('created_at', { ascending: true })
+      .limit(200)
+
+    if (!postsData) return
+
+    const postIds = postsData.map(p => p.id)
+    const { data: likesData } = await supabase
+      .from('community_likes')
+      .select('post_id')
+      .in('post_id', postIds)
+
+    const likeCountByPost: Record<string, number> = {}
+    likesData?.forEach(l => {
+      likeCountByPost[l.post_id] = (likeCountByPost[l.post_id] ?? 0) + 1
+    })
+
+    setMessages(postsData.map(p => ({
+      id: p.id,
+      text: p.text,
+      created_at: p.created_at,
+      author_id: p.author_id,
+      author_name: p.author_name ?? '익명',
+      likes: likeCountByPost[p.id] ?? 0,
+    })))
+    setLoading(false)
+  }, [])
+
+  // Realtime 구독
+  useEffect(() => {
+    fetchMessages()
+    const channel = supabase
+      .channel('chat-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_posts' }, () => {
+        fetchMessages().then(() => scrollToBottom())
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_likes' }, fetchMessages)
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [fetchMessages])
+
+  // 최초 로드 시 맨 아래로
+  useEffect(() => {
+    if (!loading) scrollToBottom('auto')
+  }, [loading])
+
+  // 이모지 피커 외부 클릭 닫기
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target as Node)) {
+        setShowEmoji(false)
+      }
+    }
+    if (showEmoji) document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showEmoji])
+
+  const handleSetName = (name: string) => {
+    localStorage.setItem('community-my-name', name)
+    setMyName(name)
+  }
+
+  const handlePost = async () => {
+    const text = newText.trim()
+    if (!text || !myName) return
+    setNewText('')
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+    }
+    await supabase.from('community_posts').insert({
+      text,
+      author_id: MY_ID,
+      author_name: myName,
+    })
+    scrollToBottom()
+  }
+
+  const handleLike = async (msgId: string) => {
+    const key = `post_${msgId}`
+    const newLiked = new Set(liked)
+    const isAlreadyLiked = newLiked.has(key)
+
+    if (isAlreadyLiked) {
+      newLiked.delete(key)
+      setMessages(prev => prev.map(m => m.id === msgId ? { ...m, likes: Math.max(0, m.likes - 1) } : m))
+      await supabase.from('community_likes').delete().eq('post_id', msgId).eq('author_id', MY_ID)
+    } else {
+      newLiked.add(key)
+      setMessages(prev => prev.map(m => m.id === msgId ? { ...m, likes: m.likes + 1 } : m))
+      setLikedAnim(msgId)
+      setTimeout(() => setLikedAnim(null), 600)
+      await supabase.from('community_likes').insert({ post_id: msgId, author_id: MY_ID })
+    }
+    setLiked(newLiked)
+    saveLiked(newLiked)
+  }
+
+  const handleDelete = async (msgId: string) => {
+    await supabase.from('community_posts').delete().eq('id', msgId)
+    setMessages(prev => prev.filter(m => m.id !== msgId))
+  }
 
   const insertEmoji = (emoji: string) => {
     const ta = textareaRef.current
@@ -142,374 +306,246 @@ export default function Community() {
       ta.focus()
       const pos = start + emoji.length
       ta.setSelectionRange(pos, pos)
-      ta.style.height = 'auto'
-      ta.style.height = Math.min(ta.scrollHeight, 120) + 'px'
     }, 0)
+    setShowEmoji(false)
   }
 
-  // 피커 외부 클릭 시 닫기
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target as Node)) {
-        setShowEmoji(false)
-      }
-    }
-    if (showEmoji) document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [showEmoji])
-
-  const fetchPosts = useCallback(async () => {
-    const { data: postsData } = await supabase
-      .from('community_posts')
-      .select('*')
-      .order('created_at', { ascending: true })
-
-    if (!postsData) return
-
-    const postIds = postsData.map(p => p.id)
-
-    const [{ data: commentsData }, { data: likesData }] = await Promise.all([
-      supabase.from('community_comments').select('*').in('post_id', postIds).order('created_at', { ascending: true }),
-      supabase.from('community_likes').select('post_id').in('post_id', postIds),
-    ])
-
-    const commentsByPost: Record<string, Comment[]> = {}
-    commentsData?.forEach(c => {
-      if (!commentsByPost[c.post_id]) commentsByPost[c.post_id] = []
-      commentsByPost[c.post_id].push(c)
-    })
-
-    const likeCountByPost: Record<string, number> = {}
-    likesData?.forEach(l => {
-      likeCountByPost[l.post_id] = (likeCountByPost[l.post_id] ?? 0) + 1
-    })
-
-    setAllPosts(postsData.map(p => ({
-      ...p,
-      likes: likeCountByPost[p.id] ?? 0,
-      comments: commentsByPost[p.id] ?? [],
-    })))
-    setLoading(false)
-  }, [])
-
-  useEffect(() => {
-    fetchPosts()
-    const channel = supabase
-      .channel('community-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_posts' }, fetchPosts)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_comments' }, fetchPosts)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_likes' }, fetchPosts)
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [fetchPosts])
-
-  useEffect(() => {
-    if (!loading) {
-      setTimeout(() => {
-        const tabBarH = 96
-        window.scrollTo({ top: document.body.scrollHeight - window.innerHeight + tabBarH })
-      }, 100)
-    }
-  }, [loading])
-
-  useEffect(() => {
-    if (!expandedId) { setCommentFocused(false); setShowCommentEmoji(false); return }
-    setTimeout(() => {
-      const el = document.getElementById(`comment-box-${expandedId}`)
-      if (!el) return
-      const rect = el.getBoundingClientRect()
-      const footerH = 80
-      const gap = 16
-      const overlapBy = rect.bottom - (window.innerHeight - footerH - gap)
-      if (overlapBy > 0) window.scrollBy({ top: overlapBy, behavior: 'smooth' })
-    }, 350)
-  }, [expandedId])
-
-  // 검색 필터링
-  const filteredPosts = search.trim()
-    ? allPosts.filter(p =>
-        p.text.toLowerCase().includes(search.trim().toLowerCase()) ||
-        p.comments.some(c => c.text.toLowerCase().includes(search.trim().toLowerCase()))
-      )
-    : allPosts
-
-  // 최신 50개씩: 전체에서 뒤에서부터 page*PAGE_SIZE개
-  const totalFiltered = filteredPosts.length
-  const startIdx = Math.max(0, totalFiltered - page * PAGE_SIZE)
-  const visiblePosts = filteredPosts.slice(startIdx)
-  const hasMore = startIdx > 0
-
-  const handlePost = async () => {
-    const text = newText.trim()
-    if (!text) return
-    setNewText('')
-    await supabase.from('community_posts').insert({ text, author_id: MY_ID })
-    await fetchPosts()
-    scrollToBottom()
+  // 날짜 구분선 표시 여부
+  const shouldShowDate = (idx: number): boolean => {
+    if (idx === 0) return true
+    return !isSameDay(messages[idx - 1].created_at, messages[idx].created_at)
   }
 
-  const handleLike = async (postId: string) => {
-    const key = `post_${postId}`
-    const newLiked = new Set(liked)
-    const isAlreadyLiked = newLiked.has(key)
-
-    if (isAlreadyLiked) {
-      newLiked.delete(key)
-      setAllPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: Math.max(0, p.likes - 1) } : p))
-    } else {
-      newLiked.add(key)
-      setAllPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p))
-    }
-    setLiked(newLiked)
-    saveLiked(newLiked)
-
-    if (isAlreadyLiked) {
-      await supabase.from('community_likes').delete().eq('post_id', postId).eq('author_id', MY_ID)
-    } else {
-      await supabase.from('community_likes').insert({ post_id: postId, author_id: MY_ID })
-    }
-  }
-
-  const handleComment = async (postId: string) => {
-    const text = (commentText[postId] ?? '').trim()
-    if (!text) return
-    setCommentText(prev => ({ ...prev, [postId]: '' }))
-    await supabase.from('community_comments').insert({ post_id: postId, text, author_id: MY_ID })
-    await fetchPosts()
-  }
-
-  const handleDelete = async (postId: string) => {
-    await supabase.from('community_posts').delete().eq('id', postId)
-    await fetchPosts()
-  }
-
-  const handleDeleteComment = async (commentId: string) => {
-    await supabase.from('community_comments').delete().eq('id', commentId)
-    await fetchPosts()
-  }
-
-  const handleShare = async (text: string, comments: Comment[] = []) => {
-    const lines = [text]
-    if (comments.length > 0) {
-      lines.push('')
-      comments.forEach(c => lines.push(`  └ ${c.text}`))
-    }
-    const shareText = lines.join('\n')
-    if (navigator.share) {
-      try { await navigator.share({ text: shareText }) } catch {}
-    } else {
-      await navigator.clipboard.writeText(shareText)
-      alert('클립보드에 복사됐어요!')
-    }
+  // 연속 메시지 여부 (같은 사람이 연속으로 보냄 - 1분 이내)
+  const isContinuous = (idx: number): boolean => {
+    if (idx === 0) return false
+    const prev = messages[idx - 1]
+    const curr = messages[idx]
+    if (prev.author_id !== curr.author_id) return false
+    const diff = new Date(curr.created_at).getTime() - new Date(prev.created_at).getTime()
+    return diff < 60000
   }
 
   return (
     <div ref={pageRef} style={{
-      background: '#F0F4F8',
-      fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
+      background: '#EEF2F7',
+      fontFamily: ff,
       minHeight: '100%',
       paddingBottom: 80,
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        .community-textarea { resize:none; outline:none; border:none; background:transparent; font-family:inherit; }
-        .community-textarea::placeholder { color:#CBD5E1; }
-        .post-card { animation: fadeSlideUp 0.25s ease; }
-        @keyframes fadeSlideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        .chat-textarea { resize:none; outline:none; border:none; background:transparent; font-family:inherit; width:100%; }
+        .chat-textarea::placeholder { color:#CBD5E1; }
+        .bubble-in { animation: bubbleIn 0.2s ease; }
+        @keyframes bubbleIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
         @keyframes spin { to { transform: rotate(360deg) } }
-        .like-btn:active { transform: scale(1.3); }
-        .like-btn { transition: transform 0.15s ease; }
+        @keyframes heartPop { 0%{transform:scale(1)} 50%{transform:scale(1.5)} 100%{transform:scale(1)} }
+        .heart-pop { animation: heartPop 0.5s ease; }
+        .msg-bubble:hover .msg-actions { opacity:1; }
+        .msg-actions { opacity:0; transition:opacity 0.15s; }
       `}</style>
 
-      {/* ── 검색창 */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '10px 14px 8px', background: '#F0F4F8' }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          background: '#fff', borderRadius: 12, padding: '0 12px',
-          height: 40, border: '1px solid #D1D9E3',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-        }}>
-          <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
-          <input
-            value={search}
-            onChange={e => { setSearch(e.target.value); setPage(1) }}
-            placeholder="글·댓글 검색..."
-            style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: '#1E293B', background: '#fff', fontFamily: 'inherit' }}
-          />
-          {search && (
-            <button onClick={() => { setSearch(''); setPage(1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-              <Icon icon="ph:x-circle" width={16} height={16} color="#94A3B8" />
-            </button>
-          )}
+      {/* 닉네임 미설정 시 팝업 */}
+      {!myName && <NicknameSetup onSet={handleSetName} />}
+
+      {/* ── 헤더 */}
+      <div style={{
+        position: 'sticky', top: 0, zIndex: 50,
+        background: '#fff',
+        borderBottom: '1px solid #E2E8F0',
+        padding: '12px 16px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'linear-gradient(135deg, #1B6EF3, #6366F1)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <span style={{ fontSize: 18 }}>🦘</span>
+          </div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 채팅방</div>
+            <div style={{ fontSize: 11, color: '#94A3B8' }}>호주 교민·여행자 모두 환영</div>
+          </div>
         </div>
+        {myName && (
+          <button onClick={() => {
+            const name = prompt('닉네임을 변경하세요', myName)
+            if (name?.trim()) handleSetName(name.trim())
+          }} style={{
+            display: 'flex', alignItems: 'center', gap: 5,
+            background: '#F1F5F9', border: 'none', borderRadius: 20,
+            padding: '6px 12px', cursor: 'pointer',
+          }}>
+            <div style={{
+              width: 20, height: 20, borderRadius: '50%',
+              background: avatarColor(myName),
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 10, color: '#fff', fontWeight: 800,
+            }}>{myName[0]}</div>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>{myName}</span>
+          </button>
+        )}
       </div>
 
+      {/* ── 메시지 목록 */}
       {loading ? (
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding: '60px 0' }}>
-          <Icon icon="ph:circle-notch" width={28} height={28} color="#1B6EF3"
-            style={{ animation:'spin 0.8s linear infinite' }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+          <Icon icon="ph:circle-notch" width={28} height={28} color={BLUE}
+            style={{ animation: 'spin 0.8s linear infinite' }} />
         </div>
       ) : (
-        <div ref={scrollContainerRef} style={{ padding: '12px 14px 0' }}>
+        <div style={{ padding: '12px 14px 0' }}>
 
-          {/* ── 더보기 버튼 (글 목록 위) */}
-          {hasMore && (
-            <button
-              onClick={() => setPage(p => p + 1)}
-              style={{
-                width: '100%', marginBottom: 12, padding: '10px',
-                background: '#fff', border: '1px solid #E2E8F0',
-                borderRadius: 12, cursor: 'pointer',
-                fontSize: 13, fontWeight: 700, color: '#1B6EF3',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              }}
-            >
-              <Icon icon="ph:arrow-up" width={14} height={14} color="#1B6EF3" />
-              이전 글 더보기 ({startIdx}개)
-            </button>
-          )}
-
-          {/* 검색 결과 없음 */}
-          {search.trim() && filteredPosts.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: '#94A3B8', fontSize: 13 }}>
-              <Icon icon="ph:magnifying-glass" width={32} height={32} color="#CBD5E1" />
-              <div style={{ marginTop: 8 }}>검색 결과가 없어요</div>
+          {messages.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94A3B8' }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>💬</div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>첫 번째 메시지를 남겨보세요!</div>
+              <div style={{ fontSize: 12, marginTop: 6 }}>호주에 사는 사람들과 자유롭게 대화해요</div>
             </div>
           )}
 
-          {visiblePosts.map(post => {
-            const isExpanded = expandedId === post.id
-            const isLiked = liked.has(`post_${post.id}`)
-            const isMine = post.author_id === MY_ID
+          {messages.map((msg, idx) => {
+            const isMine = msg.author_id === MY_ID
+            const isLiked = liked.has(`post_${msg.id}`)
+            const continuous = isContinuous(idx)
+            const color = avatarColor(msg.author_name)
+
             return (
-              <div key={post.id} className="post-card" style={{ marginBottom: 10 }}>
-                <div style={{
-                  background: '#fff', borderRadius: 16, padding: '14px 16px',
-                  boxShadow: '0 1px 6px rgba(0,0,0,0.07)', position: 'relative',
-                }}>
-                  {isMine && (
-                    <button onClick={() => handleDelete(post.id)} style={{
-                      position: 'absolute', top: 10, right: 10,
-                      background: 'none', border: 'none', cursor: 'pointer', padding: 4,
-                    }}>
-                      <Icon icon="ph:x" width={14} height={14} color="#CBD5E1" />
-                    </button>
-                  )}
-                  <div style={{ fontSize: 14, color: '#1E293B', lineHeight: 1.65, marginBottom: 10, paddingRight: isMine ? 20 : 0 }}>
-                    {post.text}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: 11, color: '#94A3B8' }}>{timeAgo(post.created_at)}</span>
-                    <div style={{ flex: 1 }} />
-                    <button onClick={() => setExpandedId(isExpanded ? null : post.id)} style={{
-                      display: 'flex', alignItems: 'center', gap: 4,
-                      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                    }}>
-                      <Icon icon="ph:chat-circle" width={18} height={18} color={isExpanded ? '#1B6EF3' : '#94A3B8'} />
-                      {post.comments.length > 0 && (
-                        <span style={{ fontSize: 12, color: isExpanded ? '#1B6EF3' : '#94A3B8', fontWeight: 600 }}>
-                          {post.comments.length}
-                        </span>
-                      )}
-                    </button>
-                    <button onClick={() => handleShare(post.text, post.comments)} style={{
-                      display: 'flex', alignItems: 'center',
-                      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                    }}>
-                      <Icon icon="ph:export" width={18} height={18} color="#94A3B8" />
-                    </button>
-                    <button className="like-btn" onClick={() => handleLike(post.id)} style={{
-                      display: 'flex', alignItems: 'center', gap: 4,
-                      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                    }}>
-                      <Icon icon={isLiked ? 'ph:heart-fill' : 'ph:heart'} width={18} height={18}
-                        color={isLiked ? '#EF4444' : '#94A3B8'} />
-                      {post.likes > 0 && (
-                        <span style={{ fontSize: 12, color: isLiked ? '#EF4444' : '#94A3B8', fontWeight: 600 }}>
-                          {post.likes}
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-                {isExpanded && (
+              <div key={msg.id}>
+                {/* 날짜 구분선 */}
+                {shouldShowDate(idx) && (
                   <div style={{
-                    background: '#F8FAFC', borderRadius: '0 0 14px 14px',
-                    border: '1px solid #E2E8F0', borderTop: 'none',
-                    padding: '10px 14px 12px', marginTop: -6,
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    margin: `${idx === 0 ? 4 : 16}px 0 12px`,
                   }}>
-                    {post.comments.map(c => (
-                      <div key={c.id} style={{
-                        display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 8,
+                    <div style={{ flex: 1, height: 1, background: '#D1D9E3' }} />
+                    <span style={{
+                      fontSize: 11, fontWeight: 600, color: '#94A3B8',
+                      background: '#EEF2F7', padding: '2px 10px', borderRadius: 20,
+                      border: '1px solid #D1D9E3',
+                    }}>{formatDateLabel(msg.created_at)}</span>
+                    <div style={{ flex: 1, height: 1, background: '#D1D9E3' }} />
+                  </div>
+                )}
+
+                {/* 메시지 버블 */}
+                <div className="bubble-in msg-bubble" style={{
+                  display: 'flex',
+                  flexDirection: isMine ? 'row-reverse' : 'row',
+                  alignItems: 'flex-end',
+                  gap: 8,
+                  marginBottom: continuous ? 2 : 10,
+                  marginTop: continuous ? 0 : (idx > 0 && !shouldShowDate(idx) ? 4 : 0),
+                }}>
+                  {/* 아바타 (상대방만, 연속이면 숨김) */}
+                  {!isMine && (
+                    <div style={{ width: 34, flexShrink: 0, display: 'flex', alignItems: 'flex-end' }}>
+                      {!continuous && (
+                        <div style={{
+                          width: 34, height: 34, borderRadius: '50%',
+                          background: color,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 14, fontWeight: 800, color: '#fff',
+                          flexShrink: 0,
+                        }}>{msg.author_name[0]}</div>
+                      )}
+                    </div>
+                  )}
+
+                  <div style={{ maxWidth: '72%', display: 'flex', flexDirection: 'column', alignItems: isMine ? 'flex-end' : 'flex-start' }}>
+                    {/* 닉네임 (상대방만, 연속이면 숨김) */}
+                    {!isMine && !continuous && (
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', marginBottom: 3, paddingLeft: 2 }}>
+                        {msg.author_name}
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, flexDirection: isMine ? 'row-reverse' : 'row' }}>
+                      {/* 말풍선 */}
+                      <div style={{
+                        background: isMine ? BLUE : '#fff',
+                        color: isMine ? '#fff' : '#1E293B',
+                        borderRadius: isMine
+                          ? (continuous ? '18px 18px 4px 18px' : '18px 4px 18px 18px')
+                          : (continuous ? '18px 18px 18px 4px' : '4px 18px 18px 18px'),
+                        padding: '10px 14px',
+                        fontSize: 14, lineHeight: 1.6,
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                        wordBreak: 'break-word',
+                        whiteSpace: 'pre-wrap',
                       }}>
-                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#CBD5E1', marginTop: 6, flexShrink: 0 }} />
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.6 }}>{c.text}</div>
-                          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{timeAgo(c.created_at)}</div>
-                        </div>
-                        {c.author_id === MY_ID && (
-                          <button onClick={() => handleDeleteComment(c.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}>
-                            <Icon icon="ph:x" width={12} height={12} color="#CBD5E1" />
+                        {msg.text}
+                      </div>
+
+                      {/* 시간 + 좋아요 */}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: isMine ? 'flex-end' : 'flex-start', gap: 2, flexShrink: 0 }}>
+                        {msg.likes > 0 && (
+                          <button onClick={() => handleLike(msg.id)} style={{
+                            display: 'flex', alignItems: 'center', gap: 2,
+                            background: 'rgba(239,68,68,0.1)', border: 'none',
+                            borderRadius: 20, padding: '2px 6px', cursor: 'pointer',
+                          }}>
+                            <span className={likedAnim === msg.id ? 'heart-pop' : ''} style={{ fontSize: 11 }}>
+                              {isLiked ? '❤️' : '🤍'}
+                            </span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: '#EF4444' }}>{msg.likes}</span>
                           </button>
                         )}
-                      </div>
-                    ))}
-                    <div id={`comment-box-${post.id}`} style={{ position: 'relative' }}>
-                      {showCommentEmoji && expandedId === post.id && (
-                        <div style={{
-                          position: 'absolute', bottom: '100%', left: 0, right: 0,
-                          background: '#fff', borderRadius: 14, padding: 12,
-                          boxShadow: '0 -4px 20px rgba(0,0,0,0.12)',
-                          border: '1px solid #E2E8F0', marginBottom: 6,
-                          display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4,
-                          maxHeight: 200, overflowY: 'auto', zIndex: 100,
-                        }}>
-                          {EMOJIS.map((emoji, i) => (
-                            <button key={i} onMouseDown={e => { e.preventDefault(); setCommentText(prev => ({ ...prev, [post.id]: (prev[post.id] ?? '') + emoji })) }} style={{
-                              background: 'none', border: 'none', cursor: 'pointer',
-                              fontSize: 20, padding: 4, borderRadius: 6, lineHeight: 1,
-                            }}>{emoji}</button>
-                          ))}
-                        </div>
-                      )}
-                      <div style={{
-                        display: 'flex', gap: 8, alignItems: 'center',
-                        background: '#fff', borderRadius: 10,
-                        border: '1px solid #E2E8F0', padding: '8px 10px',
-                        marginTop: post.comments.length > 0 ? 8 : 0,
-                      }}>
-                        <button onMouseDown={e => { e.preventDefault(); setShowCommentEmoji(v => !v) }} style={{
-                          background: 'none', border: 'none', cursor: 'pointer',
-                          padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0,
-                          fontSize: 16, opacity: showCommentEmoji && expandedId === post.id ? 1 : 0.45,
-                          transition: 'opacity 0.15s',
-                        }}>🙂</button>
-                        <input
-                          value={commentText[post.id] ?? ''}
-                          onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
-                          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment(post.id); setCommentFocused(false); setShowCommentEmoji(false) } }}
-                          onFocus={() => setCommentFocused(true)}
-                          onBlur={() => setCommentFocused(false)}
-                          placeholder="댓글 달기..."
-                          style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', fontFamily: 'inherit', color: '#1E293B' }}
-                        />
-                        <button onMouseDown={e => { e.preventDefault(); handleComment(post.id); setCommentFocused(false); setShowCommentEmoji(false) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
-                          <Icon icon="ph:paper-plane-right-fill" width={18} height={18}
-                            color={(commentText[post.id] ?? '').trim() ? '#1B6EF3' : '#CBD5E1'} />
-                        </button>
+                        <span style={{ fontSize: 10, color: '#94A3B8', whiteSpace: 'nowrap' }}>
+                          {formatTime(msg.created_at)}
+                        </span>
                       </div>
                     </div>
                   </div>
-                )}
+
+                  {/* 액션 버튼 (호버 시 표시) */}
+                  <div className="msg-actions" style={{
+                    display: 'flex', flexDirection: 'column', gap: 4,
+                    alignSelf: 'center',
+                  }}>
+                    {msg.likes === 0 && (
+                      <button onClick={() => handleLike(msg.id)} style={{
+                        background: '#fff', border: '1px solid #E2E8F0',
+                        borderRadius: '50%', width: 28, height: 28,
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                      }}>
+                        <span style={{ fontSize: 13 }}>{isLiked ? '❤️' : '🤍'}</span>
+                      </button>
+                    )}
+                    {isMine && (
+                      <button onClick={() => handleDelete(msg.id)} style={{
+                        background: '#fff', border: '1px solid #E2E8F0',
+                        borderRadius: '50%', width: 28, height: 28,
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                      }}>
+                        <Icon icon="ph:trash" width={13} height={13} color="#EF4444" />
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             )
           })}
-          <div ref={bottomRef} />
+          <div ref={bottomRef} style={{ height: 4 }} />
         </div>
       )}
 
-      <div style={{ display: commentFocused ? 'none' : 'block', position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: footerWidth ?? '100%', background: '#F0F4F8', padding: '12px 14px 20px', zIndex: 40 }}>
-        {/* 이모티콘 피커 */}
+      {/* ── 입력창 */}
+      <div style={{
+        position: 'fixed', bottom: 0,
+        left: '50%', transform: 'translateX(-50%)',
+        width: footerWidth ?? '100%',
+        background: '#fff',
+        borderTop: '1px solid #E2E8F0',
+        padding: '10px 14px 20px',
+        zIndex: 40, boxSizing: 'border-box',
+      }}>
+        {/* 이모지 피커 */}
         {showEmoji && (
           <div ref={emojiPickerRef} style={{
             position: 'absolute', bottom: '100%', left: 14, right: 14,
@@ -522,8 +558,7 @@ export default function Community() {
             {EMOJIS.map((emoji, i) => (
               <button key={i} onClick={() => insertEmoji(emoji)} style={{
                 background: 'none', border: 'none', cursor: 'pointer',
-                fontSize: 20, padding: 4, borderRadius: 6,
-                lineHeight: 1,
+                fontSize: 20, padding: 4, borderRadius: 6, lineHeight: 1,
               }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#F1F5F9')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'none')}
@@ -531,18 +566,19 @@ export default function Community() {
             ))}
           </div>
         )}
+
         <div style={{
-          display: 'flex', gap: 8, alignItems: 'center',
-          background: '#fff', borderRadius: 12, padding: '0 12px',
-          border: '1px solid #D1D9E3', height: 44,
-          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          display: 'flex', alignItems: 'flex-end', gap: 8,
+          background: '#F1F5F9', borderRadius: 24, padding: '8px 12px',
+          border: '1px solid #E2E8F0',
         }}>
           <button onClick={() => setShowEmoji(v => !v)} style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0,
-            fontSize: 18, opacity: showEmoji ? 1 : 0.45,
-            transition: 'opacity 0.15s',
+            padding: 0, fontSize: 20, opacity: showEmoji ? 1 : 0.5,
+            transition: 'opacity 0.15s', flexShrink: 0, lineHeight: 1,
+            marginBottom: 2,
           }}>🙂</button>
+
           <textarea
             ref={textareaRef}
             value={newText}
@@ -551,20 +587,26 @@ export default function Community() {
               e.target.style.height = 'auto'
               e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
             }}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); handlePost() } }}
-            placeholder="자유롭게 글을 남겨보세요 ✍️"
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                e.preventDefault()
+                handlePost()
+              }
+            }}
+            placeholder="메시지 입력..."
             rows={1}
-            className="community-textarea"
-            style={{ flex: 1, fontSize: 14, color: '#1E293B', lineHeight: 1.6, minHeight: 24, maxHeight: 120, background: '#fff' }}
+            className="chat-textarea"
+            style={{ fontSize: 14, color: '#1E293B', lineHeight: 1.6, minHeight: 24, maxHeight: 120 }}
           />
+
           <button onClick={handlePost} style={{
-            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-            background: newText.trim() ? '#1B6EF3' : '#E2E8F0', border: 'none',
+            width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+            background: newText.trim() ? BLUE : '#CBD5E1', border: 'none',
             cursor: newText.trim() ? 'pointer' : 'default',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'background 0.2s',
           }}>
-            <Icon icon="ph:paper-plane-right-fill" width={16} height={16} color={newText.trim() ? '#fff' : '#94A3B8'} />
+            <Icon icon="ph:paper-plane-right-fill" width={16} height={16} color="#fff" />
           </button>
         </div>
       </div>
