@@ -426,6 +426,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2,
                 background: active ? '#1B6EF3' : 'transparent',
                 borderBottom: active ? '2px solid #1B6EF3' : '2px solid transparent',
+                touchAction: 'manipulation',
+                WebkitTapHighlightColor: 'transparent',
               }}>
                 <Icon icon={tab.icon} width={16} height={16} color={active ? '#fff' : '#475569'} />
                 <span style={{ fontSize:10, fontWeight: active ? 700 : 500, color: active ? '#fff' : '#475569', whiteSpace:'nowrap' }}>

@@ -82,7 +82,6 @@ export default function Shopping() {
       background:'#F0F4F8', minHeight:'100vh',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       paddingBottom: 80,
-      isolation: 'isolate',
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -108,7 +107,6 @@ export default function Shopping() {
       <div style={{
         position:'relative', overflow:'hidden',
         height:120, marginBottom:0,
-        isolation:'isolate',
       }}>
         <div style={{
           position:'absolute', inset:0,
@@ -135,7 +133,7 @@ export default function Shopping() {
       {/* ── 카테고리 탭 */}
       <div style={{
         background:'#fff', borderBottom:'1px solid #E2E8F0',
-        position:'sticky', top:0, zIndex:5,
+        position:'sticky', top:0, zIndex:20,
       }}>
         <div style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto' }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
