@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 
@@ -124,19 +125,17 @@ function NameChangePopup({ currentName, onClose, onSet }: {
     onSet(name)
   }
 
-  return (
+  return createPortal(
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 999,
+      position: 'fixed', inset: 0, zIndex: 9999,
       background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
       fontFamily: ff,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
     }} onClick={onClose}>
       <div style={{
-        position: 'fixed', top: '50%', left: '50%',
-        transform: 'translate(-50%, -50%)',
         background: '#fff', borderRadius: 20, padding: '24px',
         width: 'calc(100% - 48px)', maxWidth: 340,
         boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-        zIndex: 1000,
       }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A' }}>닉네임 변경</div>
@@ -182,7 +181,8 @@ function NameChangePopup({ currentName, onClose, onSet }: {
           }}>{checking ? '확인 중...' : '변경하기'}</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
