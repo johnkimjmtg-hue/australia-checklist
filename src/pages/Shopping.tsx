@@ -82,6 +82,7 @@ export default function Shopping() {
       background:'#F0F4F8',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       paddingBottom: 80,
+      position: 'relative', zIndex: 0,
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
