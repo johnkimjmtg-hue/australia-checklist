@@ -128,14 +128,15 @@ function NameChangePopup({ currentName, onClose, onSet }: {
     <div style={{
       position: 'fixed', inset: 0, zIndex: 999,
       background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '0 24px', fontFamily: ff,
-    }}>
+      fontFamily: ff,
+    }} onClick={onClose}>
       <div style={{
+        position: 'absolute', top: '30%', left: '50%',
+        transform: 'translate(-50%, -50%)',
         background: '#fff', borderRadius: 20, padding: '24px',
-        width: '100%', maxWidth: 340,
+        width: 'calc(100% - 48px)', maxWidth: 340,
         boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-      }}>
+      }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A' }}>닉네임 변경</div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
