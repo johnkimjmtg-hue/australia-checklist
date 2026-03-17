@@ -200,10 +200,14 @@ export default function Community() {
   const [loading, setLoading] = useState(true)
   const [showEmoji, setShowEmoji] = useState(false)
   const [likedAnim, setLikedAnim] = useState<string | null>(null)
+  const [showSearch, setShowSearch] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<Message[]>([])
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
   const pageRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
 
   useEffect(() => {
@@ -285,6 +289,27 @@ export default function Community() {
     if (showEmoji) document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [showEmoji])
+
+  const handleSearch = (q: string) => {
+    setSearchQuery(q)
+    if (!q.trim()) { setSearchResults([]); return }
+    const results = messages.filter(m =>
+      m.text.toLowerCase().includes(q.trim().toLowerCase())
+    )
+    setSearchResults(results)
+  }
+
+  const scrollToMessage = (id: string) => {
+    const el = document.getElementById(`msg-${id}`)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      el.style.background = 'rgba(27,110,243,0.08)'
+      setTimeout(() => { el.style.background = '' }, 1500)
+    }
+    setShowSearch(false)
+    setSearchQuery('')
+    setSearchResults([])
+  }
 
   const handleSetName = (name: string) => {
     localStorage.setItem('community-my-name', name)
@@ -391,39 +416,118 @@ export default function Community() {
         position: 'sticky', top: 0, zIndex: 50,
         background: '#fff',
         borderBottom: '1px solid #E2E8F0',
-        padding: '12px 16px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #1B6EF3, #6366F1)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{ fontSize: 18 }}>🦘</span>
+        <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #1B6EF3, #6366F1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ fontSize: 18 }}>🦘</span>
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 채팅방</div>
+              <div style={{ fontSize: 11, color: '#94A3B8' }}>호주 교민·여행자 모두 환영</div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 채팅방</div>
-            <div style={{ fontSize: 11, color: '#94A3B8' }}>호주 교민·여행자 모두 환영</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* 검색 버튼 */}
+            <button onClick={() => {
+              setShowSearch(v => !v)
+              setSearchQuery('')
+              setSearchResults([])
+              setTimeout(() => searchInputRef.current?.focus(), 100)
+            }} style={{
+              width: 34, height: 34, borderRadius: '50%',
+              background: showSearch ? '#EFF6FF' : '#F1F5F9',
+              border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Icon icon="ph:magnifying-glass" width={16} height={16} color={showSearch ? BLUE : '#64748B'} />
+            </button>
+            {myName && (
+              <button onClick={() => {
+                const name = prompt('닉네임을 변경하세요', myName)
+                if (name?.trim()) handleSetName(name.trim())
+              }} style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                background: '#F1F5F9', border: 'none', borderRadius: 20,
+                padding: '6px 12px', cursor: 'pointer',
+              }}>
+                <div style={{
+                  width: 20, height: 20, borderRadius: '50%',
+                  background: avatarColor(myName),
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 10, color: '#fff', fontWeight: 800,
+                }}>{myName[0]}</div>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>{myName}</span>
+              </button>
+            )}
           </div>
         </div>
-        {myName && (
-          <button onClick={() => {
-            const name = prompt('닉네임을 변경하세요', myName)
-            if (name?.trim()) handleSetName(name.trim())
-          }} style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            background: '#F1F5F9', border: 'none', borderRadius: 20,
-            padding: '6px 12px', cursor: 'pointer',
-          }}>
+
+        {/* 검색창 슬라이드 다운 */}
+        {showSearch && (
+          <div style={{ padding: '0 14px 12px', borderTop: '1px solid #F1F5F9' }}>
             <div style={{
-              width: 20, height: 20, borderRadius: '50%',
-              background: avatarColor(myName),
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 10, color: '#fff', fontWeight: 800,
-            }}>{myName[0]}</div>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>{myName}</span>
-          </button>
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: '#F8FAFC', borderRadius: 12, padding: '0 12px',
+              height: 40, border: '1.5px solid #D1D9E3',
+            }}>
+              <Icon icon="ph:magnifying-glass" width={14} height={14} color="#94A3B8" />
+              <input
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={e => handleSearch(e.target.value)}
+                placeholder="대화 내용 검색..."
+                style={{
+                  flex: 1, border: 'none', outline: 'none',
+                  fontSize: 13, color: '#1E293B', background: 'transparent', fontFamily: ff,
+                }}
+              />
+              {searchQuery && (
+                <button onClick={() => { setSearchQuery(''); setSearchResults([]) }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                  <Icon icon="ph:x-circle" width={14} height={14} color="#94A3B8" />
+                </button>
+              )}
+            </div>
+            {/* 검색 결과 */}
+            {searchQuery.trim() && (
+              <div style={{
+                marginTop: 8, maxHeight: 200, overflowY: 'auto',
+                background: '#fff', borderRadius: 12, border: '1px solid #E2E8F0',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+              }}>
+                {searchResults.length === 0 ? (
+                  <div style={{ padding: '14px', textAlign: 'center', fontSize: 13, color: '#94A3B8' }}>
+                    검색 결과가 없어요
+                  </div>
+                ) : (
+                  searchResults.map(r => (
+                    <button key={r.id} onClick={() => scrollToMessage(r.id)} style={{
+                      width: '100%', padding: '10px 14px', background: 'none',
+                      border: 'none', borderBottom: '1px solid #F1F5F9',
+                      cursor: 'pointer', textAlign: 'left', fontFamily: ff,
+                    }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#F8FAFC')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                    >
+                      <div style={{ fontSize: 11, fontWeight: 700, color: BLUE, marginBottom: 2 }}>
+                        {r.author_name} · {formatTime(r.created_at)}
+                      </div>
+                      <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.5,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+                      }}>
+                        {r.text}
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -469,13 +573,14 @@ export default function Community() {
                 )}
 
                 {/* 메시지 버블 */}
-                <div className="bubble-in msg-bubble" style={{
+                <div id={`msg-${msg.id}`} className="bubble-in msg-bubble" style={{
                   display: 'flex',
                   flexDirection: isMine ? 'row-reverse' : 'row',
-                  alignItems: 'flex-end',
+                  alignItems: 'flex-start',
                   gap: 8,
                   marginBottom: continuous ? 2 : 10,
                   marginTop: continuous ? 0 : (idx > 0 && !shouldShowDate(idx) ? 4 : 0),
+                  borderRadius: 8, transition: 'background 0.4s',
                 }}>
                   {/* 아바타 + 닉네임 (상대방만, 연속이면 숨김) */}
                   {!isMine && (
@@ -524,13 +629,13 @@ export default function Community() {
                         {msg.likes > 0 && (
                           <button onClick={() => handleLike(msg.id)} style={{
                             display: 'flex', alignItems: 'center', gap: 2,
-                            background: 'rgba(239,68,68,0.1)', border: 'none',
+                            background: 'rgba(219,39,119,0.1)', border: 'none',
                             borderRadius: 20, padding: '2px 6px', cursor: 'pointer',
                           }}>
-                            <span className={likedAnim === msg.id ? 'heart-pop' : ''} style={{ fontSize: 11 }}>
-                              {isLiked ? '❤️' : '🤍'}
+                            <span className={likedAnim === msg.id ? 'heart-pop' : ''} style={{ fontSize: 12 }}>
+                              {isLiked ? '💗' : '🩷'}
                             </span>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: '#EF4444' }}>{msg.likes}</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: '#DB2777' }}>{msg.likes}</span>
                           </button>
                         )}
                         <span style={{ fontSize: 10, color: '#94A3B8', whiteSpace: 'nowrap' }}>
@@ -552,7 +657,7 @@ export default function Community() {
                         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
                       }}>
-                        <span style={{ fontSize: 13 }}>{isLiked ? '❤️' : '🤍'}</span>
+                        <span style={{ fontSize: 14 }}>{isLiked ? '💗' : '🩷'}</span>
                       </button>
                     )}
                     {isMine && (
