@@ -269,10 +269,9 @@ export default function Community() {
       channelRef.current = null
     }
 
+    // Realtime DB 변경 감지 채널 (재연결 시 새 채널명)
     const channel = supabase
-      .channel('chat-realtime-' + Date.now(), {
-        config: { presence: { key: MY_ID } }
-      })
+      .channel('chat-db-' + Date.now())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, () => {
         fetchMessages().then(() => scrollToBottom())
       })
@@ -282,21 +281,30 @@ export default function Community() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'community_likes' }, () => {
         fetchMessages()
       })
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState()
-        setOnlineCount(Object.keys(state).length)
-      })
-      .subscribe(async (status: string) => {
-        if (status === 'SUBSCRIBED') {
-          await channel.track({ online_at: new Date().toISOString() })
-        }
+      .subscribe((status: string) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
           setTimeout(() => setupChannel(), 3000)
         }
       })
 
     channelRef.current = channel
-  }, [fetchMessages, MY_ID])
+  }, [fetchMessages])
+
+  // Presence 채널은 고정 이름으로 별도 운영
+  useEffect(() => {
+    const presenceChannel = supabase.channel('hojugaja-chat-room')
+    presenceChannel
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState()
+        setOnlineCount(Object.keys(state).length)
+      })
+      .subscribe(async (status: string) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({ user_id: MY_ID, online_at: new Date().toISOString() })
+        }
+      })
+    return () => { supabase.removeChannel(presenceChannel) }
+  }, [MY_ID])
 
   useEffect(() => {
     fetchMessages()
