@@ -1101,6 +1101,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         justifyContent: 'center',
       }}>
         <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;700&display=swap');
           .calc-btn {
             background-color: #e8e8e8;
             border: none;
@@ -1147,7 +1148,11 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         }}>
           {/* 타이틀 */}
           <div style={{ textAlign: 'center', marginBottom: 16 }}>
-            <div style={{ fontSize: 20, fontWeight: 800, color: '#333', letterSpacing: 1 }}>호주가자</div>
+            <div style={{
+              fontSize: 28, fontWeight: 700, color: '#333',
+              letterSpacing: 6,
+              fontFamily: '"Josefin Sans", "Raleway", sans-serif',
+            }}>HOJUGAJA</div>
           </div>
 
           {/* 디스플레이 */}
