@@ -741,7 +741,7 @@ export default function Community() {
         width: footerWidth ?? '100%',
         background: '#fff',
         borderTop: '1px solid #E2E8F0',
-        padding: '10px 14px 20px',
+        padding: '6px 14px 8px',
         zIndex: 40, boxSizing: 'border-box',
       }}>
         {/* 이모지 피커 */}
@@ -768,7 +768,7 @@ export default function Community() {
 
         <div style={{
           display: 'flex', alignItems: 'flex-end', gap: 8,
-          background: '#F1F5F9', borderRadius: 24, padding: '8px 12px',
+          background: '#F1F5F9', borderRadius: 24, padding: '5px 10px',
           border: '1px solid #E2E8F0',
         }}>
           <button onClick={() => setShowEmoji(v => !v)} style={{
@@ -799,7 +799,7 @@ export default function Community() {
           />
 
           <button onClick={handlePost} style={{
-            width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+            width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
             background: newText.trim() ? BLUE : '#CBD5E1', border: 'none',
             cursor: newText.trim() ? 'pointer' : 'default',
             display: 'flex', alignItems: 'center', justifyContent: 'center',

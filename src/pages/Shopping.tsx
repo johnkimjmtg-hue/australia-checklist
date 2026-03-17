@@ -354,7 +354,7 @@ export default function Shopping() {
                     if (!trimmed) return <div key={i} style={{ height: 6 }} />
 
                     // 섹션 헤더: 이모지로 시작하는 줄
-                    const isHeader = /^[\u{1F300}-\u{1F9FF}\u{2600}-\u{27BF}✨🎁💡🔥⭐💎🌟]/u.test(trimmed)
+                    const isHeader = /^[✅🎁📌🔑💊⭐🏆🔥💎🌟✨]/u.test(trimmed)
                     if (isHeader) return (
                       <div key={i} style={{
                         fontSize: 13, fontWeight: 700, color: '#1E293B',
@@ -382,8 +382,8 @@ export default function Shopping() {
                       )
                     }
 
-                    // 팁: 💡로 시작
-                    if (trimmed.startsWith('💡')) {
+                    // 팁: 📌로 시작
+                    if (trimmed.startsWith('📌')) {
                       return (
                         <div key={i} style={{
                           fontSize: 13, color: '#334155', lineHeight: 1.6,
