@@ -348,6 +348,9 @@ export default function Community() {
       author_id: p.author_id,
       author_name: p.author_name ?? '익명',
       likes: likeCountByPost[p.id] ?? 0,
+      reply_to_id: p.reply_to_id ?? null,
+      reply_to_text: p.reply_to_text ?? null,
+      reply_to_name: p.reply_to_name ?? null,
     })))
     setLoading(false)
   }, [])
