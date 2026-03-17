@@ -799,13 +799,12 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
   const displayCats = CATEGORIES.filter(c => c.id !== 'custom')
 
   return (
-    <div style={{ minHeight:'100vh', background:'#F8FAFC', fontFamily:ff, overflowX:'hidden' }}>
+    <div style={{ minHeight:'100vh', background:'#F8FAFC', fontFamily:'"Apple SD Gothic Neo","Noto Sans KR",sans-serif', overflowX:'hidden' }}>
       <style>{`
-        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&display=swap');
         @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-        .menu-tile { transition: transform 0.15s ease, box-shadow 0.15s ease; }
-        .menu-tile:active { transform: scale(0.96); }
-        @media (hover: hover) { .menu-tile:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(27,110,243,0.15) !important; } }
+        .menu-tile { transition: opacity 0.15s ease; }
+        .menu-tile:active { opacity: 0.6; }
       `}</style>
 
       {/* ── 헤더 */}
@@ -815,164 +814,153 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         display:'flex', alignItems:'center', justifyContent:'space-between',
         position:'sticky', top:0, zIndex:50,
       }}>
+        <div style={{ flex:1 }} />
         <span onClick={handleLogoTap} style={{
-          fontSize:17, fontWeight:900, color:BLUE,
-          letterSpacing:2, cursor:'pointer', userSelect:'none' as any,
+          fontSize:17, fontWeight:500, color:BLUE,
+          letterSpacing:3, cursor:'pointer', userSelect:'none' as any,
+          fontFamily:'"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
         }}>HOJUGAJA</span>
-        <button style={{ background:'none', border:'none', cursor:'pointer', padding:4, display:'flex', alignItems:'center' }}>
-          <Icon icon="ph:magnifying-glass" width={22} height={22} color="#475569" />
-        </button>
+        <div style={{ flex:1, display:'flex', justifyContent:'flex-end' }}>
+          <button style={{ background:'none', border:'none', cursor:'pointer', padding:4, display:'flex', alignItems:'center' }}>
+            <Icon icon="ph:magnifying-glass" width={22} height={22} color="#475569" />
+          </button>
+        </div>
       </div>
 
       {/* ── 히어로 */}
       <div style={{
-        background:'#EEF2F7',
-        padding:'28px 20px 32px',
-        textAlign:'center',
+        background:'#4A5568',
+        padding:'32px 24px 36px',
+        display:'flex', alignItems:'center', justifyContent:'space-between', gap:16,
       }}>
-        <div style={{ fontSize:12, fontWeight:700, color:BLUE, letterSpacing:1, marginBottom:8, opacity:0.8 }}>
-          AUSTRALIA TRAVEL APP
+        {/* 왼쪽 텍스트 */}
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:13, fontWeight:400, color:'rgba(255,255,255,0.75)', marginBottom:10, letterSpacing:0.3 }}>
+            호주여행/이민 필수 사이트
+          </div>
+          <div style={{ fontSize:42, fontWeight:500, color:'#fff', lineHeight:1.15, marginBottom:10, letterSpacing:-0.5 }}>
+            호주가자
+          </div>
+          <div style={{ fontSize:14, fontWeight:400, color:'rgba(255,255,255,0.85)', lineHeight:1.6 }}>
+            준비하시기 전에<br/>꼭 확인하세요.
+          </div>
         </div>
-        <div style={{ fontSize:26, fontWeight:900, color:'#0F172A', lineHeight:1.3, marginBottom:8 }}>
-          호주여행 필수앱<br/>
-          <span style={{ color:BLUE }}>호주가자</span>
-        </div>
-        <div style={{ fontSize:14, color:'#64748B', lineHeight:1.6 }}>
-          호주 가기 전 꼭 확인하세요 🦘
+        {/* 오른쪽 스마일 아이콘 */}
+        <div style={{ flexShrink:0 }}>
+          <Icon icon="ph:smiley" width={90} height={90} color="#FFB800" />
         </div>
       </div>
 
       {/* ── 메뉴 타일 */}
-      <div style={{ padding:'20px 16px 40px' }}>
+      <div style={{ padding:'24px 20px 40px', background:'#F8FAFC' }}>
         <div style={{
           display:'grid', gridTemplateColumns:'repeat(3, 1fr)',
-          gap:12,
+          gap:20, rowGap:28,
         }}>
 
           {/* 1. 버킷리스트 */}
           <div className="menu-tile" onClick={onStart} style={{
-            background:'#fff', borderRadius:16, padding:'18px 12px 16px',
-            boxShadow:'0 2px 12px rgba(0,0,0,0.07)', cursor:'pointer',
-            display:'flex', flexDirection:'column', alignItems:'center', gap:8,
-            border:'1px solid #F1F5F9', animation:'fadeInUp 0.3s ease',
+            cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:8,
+            animation:'fadeInUp 0.3s ease',
           }}>
             <div style={{
-              width:48, height:48, borderRadius:14,
+              width:52, height:52, borderRadius:16,
               background:'#EFF6FF',
               display:'flex', alignItems:'center', justifyContent:'center',
             }}>
-              <Icon icon="ph:check-circle" width={26} height={26} color={BLUE} />
+              <Icon icon="ph:check-circle" width={28} height={28} color={BLUE} />
             </div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#1E293B', textAlign:'center', lineHeight:1.4 }}>버킷리스트</div>
-            <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600 }}>{totalItems}개</div>
+            <div style={{ fontSize:12, fontWeight:400, color:'#1E293B', textAlign:'center', lineHeight:1.5 }}>버킷리스트</div>
           </div>
 
           {/* 2. 호주쇼핑리스트 */}
           <div className="menu-tile" onClick={() => navigate('/app?tab=shopping')} style={{
-            background:'#fff', borderRadius:16, padding:'18px 12px 16px',
-            boxShadow:'0 2px 12px rgba(0,0,0,0.07)', cursor:'pointer',
-            display:'flex', flexDirection:'column', alignItems:'center', gap:8,
-            border:'1px solid #F1F5F9', animation:'fadeInUp 0.35s ease',
+            cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:8,
+            animation:'fadeInUp 0.35s ease',
           }}>
             <div style={{
-              width:48, height:48, borderRadius:14,
+              width:52, height:52, borderRadius:16,
               background:'#FFF7ED',
               display:'flex', alignItems:'center', justifyContent:'center',
             }}>
-              <Icon icon="ph:shopping-bag" width={26} height={26} color="#F97316" />
+              <Icon icon="ph:shopping-bag" width={28} height={28} color="#F97316" />
             </div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#1E293B', textAlign:'center', lineHeight:1.4 }}>호주쇼핑<br/>리스트</div>
-            <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600 }}>쇼핑필수템</div>
+            <div style={{ fontSize:12, fontWeight:400, color:'#1E293B', textAlign:'center', lineHeight:1.5 }}>호주쇼핑<br/>리스트</div>
           </div>
 
           {/* 3. 카페도장깨기 */}
           <div className="menu-tile" onClick={() => navigate('/app?tab=bingo')} style={{
-            background:'#fff', borderRadius:16, padding:'18px 12px 16px',
-            boxShadow:'0 2px 12px rgba(0,0,0,0.07)', cursor:'pointer',
-            display:'flex', flexDirection:'column', alignItems:'center', gap:8,
-            border:'1px solid #F1F5F9', animation:'fadeInUp 0.4s ease',
+            cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:8,
+            animation:'fadeInUp 0.4s ease',
           }}>
             <div style={{
-              width:48, height:48, borderRadius:14,
+              width:52, height:52, borderRadius:16,
               background:'#FDF4FF',
               display:'flex', alignItems:'center', justifyContent:'center',
             }}>
-              <Icon icon="ph:coffee" width={26} height={26} color="#A855F7" />
+              <Icon icon="ph:coffee" width={28} height={28} color="#A855F7" />
             </div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#1E293B', textAlign:'center', lineHeight:1.4 }}>카페<br/>도장깨기</div>
-            <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600 }}>카페투어</div>
+            <div style={{ fontSize:12, fontWeight:400, color:'#1E293B', textAlign:'center', lineHeight:1.5 }}>카페<br/>도장깨기</div>
           </div>
 
           {/* 4. 채팅방 */}
           <div className="menu-tile" onClick={() => navigate('/app?tab=community')} style={{
-            background:'#fff', borderRadius:16, padding:'18px 12px 16px',
-            boxShadow:'0 2px 12px rgba(0,0,0,0.07)', cursor:'pointer',
-            display:'flex', flexDirection:'column', alignItems:'center', gap:8,
-            border:'1px solid #F1F5F9', animation:'fadeInUp 0.45s ease',
+            cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:8,
+            animation:'fadeInUp 0.45s ease',
           }}>
             <div style={{
-              width:48, height:48, borderRadius:14,
+              width:52, height:52, borderRadius:16,
               background:'#F0FDF4',
               display:'flex', alignItems:'center', justifyContent:'center',
             }}>
-              <Icon icon="ph:chats-circle" width={26} height={26} color="#10B981" />
+              <Icon icon="ph:chats-circle" width={28} height={28} color="#10B981" />
             </div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#1E293B', textAlign:'center', lineHeight:1.4 }}>채팅방</div>
-            <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600 }}>교민·여행자</div>
+            <div style={{ fontSize:12, fontWeight:400, color:'#1E293B', textAlign:'center', lineHeight:1.5 }}>채팅방</div>
           </div>
 
           {/* 5. 업체/서비스 */}
           <div className="menu-tile" onClick={onServices} style={{
-            background:'#fff', borderRadius:16, padding:'18px 12px 16px',
-            boxShadow:'0 2px 12px rgba(0,0,0,0.07)', cursor:'pointer',
-            display:'flex', flexDirection:'column', alignItems:'center', gap:8,
-            border:'1px solid #F1F5F9', animation:'fadeInUp 0.5s ease',
+            cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:8,
+            animation:'fadeInUp 0.5s ease',
           }}>
             <div style={{
-              width:48, height:48, borderRadius:14,
+              width:52, height:52, borderRadius:16,
               background:'#FFF1F2',
               display:'flex', alignItems:'center', justifyContent:'center',
             }}>
-              <Icon icon="ph:buildings" width={26} height={26} color="#F43F5E" />
+              <Icon icon="ph:buildings" width={28} height={28} color="#F43F5E" />
             </div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#1E293B', textAlign:'center', lineHeight:1.4 }}>업체/<br/>서비스</div>
-            <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600 }}>{bizCount}개 업체</div>
+            <div style={{ fontSize:12, fontWeight:400, color:'#1E293B', textAlign:'center', lineHeight:1.5 }}>업체/<br/>서비스</div>
           </div>
 
           {/* 6. 버킷리스트 추천 */}
           <div className="menu-tile" onClick={() => setShowSuggestion(true)} style={{
-            background:'#fff', borderRadius:16, padding:'18px 12px 16px',
-            boxShadow:'0 2px 12px rgba(0,0,0,0.07)', cursor:'pointer',
-            display:'flex', flexDirection:'column', alignItems:'center', gap:8,
-            border:'1px solid #F1F5F9', animation:'fadeInUp 0.55s ease',
+            cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:8,
+            animation:'fadeInUp 0.55s ease',
           }}>
             <div style={{
-              width:48, height:48, borderRadius:14,
+              width:52, height:52, borderRadius:16,
               background:'#FFFBEB',
               display:'flex', alignItems:'center', justifyContent:'center',
             }}>
-              <Icon icon="ph:paper-plane-tilt" width={26} height={26} color="#F59E0B" />
+              <Icon icon="ph:paper-plane-tilt" width={28} height={28} color="#F59E0B" />
             </div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#1E293B', textAlign:'center', lineHeight:1.4 }}>버킷리스트<br/>추천</div>
-            <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600 }}>경험공유</div>
+            <div style={{ fontSize:12, fontWeight:400, color:'#1E293B', textAlign:'center', lineHeight:1.5 }}>버킷리스트<br/>추천</div>
           </div>
 
           {/* 7. 업체등록 신청 */}
           <div className="menu-tile" onClick={() => setShowForm(true)} style={{
-            background:'#fff', borderRadius:16, padding:'18px 12px 16px',
-            boxShadow:'0 2px 12px rgba(0,0,0,0.07)', cursor:'pointer',
-            display:'flex', flexDirection:'column', alignItems:'center', gap:8,
-            border:'1px solid #F1F5F9', animation:'fadeInUp 0.6s ease',
+            cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:8,
+            animation:'fadeInUp 0.6s ease',
           }}>
             <div style={{
-              width:48, height:48, borderRadius:14,
+              width:52, height:52, borderRadius:16,
               background:'#F0F9FF',
               display:'flex', alignItems:'center', justifyContent:'center',
             }}>
-              <Icon icon="ph:storefront" width={26} height={26} color="#0EA5E9" />
+              <Icon icon="ph:storefront" width={28} height={28} color="#0EA5E9" />
             </div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#1E293B', textAlign:'center', lineHeight:1.4 }}>업체등록<br/>신청</div>
-            <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600 }}>무료등록</div>
+            <div style={{ fontSize:12, fontWeight:400, color:'#1E293B', textAlign:'center', lineHeight:1.5 }}>업체등록<br/>신청</div>
           </div>
 
         </div>
@@ -980,7 +968,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 
       {/* ── 푸터 */}
       <div style={{ background:'#fff', borderTop:'1px solid #F1F5F9', padding:'20px 20px 40px', textAlign:'center' }}>
-        <div style={{ fontSize:13, fontWeight:900, color:BLUE, marginBottom:4 }}>HOJUGAJA</div>
+        <div style={{ fontSize:13, fontWeight:500, color:BLUE, marginBottom:4, letterSpacing:2 }}>HOJUGAJA</div>
         <div style={{ fontSize:11, color:'#94A3B8' }}>www.hojugaja.com · 무료 호주 여행앱</div>
       </div>
 
@@ -992,7 +980,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             <div style={{ width:36, height:4, background:'#CBD5E1', borderRadius:2, margin:'0 auto 20px' }}/>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
               <div>
-                <div style={{ fontSize:18, fontWeight:800, color:'#1E293B' }}>버킷리스트 추천</div>
+                <div style={{ fontSize:18, fontWeight:700, color:'#1E293B' }}>버킷리스트 추천</div>
                 <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>채택되면 이메일로 알려드려요 😊</div>
               </div>
               <button onClick={() => setShowSuggestion(false)} style={{ background:'none', border:'none', cursor:'pointer', padding:4 }}>
@@ -1012,7 +1000,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             <div style={{ width:36, height:4, background:'#CBD5E1', borderRadius:2, margin:'0 auto 20px' }}/>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
               <div>
-                <div style={{ fontSize:18, fontWeight:800, color:'#1E293B' }}>업체 등록 신청</div>
+                <div style={{ fontSize:18, fontWeight:700, color:'#1E293B' }}>업체 등록 신청</div>
                 <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>검토 후 등록해드려요</div>
               </div>
               <button onClick={() => setShowForm(false)} style={{ background:'none', border:'none', cursor:'pointer', padding:4 }}>
