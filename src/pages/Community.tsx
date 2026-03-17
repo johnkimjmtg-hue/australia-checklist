@@ -648,7 +648,7 @@ export default function Community() {
             {/* 검색 결과 */}
             {searchQuery.trim() && (
               <div style={{
-                marginTop: 8, maxHeight: 200, overflowY: 'auto',
+                marginTop: 8, maxHeight: 360, overflowY: 'auto',
                 background: '#fff', borderRadius: 12, border: '1px solid #E2E8F0',
                 boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
               }}>
@@ -662,11 +662,12 @@ export default function Community() {
                       width: '100%', padding: '10px 14px', background: 'none',
                       border: 'none', borderBottom: '1px solid #F1F5F9',
                       cursor: 'pointer', textAlign: 'left', fontFamily: ff,
+                      display: 'block',
                     }}
                       onMouseEnter={e => (e.currentTarget.style.background = '#F8FAFC')}
                       onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                     >
-                      <div style={{ fontSize: 11, fontWeight: 700, color: BLUE, marginBottom: 2 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: BLUE, marginBottom: 4 }}>
                         {r.author_name} · {formatTime(r.created_at)}
                       </div>
                       {r.reply_to_text && (
@@ -678,11 +679,17 @@ export default function Community() {
                           ↩ {r.reply_to_name}: {r.reply_to_text}
                         </div>
                       )}
-                      <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.5,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
-                      }}>
-                        {r.text}
-                      </div>
+                      {r.text ? (
+                        <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.5,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+                        }}>
+                          {r.text}
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: 13, color: '#CBD5E1', fontStyle: 'italic' }}>
+                          (내용 없음)
+                        </div>
+                      )}
                     </button>
                   ))
                 )}
