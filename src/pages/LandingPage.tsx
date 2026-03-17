@@ -1,8 +1,7 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import { AppState } from '../store/state'
-import { supabase } from '../lib/supabase'
 import { CATEGORIES as BCATS, BUSINESSES } from '../data/businesses'
 
 type Props = { state: AppState; onStart: () => void; onServices: () => void }
@@ -23,77 +22,6 @@ const CAT_ICON_MAP: Record<string, string> = {
   'places':            'ph:map-pin',
   'cat_1772930790490': 'ph:microphone-stage',
   'custom':            'ph:pencil-simple',
-}
-
-// ── 추천 버킷리스트 데이터 (itemId: 클릭 시 이동할 checklist 항목 id, catId: 카테고리)
-const BUCKET_RECS = [
-  {
-    id: 'blackstar',
-    title: 'Black Star Pastry',
-    desc: '시드니에서 수박 케이크 먹기',
-    img: imgCafe,
-    pos: 'center',
-    itemId: 'f14',
-    catId: 'food',
-  },
-  {
-    id: 'bondi',
-    title: 'Bondi Beach',
-    desc: '시드니 대표 해변 즐기기',
-    img: imgBeach,
-    pos: 'center 30%',
-    itemId: 'b02',
-    catId: 'beach',
-  },
-  {
-    id: 'bridgeclimb',
-    title: '하버 브리지 클라이밍',
-    desc: '시드니 전경을 발밑에 두기',
-    img: imgUnique,
-    pos: 'center',
-    itemId: 'u03',
-    catId: 'city',
-  },
-  {
-    id: 'bbq',
-    title: '공원 BBQ 파티',
-    desc: '호주식 바베큐 파티 즐기기',
-    img: imgFood,
-    pos: 'center',
-    itemId: 'f12',
-    catId: 'food',
-  },
-  {
-    id: 'kangaroo',
-    title: '캥거루 먹이주기',
-    desc: '야생동물 공원 체험',
-    img: imgNature,
-    pos: 'center',
-    itemId: 'i_1773020002843',
-    catId: 'nature',
-  },
-  {
-    id: 'bluemountains',
-    title: '블루마운틴 별보기',
-    desc: '은하수 아래 쓰리시스터즈 감상',
-    img: imgStars,
-    pos: 'center 40%',
-    itemId: 'n01',
-    catId: 'nature',
-  },
-]
-
-// ── checklist 카테고리 → 배경 이미지 매핑
-const CAT_PHOTO_MAP: Record<string, string> = {
-  'hospital':          imgCafe,
-  'food':              imgFood,
-  'shopping':          imgShopping,
-  'admin':             imgBackpack,
-  'people':            imgSuggest,
-  'parenting':         imgNature,
-  'places':            imgBeach,
-  'cat_1772930790490': imgCity,
-  'custom':            imgUnique,
 }
 
 // ── Google Maps 로딩
@@ -664,84 +592,10 @@ function ChatBubble() {
 // ══════════════════════════════════════════════════
 export default function LandingPage({ state, onStart, onServices }: Props) {
   const navigate = useNavigate()
-  const [dbItems, setDbItems] = useState<any[]>([])
-  useEffect(() => {
-    supabase.from('checklist_items').select('id,label,category_id').eq('is_active', true)
-      .then(({ data }) => { if (data) setDbItems(data) })
-  }, [])
-
-  // BucketCheckView와 완전히 동일한 방식 (1아이템 N일 배정 → N개로 카운트)
-  const totalItems   = dbItems.length || 0
-  // 발행된 버킷리스트가 있을 때만 진행률 계산 (수정중/작성중이면 0/0)
-  const isIssued     = !!state.meta?.lastIssuedAt
-  const ITEMS        = dbItems.map(i => ({ id: i.id, categoryId: i.category_id, label: i.label, emoji: '📌' }))
-  const allItems     = [...ITEMS, ...(state.customItems ?? []).map((c: any) => ({ ...c, emoji:'📝' }))]
-  const checkedItems = isIssued ? allItems.filter((i: any) => state.selected?.[i.id]) : []
-  const allRows      = (() => {
-    const rows: { id: string; day?: number }[] = []
-    checkedItems.forEach((item: any) => {
-      const days = state.schedules?.[item.id] ?? []
-      if (days.length === 0) rows.push({ id: item.id })
-      else days.forEach((d: number) => rows.push({ id: item.id, day: d }))
-    })
-    return rows
-  })()
-  const getKey       = (id: string, day?: number) => day !== undefined ? `${id}_${day}` : id
-  const total        = allRows.length
-  const achieved     = (() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })()
-  const checked      = allRows.filter(r => !!achieved[getKey(r.id, r.day)]).length
-  const progress     = total > 0 ? Math.round((checked / total) * 100) : 0
-  const [bizCount, setBizCount] = useState(BUSINESSES.length)
-
-  useEffect(() => {
-    async function fetchBizCount() {
-      try {
-        const { supabase } = await import('../lib/supabase')
-        const { count } = await supabase
-          .from('businesses')
-          .select('*', { count: 'exact', head: true })
-          .eq('is_active', true)
-        if (count !== null) setBizCount(count)
-      } catch {}
-    }
-    fetchBizCount()
-  }, [])
-
   const [showForm, setShowForm]             = useState(false)
   const [showSuggestion, setShowSuggestion] = useState(false)
   const [logoTap, setLogoTap]               = useState(0)
-  const [sliderIdx, setSliderIdx]           = useState(0)
-  const [sliderAnimate, setSliderAnimate]   = useState(true)
-  const sliderRef    = useRef<HTMLDivElement>(null)
   const logoTimer    = useRef<any>(null)
-  const touchStartX  = useRef<number>(0)
-  const touchStartY  = useRef<number>(0)
-  const isDragging   = useRef(false)
-
-  // 카드 앞뒤로 복제해서 무한루프
-  const CLONED = [...BUCKET_RECS, ...BUCKET_RECS, ...BUCKET_RECS]
-  const OFFSET  = BUCKET_RECS.length // 가운데 세트 시작 인덱스
-  const [realIdx, setRealIdx] = useState(OFFSET)
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX
-    touchStartY.current = e.touches[0].clientY
-    isDragging.current = false
-  }
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const dx = e.changedTouches[0].clientX - touchStartX.current
-    const dy = e.changedTouches[0].clientY - touchStartY.current
-    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return // 탭 허용
-    if (Math.abs(dx) < Math.abs(dy) * 0.8) return // 세로 스크롤 무시
-    if (dx < -40) {
-      setSliderAnimate(true)
-      setRealIdx(i => i + 1)
-    } else if (dx > 40) {
-      setSliderAnimate(true)
-      setRealIdx(i => i - 1)
-    }
-  }
 
   const handleLogoTap = () => {
     const next = logoTap + 1
@@ -750,37 +604,6 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
     if (next >= 5) { window.location.href = '/admin'; setLogoTap(0); return }
     logoTimer.current = setTimeout(() => setLogoTap(0), 2000)
   }
-
-  // 자동 재생
-  useEffect(() => {
-    const t = setInterval(() => {
-      setSliderAnimate(true)
-      setRealIdx(i => i + 1)
-    }, 3000)
-    return () => clearInterval(t)
-  }, [])
-
-  // 끝에 닿으면 애니 없이 순간이동
-  useEffect(() => {
-    if (realIdx >= BUCKET_RECS.length * 2) {
-      const timer = setTimeout(() => {
-        setSliderAnimate(false)
-        setRealIdx(OFFSET)
-      }, 350)
-      return () => clearTimeout(timer)
-    }
-    if (realIdx < OFFSET) {
-      const timer = setTimeout(() => {
-        setSliderAnimate(false)
-        setRealIdx(BUCKET_RECS.length * 2 - 1)
-      }, 350)
-      return () => clearTimeout(timer)
-    }
-    // dot 인덱스 동기화
-    setSliderIdx((realIdx - OFFSET) % BUCKET_RECS.length)
-  }, [realIdx])
-
-  const displayCats = CATEGORIES.filter(c => c.id !== 'custom')
 
   return (
     <div style={{ background:'#e8e8e8', fontFamily:ff, overflowX:'hidden' }}>
