@@ -267,6 +267,7 @@ export default function Community() {
       author_id: MY_ID,
       author_name: myName,
     })
+    await fetchMessages()
     scrollToBottom()
   }
 
