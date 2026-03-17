@@ -94,6 +94,96 @@ const EMOJIS = [
   '📱','💻','📷','📸','💡','💰','💎','🔑','📝','📖',
 ]
 
+// ── 닉네임 변경 팝업
+function NameChangePopup({ currentName, onClose, onSet }: {
+  currentName: string
+  onClose: () => void
+  onSet: (name: string) => void
+}) {
+  const [input, setInput] = useState(currentName)
+  const [checking, setChecking] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async () => {
+    const name = input.trim()
+    if (!name || name === currentName) { onClose(); return }
+    setChecking(true)
+    setError('')
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    const { data } = await supabase
+      .from('community_posts')
+      .select('id')
+      .eq('author_name', name)
+      .gte('created_at', since)
+      .limit(1)
+    setChecking(false)
+    if (data && data.length > 0) {
+      setError('이미 사용 중인 닉네임이에요.')
+      return
+    }
+    onSet(name)
+  }
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 999,
+      background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '0 24px', fontFamily: ff,
+    }}>
+      <div style={{
+        background: '#fff', borderRadius: 20, padding: '24px',
+        width: '100%', maxWidth: 340,
+        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A' }}>닉네임 변경</div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+            <Icon icon="ph:x" width={18} height={18} color="#94A3B8" />
+          </button>
+        </div>
+
+        <input
+          value={input}
+          onChange={e => { setInput(e.target.value); setError('') }}
+          onKeyDown={e => { if (e.key === 'Enter' && input.trim()) handleSubmit() }}
+          placeholder="새 닉네임 입력 (최대 10자)"
+          maxLength={10}
+          autoFocus
+          style={{
+            width: '100%', height: 48,
+            border: `1.5px solid ${error ? '#EF4444' : '#D1D9E3'}`,
+            borderRadius: 12, padding: '0 14px', fontSize: 15,
+            color: '#0F172A', fontFamily: ff, outline: 'none',
+            boxSizing: 'border-box',
+          }}
+        />
+        {error && (
+          <div style={{ fontSize: 12, color: '#EF4444', marginTop: 6, fontWeight: 600 }}>
+            ⚠️ {error}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+          <button onClick={onClose} style={{
+            flex: 1, height: 48, borderRadius: 12, border: '1.5px solid #E2E8F0',
+            background: '#fff', color: '#64748B', fontSize: 14, fontWeight: 600,
+            cursor: 'pointer', fontFamily: ff,
+          }}>취소</button>
+          <button onClick={handleSubmit} disabled={!input.trim() || checking} style={{
+            flex: 1, height: 48, borderRadius: 12, border: 'none',
+            background: input.trim() && !checking ? BLUE : '#E2E8F0',
+            color: input.trim() && !checking ? '#fff' : '#94A3B8',
+            fontSize: 14, fontWeight: 700,
+            cursor: input.trim() && !checking ? 'pointer' : 'default',
+            fontFamily: ff, transition: 'all 0.2s',
+          }}>{checking ? '확인 중...' : '변경하기'}</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── 닉네임 설정 화면
 function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
   const [input, setInput] = useState('')
@@ -209,6 +299,7 @@ export default function Community() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Message[]>([])
   const [onlineCount, setOnlineCount] = useState(1)
+  const [showNameChange, setShowNameChange] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
@@ -502,10 +593,7 @@ export default function Community() {
               <Icon icon="ph:magnifying-glass" width={16} height={16} color={showSearch ? BLUE : '#64748B'} />
             </button>
             {myName && (
-              <button onClick={() => {
-                const name = prompt('닉네임을 변경하세요', myName)
-                if (name?.trim()) handleSetName(name.trim())
-              }} style={{
+              <button onClick={() => setShowNameChange(true)} style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 background: '#F1F5F9', border: 'none', borderRadius: 20,
                 padding: '6px 12px', cursor: 'pointer',
@@ -807,6 +895,15 @@ export default function Community() {
           }}>
             <Icon icon="ph:paper-plane-right-fill" width={16} height={16} color="#fff" />
           </button>
+        {/* 닉네임 변경 팝업 */}
+        {showNameChange && myName && (
+          <NameChangePopup
+            currentName={myName}
+            onClose={() => setShowNameChange(false)}
+            onSet={(name) => { handleSetName(name); setShowNameChange(false) }}
+          />
+        )}
+
         </div>
       </div>
     </div>
