@@ -741,7 +741,7 @@ export default function Community() {
         width: footerWidth ?? '100%',
         background: '#fff',
         borderTop: '1px solid #E2E8F0',
-        padding: '6px 14px 8px',
+        padding: '6px 14px 16px',
         zIndex: 40, boxSizing: 'border-box',
       }}>
         {/* 이모지 피커 */}
