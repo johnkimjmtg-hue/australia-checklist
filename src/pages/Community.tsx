@@ -254,9 +254,16 @@ export default function Community() {
     setLoading(false)
   }, [])
 
-  // Realtime 구독
-  useEffect(() => {
-    fetchMessages()
+  // Realtime 구독 + 자동 재연결
+  const channelRef = useRef<any>(null)
+
+  const setupChannel = useCallback(() => {
+    // 기존 채널 제거
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current)
+      channelRef.current = null
+    }
+
     const channel = supabase
       .channel('chat-realtime-' + Date.now())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, () => {
@@ -268,11 +275,34 @@ export default function Community() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'community_likes' }, () => {
         fetchMessages()
       })
-      .subscribe((status) => {
-        console.log('Realtime status:', status)
+      .subscribe((status: string) => {
+        // 연결 끊기면 3초 후 자동 재연결
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          setTimeout(() => setupChannel(), 3000)
+        }
       })
-    return () => { supabase.removeChannel(channel) }
-  }, [])
+
+    channelRef.current = channel
+  }, [fetchMessages])
+
+  useEffect(() => {
+    fetchMessages()
+    setupChannel()
+
+    // 백그라운드에서 돌아올 때 재연결 + 최신 메시지 로드
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchMessages()
+        setupChannel()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+      if (channelRef.current) supabase.removeChannel(channelRef.current)
+    }
+  }, [setupChannel])
 
   // 최초 로드 시 맨 아래로
   useEffect(() => {
