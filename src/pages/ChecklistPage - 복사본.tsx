@@ -47,11 +47,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [shakeBtn, setShakeBtn]       = useState(false)
   const [customLabel, setCustomLabel] = useState('')
   const [bingoCity, setBingoCity]     = useState<'melbourne'|'sydney'>('melbourne')
-  const [mainTab, setMainTab]         = useState<MainTab>(() => {
-    const tab = searchParams.get('tab')
-    if (tab === 'services' || tab === 'shopping' || tab === 'bingo' || tab === 'community') return tab
-    return 'bucketlist'
-  })
+  const [mainTab, setMainTab]         = useState<MainTab>(
+    searchParams.get('tab') === 'services' ? 'services' : 'bucketlist'
+  )
   const [showScheduleView, setShowScheduleView] = useState(!!trip)
   const [scheduleSelectedItem, setScheduleSelectedItem] = useState<string|null>(null)
   const [scrollTrigger, setScrollTrigger] = useState(0)
@@ -415,10 +413,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <div style={{ display:'flex', padding:'8px 8px 0', gap:2, overflowX:'auto', scrollbarWidth:'none' }}>
           {([
             { id:'bucketlist', icon:'ph:check-circle',  label:'버킷리스트' },
-            { id:'shopping',   icon:'ph:shopping-bag',  label:'호주쇼핑리스트' },
-            { id:'bingo',      icon:'ph:coffee',        label:'카페도장깨기' },
+            { id:'shopping',   icon:'ph:shopping-bag',  label:'쇼핑리스트' },
+            { id:'bingo',      icon:'ph:coffee',        label:'카페빙고게임' },
             { id:'community',  icon:'ph:chats-circle',  label:'채팅방' },
-            { id:'services',   icon:'ph:buildings',     label:'업체/서비스' },
+            { id:'services',   icon:'ph:buildings',     label:'업체리스트' },
           ] as { id: MainTab; icon: string; label: string }[]).map(tab => {
             const active = mainTab === tab.id
             return (
