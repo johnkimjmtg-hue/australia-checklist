@@ -93,18 +93,11 @@ export default function Shopping() {
           backgroundImage:`url(${imgShopping})`,
           backgroundSize:'cover', backgroundPosition:'center',
         }}/>
-        <div style={{
-          position:'absolute', inset:0,
-          background:'linear-gradient(90deg, rgba(232,232,232,0.75) 0%, rgba(232,232,232,0.45) 60%, rgba(232,232,232,0.10) 100%)',
-        }}/>
         <div style={{ position:'absolute', inset:0, padding:'20px 16px', display:'flex', flexDirection:'column', justifyContent:'center' }}>
-          <div style={{ fontSize:11, color:'rgba(50,50,50,0.6)', fontWeight:600, letterSpacing:1, marginBottom:4 }}>
-            AUSTRALIA SHOPPING
-          </div>
-          <div style={{ fontSize:20, fontWeight:800, color:'#1E293B', marginBottom:2 }}>
-            호주 쇼핑 리스트 🛍
-          </div>
-          <div style={{ fontSize:12, color:'rgba(30,41,59,0.7)' }}>
+          <div style={{
+            fontSize:22, fontWeight:900, color:'#fff',
+            textShadow:'0 1px 4px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4)',
+          }}>
             호주에서 꼭 사가야 할 아이템을 모았어요
           </div>
         </div>
@@ -166,7 +159,7 @@ export default function Shopping() {
                   }}>
                     {p.image_url
                       ? <img src={p.image_url} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                      : <Icon icon="ph:shopping-bag" width={36} height={36} color="#C8C8C8" />
+                      : <Icon icon="ph:shopping-bag" width={36} height={36} color="#93C5FD" />
                     }
                   </div>
                   <div style={{ padding:'10px 10px 12px' }}>
