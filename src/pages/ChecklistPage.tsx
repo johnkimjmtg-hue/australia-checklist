@@ -565,43 +565,20 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 const isHighlight = highlightItem === item.id
                 return (
                   <div key={item.id} id={`item-${item.id}`} style={{
-                    display:'flex', alignItems:'center', gap:12,
-                    padding:'12px 14px',
+                    display:'flex', alignItems:'stretch', gap:10,
+                    padding:'12px 12px 12px 14px',
                     borderRadius:12,
                     background: isHighlight ? '#EFF6FF'
                               : checked && dayCount===0 ? '#fffbeb'
                               : checked ? '#fff8e4'
                               : '#fff',
-                    boxShadow: isHighlight ? '0 2px 8px rgba(27,110,243,0.12)'
-                              : checked ? '0 2px 8px rgba(0,0,0,0.06)'
-                              : '0 2px 8px rgba(0,0,0,0.06)',
-                    minHeight:52, cursor:'pointer',
                     border:'1px solid #C8C8C8',
                     borderLeft: isHighlight ? '4px solid #1B6EF3'
                               : checked ? '4px solid #16A34A'
                               : '4px solid #CBD5E1',
                     transition:'all 0.3s',
                   }}>
-                    {/* Checkbox — 녹색 */}
-                    <button onClick={() => {
-                      if (!trip) { setModal('noTrip'); return }
-                      if (!checked) {}
-                      setState(toggleItem(state, item.id))
-                    }} style={{
-                      width:22, height:22, borderRadius:4, flexShrink:0,
-                      border: checked ? 'none' : '1px solid #C8C8C8',
-                      background: checked ? '#16A34A' : '#fff',
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      cursor:'pointer', padding:0,
-                    }}>
-                      {checked && (
-                        <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
-                          <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      )}
-                    </button>
-
-                    {/* 단색 아이콘 or 썸네일 */}
+                    {/* 왼쪽 - 원형 사진 or 아이콘 */}
                     {(() => {
                       const db = dbItems.find(d => d.id === item.id)
                       return db?.image_url ? (
@@ -611,65 +588,71 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                             e.stopPropagation()
                             setDetailItem(db)
                             if ((db.related_business_ids?.length ?? 0) > 0) {
-                              const ids = db.related_business_ids!
-                              const { data } = await supabase.from('businesses').select('*').in('id', ids)
+                              const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
                               setDetailBizCards(data ?? [])
                             } else setDetailBizCards([])
                           }}
-                          style={{ width:48, height:48, borderRadius:8, objectFit:'cover', flexShrink:0, cursor:'pointer', border:'1px solid #E2E8F0' }}
+                          style={{ width:60, height:60, borderRadius:'50%', objectFit:'cover', flexShrink:0, cursor:'pointer', border:'2px solid #E2E8F0', alignSelf:'center' }}
                         />
                       ) : (
-                        <Icon
-                          icon={db?.icon ?? CAT_ICON_MAP[(item as any).categoryId] ?? 'ph:star'}
-                          width={20} height={20}
-                          color={checked ? '#78716C' : '#CBD5E1'}
-                        />
+                        <div style={{
+                          width:60, height:60, borderRadius:'50%', flexShrink:0,
+                          background:'#f0f0f0', border:'2px solid #E2E8F0',
+                          display:'flex', alignItems:'center', justifyContent:'center', alignSelf:'center',
+                        }}>
+                          <Icon
+                            icon={db?.icon ?? CAT_ICON_MAP[(item as any).categoryId] ?? 'ph:star'}
+                            width={24} height={24}
+                            color={checked ? '#78716C' : '#CBD5E1'}
+                          />
+                        </div>
                       )
                     })()}
 
-                    {/* 제목 + address + description */}
-                    <div style={{ flex:1, display:'flex', flexDirection:'column', gap:2, minWidth:0 }}
-                      onClick={() => { if (checked && showScheduleView) setScheduleSelectedItem(item.id) }}>
+                    {/* 가운데 - 제목 + 설명 + 뱃지 */}
+                    <div style={{ flex:1, display:'flex', flexDirection:'column', gap:3, minWidth:0, justifyContent:'center' }}>
                       <span style={{
-                        fontSize:15, fontWeight: checked ? 600 : 400,
-                        color: checked ? '#0F172A' : '#64748B',
-                        cursor: checked && showScheduleView ? 'pointer' : 'default',
+                        fontSize:14, fontWeight: checked ? 700 : 500,
+                        color: checked ? '#0F172A' : '#475569',
                         lineHeight:1.4,
                         display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden',
                       }}>{item.label}</span>
                       {(() => {
                         const db = dbItems.find(d => d.id === item.id)
-                        const stateMap: Record<string,string> = {
-                          'NSW':'시드니', 'VIC':'멜번', 'QLD':'브리즈번',
-                          'WA':'퍼스', 'SA':'애들레이드', 'TAS':'태즈매니아',
-                          'ACT':'캔버라', 'NT':'다윈',
+                        const stateMap: Record<string, {label:string; color:string; bg:string; icon:string}> = {
+                          'NSW': { label:'시드니', color:'#1B6EF3', bg:'#EFF6FF', icon:'ph:buildings' },
+                          'VIC': { label:'멜번',   color:'#7C3AED', bg:'#F5F3FF', icon:'ph:train' },
+                          'QLD': { label:'브리즈번', color:'#D97706', bg:'#FFFBEB', icon:'ph:sun' },
+                          'WA':  { label:'퍼스',   color:'#0891B2', bg:'#ECFEFF', icon:'ph:waves' },
+                          'SA':  { label:'애들레이드', color:'#BE185D', bg:'#FDF2F8', icon:'ph:wine' },
+                          'TAS': { label:'태즈매니아', color:'#065F46', bg:'#ECFDF5', icon:'ph:tree' },
+                          'ACT': { label:'캔버라', color:'#374151', bg:'#F9FAFB', icon:'ph:flag' },
+                          'NT':  { label:'다윈',   color:'#92400E', bg:'#FFFBEB', icon:'ph:compass' },
                         }
-                        const region = db?.address
-                          ? (Object.entries(stateMap).find(([k]) => db.address!.toUpperCase().includes(k))?.[1] ?? null)
-                          : null
+                        const regionKey = db?.address ? Object.keys(stateMap).find(k => db.address!.toUpperCase().includes(k)) : null
+                        const region = regionKey ? stateMap[regionKey] : null
+                        const hasDetail = !!(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0 || db?.tips)
                         return (
                           <>
                             {db?.description && (
                               <span style={{
-                                fontSize:11, color:'#94A3B8', fontWeight:400,
+                                fontSize:11, color:'#94A3B8', fontWeight:400, lineHeight:1.5,
                                 overflow:'hidden', textOverflow:'ellipsis',
-                                display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical',
+                                display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
                               }}>{db.description}</span>
                             )}
-                            {(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0 || db?.tips) && (
-                              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:5 }}>
-                                {region ? (
+                            {hasDetail && (
+                              <div style={{ display:'flex', alignItems:'center', gap:5, marginTop:2, flexWrap:'wrap' }}>
+                                {region && (
                                   <span style={{
-                                    fontSize:10, fontWeight:700, color:'#64748B',
-                                    background:'#e8e8e8',
-                                    border:'1px solid #C8C8C8',
-                                    borderRadius:20, padding:'2px 9px',
-                                    display:'flex', alignItems:'center', gap:3,
+                                    fontSize:10, fontWeight:700, color: region.color,
+                                    background: region.bg, borderRadius:20,
+                                    padding:'2px 8px', display:'flex', alignItems:'center', gap:3,
                                   }}>
-                                    <Icon icon="ph:map-pin-simple" width={10} height={10} color="#94A3B8" />
-                                    {region}
+                                    <Icon icon={region.icon} width={10} height={10} color={region.color} />
+                                    {region.label}
                                   </span>
-                                ) : <span />}
+                                )}
                                 <button
                                   onClick={async e => {
                                     e.stopPropagation()
@@ -681,14 +664,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                     } else setDetailBizCards([])
                                   }}
                                   style={{
-                                    fontSize:10, fontWeight:700, color:'#1B6EF3',
-                                    background:'#e8e8e8',
-                                    border:'1px solid #C8C8C8',
-                                    borderRadius:20, cursor:'pointer',
-                                    padding:'2px 10px',
+                                    fontSize:10, fontWeight:600, color:'#64748B',
+                                    background:'#e8e8e8', border:'1px solid #C8C8C8',
+                                    borderRadius:20, cursor:'pointer', padding:'2px 9px',
                                     boxShadow:'2px 2px 4px #d0d0d0, -2px -2px 4px #ffffff',
                                   }}>
-                                  자세히 알아보기 ›
+                                  자세히 ›
                                 </button>
                               </div>
                             )}
@@ -697,25 +678,47 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       })()}
                     </div>
 
-                    {/* Schedule button */}
-                    <button onClick={() => {
-                      if (!checked) return
-                      if (!trip) { setModal('noTrip'); return }
-                      setSheetItem(item as CheckItem)
-                    }} style={{
-                      height:28, padding:'0 10px', borderRadius:6, fontSize:11, fontWeight:700,
-                      cursor: checked ? 'pointer' : 'default', flexShrink:0,
-                      border: 'none',
-                      background: !checked        ? '#F1F5F9'
-                                : dayCount>0      ? 'rgba(68,64,60,0.10)'
-                                : '#FFCD00',
-                      color: !checked        ? '#CBD5E1'
-                           : dayCount>0      ? '#44403C'
-                           : '#92620a',
-                      boxShadow: checked && dayCount===0 ? '0 2px 6px rgba(255,205,0,0.4)' : 'none',
-                    }}>
-                      {dayCount>0 ? `${dayCount}일 ✓` : '+일정'}
-                    </button>
+                    {/* 오른쪽 - 체크박스 위, 일정 아래 */}
+                    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, gap:6, paddingTop:2, paddingBottom:2 }}>
+                      <button onClick={e => {
+                        e.stopPropagation()
+                        if (!trip) { setModal('noTrip'); return }
+                        setState(toggleItem(state, item.id))
+                      }} style={{
+                        width:26, height:26, borderRadius:6, flexShrink:0,
+                        border: checked ? 'none' : '1.5px solid #C8C8C8',
+                        background: checked ? '#16A34A' : '#fff',
+                        display:'flex', alignItems:'center', justifyContent:'center',
+                        cursor:'pointer', padding:0,
+                        boxShadow: checked ? 'none' : '1px 1px 3px #d0d0d0, -1px -1px 3px #ffffff',
+                      }}>
+                        {checked && (
+                          <svg width="12" height="9" viewBox="0 0 11 8" fill="none">
+                            <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </button>
+                      <button onClick={e => {
+                        e.stopPropagation()
+                        if (!checked) return
+                        if (!trip) { setModal('noTrip'); return }
+                        setSheetItem(item as CheckItem)
+                      }} style={{
+                        height:26, padding:'0 8px', borderRadius:6, fontSize:10, fontWeight:700,
+                        cursor: checked ? 'pointer' : 'default', flexShrink:0,
+                        border:'none',
+                        background: !checked   ? '#F1F5F9'
+                                  : dayCount>0 ? 'rgba(68,64,60,0.10)'
+                                  : '#FFCD00',
+                        color: !checked   ? '#CBD5E1'
+                             : dayCount>0 ? '#44403C'
+                             : '#92620a',
+                        boxShadow: checked && dayCount===0 ? '0 2px 6px rgba(255,205,0,0.4)' : 'none',
+                        whiteSpace:'nowrap',
+                      }}>
+                        {dayCount>0 ? `${dayCount}일 ✓` : '+일정'}
+                      </button>
+                    </div>
                   </div>
                 )
               })}
