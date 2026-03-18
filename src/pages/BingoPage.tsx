@@ -464,7 +464,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   return (
     <div ref={pageRef} style={{
       minHeight: embedded ? 'auto' : '100vh',
-      background: '#F0F4F8',
+      background: '#e8e8e8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       display: 'flex', flexDirection: 'column',
     }}>
