@@ -620,14 +620,14 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       {(() => {
                         const db = dbItems.find(d => d.id === item.id)
                         const stateMap: Record<string, {label:string; color:string; bg:string; icon:string}> = {
-                          'NSW': { label:'시드니', color:'#1B6EF3', bg:'#EFF6FF', icon:'ph:buildings' },
-                          'VIC': { label:'멜번',   color:'#7C3AED', bg:'#F5F3FF', icon:'ph:train' },
-                          'QLD': { label:'브리즈번', color:'#D97706', bg:'#FFFBEB', icon:'ph:sun' },
-                          'WA':  { label:'퍼스',   color:'#0891B2', bg:'#ECFEFF', icon:'ph:waves' },
-                          'SA':  { label:'애들레이드', color:'#BE185D', bg:'#FDF2F8', icon:'ph:wine' },
-                          'TAS': { label:'태즈매니아', color:'#065F46', bg:'#ECFDF5', icon:'ph:tree' },
-                          'ACT': { label:'캔버라', color:'#374151', bg:'#F9FAFB', icon:'ph:flag' },
-                          'NT':  { label:'다윈',   color:'#92400E', bg:'#FFFBEB', icon:'ph:compass' },
+                          'NSW': { label:'시드니', color:'#fff', bg:'#B8860B', icon:'ph:house-line' },
+                          'VIC': { label:'멜번',   color:'#fff', bg:'#1a237e', icon:'ph:tram' },
+                          'QLD': { label:'브리즈번', color:'#fff', bg:'#E65100', icon:'ph:sun' },
+                          'WA':  { label:'퍼스',   color:'#fff', bg:'#0891B2', icon:'ph:waves' },
+                          'SA':  { label:'애들레이드', color:'#fff', bg:'#BE185D', icon:'ph:wine' },
+                          'TAS': { label:'태즈매니아', color:'#fff', bg:'#065F46', icon:'ph:tree' },
+                          'ACT': { label:'캔버라', color:'#fff', bg:'#374151', icon:'ph:flag' },
+                          'NT':  { label:'다윈',   color:'#fff', bg:'#92400E', icon:'ph:compass' },
                         }
                         const regionKey = db?.address ? Object.keys(stateMap).find(k => db.address!.toUpperCase().includes(k)) : null
                         const region = regionKey ? stateMap[regionKey] : null
@@ -642,17 +642,18 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                               }}>{db.description}</span>
                             )}
                             {hasDetail && (
-                              <div style={{ display:'flex', alignItems:'center', gap:5, marginTop:2, flexWrap:'wrap' }}>
-                                {region && (
+                              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:4 }}>
+                                {region ? (
                                   <span style={{
-                                    fontSize:10, fontWeight:700, color: region.color,
+                                    fontSize:12, fontWeight:700, color: region.color,
                                     background: region.bg, borderRadius:20,
-                                    padding:'2px 8px', display:'flex', alignItems:'center', gap:3,
+                                    padding:'3px 10px', display:'flex', alignItems:'center', gap:4,
+                                    flexShrink:0,
                                   }}>
-                                    <Icon icon={region.icon} width={10} height={10} color={region.color} />
+                                    <Icon icon={region.icon} width={12} height={12} color={region.color} />
                                     {region.label}
                                   </span>
-                                )}
+                                ) : <span />}
                                 <button
                                   onClick={async e => {
                                     e.stopPropagation()
@@ -664,12 +665,13 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                     } else setDetailBizCards([])
                                   }}
                                   style={{
-                                    fontSize:10, fontWeight:600, color:'#64748B',
+                                    fontSize:12, fontWeight:600, color:'#475569',
                                     background:'#e8e8e8', border:'1px solid #C8C8C8',
-                                    borderRadius:20, cursor:'pointer', padding:'2px 9px',
+                                    borderRadius:20, cursor:'pointer', padding:'3px 10px',
                                     boxShadow:'2px 2px 4px #d0d0d0, -2px -2px 4px #ffffff',
+                                    flexShrink:0,
                                   }}>
-                                  자세히 ›
+                                  자세히 알아보기
                                 </button>
                               </div>
                             )}
