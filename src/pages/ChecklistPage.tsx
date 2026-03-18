@@ -482,28 +482,34 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   </span>
                 )}
               </div>
-              <div style={{ display:'flex', gap:6 }}>
+              <div style={{ display:'flex', gap:8 }}>
                 <button onClick={handleOpenTripPicker} style={{
                   height:34, padding:'0 14px', borderRadius:8, border:'none',
-                  background: tripLabel ? '#16A34A' : '#fff',
-                  color: tripLabel ? '#fff' : '#0F172A',
-                  fontSize:13, fontWeight:800, cursor:'pointer',
+                  background: '#e8e8e8',
+                  color: tripLabel ? '#16A34A' : '#94A3B8',
+                  fontSize:13, fontWeight:700, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:5,
-                  boxShadow: tripLabel ? '0 2px 8px rgba(22,163,74,0.30)' : '0 2px 6px rgba(0,0,0,0.10)',
+                  boxShadow: tripLabel
+                    ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                    : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                   animation: !tripLabel ? 'pulse 1.4s ease-in-out infinite' : 'none',
+                  WebkitTapHighlightColor:'transparent',
                 }}>
-                  <Icon icon="ph:airplane-takeoff" width={15} height={15} color={tripLabel ? '#fff' : '#94A3B8'} />
+                  <Icon icon="ph:airplane-takeoff" width={15} height={15} color={tripLabel ? '#16A34A' : '#94A3B8'} />
                   {tripLabel ?? '여행일정 설정'}
                 </button>
                 <button onClick={() => setShowScheduleView(v=>!v)} style={{
                   height:34, padding:'0 14px', borderRadius:8, border:'none',
-                  background: showScheduleView ? '#1B6EF3' : '#fff',
-                  color: showScheduleView ? '#fff' : '#0F172A',
-                  fontSize:13, fontWeight:800, cursor:'pointer',
+                  background: '#e8e8e8',
+                  color: showScheduleView ? '#1B6EF3' : '#94A3B8',
+                  fontSize:13, fontWeight:700, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:5,
-                  boxShadow: showScheduleView ? '0 2px 8px rgba(27,110,243,0.25)' : '0 2px 6px rgba(0,0,0,0.10)',
+                  boxShadow: showScheduleView
+                    ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                    : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                  WebkitTapHighlightColor:'transparent',
                 }}>
-                  <Icon icon="ph:list-checks" width={15} height={15} color={showScheduleView ? '#fff' : '#94A3B8'} />
+                  <Icon icon="ph:list-checks" width={15} height={15} color={showScheduleView ? '#1B6EF3' : '#94A3B8'} />
                   일정보기
                 </button>
               </div>
@@ -537,13 +543,16 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     return (
                       <button key={cat.id} className="chip-btn" onClick={() => setState(setCategory(state, cat.id))} style={{
                         height:36, borderRadius:8, border:'none',
-                        background: isActive ? '#1B6EF3' : '#fff',
-                        color: isActive ? '#fff' : '#0F172A',
-                        fontSize:12, fontWeight:700,
+                        background: '#e8e8e8',
+                        color: isActive ? '#1B6EF3' : '#64748B',
+                        fontSize:12, fontWeight: isActive ? 700 : 500,
                         cursor:'pointer', position:'relative',
                         flexShrink:0, padding:'0 14px',
-                        boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
+                        boxShadow: isActive
+                          ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                          : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                         display:'flex', alignItems:'center', justifyContent:'center', gap: isCustom ? 4 : 0,
+                        WebkitTapHighlightColor:'transparent',
                       }}>
                         {isCustom && <Icon icon="ph:pencil-simple" width={11} height={11} color={isActive ? '#FFCD00' : '#94A3B8'} />}
                         {cat.label}
