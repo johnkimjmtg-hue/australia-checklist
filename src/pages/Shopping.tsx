@@ -124,7 +124,7 @@ export default function Shopping() {
         background:'#e8e8e8', borderBottom:'1px solid #D1D9E3',
         position:'sticky', top:0, zIndex:20,
       }}>
-        <div style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto' }}>
+        <div style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto', scrollbarWidth:'thin', scrollbarColor:'#C8C8C8 #e8e8e8' }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
             flexShrink:0, height:34, padding:'0 14px', borderRadius:20, cursor:'pointer',
             background: '#e8e8e8', border: 'none',
