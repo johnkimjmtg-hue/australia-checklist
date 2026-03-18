@@ -498,11 +498,19 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
           80%  { opacity:0.8; }
           100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1) rotate(var(--r)); opacity:0; }
         }
+        .neu-tab {
+          background: #e8e8e8; border: none; cursor: pointer;
+          display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+          transition: all 0.15s ease; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+          box-shadow: 3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff; border-radius: 10px;
+        }
+        .neu-tab.active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff; }
+        .neu-tab:active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff; }
       `}</style>
 
       {/* ── 헤더 */}
-      {!embedded && <div style={{ background:'#fff', flexShrink:0 }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
+      {!embedded && <div style={{ background:'#e8e8e8', paddingBottom:8, flexShrink:0 }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 12px' }}>
           <span onClick={handleLogoTap}
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}>
             HOJUGAJA
@@ -511,25 +519,21 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             {city === 'melbourne' ? '멜번' : '시드니'}
           </span>
         </div>
-        <div style={{ display:'flex', padding:'8px 8px 0', gap:2, overflowX:'auto', scrollbarWidth:'none' }}>
+        <div style={{ display:'flex', padding:'0 10px', gap:8, overflowX:'auto', scrollbarWidth:'none' }}>
           {([
-            { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트', action: onBack },
-            { id:'services',   icon:'ph:buildings',    label:'업체/서비스', action: () => {} },
-            { id:'shopping',   icon:'ph:shopping-bag', label:'호주쇼핑리스트',   action: () => {} },
-            { id:'bingo',      icon:'ph:coffee',       label:'카페도장깨기',   action: () => {} },
-            { id:'community',  icon:'ph:chats-circle', label:'커뮤니티',   action: () => {} },
+            { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트',  action: onBack },
+            { id:'shopping',   icon:'ph:shopping-bag', label:'쇼핑리스트',  action: () => {} },
+            { id:'bingo',      icon:'ph:coffee',       label:'카페빙고게임', action: () => {} },
+            { id:'community',  icon:'ph:chats-circle', label:'채팅방',      action: () => {} },
+            { id:'services',   icon:'ph:buildings',    label:'업체리스트',  action: () => {} },
           ]).map(tab => {
             const active = tab.id === 'bingo'
             return (
-              <button key={tab.id} onClick={tab.action} style={{
-                flex:1, minWidth:0, height:48, border:'none', cursor:'pointer',
-                borderRadius:'6px 6px 0 0',
-                display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2,
-                background: active ? '#1B6EF3' : 'transparent',
-                borderBottom: active ? '2px solid #1B6EF3' : '2px solid transparent',
-              }}>
-                <Icon icon={tab.icon} width={16} height={16} color={active ? '#fff' : '#475569'} />
-                <span style={{ fontSize:10, fontWeight: active ? 700 : 500, color: active ? '#fff' : '#475569', whiteSpace:'nowrap' }}>
+              <button key={tab.id} onClick={tab.action}
+                className={`neu-tab${active ? ' active' : ''}`}
+                style={{ flex:1, minWidth:0, height:52 }}>
+                <Icon icon={tab.icon} width={16} height={16} color={active ? '#1B6EF3' : '#94A3B8'} />
+                <span style={{ fontSize:9, fontWeight: active ? 700 : 500, color: active ? '#1B6EF3' : '#94A3B8', whiteSpace:'nowrap' }}>
                   {tab.label}
                 </span>
               </button>
