@@ -987,8 +987,8 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
       <div style={{
         position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
         width: 'calc(100% - 32px)', maxWidth: 340,
-        background: '#fff', borderRadius: 16, padding: '20px 20px 16px',
-        zIndex: 501, boxShadow: '0 10px 15px rgba(0,0,0,0.10)',
+        background: '#e8e8e8', borderRadius: 16, padding: '20px 20px 16px',
+        zIndex: 501,
         animation: 'scaleIn 0.2s ease',
         transformOrigin: 'center center',
         maxHeight: '90vh', overflowY: 'auto',
@@ -1039,10 +1039,13 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
 
         <button onClick={() => selected && onSelect(selected)} style={{
           width: '100%', height: 54, borderRadius: 6, border: 'none', cursor: selected ? 'pointer' : 'default',
-          background: selected ? '#1B6EF3' : '#C8C8C8',
-          color: selected ? '#fff' : '#94A3B8', fontSize: 15, fontWeight: 700,
+          background: '#e8e8e8',
+          color: selected ? '#1B6EF3' : '#94A3B8', fontSize: 15, fontWeight: 700,
           marginTop: 10, marginBottom: 4,
-          boxShadow: selected ? '0 10px 15px rgba(0,0,0,0.10)' : 'none',
+          boxShadow: selected
+            ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+            : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          WebkitTapHighlightColor: 'transparent',
         }}>
           {isStart ? '다음 →' : '완료'}
         </button>
@@ -1072,25 +1075,24 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
       <div onClick={onCancel} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.60)', zIndex:600, animation:'fadeIn 0.2s ease' }}/>
       <div style={{
         position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-        background:'#fff', borderRadius:16, padding:'24px 20px',
+        background:'#e8e8e8', borderRadius:16, padding:'24px 20px',
         zIndex:601, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
         animation:'scaleIn 0.22s ease',
         transformOrigin:'center center',
-        boxShadow:'0 10px 15px rgba(0,0,0,0.10)',
       }}>
         <p style={{ fontSize:16, fontWeight:700, color:'#0F172A', marginBottom: message ? 8 : 20, lineHeight:1.5 }}>{title}</p>
         {message && <p style={{ fontSize:14, color:'#64748B', marginBottom:20, lineHeight:1.6 }}>{message}</p>}
         <div style={{ display:'flex', gap:8 }}>
           {confirmFirst && (
-            <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:6, background: confirmColor ?? '#1B6EF3', color:'#fff', fontWeight:700, fontSize:15, cursor:'pointer' }}>
+            <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:6, background:'#e8e8e8', color: confirmColor ?? '#1B6EF3', fontWeight:700, fontSize:15, cursor:'pointer', boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>
               {confirmLabel}
             </button>
           )}
           {!hideCancel && (
-            <button onClick={onCancel} style={{ flex:1, height:48, border:'1px solid #C8C8C8', borderRadius:6, background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer' }}>취소</button>
+            <button onClick={onCancel} style={{ flex:1, height:48, border:'none', borderRadius:6, background:'#e8e8e8', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer', boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>취소</button>
           )}
           {!confirmFirst && (
-            <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:6, background: confirmColor ?? '#1B6EF3', color:'#fff', fontWeight:700, fontSize:15, cursor:'pointer' }}>
+            <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:6, background:'#e8e8e8', color: confirmColor ?? '#1B6EF3', fontWeight:700, fontSize:15, cursor:'pointer', boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>
               {confirmLabel}
             </button>
           )}
