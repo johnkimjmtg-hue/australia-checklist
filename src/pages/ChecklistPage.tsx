@@ -654,7 +654,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                     } else setDetailBizCards([])
                                   }}
                                   style={{
-                                    fontSize:12, fontWeight:600, color:'#1B6EF3',
+                                    fontSize:11, fontWeight:600, color:'#1B6EF3',
                                     background:'#fff', border:'1px solid #C8C8C8',
                                     borderRadius:20, cursor:'pointer', padding:'3px 10px',
                                     flexShrink:0,
