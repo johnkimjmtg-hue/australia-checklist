@@ -140,7 +140,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         }
         @media (min-width:769px) {
           .cat-scroll::-webkit-scrollbar { height:4px; }
-          .cat-scroll::-webkit-scrollbar-track { background:#F0F4F8; border-radius:2px; }
+          .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
           .cat-scroll::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:2px; }
         }
       `}</style>
@@ -148,7 +148,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       {/* ── 스티키 헤더 ── */}
       <div style={{
         position:'sticky', top:0, zIndex:10,
-        background:'rgba(240,244,248,0.97)', backdropFilter:'blur(10px)',
+        background:'rgba(232,232,232,0.97)', backdropFilter:'blur(10px)',
         padding:'12px 16px 12px',
       }}>
         {/* 전체/북마크/비상연락처 탭 */}
@@ -165,9 +165,9 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
                 height:34, padding:'0 14px', borderRadius:20,
                 cursor:'pointer', fontSize:13, fontWeight:700,
-                background: isActive ? '#1B6EF3' : tab === 'emergency' ? '#DC2626' : '#e8e8e8',
+                background: isActive ? '#1B6EF3' : tab === 'emergency' ? '#DC2626' : '#fff',
                 color: isActive ? '#fff' : tab === 'emergency' ? '#fff' : '#64748B',
-                border: isActive ? '1.5px solid #1B6EF3' : tab === 'emergency' ? '1.5px solid #DC2626' : '1.5px solid #CBD5E1',
+                border: isActive ? '1.5px solid #1B6EF3' : tab === 'emergency' ? '1.5px solid #DC2626' : '1.5px solid #D1D9E3',
                 display:'flex', alignItems:'center', gap:5,
                 whiteSpace:'nowrap',
               }}>
@@ -182,7 +182,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         {serviceTab === 'all' && (<>
         <div style={{
           display:'flex', alignItems:'center', gap:8,
-          background:'#e8e8e8', borderRadius:12, padding:'0 12px',
+          background:'#fff', borderRadius:12, padding:'0 12px',
           border:'1.5px solid #D1D9E3', height:42,
           boxShadow:'0 1px 4px rgba(0,0,0,0.05)',
           marginBottom:10,
@@ -214,12 +214,12 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 onClick={() => { setCategory(cat.id); setShowAll(false) }}
                 style={{
                   height:36, borderRadius:8,
-                  background: isActive ? '#1B6EF3' : '#e8e8e8',
+                  background: isActive ? '#1B6EF3' : '#fff',
                   color: isActive ? '#fff' : '#0F172A',
                   fontSize:12, fontWeight:700,
                   cursor:'pointer', position:'relative',
                   flexShrink:0, width:88,
-                  border: isActive ? '1.5px solid #1B6EF3' : '1.5px solid #CBD5E1',
+                  border: isActive ? '1.5px solid #1B6EF3' : '1.5px solid #D1D9E3',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   whiteSpace:'nowrap',
                 }}>
@@ -351,7 +351,7 @@ function LoadingState() {
     <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
       {[0,1,2].map(i => (
         <div key={i} style={{
-          background:'#e8e8e8', borderRadius:12, padding:'20px 16px',
+          background:'#fff', borderRadius:12, padding:'20px 16px',
           boxShadow:'0 2px 8px rgba(0,0,0,0.06)', opacity:0.6,
         }}>
           <div style={{ height:14, width:'55%', background:'#E2E8F0', borderRadius:6, marginBottom:10 }}/>
@@ -499,7 +499,7 @@ function EmergencyTab() {
 
           {/* 카드 */}
           <div style={{
-            background:'#e8e8e8', borderRadius:12, overflow:'hidden',
+            background:'#fff', borderRadius:12, overflow:'hidden',
             border:`1.5px solid ${group.border}`,
             boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
           }}>
