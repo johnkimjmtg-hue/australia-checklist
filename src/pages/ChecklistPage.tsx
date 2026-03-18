@@ -348,14 +348,20 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff;
         }
         .cat-scroll { overflow-x:auto; }
+        .day-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:#C8C8C8 #e8e8e8; }
+        .day-scroll::-webkit-scrollbar { height:4px; }
+        .day-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
+        .day-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
         @media (max-width:768px) {
-          .cat-scroll { scrollbar-width:none; -ms-overflow-style:none; }
-          .cat-scroll::-webkit-scrollbar { display:none; }
+          .cat-scroll { scrollbar-width:thin; scrollbar-color:#C8C8C8 #e8e8e8; }
+          .cat-scroll::-webkit-scrollbar { height:4px; }
+          .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
+          .cat-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
         }
         @media (min-width:769px) {
           .cat-scroll::-webkit-scrollbar { height:4px; }
           .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
-          .cat-scroll::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:2px; }
+          .cat-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
         }
       `}</style>
 
@@ -849,7 +855,7 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: 
 
   return (
     <div style={{ borderTop:'1px solid #C8C8C8', padding:'10px 16px 12px', background:'#e8e8e8' }}>
-      <div ref={scrollRef} style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4, scrollBehavior:'smooth' }}>
+      <div ref={scrollRef} className="day-scroll" style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4, scrollBehavior:'smooth' }}>
         {days.map((d, idx) => {
           const isActive   = activeDayIdx === idx
           const bg = dayColor(dayCount[idx])
