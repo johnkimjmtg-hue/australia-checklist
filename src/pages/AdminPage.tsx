@@ -1965,6 +1965,7 @@ function ShoppingTab() {
 
   const handleSave = async () => {
     if (!form.name.trim()) return
+    if (form.tags.length === 0) { alert('태그를 최소 1개 이상 선택해주세요.'); return }
     setSaving(true)
     let imageUrl = form.image_url
 
@@ -2090,12 +2091,40 @@ function ShoppingTab() {
 
         {/* 태그 */}
         <div>
-          <span style={labelStyle}>태그 (쉼표로 구분)</span>
-          <input
-            value={form.tags.join(', ')}
-            onChange={e => setForm(f => ({...f, tags: e.target.value.split(',').map(s => s.trim()).filter(Boolean)}))}
-            style={inputStyle} placeholder="인기, 강추, 선물용"
-          />
+          <span style={labelStyle}>태그 <span style={{ color:'#EF4444' }}>*</span> <span style={{ fontSize:11, color:'#94A3B8' }}>(최소 1개 이상 선택)</span></span>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginTop:6 }}>
+            {['인기', '강추', '선물', '프리미엄', '가성비', '필수템', '안사면 후회', '없어서 못삼', '한국보다 저렴', '호주 한정', '약국 인기', '마트 필수', '현지인 추천', '유아동', '건강식품'].map(tag => {
+              const selected = form.tags.includes(tag)
+              return (
+                <label key={tag} style={{
+                  display:'flex', alignItems:'center', gap:5, cursor:'pointer',
+                  fontSize:12, fontWeight: selected ? 700 : 500,
+                  color: selected ? '#1B6EF3' : '#64748B',
+                  background: selected ? '#EFF6FF' : '#F1F5F9',
+                  border: selected ? '1.5px solid #1B6EF3' : '1.5px solid #E2E8F0',
+                  borderRadius:20, padding:'5px 12px',
+                  transition:'all 0.15s',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        setForm(f => ({ ...f, tags: [...f.tags, tag] }))
+                      } else {
+                        setForm(f => ({ ...f, tags: f.tags.filter(t => t !== tag) }))
+                      }
+                    }}
+                    style={{ display:'none' }}
+                  />
+                  {selected ? '✓ ' : ''}{tag}
+                </label>
+              )
+            })}
+          </div>
+          {form.tags.length === 0 && (
+            <div style={{ fontSize:11, color:'#EF4444', marginTop:6 }}>태그를 최소 1개 이상 선택해주세요.</div>
+          )}
         </div>
 
         {/* 옵션 */}
