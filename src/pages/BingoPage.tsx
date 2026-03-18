@@ -620,7 +620,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                   borderRadius:10,
                   overflow:'hidden',
                   cursor:'pointer',
-                  border: isHighlight ? '2px solid #EF4444' : '2px solid #E2E8F0',
+                  border: isHighlight ? '2px solid #EF4444' : '2px solid #C8C8C8',
                   background: '#fff',
                   boxShadow: isHighlight
                     ? '0 2px 10px rgba(239,68,68,0.20)'
@@ -767,7 +767,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                         display:'flex', alignItems:'center', gap:10,
                         background: themeBg, borderRadius:10,
                         padding:'12px 14px', cursor:'pointer',
-                        border:`1.5px solid ${isChecked ? themeColor : '#E2E8F0'}`,
+                        border:`1.5px solid ${isChecked ? themeColor : '#C8C8C8'}`,
                       }}
                     >
                       <div style={{
