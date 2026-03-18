@@ -463,10 +463,11 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
 
   return (
     <div ref={pageRef} style={{
-      minHeight: embedded ? 'auto' : '100vh',
+      height: embedded ? 'auto' : '100vh',
       background: '#e8e8e8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       display: 'flex', flexDirection: 'column',
+      overflow: embedded ? 'visible' : 'hidden',
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -600,7 +601,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       </div>
 
       {/* ── 5x5 빙고판 */}
-      <div style={{ flex:1, padding:'8px 12px 120px', overflowY:'auto' }}>
+      <div style={{ flex:1, padding:'8px 12px 120px', overflowY:'auto', minHeight:0 }}>
         <div style={{
           display:'grid', gridTemplateColumns:'repeat(5, 1fr)',
           gap:6,
