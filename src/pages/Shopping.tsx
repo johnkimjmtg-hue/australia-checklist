@@ -124,7 +124,7 @@ export default function Shopping() {
         background:'#e8e8e8', borderBottom:'1px solid #D1D9E3',
         position:'sticky', top:0, zIndex:20,
       }}>
-        <div style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto', scrollbarWidth:'thin', scrollbarColor:'#C8C8C8 #e8e8e8' }}>
+        <div style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto', scrollbarWidth:'none' }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
             flexShrink:0, height:34, padding:'0 14px', borderRadius:20, cursor:'pointer',
             background: '#e8e8e8', border: 'none',
@@ -159,7 +159,7 @@ export default function Shopping() {
               <span>⭐ 강력 추천</span>
               <div style={{ flex:1, height:1, background:'#E2E8F0' }} />
             </div>
-            <div className="featured-scroll" style={{ display:'flex', gap:10, paddingBottom:8, overflowX:'auto', scrollbarWidth:'thin', scrollbarColor:'#C8C8C8 #e8e8e8' }}>
+            <div className="featured-scroll" style={{ display:'flex', gap:10, paddingBottom:8, overflowX:'auto', scrollbarWidth:'none' }}>
               {featured.map(p => (
                 <div key={p.id} className="prod-card" onClick={() => setSelProduct(p)} style={{
                   flexShrink:0, width:160,
