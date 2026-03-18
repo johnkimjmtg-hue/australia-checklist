@@ -564,7 +564,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         </div>
         <div style={{
           background:'#fff', borderRadius:12,
-          border:'1px solid #E2E8F0',
+          border:'1px solid #C8C8C8',
           padding:'16px 18px', display:'flex', alignItems:'center', gap:16,
         }}>
           <MiniGrid count={checked.size} />
@@ -738,7 +738,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                 return (
                   <div style={{
                     background:'#fff', borderRadius:16, padding:'16px',
-                    marginBottom:12, border:'1px solid #E2E8F0',
+                    marginBottom:12, border:'1px solid #C8C8C8',
                   }}>
                     <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:14 }}>
                       {/* 원형 스탬프 이미지 */}
@@ -820,7 +820,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         </button>
         <button onClick={() => setShowMoreMenu(true)} style={{
           width:44, height:44, borderRadius:12, flexShrink:0,
-          border:'1px solid #E2E8F0', background:'#fff',
+          border:'1px solid #C8C8C8', background:'#fff',
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
           boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
         }}>
@@ -1077,7 +1077,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             <p style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.6 }}>지금까지의 방문 기록이 모두 삭제됩니다.</p>
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={() => setShowReset(false)} style={{
-                flex:1, height:48, border:'1px solid #E2E8F0', borderRadius:6,
+                flex:1, height:48, border:'1px solid #C8C8C8', borderRadius:6,
                 background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer',
               }}>아니요</button>
               <button onClick={() => { setChecked(new Set()); setCheckOrder([]); setShowReset(false) }} style={{
