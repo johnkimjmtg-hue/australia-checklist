@@ -639,15 +639,16 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       }}>{item.label}</span>
                       {(() => {
                         const db = dbItems.find(d => d.id === item.id)
+                        const stateMap: Record<string,string> = {
+                          'NSW':'시드니', 'VIC':'멜번', 'QLD':'브리즈번',
+                          'WA':'퍼스', 'SA':'애들레이드', 'TAS':'태즈매니아',
+                          'ACT':'캔버라', 'NT':'다윈',
+                        }
+                        const region = db?.address
+                          ? (Object.entries(stateMap).find(([k]) => db.address!.toUpperCase().includes(k))?.[1] ?? null)
+                          : null
                         return (
                           <>
-                            {db?.address && (
-                              <span
-                                onClick={e => { e.stopPropagation(); window.open(`https://maps.google.com/?q=${encodeURIComponent(db.address!)}`, '_blank') }}
-                                style={{ fontSize:11, color:'#1B6EF3', fontWeight:500, cursor:'pointer', textDecoration:'underline', textDecorationColor:'rgba(27,110,243,0.3)' }}>
-                                📍 {db.address}
-                              </span>
-                            )}
                             {db?.description && (
                               <span style={{
                                 fontSize:11, color:'#94A3B8', fontWeight:400,
@@ -656,21 +657,19 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                               }}>{db.description}</span>
                             )}
                             {(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0 || db?.tips) && (
-                              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:4 }}>
-                                {db?.address ? (() => {
-                                  const stateMap: Record<string,string> = {
-                                    'NSW':'시드니 지역', 'VIC':'멜번 지역', 'QLD':'브리즈번 지역',
-                                    'WA':'퍼스 지역', 'SA':'애들레이드 지역', 'TAS':'태즈매니아',
-                                    'ACT':'캔버라', 'NT':'노던 테리토리',
-                                  }
-                                  const matched = Object.entries(stateMap).find(([k]) => db.address!.toUpperCase().includes(k))
-                                  return matched ? (
-                                    <span style={{ fontSize:10, color:'#94A3B8', fontWeight:500, display:'flex', alignItems:'center', gap:3 }}>
-                                      <Icon icon="ph:map-pin" width={11} height={11} color="#94A3B8" />
-                                      {matched[1]}
-                                    </span>
-                                  ) : <span />
-                                })() : <span />}
+                              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:5 }}>
+                                {region ? (
+                                  <span style={{
+                                    fontSize:10, fontWeight:700, color:'#64748B',
+                                    background:'#e8e8e8',
+                                    border:'1px solid #C8C8C8',
+                                    borderRadius:20, padding:'2px 9px',
+                                    display:'flex', alignItems:'center', gap:3,
+                                  }}>
+                                    <Icon icon="ph:map-pin-simple" width={10} height={10} color="#94A3B8" />
+                                    {region}
+                                  </span>
+                                ) : <span />}
                                 <button
                                   onClick={async e => {
                                     e.stopPropagation()
@@ -682,10 +681,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                     } else setDetailBizCards([])
                                   }}
                                   style={{
-                                    fontSize:10, fontWeight:700,
-                                    color:'#fff', background:'#1B6EF3',
-                                    border:'none', borderRadius:20, cursor:'pointer',
-                                    padding:'3px 10px',
+                                    fontSize:10, fontWeight:700, color:'#1B6EF3',
+                                    background:'#e8e8e8',
+                                    border:'1px solid #C8C8C8',
+                                    borderRadius:20, cursor:'pointer',
+                                    padding:'2px 10px',
+                                    boxShadow:'2px 2px 4px #d0d0d0, -2px -2px 4px #ffffff',
                                   }}>
                                   자세히 알아보기 ›
                                 </button>
