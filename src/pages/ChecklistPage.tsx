@@ -5,7 +5,7 @@ import { CheckItem } from '../data/checklist'
 import { supabase } from '../lib/supabase'
 
 type Category = { id: string; label: string; emoji: string; sort_order: number }
-type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null }
+type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null; image_url?: string | null; tips?: string | null }
 import {
   AppState, TripInfo,
   toggleItem, setSchedule, setCategory, addCustom,
@@ -62,6 +62,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [shopCount, setShopCount] = useState(0)
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
   const [detailBiz, setDetailBiz] = useState<Business|null>(null)
+  const [detailItem, setDetailItem] = useState<DBItem|null>(null)
+  const [detailBizCards, setDetailBizCards] = useState<Business[]>([])
 
   useEffect(() => {
     async function fetchBizCount() {
@@ -599,12 +601,31 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       )}
                     </button>
 
-                    {/* 단색 아이콘 */}
-                    <Icon
-                      icon={dbItems.find(d => d.id === item.id)?.icon ?? CAT_ICON_MAP[(item as any).categoryId] ?? 'ph:star'}
-                      width={20} height={20}
-                      color={checked ? '#78716C' : '#CBD5E1'}
-                    />
+                    {/* 단색 아이콘 or 썸네일 */}
+                    {(() => {
+                      const db = dbItems.find(d => d.id === item.id)
+                      return db?.image_url ? (
+                        <img
+                          src={db.image_url} alt=""
+                          onClick={async e => {
+                            e.stopPropagation()
+                            setDetailItem(db)
+                            if ((db.related_business_ids?.length ?? 0) > 0) {
+                              const ids = db.related_business_ids!
+                              const { data } = await supabase.from('businesses').select('*').in('id', ids)
+                              setDetailBizCards(data ?? [])
+                            } else setDetailBizCards([])
+                          }}
+                          style={{ width:48, height:48, borderRadius:8, objectFit:'cover', flexShrink:0, cursor:'pointer', border:'1px solid #E2E8F0' }}
+                        />
+                      ) : (
+                        <Icon
+                          icon={db?.icon ?? CAT_ICON_MAP[(item as any).categoryId] ?? 'ph:star'}
+                          width={20} height={20}
+                          color={checked ? '#78716C' : '#CBD5E1'}
+                        />
+                      )
+                    })()}
 
                     {/* 제목 + address + description */}
                     <div style={{ flex:1, display:'flex', flexDirection:'column', gap:2, minWidth:0 }}
@@ -614,6 +635,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                         color: checked ? '#0F172A' : '#64748B',
                         cursor: checked && showScheduleView ? 'pointer' : 'default',
                         lineHeight:1.4,
+                        display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden',
                       }}>{item.label}</span>
                       {(() => {
                         const db = dbItems.find(d => d.id === item.id)
@@ -630,8 +652,26 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                               <span style={{
                                 fontSize:11, color:'#94A3B8', fontWeight:400,
                                 overflow:'hidden', textOverflow:'ellipsis',
-                                display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
+                                display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical',
                               }}>{db.description}</span>
+                            )}
+                            {(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0) && (
+                              <button
+                                onClick={async e => {
+                                  e.stopPropagation()
+                                  if (!db) return
+                                  setDetailItem(db)
+                                  if ((db.related_business_ids?.length ?? 0) > 0) {
+                                    const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
+                                    setDetailBizCards(data ?? [])
+                                  } else setDetailBizCards([])
+                                }}
+                                style={{
+                                  alignSelf:'flex-start', fontSize:10, fontWeight:600, color:'#1B6EF3',
+                                  background:'none', border:'none', cursor:'pointer', padding:'2px 0', marginTop:2,
+                                }}>
+                                자세히 알아보기 ›
+                              </button>
                             )}
                             {((db?.related_business_ids?.length ?? 0) > 0 || db?.related_business_id) && (
                               <div style={{ display:'flex', gap:4, flexWrap:'wrap', marginTop:2 }}>
@@ -774,6 +814,112 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
           achieved={achieved}
           onClose={() => setShowReceipt(false)} onReset={() => setModal('confirmReset')} />
+      )}
+
+      {/* 버킷리스트 상세 팝업 */}
+      {detailItem && (
+        <div onClick={() => setDetailItem(null)} style={{
+          position:'fixed', inset:0, zIndex:600,
+          background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)',
+          display:'flex', alignItems:'flex-end', justifyContent:'center',
+          fontFamily:"'Pretendard','Noto Sans KR',sans-serif",
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            width:'100%', maxWidth:390,
+            background:'#e8e8e8', borderRadius:'20px 20px 0 0',
+            maxHeight:'88vh', overflowY:'auto',
+            animation:'slideUpSheet 0.25s ease',
+          }}>
+            {/* 사진 (있을 때만) */}
+            {detailItem.image_url && (
+              <img src={detailItem.image_url} alt="" style={{
+                width:'100%', height:200, objectFit:'cover',
+                borderRadius:'20px 20px 0 0',
+              }} />
+            )}
+            <div style={{ padding:'20px 20px 36px' }}>
+              {/* 핸들 (사진 없을 때만) */}
+              {!detailItem.image_url && (
+                <div style={{ width:36, height:4, background:'#C8C8C8', borderRadius:2, margin:'0 auto 16px' }} />
+              )}
+              {/* 제목 */}
+              <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', lineHeight:1.4, marginBottom:12 }}>
+                {detailItem.label}
+              </div>
+              {/* 설명 */}
+              {detailItem.description && (
+                <div style={{ fontSize:14, color:'#475569', lineHeight:1.7, marginBottom:16, whiteSpace:'pre-wrap' }}>
+                  {detailItem.description}
+                </div>
+              )}
+              {/* 팁 */}
+              {detailItem.tips && (
+                <div style={{
+                  background:'#fff', border:'1px solid #C8C8C8', borderRadius:12,
+                  padding:'12px 14px', marginBottom:16,
+                }}>
+                  <div style={{ fontSize:12, fontWeight:700, color:'#F59E0B', marginBottom:6 }}>💡 현지인 팁</div>
+                  <div style={{ fontSize:13, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
+                </div>
+              )}
+              {/* 주소 */}
+              {detailItem.address && (
+                <button
+                  onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')}
+                  style={{
+                    display:'flex', alignItems:'center', gap:8, width:'100%',
+                    background:'#fff', border:'1px solid #C8C8C8', borderRadius:12,
+                    padding:'12px 14px', marginBottom:16, cursor:'pointer', textAlign:'left',
+                  }}>
+                  <Icon icon="ph:map-pin" width={18} height={18} color="#1B6EF3" />
+                  <div>
+                    <div style={{ fontSize:11, color:'#94A3B8', fontWeight:500 }}>여기서 할 수 있어요</div>
+                    <div style={{ fontSize:13, color:'#1B6EF3', fontWeight:600, textDecoration:'underline' }}>{detailItem.address}</div>
+                  </div>
+                  <Icon icon="ph:arrow-square-out" width={14} height={14} color="#94A3B8" style={{ marginLeft:'auto' }} />
+                </button>
+              )}
+              {/* 관련 업체 카드 */}
+              {detailBizCards.length > 0 && (
+                <div style={{ marginBottom:16 }}>
+                  <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:8 }}>🏪 여기서 예약·구매할 수 있어요</div>
+                  <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                    {detailBizCards.map(biz => (
+                      <div key={biz.id} style={{
+                        background:'#fff', border:'1px solid #C8C8C8', borderRadius:12,
+                        padding:'12px 14px', display:'flex', alignItems:'center', gap:10,
+                      }}>
+                        {biz.image_url
+                          ? <img src={biz.image_url} alt="" style={{ width:40, height:40, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
+                          : <div style={{ width:40, height:40, borderRadius:8, background:'#F1F5F9', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                              <Icon icon="ph:buildings" width={20} height={20} color="#94A3B8" />
+                            </div>
+                        }
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ fontSize:13, fontWeight:700, color:'#0F172A', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{biz.name}</div>
+                          {biz.address && <div style={{ fontSize:11, color:'#94A3B8', marginTop:2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>📍 {biz.address}</div>}
+                        </div>
+                        {biz.website && (
+                          <button onClick={() => window.open(biz.website, '_blank')} style={{
+                            background:'#e8e8e8', border:'none', borderRadius:8, padding:'6px 10px',
+                            fontSize:11, fontWeight:600, color:'#1B6EF3', cursor:'pointer', flexShrink:0,
+                            boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                          }}>바로가기</button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* 닫기 버튼 */}
+              <button onClick={() => setDetailItem(null)} style={{
+                width:'100%', height:48, borderRadius:12, border:'none',
+                background:'#e8e8e8', color:'#64748B', fontSize:14, fontWeight:700,
+                cursor:'pointer', boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              }}>닫기</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* 관련업체 팝업 */}

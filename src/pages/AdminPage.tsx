@@ -35,7 +35,7 @@ const EMPTY_FORM = {
 
 // ── 체크리스트 타입 (DB 기반)
 type Cat  = { id:string; label:string; emoji:string; sort_order:number }
-type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean; address?:string|null; description?:string|null; related_business_id?:string|null; related_business_ids?:string[]|null }
+type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean; address?:string|null; description?:string|null; related_business_id?:string|null; related_business_ids?:string[]|null; image_url?:string|null; tips?:string|null }
 
 const EMOJI_MAP: [string[], string][] = [
   [['크림','로션','에센스','토너','팩'], '🧴'],
@@ -926,7 +926,7 @@ function ItemsTab({ cats, items, setItems }: {
     showToast('저장됨')
   }
 
-  async function saveDetail(id: string, field: 'address'|'description', val: string) {
+  async function saveDetail(id: string, field: 'address'|'description'|'tips'|'image_url', val: string) {
     const value = val.trim() || null
     await supabase.from('checklist_items').update({ [field]: value }).eq('id', id)
     setItems(items.map(i => i.id===id ? {...i, [field]: value} : i))
@@ -937,6 +937,25 @@ function ItemsTab({ cats, items, setItems }: {
     await supabase.from('checklist_items').update({ related_business_ids: ids }).eq('id', id)
     setItems(items.map(i => i.id===id ? {...i, related_business_ids: ids} : i))
     showToast('저장됨')
+  }
+
+  async function uploadItemImage(id: string, file: File) {
+    setSaving(true)
+    const ext = file.name.split('.').pop()
+    const path = `checklist/${id}_${Date.now()}.${ext}`
+    const { error: upErr } = await supabase.storage.from('shopping-images').upload(path, file, { upsert: true })
+    if (upErr) { showToast('이미지 업로드 실패'); setSaving(false); return }
+    const { data: { publicUrl } } = supabase.storage.from('shopping-images').getPublicUrl(path)
+    await supabase.from('checklist_items').update({ image_url: publicUrl }).eq('id', id)
+    setItems(items.map(i => i.id===id ? {...i, image_url: publicUrl} : i))
+    showToast('이미지 저장됨')
+    setSaving(false)
+  }
+
+  async function deleteItemImage(id: string) {
+    await supabase.from('checklist_items').update({ image_url: null }).eq('id', id)
+    setItems(items.map(i => i.id===id ? {...i, image_url: null} : i))
+    showToast('이미지 삭제됨')
   }
 
   async function updateIcon(id: string, icon: string) {
@@ -1125,27 +1144,65 @@ function ItemsTab({ cats, items, setItems }: {
               <div style={{
                 border:'1px solid #E2E8F0', borderTop:'none',
                 borderRadius:'0 0 10px 10px', padding:'12px 14px',
-                background:'#F8FAFC', display:'flex', flexDirection:'column', gap:8,
+                background:'#F8FAFC', display:'flex', flexDirection:'column', gap:10,
               }}>
+                {/* 이미지 업로드 */}
+                <div style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
+                  <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0, paddingTop:4 }}>🖼 이미지</span>
+                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:6 }}>
+                    {item.image_url && (
+                      <div style={{ position:'relative', display:'inline-block' }}>
+                        <img src={item.image_url} alt="" style={{ width:120, height:80, objectFit:'cover', borderRadius:8, border:'1px solid #E2E8F0' }} />
+                        <button onClick={() => deleteItemImage(item.id)} style={{
+                          position:'absolute', top:4, right:4, background:'rgba(0,0,0,0.5)',
+                          border:'none', borderRadius:4, color:'#fff', fontSize:11, cursor:'pointer', padding:'2px 5px'
+                        }}>✕</button>
+                      </div>
+                    )}
+                    <label style={{
+                      display:'inline-block', padding:'6px 12px', borderRadius:8,
+                      border:'1.5px dashed #CBD5E1', fontSize:12, color:'#64748B',
+                      cursor:'pointer', background:'#fff', textAlign:'center'
+                    }}>
+                      {item.image_url ? '이미지 교체' : '+ 이미지 업로드'}
+                      <input type="file" accept="image/*" style={{ display:'none' }}
+                        onChange={e => { const f = e.target.files?.[0]; if(f) uploadItemImage(item.id, f) }} />
+                    </label>
+                  </div>
+                </div>
+                {/* Suburb */}
                 <div style={{ display:'flex', gap:8, alignItems:'center' }}>
                   <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0 }}>📍 Suburb</span>
                   <input
                     defaultValue={item.address ?? ''}
                     onBlur={e => saveDetail(item.id, 'address', e.target.value)}
-                    placeholder="예: Surry Hills"
+                    placeholder="예: Surry Hills NSW 2010"
                     style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px' }}
                   />
                 </div>
+                {/* 설명 */}
                 <div style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
                   <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0, paddingTop:6 }}>📝 설명</span>
                   <textarea
                     defaultValue={item.description ?? ''}
                     onBlur={e => saveDetail(item.id, 'description', e.target.value)}
-                    placeholder="한 줄 설명 (선택)"
+                    placeholder="왜 호주에서 꼭 해야 하는지 어필하는 설명 (길게 써도 됩니다)"
+                    rows={5}
+                    style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px', resize:'vertical' }}
+                  />
+                </div>
+                {/* 팁 */}
+                <div style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
+                  <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0, paddingTop:6 }}>💡 팁</span>
+                  <textarea
+                    defaultValue={item.tips ?? ''}
+                    onBlur={e => saveDetail(item.id, 'tips', e.target.value)}
+                    placeholder="현지인 꿀팁 (예: 오전 일찍 가야 줄 짧아요)"
                     rows={2}
                     style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px', resize:'vertical' }}
                   />
                 </div>
+                {/* 관련업체 */}
                 <div style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
                   <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0, paddingTop:6 }}>🏢 관련업체</span>
                   <EditBizMultiSearch
