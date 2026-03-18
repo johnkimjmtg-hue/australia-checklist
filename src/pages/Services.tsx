@@ -133,6 +133,8 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     <div style={{ minHeight:'100vh', background:'#e8e8e8', fontFamily:ff, paddingBottom:40 }}>
       <style>{`
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
+        .svc-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .svc-btn:active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff !important; transform: scale(0.97); }
         .cat-scroll { overflow-x:auto; }
         @media (max-width:768px) {
           .cat-scroll { scrollbar-width:none; -ms-overflow-style:none; }
@@ -162,7 +164,9 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             const inactiveShadow = tab === 'emergency' ? '0 1px 3px rgba(220,38,38,0.3)' : '0 1px 3px rgba(0,0,0,0.07)'
             const label = tab === 'all' ? '전체 업종' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
             return (
-              <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
+              <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }}
+                className="svc-btn"
+                style={{
                 height:34, padding:'0 14px', borderRadius:20,
                 cursor:'pointer', fontSize:13, fontWeight:700,
                 background: '#e8e8e8',
@@ -213,7 +217,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             const count = catCounts[cat.id] || 0
             if (cat.id !== 'all' && count === 0) return null
             return (
-              <button key={cat.id} className="chip-btn"
+              <button key={cat.id} className="chip-btn svc-btn"
                 onClick={() => { setCategory(cat.id); setShowAll(false) }}
                 style={{
                   height:36, borderRadius:8,
