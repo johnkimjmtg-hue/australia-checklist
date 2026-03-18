@@ -27,7 +27,6 @@ type Props = {
   onLanding:   () => void
 }
 
-/* ══ 아이템별 아이코니파이 단색 아이콘 매핑 ══ */
 const CAT_ICONS: Record<string,string> = {
   hospital:'ph:first-aid-kit',food:'ph:fork-knife',shopping:'ph:shopping-bag',
   admin:'ph:files',people:'ph:users',parenting:'ph:baby',places:'ph:map-pin',
@@ -37,7 +36,6 @@ function ItemIcon({ itemId, categoryId, color }: { itemId:string; categoryId:str
   return <Icon icon={ITEM_ICONS[itemId] ?? CAT_ICONS[categoryId] ?? 'ph:star'} width={20} height={20} color={color} />
 }
 
-/* ══ 꽃가루 ══ */
 interface Particle { id:number; x:number; color:string; size:number; duration:number; delay:number }
 function Confetti({ trigger }: { trigger:number }) {
   const [particles, setParticles] = useState<Particle[]>([])
@@ -67,7 +65,6 @@ function Confetti({ trigger }: { trigger:number }) {
   )
 }
 
-/* ══ 동전 스택 (원형 동전) ══ */
 function CoinStack({ count, total }: { count:number; total:number }) {
   const maxCoins = 8
   const filled   = total > 0 ? Math.round((count / total) * maxCoins) : 0
@@ -80,8 +77,7 @@ function CoinStack({ count, total }: { count:number; total:number }) {
             width: 28, height: 14, borderRadius: '50%',
             background: isGold
               ? 'radial-gradient(ellipse at 35% 35%, #FFE566, #FFCD00 60%, #C8960C)'
-              : '#E2E8F0',
-            boxShadow: isGold ? '0 2px 4px rgba(180,130,0,0.35), inset 0 1px 2px rgba(255,255,255,0.5)' : 'none',
+              : '#C8C8C8',
             transition: `all 0.3s ease ${i * 0.06}s`,
             animation: isGold ? `coinPop 0.3s ease ${i * 0.06}s both` : 'none',
           }}/>
@@ -94,13 +90,12 @@ function CoinStack({ count, total }: { count:number; total:number }) {
   )
 }
 
-/* ══ 원형 그래프 ══ */
 function CircleProgress({ pct }: { pct:number }) {
   const R = 44, C = 2*Math.PI*R
   return (
     <div style={{ position:'relative',width:100,height:100,flexShrink:0 }}>
       <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
-        <circle cx={50} cy={50} r={R} fill="none" stroke="#F1F5F9" strokeWidth={10}/>
+        <circle cx={50} cy={50} r={R} fill="none" stroke="#C8C8C8" strokeWidth={10}/>
         <circle cx={50} cy={50} r={R} fill="none" stroke="#FFCD00" strokeWidth={10}
           strokeDasharray={C} strokeDashoffset={C-(pct/100)*C} strokeLinecap="round"
           style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)' }}
@@ -113,7 +108,6 @@ function CircleProgress({ pct }: { pct:number }) {
   )
 }
 
-/* ══ 전체 완료 팝업 ══ */
 function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>void; onClose:()=>void }) {
   return (
     <>
@@ -121,8 +115,8 @@ function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>v
       <div style={{
         position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
         width:'calc(100% - 40px)',maxWidth:320,
-        background:'#fff',borderRadius:20,padding:'32px 24px 24px',
-        zIndex:701,textAlign:'center',boxShadow:'0 24px 48px rgba(0,0,0,0.20)',
+        background:'#e8e8e8',borderRadius:20,padding:'32px 24px 24px',
+        zIndex:701,textAlign:'center',
       }}>
         <div style={{ fontSize:52,marginBottom:8 }}>🎉</div>
         <div style={{ fontSize:22,fontWeight:800,color:'#1B6EF3',marginBottom:8 }}>축하합니다!</div>
@@ -132,12 +126,14 @@ function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>v
         </div>
         <div style={{ display:'flex',gap:8 }}>
           <button onClick={onClose} style={{
-            flex:1,height:48,borderRadius:8,border:'1px solid #E2E8F0',
-            background:'#fff',color:'#64748B',fontSize:14,fontWeight:600,cursor:'pointer',
+            flex:1,height:48,borderRadius:8,border:'1px solid #C8C8C8',
+            background:'#e8e8e8',color:'#64748B',fontSize:14,fontWeight:600,cursor:'pointer',
+            boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           }}>닫기</button>
           <button onClick={onReset} style={{
             flex:2,height:48,borderRadius:8,border:'none',
-            background:'#1B6EF3',color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer',
+            background:'#e8e8e8',color:'#1B6EF3',fontSize:14,fontWeight:700,cursor:'pointer',
+            boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           }}>다시 시작하기</button>
         </div>
       </div>
@@ -145,7 +141,6 @@ function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>v
   )
 }
 
-/* ══ 삭제 확인 모달 ══ */
 function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=>void }) {
   return (
     <>
@@ -153,21 +148,20 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=
       <div style={{
         position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
         width:'calc(100% - 48px)',maxWidth:300,
-        background:'#fff',borderRadius:16,padding:'28px 20px 20px',
-        zIndex:601,textAlign:'center',boxShadow:'0 20px 40px rgba(0,0,0,0.15)',
+        background:'#e8e8e8',borderRadius:16,padding:'28px 20px 20px',
+        zIndex:601,textAlign:'center',
       }}>
         <p style={{ fontSize:17,fontWeight:700,color:'#1E293B',marginBottom:8 }}>버킷리스트를 삭제할까요?</p>
         <p style={{ fontSize:14,color:'#64748B',lineHeight:1.6,marginBottom:24 }}>모든 체크 내용과 일정이 삭제됩니다.</p>
         <div style={{ display:'flex',gap:8 }}>
-          <button onClick={onCancel} style={{ flex:1,height:48,borderRadius:6,border:'1px solid #E2E8F0',background:'#fff',color:'#64748B',fontSize:15,fontWeight:600,cursor:'pointer' }}>취소</button>
-          <button onClick={onConfirm} style={{ flex:2,height:48,borderRadius:6,border:'none',background:'#DC2626',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer' }}>삭제하기</button>
+          <button onClick={onCancel} style={{ flex:1,height:48,borderRadius:6,border:'1px solid #C8C8C8',background:'#e8e8e8',color:'#64748B',fontSize:15,fontWeight:600,cursor:'pointer',boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>취소</button>
+          <button onClick={onConfirm} style={{ flex:2,height:48,borderRadius:6,border:'none',background:'#e8e8e8',color:'#DC2626',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>삭제하기</button>
         </div>
       </div>
     </>
   )
 }
 
-/* ══ 메인 ══ */
 export default function BucketCheckView({ state, trip, setState, items, dbItems, onAchievedChange, onEdit, onDelete, onShare, onServices, onShopping, onBingo, onCommunity, onLanding }: Props) {
   const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
@@ -214,7 +208,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   })
   const sortedDays = Array.from(byDay.keys()).sort((a,b)=>a-b)
 
-  // total = 날짜별 행 수 기준 (1개 아이템 4일 배정 → 4개)
   const allRows: { id: string; day?: number }[] = []
   checkedItems.forEach(item => {
     const days = state.schedules[item.id] ?? []
@@ -240,9 +233,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
     if (!wasAchieved) {
       const newCount = allRows.filter(r => !!next[getKey(r.id, r.day)]).length
       const isLast = newCount === total
-      if (!isLast) {
-        setConfettiTrigger(t => t+1)
-      }
+      if (!isLast) setConfettiTrigger(t => t+1)
     }
   }
 
@@ -254,7 +245,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   const achievedCount = allRows.filter(r => !!achieved[getKey(r.id, r.day)]).length
   const pct = total > 0 ? Math.round((achievedCount/total)*100) : 0
 
-  // 전체 완료 감지
   useEffect(() => {
     if (total > 0 && achievedCount === total && prevAchieved.current < total) {
       setTimeout(() => {
@@ -265,7 +255,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
     prevAchieved.current = achievedCount
   }, [achievedCount, total])
 
-  // row 기준 필터: 날짜별로 각각 체크
   const isRowDone = (id: string, day?: number) => !!achieved[getKey(id, day)]
   const filterRow = (id: string, day?: number) =>
     filter==='done' ? isRowDone(id, day) : filter==='todo' ? !isRowDone(id, day) : true
@@ -274,7 +263,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
     { key:'all', label:'전체' }, { key:'todo', label:'미완료' }, { key:'done', label:'완료' },
   ]
 
-  /* ══ 체크 행 ══ */
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
   const [detailBiz, setDetailBiz] = useState<any>(null)
 
@@ -286,14 +274,13 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         display:'flex',alignItems:'flex-start',gap:12,
         padding:'12px 16px',margin:'0 16px',borderRadius:12,
         background: isAchieved ? '#fff8e4' : '#fff',
-        border:'1px solid #E2E8F0',
-        borderLeft: isAchieved ? '4px solid #16A34A' : '4px solid #CBD5E1',
-        boxShadow: isAchieved ? '0 4px 12px rgba(180,130,0,0.10)' : '0 4px 16px rgba(0,0,0,0.08)',
+        border:'1px solid #C8C8C8',
+        borderLeft: isAchieved ? '4px solid #16A34A' : '4px solid #C8C8C8',
         minHeight:52,transition:'all 0.15s ease',
       }}>
         <div onClick={() => toggleAchieved(item.id, day)} style={{
           width:22,height:22,borderRadius:4,flexShrink:0,
-          border: isAchieved ? 'none' : '1.5px solid #CBD5E1',
+          border: isAchieved ? 'none' : '1px solid #C8C8C8',
           background: isAchieved ? '#16A34A' : '#fff',
           display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s',
           cursor:'pointer',
@@ -356,7 +343,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   }
 
   return (
-    <div ref={pageRef} style={{ minHeight:'100vh', background:'#F0F4F8', fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif', maxWidth:480, margin:'0 auto', position:'relative' }}>
+    <div ref={pageRef} style={{ minHeight:'100vh', background:'#e8e8e8', fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif', maxWidth:480, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
@@ -369,37 +356,54 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           60%  { transform:translateY(-3px) scale(1.1); opacity:1; }
           100% { transform:translateY(0) scale(1); opacity:1; }
         }
+        .neu-tab {
+          background: #e8e8e8;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          transition: all 0.15s ease;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+          box-shadow: 3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff;
+          border-radius: 10px;
+        }
+        .neu-tab.active {
+          box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff;
+        }
+        .neu-tab:active {
+          box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff;
+        }
       `}</style>
 
       <Confetti trigger={confettiTrigger} />
 
       {/* ══ 헤더 + 탭 ══ */}
-      <div style={{ background:'#fff' }}>
-        <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px 0' }}>
+      <div style={{ background:'#e8e8e8', paddingBottom:8 }}>
+        <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px 12px' }}>
           <span onClick={handleLogoTap}
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
           <span style={{ fontSize:13,color:'#64748B',fontWeight:600 }}>{achievedCount}/{total}</span>
         </div>
-        <div style={{ display:'flex', padding:'8px 8px 0', gap:2, overflowX:'auto', scrollbarWidth:'none' }}>
+        <div style={{ display:'flex', padding:'0 10px', gap:8, overflowX:'auto', scrollbarWidth:'none' }}>
           {([
             { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트', action: () => {} },
-            { id:'services',   icon:'ph:buildings',    label:'업체/서비스', action: onServices },
-            { id:'shopping',   icon:'ph:shopping-bag', label:'호주쇼핑리스트',   action: onShopping },
-            { id:'bingo',      icon:'ph:coffee',       label:'카페도장깨기',   action: onBingo },
-            { id:'community',  icon:'ph:chats-circle', label:'커뮤니티',   action: onCommunity },
+            { id:'services',   icon:'ph:buildings',    label:'업체리스트', action: onServices },
+            { id:'shopping',   icon:'ph:shopping-bag', label:'쇼핑리스트', action: onShopping },
+            { id:'bingo',      icon:'ph:coffee',       label:'카페빙고게임', action: onBingo },
+            { id:'community',  icon:'ph:chats-circle', label:'채팅방', action: onCommunity },
           ]).map(tab => {
             const active = tab.id === 'bucketlist'
             return (
-              <button key={tab.id} onClick={tab.action} style={{
-                flex:1, minWidth:0, height:48, border:'none', cursor:'pointer',
-                borderRadius:'6px 6px 0 0',
-                display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2,
-                background: active ? '#1B6EF3' : 'transparent',
-                borderBottom: active ? '2px solid #1B6EF3' : '2px solid transparent',
-              }}>
-                <Icon icon={tab.icon} width={16} height={16} color={active ? '#fff' : '#475569'} />
-                <span style={{ fontSize:10, fontWeight: active ? 700 : 500, color: active ? '#fff' : '#475569', whiteSpace:'nowrap' }}>
+              <button key={tab.id} onClick={tab.action}
+                className={`neu-tab${active ? ' active' : ''}`}
+                style={{ flex:1, minWidth:0, height:52 }}>
+                <Icon icon={tab.icon} width={16} height={16} color={active ? '#1B6EF3' : '#94A3B8'} />
+                <span style={{ fontSize:9, fontWeight: active ? 700 : 500, color: active ? '#1B6EF3' : '#94A3B8', whiteSpace:'nowrap' }}>
                   {tab.label}
                 </span>
               </button>
@@ -408,12 +412,12 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         </div>
       </div>
 
-      {/* ══ 진행 카드 — sticky ══ */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background:'#F0F4F8', padding:'16px 16px 0' }}>
+      {/* ══ 진행 카드 ══ */}
+      <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'16px 16px 0' }}>
         <div style={{
-          background:'#fff',borderRadius:12,
-          boxShadow:'0 4px 20px rgba(27,110,243,0.10),0 1px 4px rgba(0,0,0,0.06)',
-          padding:'20px',display:'flex',alignItems:'center',gap:20,
+          background:'#fff', borderRadius:12,
+          border:'1px solid #C8C8C8',
+          padding:'20px', display:'flex', alignItems:'center', gap:20,
         }}>
           <CircleProgress pct={pct} />
           <div style={{ flex:1 }}>
@@ -427,7 +431,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             </div>
             <div style={{ fontSize:13,color:'#94A3B8',lineHeight:1.5 }}>나만의 버킷리스트 꼭 완료하세요.</div>
           </div>
-          {/* 동전 스택 */}
           <CoinStack count={achievedCount} total={total} />
         </div>
       </div>
@@ -437,11 +440,15 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         <span style={{ fontSize:12,color:'#94A3B8',fontWeight:600,flexShrink:0 }}>필터</span>
         {FILTERS.map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)} style={{
-            height:30,padding:'0 14px',borderRadius:6,
-            border:`1px solid ${filter===f.key ? '#1B6EF3' : '#E2E8F0'}`,
-            background: filter===f.key ? '#1B6EF3' : 'transparent',
-            color: filter===f.key ? '#fff' : '#64748B',
-            fontSize:13,fontWeight:filter===f.key?700:500,cursor:'pointer',transition:'all 0.15s',
+            height:30, padding:'0 14px', borderRadius:6,
+            border:'none',
+            background:'#e8e8e8',
+            color: filter===f.key ? '#1B6EF3' : '#94A3B8',
+            fontSize:13, fontWeight: filter===f.key ? 700 : 500, cursor:'pointer',
+            boxShadow: filter===f.key
+              ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+              : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+            WebkitTapHighlightColor:'transparent',
           }}>{f.label}</button>
         ))}
       </div>
@@ -496,25 +503,28 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         left:'50%', transform:'translateX(-50%)',
         width: footerWidth ?? '100%',
         padding:'12px 14px 20px',
-        background:'#fff',
+        background:'#e8e8e8',
         zIndex:20, boxSizing:'border-box',
         display:'flex', gap:8,
+        borderTop:'1px solid #C8C8C8',
       }}>
         <button onClick={onLanding} style={{
           flex:1, height:44, borderRadius:8, border:'none',
-          background:'#1B6EF3', color:'#fff',
+          background:'#e8e8e8', color:'#1B6EF3',
           fontSize:15, fontWeight:700, cursor:'pointer',
-          boxShadow:'0 4px 12px rgba(27,110,243,0.25)',
+          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+          WebkitTapHighlightColor:'transparent',
         }}>
-          <Icon icon="ph:check-circle" width={18} height={18} color="#fff" />
+          <Icon icon="ph:check-circle" width={18} height={18} color="#1B6EF3" />
           저장하고 나가기
         </button>
         <button onClick={() => setShowMoreMenu(true)} style={{
           width:44, height:44, borderRadius:12, flexShrink:0,
-          border:'1px solid #E2E8F0', background:'#fff',
+          border:'none', background:'#e8e8e8',
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-          boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
+          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          WebkitTapHighlightColor:'transparent',
         }}>
           <Icon icon="ph:dots-three-vertical" width={20} height={20} color="#64748B" />
         </button>
@@ -529,33 +539,35 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         }} onClick={() => setShowMoreMenu(false)}>
           <div style={{
             width:'100%', maxWidth:390,
-            background:'#fff', borderRadius:'20px 20px 0 0',
+            background:'#e8e8e8', borderRadius:'20px 20px 0 0',
             padding:'20px 16px 36px',
-            boxShadow:'0 -4px 24px rgba(0,0,0,0.15)',
           }} onClick={e => e.stopPropagation()}>
-            <div style={{ width:40, height:4, borderRadius:2, background:'#E2E8F0', margin:'0 auto 20px' }} />
+            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'0 auto 20px' }} />
             <div style={{ fontSize:13, fontWeight:800, color:'#94A3B8', marginBottom:14, letterSpacing:0.5 }}>더보기</div>
             <button onClick={() => { setShowMoreMenu(false); onShare() }} style={{
               width:'100%', height:52, borderRadius:12, border:'none',
-              background:'#1B6EF3', color:'#fff',
+              background:'#e8e8e8', color:'#1B6EF3',
               fontSize:15, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
+              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
             }}>
-              <Icon icon="ph:share-network" width={18} height={18} color="#fff" />공유하기
+              <Icon icon="ph:share-network" width={18} height={18} color="#1B6EF3" />공유하기
             </button>
             <button onClick={() => { setShowMoreMenu(false); onEdit() }} style={{
-              width:'100%', height:52, borderRadius:12,
-              border:'1.5px solid #D1D9E3', background:'#F8FAFC', color:'#1E293B',
+              width:'100%', height:52, borderRadius:12, border:'none',
+              background:'#e8e8e8', color:'#64748B',
               fontSize:15, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
+              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
             }}>
               <Icon icon="ph:pencil-simple" width={18} height={18} color="#64748B" />수정하기
             </button>
             <button onClick={() => { setShowMoreMenu(false); setShowDelete(true) }} style={{
-              width:'100%', height:52, borderRadius:12,
-              border:'1.5px solid #FECDD3', background:'#FFF5F5', color:'#DC2626',
+              width:'100%', height:52, borderRadius:12, border:'none',
+              background:'#e8e8e8', color:'#DC2626',
               fontSize:15, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:10, padding:'0 18px',
+              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
             }}>
               <Icon icon="ph:trash" width={18} height={18} color="#DC2626" />삭제하기
             </button>
@@ -587,7 +599,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             width:'100%', maxWidth:390, zIndex:801,
             maxHeight:'85vh', overflowY:'auto',
             borderRadius:'20px 20px 0 0',
-            background:'#F0F4F8',
+            background:'#e8e8e8',
             padding:'12px 12px 32px',
             boxSizing:'border-box',
             animation:'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)',
