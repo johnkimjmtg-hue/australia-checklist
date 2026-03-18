@@ -946,7 +946,7 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: 
                 minWidth:54, height:46, borderRadius:8, flexShrink:0,
                 border: isActive ? '1px solid #1B6EF3' : '1px solid #C8C8C8',
                 cursor:'pointer',
-                background: isActive ? '#EFF6FF' : '#fff',
+                background: isActive ? '#EFF6FF' : bg,
                 color: isActive ? '#1B6EF3' : '#64748B',
                 fontSize:11, fontWeight: isActive ? 700 : 500, position:'relative', textAlign:'center',
                 lineHeight:1.3, padding:'4px 2px',
