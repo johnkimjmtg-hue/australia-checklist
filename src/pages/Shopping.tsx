@@ -73,7 +73,23 @@ export default function Shopping() {
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'60vh' }}>
       <Icon icon="ph:circle-notch" width={28} height={28} color="#1B6EF3"
         style={{ animation:'spin 0.8s linear infinite' }} />
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .prod-card:active{transform:scale(0.97)}
+        .prod-card{transition:transform 0.15s ease;}
+        .cat-btn{transition:all 0.15s ease; -webkit-tap-highlight-color:transparent;}
+        .sort-btn{transition:all 0.15s ease;}
+        .featured-scroll{overflow-x:auto;}
+        @media (max-width:768px){
+          .featured-scroll{scrollbar-width:none;-ms-overflow-style:none;}
+          .featured-scroll::-webkit-scrollbar{display:none;}
+        }
+        @media (min-width:769px){
+          .featured-scroll::-webkit-scrollbar{height:4px;}
+          .featured-scroll::-webkit-scrollbar-track{background:#e8e8e8;border-radius:2px;}
+          .featured-scroll::-webkit-scrollbar-thumb{background:#C8C8C8;border-radius:2px;}
+        }
+      `}</style>
     </div>
   )
 
