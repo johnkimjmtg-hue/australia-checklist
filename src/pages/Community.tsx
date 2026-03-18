@@ -574,6 +574,7 @@ export default function Community() {
       <div style={{
         position: 'sticky', top: 0, zIndex: 50,
         background: '#fff',
+        borderTop: '1px solid #C8C8C8',
         borderBottom: '1px solid #C8C8C8',
       }}>
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
