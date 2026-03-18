@@ -158,11 +158,10 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           {(['all', 'bookmarks', 'emergency'] as ServiceTab[]).map(tab => {
             const isActive = serviceTab === tab
             const iconName = tab === 'all' ? 'ph:list-bullets' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:bell-fill'
-            const inactiveIconColor = tab === 'bookmarks' ? '#FFB800' : '#fff'
-            const inactiveTextColor = tab === 'emergency' ? '#fff' : '#64748B'
-            const inactiveBg = tab === 'emergency' ? '#DC2626' : '#fff'
-            const inactiveShadow = tab === 'emergency' ? '0 1px 3px rgba(220,38,38,0.3)' : '0 1px 3px rgba(0,0,0,0.07)'
             const label = tab === 'all' ? '전체 업종' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
+            const activeColor = tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? '#DC2626' : '#1B6EF3'
+            const inactiveColor = tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? '#DC2626' : '#94A3B8'
+            const color = isActive ? activeColor : inactiveColor
             return (
               <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }}
                 className="svc-btn"
@@ -170,9 +169,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 height:34, padding:'0 14px', borderRadius:20,
                 cursor:'pointer', fontSize:13, fontWeight:700,
                 background: '#e8e8e8',
-                color: isActive
-                  ? '#1B6EF3'
-                  : tab === 'emergency' ? '#DC2626' : '#94A3B8',
+                color,
                 border: 'none',
                 boxShadow: isActive
                   ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
@@ -180,7 +177,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 display:'flex', alignItems:'center', gap:5,
                 whiteSpace:'nowrap',
               }}>
-                <Icon icon={iconName} width={13} height={13} color={isActive ? '#1B6EF3' : tab === 'emergency' ? '#DC2626' : '#94A3B8'} />
+                <Icon icon={iconName} width={13} height={13} color={color} />
                 {label}
               </button>
             )
