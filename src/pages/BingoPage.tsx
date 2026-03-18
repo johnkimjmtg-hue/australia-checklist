@@ -721,7 +721,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               width:'100%', maxWidth:390,
               maxHeight:'85vh', overflowY:'auto',
               borderRadius:'20px 20px 0 0',
-              background:'#F0F4F8',
+              background:'#e8e8e8',
               padding:'12px 12px 32px',
               boxSizing:'border-box',
             }}>
@@ -806,13 +806,12 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         background:'#fff',
         zIndex:50, boxSizing:'border-box',
         display:'flex', gap:8,
-        borderTop:'1px solid #E2E8F0',
+        borderTop:'1px solid #C8C8C8',
       }}>
         <button onClick={() => onBack?.()} style={{
           flex:1, height:44, borderRadius:8, border:'none',
           background:'#1B6EF3', color:'#fff',
           fontSize:15, fontWeight:700, cursor:'pointer',
-          boxShadow:'0 4px 12px rgba(27,110,243,0.25)',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
         }}>
           <Icon icon="ph:check-circle" width={18} height={18} color="#fff" />
@@ -822,7 +821,6 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
           width:44, height:44, borderRadius:12, flexShrink:0,
           border:'1px solid #C8C8C8', background:'#fff',
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-          boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
         }}>
           <Icon icon="ph:dots-three-vertical" width={20} height={20} color="#64748B" />
         </button>
