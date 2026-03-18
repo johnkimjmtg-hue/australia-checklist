@@ -170,7 +170,7 @@ function NameChangePopup({ currentName, onClose, onSet }: {
 
         <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
           <button onClick={onClose} style={{
-            flex: 1, height: 48, borderRadius: 12, border: '1.5px solid #E2E8F0',
+            flex: 1, height: 48, borderRadius: 12, border: '1px solid #C8C8C8',
             background: '#fff', color: '#64748B', fontSize: 14, fontWeight: 600,
             cursor: 'pointer', fontFamily: ff,
           }}>취소</button>
@@ -262,7 +262,7 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
           {examples.map(ex => (
             <button key={ex} onClick={() => { setInput(ex); setError('') }} style={{
               fontSize: 11, fontWeight: 600, padding: '4px 10px',
-              borderRadius: 20, border: '1px solid #E2E8F0',
+              borderRadius: 20, border: '1px solid #C8C8C8',
               background: '#e8e8e8', color: '#64748B', cursor: 'pointer',
             }}>{ex}</button>
           ))}
@@ -574,7 +574,7 @@ export default function Community() {
       <div style={{
         position: 'sticky', top: 0, zIndex: 50,
         background: '#fff',
-        borderBottom: '1px solid #E2E8F0',
+        borderBottom: '1px solid #C8C8C8',
       }}>
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -636,7 +636,7 @@ export default function Community() {
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8,
               background: '#e8e8e8', borderRadius: 12, padding: '0 12px',
-              height: 40, border: '1.5px solid #D1D9E3',
+              height: 40, border: '1px solid #C8C8C8',
             }}>
               <Icon icon="ph:magnifying-glass" width={14} height={14} color="#94A3B8" />
               <input
@@ -744,7 +744,7 @@ export default function Community() {
                     <span style={{
                       fontSize: 11, fontWeight: 600, color: '#94A3B8',
                       background: '#e8e8e8', padding: '2px 10px', borderRadius: 20,
-                      border: '1px solid #D1D9E3',
+                      border: '1px solid #C8C8C8',
                     }}>{formatDateLabel(msg.created_at)}</span>
                     <div style={{ flex: 1, height: 1, background: '#D1D9E3' }} />
                   </div>
@@ -850,7 +850,7 @@ export default function Community() {
                       setReplyTo(msg)
                       textareaRef.current?.focus()
                     }} style={{
-                      background: '#fff', border: '1px solid #E2E8F0',
+                      background: '#fff', border: '1px solid #C8C8C8',
                       borderRadius: '50%', width: 28, height: 28,
                       cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
@@ -859,7 +859,7 @@ export default function Community() {
                     </button>
                     {msg.likes === 0 && (
                       <button onClick={() => handleLike(msg.id)} style={{
-                        background: '#fff', border: '1px solid #E2E8F0',
+                        background: '#fff', border: '1px solid #C8C8C8',
                         borderRadius: '50%', width: 28, height: 28,
                         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
@@ -869,7 +869,7 @@ export default function Community() {
                     )}
                     {isMine && (
                       <button onClick={() => handleDelete(msg.id)} style={{
-                        background: '#fff', border: '1px solid #E2E8F0',
+                        background: '#fff', border: '1px solid #C8C8C8',
                         borderRadius: '50%', width: 28, height: 28,
                         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
@@ -891,8 +891,8 @@ export default function Community() {
         position: 'fixed', bottom: 0,
         left: '50%', transform: 'translateX(-50%)',
         width: footerWidth ?? '100%',
-        background: '#fff',
-        borderTop: '1px solid #E2E8F0',
+        background: '#e8e8e8',
+        borderTop: '1px solid #C8C8C8',
         padding: '6px 14px 16px',
         zIndex: 40, boxSizing: 'border-box',
       }}>
@@ -900,7 +900,7 @@ export default function Community() {
         {replyTo && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8,
-            background: '#F1F5F9', borderRadius: 10,
+            background: '#e8e8e8', borderRadius: 10,
             padding: '8px 12px', marginBottom: 6,
             borderLeft: `3px solid ${BLUE}`,
           }}>
@@ -926,7 +926,7 @@ export default function Community() {
             position: 'absolute', bottom: '100%', left: 14, right: 14,
             background: '#fff', borderRadius: 14, padding: 12,
             boxShadow: '0 -4px 20px rgba(0,0,0,0.12)',
-            border: '1px solid #E2E8F0', marginBottom: 6,
+            border: '1px solid #C8C8C8', marginBottom: 6,
             display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4,
             maxHeight: 200, overflowY: 'auto',
           }}>
@@ -944,8 +944,8 @@ export default function Community() {
 
         <div style={{
           display: 'flex', alignItems: 'flex-end', gap: 8,
-          background: '#F1F5F9', borderRadius: 24, padding: '5px 10px',
-          border: '1px solid #E2E8F0',
+          background: '#fff', borderRadius: 24, padding: '5px 10px',
+          border: '1px solid #C8C8C8',
         }}>
           <button onClick={() => setShowEmoji(v => !v)} style={{
             background: 'none', border: 'none', cursor: 'pointer',
