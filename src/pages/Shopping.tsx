@@ -286,7 +286,7 @@ export default function Shopping() {
           }} />
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:390, background:'#fff',
+            width:'100%', maxWidth:390, background:'#e8e8e8',
             borderRadius:'20px 20px 0 0', zIndex:501,
             animation:'slideUp 0.3s ease',
             maxHeight:'85vh', overflowY:'auto',
@@ -295,47 +295,43 @@ export default function Shopping() {
             @keyframes fadeIn{from{opacity:0}to{opacity:1}}`}</style>
 
             {/* 드래그 핸들 */}
-            <div style={{ width:40, height:4, borderRadius:2, background:'#E2E8F0', margin:'12px auto 0' }} />
+            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'12px auto 0' }} />
 
             {/* 이미지 */}
             <div style={{
               width:'100%', height:220,
-              background: selProduct.image_url ? 'none' : 'linear-gradient(135deg, #EFF6FF, #DBEAFE)',
+              background: selProduct.image_url ? 'none' : 'linear-gradient(135deg, #e0e0e0, #d0d0d0)',
               display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden',
             }}>
               {selProduct.image_url
                 ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                : <Icon icon="ph:shopping-bag" width={60} height={60} color="#93C5FD" />
+                : <Icon icon="ph:shopping-bag" width={60} height={60} color="#94A3B8" />
               }
             </div>
 
             <div style={{ padding:'16px 18px 40px' }}>
-              {/* 태그들 */}
-              <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
+              {/* 태그들 + 가격 뱃지 */}
+              <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, alignItems:'center' }}>
                 {selProduct.tags.map(tag => (
                   <span key={tag} style={{
                     fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6,
-                    background: TAG_COLOR[tag]?.bg ?? '#F1F5F9',
+                    background: TAG_COLOR[tag]?.bg ?? '#e8e8e8',
                     color: TAG_COLOR[tag]?.color ?? '#475569',
                   }}>{tag}</span>
                 ))}
+                <span style={{
+                  fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6,
+                  background: TAG_COLOR[selProduct.price_range]?.bg ?? '#e8e8e8',
+                  color: PRICE_COLOR[selProduct.price_range] ?? '#475569',
+                  border:`1px solid ${PRICE_COLOR[selProduct.price_range] ?? '#C8C8C8'}`,
+                  marginLeft:'auto',
+                }}>
+                  {selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}
+                </span>
               </div>
 
               <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', marginBottom:4 }}>{selProduct.name}</div>
               <div style={{ fontSize:13, color:'#64748B', marginBottom:12 }}>{selProduct.brand}</div>
-
-              {/* 가격대 */}
-              <div style={{
-                display:'inline-flex', alignItems:'center', gap:6,
-                background: '#F8FAFC', borderRadius:8, padding:'8px 12px', marginBottom:14,
-              }}>
-                <span style={{ fontSize:16, fontWeight:800, color: PRICE_COLOR[selProduct.price_range] }}>
-                  {selProduct.price_range}
-                </span>
-                <span style={{ fontSize:12, color:'#64748B', fontWeight:600 }}>
-                  {PRICE_LABEL[selProduct.price_range]}
-                </span>
-              </div>
 
               {/* 설명 */}
               {selProduct.description && (
@@ -355,7 +351,7 @@ export default function Shopping() {
                       <span key={store} style={{
                         fontSize:11, fontWeight:600, padding:'5px 10px', borderRadius:8,
                         background:'#e8e8e8', color:'#475569',
-                        border:'1px solid #E2E8F0',
+                        border:'1px solid #C8C8C8',
                       }}>🏪 {store}</span>
                     ))}
                   </div>
@@ -364,7 +360,9 @@ export default function Shopping() {
 
               <button onClick={() => setSelProduct(null)} style={{
                 width:'100%', height:50, borderRadius:12, border:'none',
-                background:'#1B6EF3', color:'#fff', fontSize:15, fontWeight:700, cursor:'pointer',
+                background:'#e8e8e8', color:'#1B6EF3', fontSize:15, fontWeight:700, cursor:'pointer',
+                boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                WebkitTapHighlightColor:'transparent',
               }}>확인</button>
             </div>
           </div>
