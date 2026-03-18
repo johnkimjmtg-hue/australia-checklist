@@ -155,19 +155,18 @@ export default function Shopping() {
                 <div key={p.id} className="prod-card" onClick={() => setSelProduct(p)} style={{
                   flexShrink:0, width:160,
                   background:'#fff', borderRadius:14,
-                  boxShadow:'0 2px 12px rgba(27,110,243,0.10)',
                   overflow:'hidden', cursor:'pointer',
-                  border:'1.5px solid #DBEAFE',
+                  border:'1px solid #C8C8C8',
                 }}>
                   {/* 이미지 */}
                   <div style={{
                     width:'100%', height:120,
-                    background: p.image_url ? 'none' : 'linear-gradient(135deg, #EFF6FF, #DBEAFE)',
+                    background: p.image_url ? 'none' : 'linear-gradient(135deg, #e8e8e8, #e0e0e0)',
                     display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden',
                   }}>
                     {p.image_url
                       ? <img src={p.image_url} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                      : <Icon icon="ph:shopping-bag" width={36} height={36} color="#93C5FD" />
+                      : <Icon icon="ph:shopping-bag" width={36} height={36} color="#C8C8C8" />
                     }
                   </div>
                   <div style={{ padding:'10px 10px 12px' }}>
