@@ -95,14 +95,14 @@ function CircleProgress({ pct }: { pct:number }) {
   return (
     <div style={{ position:'relative',width:100,height:100,flexShrink:0 }}>
       <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
-        <circle cx={50} cy={50} r={R} fill="none" stroke="#C8C8C8" strokeWidth={10}/>
+        <circle cx={50} cy={50} r={R} fill="none" stroke="#a8b498" strokeWidth={10}/>
         <circle cx={50} cy={50} r={R} fill="none" stroke="#FFCD00" strokeWidth={10}
           strokeDasharray={C} strokeDashoffset={C-(pct/100)*C} strokeLinecap="round"
           style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)' }}
         />
       </svg>
       <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center' }}>
-        <span style={{ fontSize:15,fontWeight:800,color:'#1B6EF3' }}>{pct}%</span>
+        <span style={{ fontSize:15,fontWeight:800,color:'#2d3e1f' }}>{pct}%</span>
       </div>
     </div>
   )
@@ -415,21 +415,22 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       {/* ══ 진행 카드 ══ */}
       <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'16px 16px 0' }}>
         <div style={{
-          background:'#fff', borderRadius:12,
-          border:'1px solid #C8C8C8',
+          background:'#c8d4b8',
+          borderRadius:12,
+          boxShadow:'inset 3px 3px 8px #a8b498, inset -2px -2px 6px #e8f4d8',
           padding:'20px', display:'flex', alignItems:'center', gap:20,
         }}>
           <CircleProgress pct={pct} />
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:22,fontWeight:800,color:'#1E293B',marginBottom:4,lineHeight:1.2 }}>호주 버킷리스트</div>
-            <div style={{ fontSize:12,color:'#94A3B8',fontWeight:600,marginBottom:6 }}>
+            <div style={{ fontSize:20,fontWeight:800,color:'#2d3e1f',marginBottom:4,lineHeight:1.2 }}>호주 버킷리스트</div>
+            <div style={{ fontSize:12,color:'#4a5e32',fontWeight:600,marginBottom:6 }}>
               {trip.startDate.slice(5).replace('-','/')} ~ {trip.endDate.slice(5).replace('-','/')}
             </div>
             <div style={{ display:'flex',alignItems:'baseline',gap:4,marginBottom:4 }}>
-              <span style={{ fontSize:28,fontWeight:800,color:'#1B6EF3',lineHeight:1 }}>{achievedCount}</span>
-              <span style={{ fontSize:17,fontWeight:600,color:'#64748B' }}>/{total}건 완료</span>
+              <span style={{ fontSize:28,fontWeight:800,color:'#2d3e1f',lineHeight:1 }}>{achievedCount}</span>
+              <span style={{ fontSize:17,fontWeight:600,color:'#4a5e32' }}>/{total}건 완료</span>
             </div>
-            <div style={{ fontSize:13,color:'#94A3B8',lineHeight:1.5 }}>나만의 버킷리스트 꼭 완료하세요.</div>
+            <div style={{ fontSize:13,color:'#4a5e32',lineHeight:1.5 }}>나만의 버킷리스트 꼭 완료하세요.</div>
           </div>
           <CoinStack count={achievedCount} total={total} />
         </div>
