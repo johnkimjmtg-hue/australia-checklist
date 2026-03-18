@@ -163,11 +163,11 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             const label = tab === 'all' ? '전체 업종' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
             return (
               <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
-                height:34, padding:'0 14px', borderRadius:20, border:'none',
+                height:34, padding:'0 14px', borderRadius:20,
                 cursor:'pointer', fontSize:13, fontWeight:700,
-                background: isActive ? '#1B6EF3' : inactiveBg,
-                color: isActive ? '#fff' : inactiveTextColor,
-                boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : inactiveShadow,
+                background: isActive ? '#1B6EF3' : tab === 'emergency' ? '#DC2626' : '#e8e8e8',
+                color: isActive ? '#fff' : tab === 'emergency' ? '#fff' : '#64748B',
+                border: isActive ? '1.5px solid #1B6EF3' : tab === 'emergency' ? '1.5px solid #DC2626' : '1.5px solid #CBD5E1',
                 display:'flex', alignItems:'center', gap:5,
                 whiteSpace:'nowrap',
               }}>
@@ -182,7 +182,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         {serviceTab === 'all' && (<>
         <div style={{
           display:'flex', alignItems:'center', gap:8,
-          background:'#fff', borderRadius:12, padding:'0 12px',
+          background:'#e8e8e8', borderRadius:12, padding:'0 12px',
           border:'1.5px solid #D1D9E3', height:42,
           boxShadow:'0 1px 4px rgba(0,0,0,0.05)',
           marginBottom:10,
@@ -213,13 +213,13 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               <button key={cat.id} className="chip-btn"
                 onClick={() => { setCategory(cat.id); setShowAll(false) }}
                 style={{
-                  height:36, borderRadius:8, border:'none',
-                  background: isActive ? '#1B6EF3' : '#fff',
+                  height:36, borderRadius:8,
+                  background: isActive ? '#1B6EF3' : '#e8e8e8',
                   color: isActive ? '#fff' : '#0F172A',
                   fontSize:12, fontWeight:700,
                   cursor:'pointer', position:'relative',
                   flexShrink:0, width:88,
-                  boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
+                  border: isActive ? '1.5px solid #1B6EF3' : '1.5px solid #CBD5E1',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   whiteSpace:'nowrap',
                 }}>
@@ -351,7 +351,7 @@ function LoadingState() {
     <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
       {[0,1,2].map(i => (
         <div key={i} style={{
-          background:'#fff', borderRadius:12, padding:'20px 16px',
+          background:'#e8e8e8', borderRadius:12, padding:'20px 16px',
           boxShadow:'0 2px 8px rgba(0,0,0,0.06)', opacity:0.6,
         }}>
           <div style={{ height:14, width:'55%', background:'#E2E8F0', borderRadius:6, marginBottom:10 }}/>
@@ -499,7 +499,7 @@ function EmergencyTab() {
 
           {/* 카드 */}
           <div style={{
-            background:'#fff', borderRadius:12, overflow:'hidden',
+            background:'#e8e8e8', borderRadius:12, overflow:'hidden',
             border:`1.5px solid ${group.border}`,
             boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
           }}>

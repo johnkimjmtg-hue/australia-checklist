@@ -469,7 +469,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : (
         <>
           {/* ── SUB HEADER (버튼들) — 스크롤 시 사라짐 ── */}
-          <div style={{ background:'#F0F4F8' }}>
+          <div style={{ background:'#e8e8e8' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 20px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                 <span style={{ fontSize:14, fontWeight:700, color: done>0 ? '#1B6EF3' : '#94A3B8' }}>
@@ -511,7 +511,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           </div>
 
           {/* ── STICKY: 달력 + 카테고리 칩 ── */}
-          <div style={{ background:'#F0F4F8', position:'sticky', top:0, zIndex:24 }}>
+          <div style={{ background:'#e8e8e8', position:'sticky', top:0, zIndex:24 }}>
 
             {/* Schedule grid view */}
             {showScheduleView && trip && (
@@ -565,7 +565,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           </div>
 
           {/* ── LIST ── */}
-          <div style={{ paddingBottom:100, background:'#F0F4F8' }}>
+          <div style={{ paddingBottom:100, background:'#e8e8e8' }}>
             {/* Section label */}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 20px 8px' }}>
               <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
@@ -854,7 +854,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             width:'100%', maxWidth:390,
             maxHeight:'85vh', overflowY:'auto',
             borderRadius:'20px 20px 0 0',
-            background:'#F0F4F8',
+            background:'#e8e8e8',
             padding:'12px 12px 32px',
             boxSizing:'border-box',
           }}>
@@ -922,7 +922,7 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: 
     : []
 
   return (
-    <div style={{ borderTop:'1px solid #E2E8F0', padding:'10px 16px 12px', background:'#F8FAFC' }}>
+    <div style={{ borderTop:'1px solid #E2E8F0', padding:'10px 16px 12px', background:'#e8e8e8' }}>
       <div ref={scrollRef} style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4, scrollBehavior:'smooth' }}>
         {days.map((d, idx) => {
           const isActive   = activeDayIdx === idx
