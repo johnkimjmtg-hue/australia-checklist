@@ -663,7 +663,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                 <div style={{
                   width:'100%', padding:'3px 4px',
                   fontSize:9, fontWeight:700, textAlign:'center',
-                  color: isChecked ? '#1B6EF3' : '#64748B',
+                  color: isChecked ? '#6F4E37' : '#64748B',
                   lineHeight:1.2,
                   background:'#fff',
                   whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
@@ -734,8 +734,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
 
               {/* 상단: 스탬프 이미지 + 멘트 + 체크 */}
               {(() => {
-                const themeColor = city === 'melbourne' ? '#6F4E37' : '#1B6EF3'
-                const themeBg    = city === 'melbourne' ? 'rgba(111,78,55,0.08)' : 'rgba(27,110,243,0.08)'
+                const themeColor = city === 'melbourne' ? '#6F4E37' : '#6F4E37'
+                const themeBg    = city === 'melbourne' ? 'rgba(111,78,55,0.08)' : 'rgba(111,78,55,0.08)'
                 return (
                   <div style={{
                     background:'#fff', borderRadius:16, padding:'16px',
