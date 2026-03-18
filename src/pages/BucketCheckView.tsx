@@ -392,10 +392,10 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         <div style={{ display:'flex', padding:'0 10px', gap:8, overflowX:'auto', scrollbarWidth:'none' }}>
           {([
             { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트', action: () => {} },
-            { id:'services',   icon:'ph:buildings',    label:'업체리스트', action: onServices },
-            { id:'shopping',   icon:'ph:shopping-bag', label:'쇼핑리스트', action: onShopping },
-            { id:'bingo',      icon:'ph:coffee',       label:'카페빙고게임', action: onBingo },
-            { id:'community',  icon:'ph:chats-circle', label:'채팅방', action: onCommunity },
+			{ id:'shopping',   icon:'ph:shopping-bag', label:'쇼핑리스트', action: onShopping },
+			{ id:'bingo',      icon:'ph:coffee',       label:'카페빙고게임', action: onBingo },
+			{ id:'community',  icon:'ph:chats-circle', label:'채팅방', action: onCommunity },
+			{ id:'services',   icon:'ph:buildings',    label:'업체리스트', action: onServices },
           ]).map(tab => {
             const active = tab.id === 'bucketlist'
             return (
