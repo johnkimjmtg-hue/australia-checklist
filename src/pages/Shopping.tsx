@@ -93,12 +93,12 @@ export default function Shopping() {
           backgroundImage:`url(${imgShopping})`,
           backgroundSize:'cover', backgroundPosition:'center',
         }}/>
-        <div style={{ position:'absolute', inset:0, padding:'20px 16px', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center' }}>
+        <div style={{ position:'absolute', inset:0, padding:'12px 16px', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
           <div style={{
-            fontSize:22, fontWeight:900, color:'#fff', textAlign:'center',
-            textShadow:'0 1px 4px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4)',
+            fontSize:11, fontWeight:400, color:'rgba(255,255,255,0.85)',
+            textShadow:'0 1px 3px rgba(0,0,0,0.5)',
           }}>
-            호주에서 꼭 사야하는 아이템
+            호주에서 꼭 사야하는 아이템을 모았어요.
           </div>
         </div>
       </div>
