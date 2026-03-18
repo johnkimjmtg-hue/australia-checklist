@@ -47,11 +47,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [shakeBtn, setShakeBtn]       = useState(false)
   const [customLabel, setCustomLabel] = useState('')
   const [bingoCity, setBingoCity]     = useState<'melbourne'|'sydney'>('melbourne')
-  const [mainTab, setMainTab]         = useState<MainTab>(() => {
-    const tab = searchParams.get('tab')
-    if (tab === 'services' || tab === 'shopping' || tab === 'bingo' || tab === 'community') return tab
-    return 'bucketlist'
-  })
+  const [mainTab, setMainTab]         = useState<MainTab>(
+    searchParams.get('tab') === 'services' ? 'services' : 'bucketlist'
+  )
   const [showScheduleView, setShowScheduleView] = useState(!!trip)
   const [scheduleSelectedItem, setScheduleSelectedItem] = useState<string|null>(null)
   const [scrollTrigger, setScrollTrigger] = useState(0)
@@ -376,6 +374,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       boxSizing:'border-box', maxWidth:480, margin:'0 auto', position:'relative' }}>
 
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;700&display=swap');
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
         @keyframes scaleIn  { from{opacity:0;transform:translate(-50%,-50%) scale(.94)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
@@ -405,7 +404,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         {/* 브랜드 + 카운터 */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
           <span onClick={handleLogoTap}
-            style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
+            style={{ fontSize:15, color:'#1B6EF3', fontWeight:700, letterSpacing:4, cursor:'pointer', userSelect:'none', fontFamily:'"Josefin Sans", sans-serif' }}
           >HOJUGAJA</span>
           <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
             {mainTab === 'services' ? `${bizCount}개 업체` : mainTab === 'bucketlist' ? `${total}개 버킷리스트` : mainTab === 'bingo' ? (bingoCity === 'melbourne' ? '멜번' : '시드니') : mainTab === 'shopping' ? `${shopCount}개 상품` : ''}
