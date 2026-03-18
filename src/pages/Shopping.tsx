@@ -118,18 +118,24 @@ export default function Shopping() {
         <div style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto' }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
             flexShrink:0, height:34, padding:'0 14px', borderRadius:20, cursor:'pointer',
-            background: selCat === null ? '#1B6EF3' : '#e8e8e8',
-            border: selCat === null ? '1.5px solid #1B6EF3' : '1.5px solid #CBD5E1',
-            color: selCat === null ? '#fff' : '#475569',
-            fontSize:12, fontWeight:700,
+            background: '#e8e8e8', border: 'none',
+            color: selCat === null ? '#1B6EF3' : '#94A3B8',
+            fontSize:12, fontWeight: selCat === null ? 700 : 500,
+            boxShadow: selCat === null
+              ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+              : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+            WebkitTapHighlightColor: 'transparent',
           }}>전체</button>
           {categories.map(cat => (
             <button key={cat.id} className="cat-btn" onClick={() => setSelCat(cat.id)} style={{
               flexShrink:0, height:34, padding:'0 14px', borderRadius:20, cursor:'pointer',
-              background: selCat === cat.id ? '#1B6EF3' : '#e8e8e8',
-              border: selCat === cat.id ? '1.5px solid #1B6EF3' : '1.5px solid #CBD5E1',
-              color: selCat === cat.id ? '#fff' : '#475569',
-              fontSize:12, fontWeight:700, whiteSpace:'nowrap',
+              background: '#e8e8e8', border: 'none',
+              color: selCat === cat.id ? '#1B6EF3' : '#94A3B8',
+              fontSize:12, fontWeight: selCat === cat.id ? 700 : 500, whiteSpace:'nowrap',
+              boxShadow: selCat === cat.id
+                ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              WebkitTapHighlightColor: 'transparent',
             }}>{cat.emoji} {cat.name}</button>
           ))}
         </div>
@@ -200,9 +206,13 @@ export default function Shopping() {
               { id:'name', label:'이름순' },
             ] as {id:SortOption; label:string}[]).map(s => (
               <button key={s.id} className="sort-btn" onClick={() => setSortBy(s.id)} style={{
-                fontSize:10, fontWeight:700, padding:'4px 8px', borderRadius:6, border:'none', cursor:'pointer',
-                background: sortBy === s.id ? '#1B6EF3' : '#F1F5F9',
-                color: sortBy === s.id ? '#fff' : '#64748B',
+                fontSize:10, fontWeight: sortBy === s.id ? 700 : 500, padding:'4px 8px', borderRadius:6, border:'none', cursor:'pointer',
+                background: '#e8e8e8',
+                color: sortBy === s.id ? '#1B6EF3' : '#94A3B8',
+                boxShadow: sortBy === s.id
+                  ? 'inset 2px 2px 4px #c5c5c5, inset -2px -2px 4px #ffffff'
+                  : '2px 2px 4px #c5c5c5, -2px -2px 4px #ffffff',
+                WebkitTapHighlightColor: 'transparent',
               }}>{s.label}</button>
             ))}
           </div>
@@ -213,15 +223,15 @@ export default function Shopping() {
           {filtered.map((p, i) => (
             <div key={p.id} className="prod-card" onClick={() => setSelProduct(p)} style={{
               background:'#fff', borderRadius:14,
-              boxShadow:'0 1px 6px rgba(0,0,0,0.07)',
+              border:'1px solid #C8C8C8',
               overflow:'hidden', cursor:'pointer',
               animation:`fadeUp 0.25s ease ${i * 0.04}s both`,
-              border:'1px solid #F1F5F9',
+              border:'1px solid #C8C8C8',
             }}>
               {/* 이미지 */}
               <div style={{
                 width:'100%', aspectRatio:'1',
-                background: p.image_url ? 'none' : 'linear-gradient(135deg, #F8FAFC, #F1F5F9)',
+                background: p.image_url ? 'none' : 'linear-gradient(135deg, #e8e8e8, #e0e0e0)',
                 display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden',
               }}>
                 {p.image_url
@@ -344,7 +354,7 @@ export default function Shopping() {
                     {selProduct.where_to_buy.map(store => (
                       <span key={store} style={{
                         fontSize:11, fontWeight:600, padding:'5px 10px', borderRadius:8,
-                        background:'#F1F5F9', color:'#475569',
+                        background:'#e8e8e8', color:'#475569',
                         border:'1px solid #E2E8F0',
                       }}>🏪 {store}</span>
                     ))}
