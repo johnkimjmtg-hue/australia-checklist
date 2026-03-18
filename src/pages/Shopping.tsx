@@ -95,16 +95,16 @@ export default function Shopping() {
         }}/>
         <div style={{
           position:'absolute', inset:0,
-          background:'linear-gradient(90deg, rgba(0,20,80,0.55) 0%, rgba(0,20,80,0.30) 60%, rgba(0,20,80,0.05) 100%)',
+          background:'linear-gradient(90deg, rgba(232,232,232,0.75) 0%, rgba(232,232,232,0.45) 60%, rgba(232,232,232,0.10) 100%)',
         }}/>
         <div style={{ position:'absolute', inset:0, padding:'20px 16px', display:'flex', flexDirection:'column', justifyContent:'center' }}>
-          <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', fontWeight:600, letterSpacing:1, marginBottom:4 }}>
+          <div style={{ fontSize:11, color:'rgba(50,50,50,0.6)', fontWeight:600, letterSpacing:1, marginBottom:4 }}>
             AUSTRALIA SHOPPING
           </div>
-          <div style={{ fontSize:20, fontWeight:800, color:'#fff', marginBottom:2 }}>
+          <div style={{ fontSize:20, fontWeight:800, color:'#1E293B', marginBottom:2 }}>
             호주 쇼핑 리스트 🛍
           </div>
-          <div style={{ fontSize:12, color:'rgba(255,255,255,0.8)' }}>
+          <div style={{ fontSize:12, color:'rgba(30,41,59,0.7)' }}>
             호주에서 꼭 사가야 할 아이템을 모았어요
           </div>
         </div>
