@@ -591,7 +591,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 <div style={{
                   flex:1, display:'flex', alignItems:'center', gap:8,
                   background:'#fff', borderRadius:10, padding:'0 12px',
-                  border:'1px solid #E2E8F0', height:44,
+                  border:'1px solid #C8C8C8', height:44,
                   boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
                 }}>
                   <Icon icon="ph:plus-circle" width={18} height={18} color="#1B6EF3" />
@@ -630,7 +630,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                               : checked ? '0 2px 8px rgba(0,0,0,0.06)'
                               : '0 2px 8px rgba(0,0,0,0.06)',
                     minHeight:52, cursor:'pointer',
-                    border:'1px solid #E2E8F0',
+                    border:'1px solid #C8C8C8',
                     borderLeft: isHighlight ? '4px solid #1B6EF3'
                               : checked ? '4px solid #16A34A'
                               : '4px solid #CBD5E1',
@@ -748,7 +748,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             background:'#fff',
             zIndex:20, boxSizing:'border-box',
             padding:'12px 14px 20px',
-            borderTop:'1px solid #E2E8F0',
+            borderTop:'1px solid #C8C8C8',
           }}>
             {unscheduledCount>0 && done>0 && (
               <div style={{ fontSize:11, color:'#92620a', textAlign:'center', marginBottom:8, fontWeight:700,
@@ -767,7 +767,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               <button onClick={() => setModal('confirmReset')} style={{
                 flex:2, height:44,
                 background:'#fff', color:'#64748B',
-                border:'1px solid #E2E8F0', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer',
+                border:'1px solid #C8C8C8', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer',
               }}>↻ 초기화</button>
             </div>
           </div>
@@ -786,7 +786,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           zIndex:998, pointerEvents:'none',
           display:'flex', alignItems:'center', gap:10,
           background:'#fff',
-          border:'1.5px solid #E2E8F0',
+          border:'1px solid #C8C8C8',
           color:'#0F172A', fontSize:15, fontWeight:700,
           padding:'13px 20px', borderRadius:14,
           boxShadow:'0 8px 24px rgba(0,0,0,0.13)',
@@ -931,7 +931,7 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: 
     : []
 
   return (
-    <div style={{ borderTop:'1px solid #E2E8F0', padding:'10px 16px 12px', background:'#e8e8e8' }}>
+    <div style={{ borderTop:'1px solid #C8C8C8', padding:'10px 16px 12px', background:'#e8e8e8' }}>
       <div ref={scrollRef} style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:4, scrollBehavior:'smooth' }}>
         {days.map((d, idx) => {
           const isActive   = activeDayIdx === idx
@@ -1170,7 +1170,7 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
             </button>
           )}
           {!hideCancel && (
-            <button onClick={onCancel} style={{ flex:1, height:48, border:'1px solid #E2E8F0', borderRadius:6, background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer' }}>취소</button>
+            <button onClick={onCancel} style={{ flex:1, height:48, border:'1px solid #C8C8C8', borderRadius:6, background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer' }}>취소</button>
           )}
           {!confirmFirst && (
             <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:6, background: confirmColor ?? '#1B6EF3', color:'#fff', fontWeight:700, fontSize:15, cursor:'pointer' }}>
