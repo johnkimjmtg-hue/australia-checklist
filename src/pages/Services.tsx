@@ -165,20 +165,16 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }} style={{
                 height:34, padding:'0 14px', borderRadius:20,
                 cursor:'pointer', fontSize:13, fontWeight:700,
-                background: isActive
+                background: '#e8e8e8',
+                color: isActive
                   ? '#1B6EF3'
-                  : tab === 'emergency' ? '#DC2626' : '#e8e8e8',
-                color: isActive ? '#fff' : tab === 'emergency' ? '#fff' : '#64748B',
+                  : tab === 'emergency' ? '#DC2626' : '#94A3B8',
                 border: 'none',
-                boxShadow: isActive
-                  ? 'inset 3px 3px 6px rgba(0,0,0,0.2), inset -2px -2px 4px rgba(255,255,255,0.15)'
-                  : tab === 'emergency'
-                    ? 'inset 3px 3px 6px rgba(0,0,0,0.2), inset -2px -2px 4px rgba(255,255,255,0.15)'
-                    : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                 display:'flex', alignItems:'center', gap:5,
                 whiteSpace:'nowrap',
               }}>
-                <Icon icon={iconName} width={13} height={13} color={isActive ? '#fff' : inactiveIconColor} />
+                <Icon icon={iconName} width={13} height={13} color={isActive ? '#1B6EF3' : tab === 'emergency' ? '#DC2626' : '#94A3B8'} />
                 {label}
               </button>
             )
@@ -221,15 +217,13 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 onClick={() => { setCategory(cat.id); setShowAll(false) }}
                 style={{
                   height:36, borderRadius:8,
-                  background: isActive ? '#1B6EF3' : '#e8e8e8',
-                  color: isActive ? '#fff' : '#0F172A',
-                  fontSize:12, fontWeight:700,
+                  background: '#e8e8e8',
+                  color: isActive ? '#1B6EF3' : '#64748B',
+                  fontSize:12, fontWeight: isActive ? 700 : 500,
                   cursor:'pointer', position:'relative',
                   flexShrink:0, width:88,
                   border: 'none',
-                  boxShadow: isActive
-                    ? 'inset 3px 3px 6px rgba(0,0,0,0.2), inset -2px -2px 4px rgba(255,255,255,0.15)'
-                    : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                  boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   whiteSpace:'nowrap',
                 }}>
