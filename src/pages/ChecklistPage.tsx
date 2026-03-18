@@ -1048,9 +1048,7 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
           background: '#e8e8e8',
           color: selected ? '#1B6EF3' : '#94A3B8', fontSize: 15, fontWeight: 700,
           marginTop: 10, marginBottom: 4,
-          boxShadow: selected
-            ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-            : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           WebkitTapHighlightColor: 'transparent',
         }}>
           {isStart ? '다음 →' : '완료'}
