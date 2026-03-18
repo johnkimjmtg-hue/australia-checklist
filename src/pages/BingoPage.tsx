@@ -564,7 +564,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         </div>
         <div style={{
           background:'#fff', borderRadius:12,
-          boxShadow:'0 4px 20px rgba(27,110,243,0.10), 0 1px 4px rgba(0,0,0,0.06)',
+          border:'1px solid #E2E8F0',
           padding:'16px 18px', display:'flex', alignItems:'center', gap:16,
         }}>
           <MiniGrid count={checked.size} />
@@ -738,7 +738,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                 return (
                   <div style={{
                     background:'#fff', borderRadius:16, padding:'16px',
-                    marginBottom:12, boxShadow:'0 2px 10px rgba(0,0,0,0.07)',
+                    marginBottom:12, border:'1px solid #E2E8F0',
                   }}>
                     <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:14 }}>
                       {/* 원형 스탬프 이미지 */}
