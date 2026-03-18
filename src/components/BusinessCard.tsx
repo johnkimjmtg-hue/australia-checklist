@@ -32,7 +32,7 @@ export default function BusinessCard({ business }: Props) {
   const btnBlue: React.CSSProperties = {
     ...btnBase,
     background:'#1B6EF3', color:'#fff', border:'none',
-    boxShadow:'0 2px 8px rgba(27,110,243,0.25)',
+    
   }
 
   // 버튼 순서: 전화, 경로, 웹사이트, 카톡, 구글리뷰, 공유 (없는건 스킵)
@@ -89,10 +89,9 @@ export default function BusinessCard({ business }: Props) {
 
       <div style={{
         background:'#fff', borderRadius:14,
-        boxShadow: is_featured
-          ? '0 4px 20px rgba(27,110,243,0.13),0 1px 4px rgba(0,0,0,0.07)'
-          : '0 4px 16px rgba(0,0,0,0.10)',
         overflow:'hidden',
+        borderLeft: is_featured ? '4px solid #1B6EF3' : '4px solid #CBD5E1',
+        border: '1px solid #E2E8F0',
         borderLeft: is_featured ? '4px solid #1B6EF3' : '4px solid #CBD5E1',
       }}>
         <div style={{ padding:'16px' }}>

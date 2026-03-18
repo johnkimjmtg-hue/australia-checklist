@@ -193,7 +193,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           display:'flex', alignItems:'center', gap:8,
           background:'#fff', borderRadius:12, padding:'0 12px',
           border:'1.5px solid #D1D9E3', height:42,
-          boxShadow:'0 1px 4px rgba(0,0,0,0.05)',
+          
           marginBottom:10,
         }}>
           <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
@@ -310,7 +310,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                   cursor:'pointer', display:'flex', alignItems:'center',
                   justifyContent:'center', gap:8,
                   fontSize:14, fontWeight:700, color:'#fff',
-                  boxShadow:'0 2px 8px rgba(27,110,243,0.25)',
+                  
                 }}>
                   <Icon icon="ph:list-bullets" width={16} height={16} color="#fff" />
                   더 많은 업체 보기 ({allBusinesses.length - 10})
@@ -364,7 +364,7 @@ function LoadingState() {
       {[0,1,2].map(i => (
         <div key={i} style={{
           background:'#fff', borderRadius:12, padding:'20px 16px',
-          boxShadow:'0 2px 8px rgba(0,0,0,0.06)', opacity:0.6,
+          opacity:0.6,
         }}>
           <div style={{ height:14, width:'55%', background:'#E2E8F0', borderRadius:6, marginBottom:10 }}/>
           <div style={{ height:10, width:'35%', background:'#F1F5F9', borderRadius:6, marginBottom:8 }}/>
@@ -513,7 +513,7 @@ function EmergencyTab() {
           <div style={{
             background:'#fff', borderRadius:12, overflow:'hidden',
             border:`1.5px solid ${group.border}`,
-            boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
+            
           }}>
             {group.items.map((item, ii) => (
               <a
