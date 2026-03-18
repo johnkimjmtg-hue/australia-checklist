@@ -159,8 +159,9 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             const isActive = serviceTab === tab
             const iconName = tab === 'all' ? 'ph:list-bullets' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:bell-fill'
             const label = tab === 'all' ? '전체 업종' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
-            const activeColor = tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? '#DC2626' : '#1B6EF3'
-            const inactiveColor = tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? '#DC2626' : '#94A3B8'
+            const activeColor = '#1B6EF3'
+            const inactiveColor = tab === 'emergency' ? '#DC2626' : '#94A3B8'
+            const iconColor = isActive ? '#1B6EF3' : tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? '#DC2626' : '#94A3B8'
             const color = isActive ? activeColor : inactiveColor
             return (
               <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }}
@@ -177,7 +178,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 display:'flex', alignItems:'center', gap:5,
                 whiteSpace:'nowrap',
               }}>
-                <Icon icon={iconName} width={13} height={13} color={color} />
+                <Icon icon={iconName} width={13} height={13} color={iconColor} />
                 {label}
               </button>
             )
