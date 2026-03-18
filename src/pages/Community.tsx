@@ -183,8 +183,8 @@ function NameChangePopup({ currentName, onClose, onSet }: {
             cursor: input.trim() && !checking ? 'pointer' : 'default',
             fontFamily: ff,
             boxShadow: input.trim() && !checking
-              ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-              : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              ? '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff'
+              : 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff',
           }}>{checking ? '확인 중...' : '변경하기'}</button>
         </div>
       </div>
@@ -283,8 +283,8 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
             cursor: input.trim() && !checking ? 'pointer' : 'default',
             fontFamily: ff,
             boxShadow: input.trim() && !checking
-              ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-              : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              ? '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff'
+              : 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff',
           }}
         >{checking ? '확인 중...' : '입장하기 →'}</button>
       </div>
