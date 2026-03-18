@@ -174,7 +174,9 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                   ? '#1B6EF3'
                   : tab === 'emergency' ? '#DC2626' : '#94A3B8',
                 border: 'none',
-                boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                boxShadow: isActive
+                  ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                  : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                 display:'flex', alignItems:'center', gap:5,
                 whiteSpace:'nowrap',
               }}>
@@ -227,7 +229,9 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                   cursor:'pointer', position:'relative',
                   flexShrink:0, width:88,
                   border: 'none',
-                  boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                  boxShadow: isActive
+                    ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                    : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   whiteSpace:'nowrap',
                 }}>
