@@ -135,15 +135,16 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .svc-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         .svc-btn:active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff !important; transform: scale(0.97); }
-        .cat-scroll { overflow-x:auto; }
+        .cat-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:#C8C8C8 #e8e8e8; }
         @media (max-width:768px) {
-          .cat-scroll { scrollbar-width:none; -ms-overflow-style:none; }
-          .cat-scroll::-webkit-scrollbar { display:none; }
+          .cat-scroll::-webkit-scrollbar { height:4px; }
+          .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
+          .cat-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
         }
         @media (min-width:769px) {
           .cat-scroll::-webkit-scrollbar { height:4px; }
           .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
-          .cat-scroll::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:2px; }
+          .cat-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
         }
       `}</style>
 
