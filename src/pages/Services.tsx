@@ -304,15 +304,16 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 )}
                 <button onClick={() => setShowAll(true)} style={{
                   width:'100%', marginTop:14, height:48,
-                  background:'#1B6EF3', border:'none', borderRadius:12,
+                  background:'#e8e8e8', border:'none', borderRadius:12,
                   cursor:'pointer', display:'flex', alignItems:'center',
                   justifyContent:'center', gap:8,
-                  fontSize:14, fontWeight:700, color:'#fff',
-                  
+                  fontSize:14, fontWeight:700, color:'#1B6EF3',
+                  boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                  WebkitTapHighlightColor:'transparent',
                 }}>
-                  <Icon icon="ph:list-bullets" width={16} height={16} color="#fff" />
+                  <Icon icon="ph:list-bullets" width={16} height={16} color="#1B6EF3" />
                   더 많은 업체 보기 ({allBusinesses.length - 10})
-                  <Icon icon="ph:caret-down" width={14} height={14} color="#fff" />
+                  <Icon icon="ph:caret-down" width={14} height={14} color="#1B6EF3" />
                 </button>
               </>
             )}
