@@ -39,16 +39,13 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
               return (
                 <button key={idx} onClick={() => toggle(idx)} style={{
                   padding:'8px 4px', borderRadius:10, cursor:'pointer', textAlign:'center',
-                  border: 'none',
-                  background: '#e8e8e8',
+                  border: sel ? '1.5px solid #1B6EF3' : '1px solid #C8C8C8',
+                  background: '#fff',
                   color: sel ? '#1B6EF3' : '#64748B',
-                  boxShadow: sel
-                    ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-                    : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                   transition:'all .12s',
                   WebkitTapHighlightColor: 'transparent',
                 }}>
-                  <div style={{ fontWeight: sel ? 800 : 600, fontSize:12 }}>{idx+1}일</div>
+                  <div style={{ fontWeight: sel ? 800 : 500, fontSize:12 }}>{idx+1}일</div>
                   <div style={{ fontSize:10, opacity:.7, marginTop:1 }}>{fmtMD(d)}</div>
                   <div style={{ fontSize:9, opacity:.6 }}>{dow(d)}</div>
                 </button>
@@ -63,9 +60,7 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
           fontSize:13, fontWeight:700,
           color: currentDays.length > 0 ? '#1B6EF3' : '#94A3B8',
           cursor:'pointer',
-          boxShadow: currentDays.length > 0
-            ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-            : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           WebkitTapHighlightColor: 'transparent',
         }}>{currentDays.length > 0 ? `${currentDays.length}일 추가하기 ✓` : '닫기'}</button>
       </div>
