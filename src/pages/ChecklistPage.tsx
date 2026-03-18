@@ -655,7 +655,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                 display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical',
                               }}>{db.description}</span>
                             )}
-                            {(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0) && (
+                            {(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0 || db?.tips) && (
                               <button
                                 onClick={async e => {
                                   e.stopPropagation()
@@ -667,33 +667,13 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                   } else setDetailBizCards([])
                                 }}
                                 style={{
-                                  alignSelf:'flex-start', fontSize:10, fontWeight:600, color:'#1B6EF3',
-                                  background:'none', border:'none', cursor:'pointer', padding:'2px 0', marginTop:2,
+                                  alignSelf:'flex-start', fontSize:10, fontWeight:700,
+                                  color:'#fff', background:'#1B6EF3',
+                                  border:'none', borderRadius:20, cursor:'pointer',
+                                  padding:'3px 10px', marginTop:3,
                                 }}>
                                 자세히 알아보기 ›
                               </button>
-                            )}
-                            {((db?.related_business_ids?.length ?? 0) > 0 || db?.related_business_id) && (
-                              <div style={{ display:'flex', gap:4, flexWrap:'wrap', marginTop:2 }}>
-                                {(db?.related_business_ids?.length ? db.related_business_ids : db?.related_business_id ? [db.related_business_id] : []).map(bizId => (
-                                  <button key={bizId}
-                                    onClick={async e => {
-                                      e.stopPropagation()
-                                      setDetailBizId(bizId)
-                                      const { data } = await supabase.from('businesses').select('*').eq('id', bizId).single()
-                                      if (data) setDetailBiz(data)
-                                    }}
-                                    style={{
-                                      display:'flex', alignItems:'center', gap:3,
-                                      fontSize:10, fontWeight:700, color:'#1B6EF3',
-                                      background:'rgba(27,110,243,0.08)', border:'none',
-                                      borderRadius:4, padding:'2px 7px', cursor:'pointer',
-                                    }}>
-                                    <Icon icon="ph:buildings" width={11} height={11} color="#1B6EF3" />
-                                    관련업체
-                                  </button>
-                                ))}
-                              </div>
                             )}
                           </>
                         )
@@ -821,27 +801,26 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <div onClick={() => setDetailItem(null)} style={{
           position:'fixed', inset:0, zIndex:600,
           background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)',
-          display:'flex', alignItems:'flex-end', justifyContent:'center',
           fontFamily:"'Pretendard','Noto Sans KR',sans-serif",
         }}>
           <div onClick={e => e.stopPropagation()} style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:390,
             background:'#e8e8e8', borderRadius:'20px 20px 0 0',
             maxHeight:'88vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease',
           }}>
-            {/* 사진 (있을 때만) */}
+            {/* 핸들 */}
+            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'12px auto 0' }} />
+
+            {/* 이미지 (있을 때만) */}
             {detailItem.image_url && (
-              <img src={detailItem.image_url} alt="" style={{
-                width:'100%', height:200, objectFit:'cover',
-                borderRadius:'20px 20px 0 0',
-              }} />
+              <div style={{ width:'100%', height:220, overflow:'hidden', marginTop:8 }}>
+                <img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+              </div>
             )}
-            <div style={{ padding:'20px 20px 36px' }}>
-              {/* 핸들 (사진 없을 때만) */}
-              {!detailItem.image_url && (
-                <div style={{ width:36, height:4, background:'#C8C8C8', borderRadius:2, margin:'0 auto 16px' }} />
-              )}
+
+            <div style={{ padding:'16px 18px 40px' }}>
               {/* 제목 */}
               <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', lineHeight:1.4, marginBottom:12 }}>
                 {detailItem.label}
@@ -882,31 +861,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               {/* 관련 업체 카드 */}
               {detailBizCards.length > 0 && (
                 <div style={{ marginBottom:16 }}>
-                  <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:8 }}>🏪 여기서 예약·구매할 수 있어요</div>
+                  <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:8 }}>🏢 관련 업체</div>
                   <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                     {detailBizCards.map(biz => (
-                      <div key={biz.id} style={{
-                        background:'#fff', border:'1px solid #C8C8C8', borderRadius:12,
-                        padding:'12px 14px', display:'flex', alignItems:'center', gap:10,
-                      }}>
-                        {biz.image_url
-                          ? <img src={biz.image_url} alt="" style={{ width:40, height:40, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
-                          : <div style={{ width:40, height:40, borderRadius:8, background:'#F1F5F9', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                              <Icon icon="ph:buildings" width={20} height={20} color="#94A3B8" />
-                            </div>
-                        }
-                        <div style={{ flex:1, minWidth:0 }}>
-                          <div style={{ fontSize:13, fontWeight:700, color:'#0F172A', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{biz.name}</div>
-                          {biz.address && <div style={{ fontSize:11, color:'#94A3B8', marginTop:2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>📍 {biz.address}</div>}
-                        </div>
-                        {biz.website && (
-                          <button onClick={() => window.open(biz.website, '_blank')} style={{
-                            background:'#e8e8e8', border:'none', borderRadius:8, padding:'6px 10px',
-                            fontSize:11, fontWeight:600, color:'#1B6EF3', cursor:'pointer', flexShrink:0,
-                            boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-                          }}>바로가기</button>
-                        )}
-                      </div>
+                      <BusinessCard key={biz.id} business={biz} />
                     ))}
                   </div>
                 </div>
