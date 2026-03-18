@@ -170,68 +170,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   }
 
   const [showFireworks, setShowFireworks] = useState(false)
-  const [toast, setToast] = useState<string|null>(null)
-  const toastTimer = useRef<any>(null)
-
-  const TOASTS = [
-    '좋은 선택이에요 ✨',
-    '호주에서 꼭 해봐요 🦘',
-    '기대되는데요! 🎯',
-    '완료! 리스트에 추가됐어요 🎉',
-    '오 이거 꼭 해야해! 👍',
-    '완벽한 선택 🌟',
-    '호주 여행이 기대돼요 ✈️',
-    '좋아요, 잊지 마세요! 📌',
-    '이거 진짜 꿀이에요 🍯',
-    '후회 없을 거예요 😎',
-    '현지인도 추천해요 🙌',
-    '이건 필수 중의 필수! 💯',
-    '가면 무조건 해야 해요 🔥',
-    '나중에 감사할 거예요 😄',
-    '한국 가서 자랑할 수 있어요 🏆',
-    '이거 빼면 서운하죠 😅',
-    '추억 제대로 만들어봐요 📸',
-    '역시 안목이 있으시네요 👀',
-    '완벽한 호주 여행 준비 중 🌏',
-    '한 발짝 더 가까워졌어요 🚀',
-    '호주 고수의 선택! 🦅',
-    '이 정도면 현지인이죠 😂',
-    '시드니가 기다리고 있어요 🌉',
-    '잊으면 진짜 후회해요 😤',
-    '이건 무조건 체크! ✅',
-    '캥거루도 엄지척 👍',
-    '비행기 티켓 끊어야겠는데요 🎫',
-    '오 이거 저도 가고 싶다 🤩',
-    '호주 마스터 등극 중 👑',
-    '이 정도면 가이드북 써도 되겠어요 📖',
-    '와 진짜요? 이것도요? 😲',
-    '잘하셨어요, 진심으로 🫶',
-    '호주가 기다리고 있어요! 🌅',
-    '인스타 피드 대박 예감 📱',
-    '이거 안 하면 진짜 손해예요 💸',
-    '벌써 설레는데요 🥹',
-    '호주 여행 A+ 예상 🎓',
-    '이 선택, 두고두고 잘했다 할 거예요 😌',
-    '한국 친구들이 부러워할 거예요 😏',
-    '여행 고수의 냄새가 나요 🐨',
-    '이거 리얼 꿀팁이에요 🍀',
-    '준비성 하나는 최고예요 💪',
-    '호주 현지인 인정 도장 🔖',
-    '이쯤 되면 호주 홍보대사 아닌가요 😄',
-    '오늘도 한 걸음 더! 👣',
-    '이 여행, 절대 후회 없을 거예요 🌈',
-    '체크 소리가 들려요 딸깍 🎵',
-    '역대급 여행 준비 중 🏄',
-    '이거 찐이에요, 찐 🫡',
-    '보는 눈이 있으시네요 🕶️',
-  ]
-
-  const showToast = () => {
-    const msg = TOASTS[Math.floor(Math.random() * TOASTS.length)]
-    setToast(msg)
-    if (toastTimer.current) clearTimeout(toastTimer.current)
-    toastTimer.current = setTimeout(() => setToast(null), 2000)
-  }
 
   const playFireworksSound = () => {
     try {
@@ -639,7 +577,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     {/* Checkbox — 녹색 */}
                     <button onClick={() => {
                       if (!trip) { setModal('noTrip'); return }
-                      if (!checked) showToast()
+                      if (!checked) {}
                       setState(toggleItem(state, item.id))
                     }} style={{
                       width:22, height:22, borderRadius:4, flexShrink:0,
@@ -784,31 +722,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
 
       {/* ── 토스트 ── */}
-      {toast && (
-        <div style={{
-          position:'fixed', top:135, left:'50%', transform:'translateX(-50%)',
-          zIndex:998, pointerEvents:'none',
-          display:'flex', alignItems:'center', gap:10,
-          background:'#fff',
-          border:'1px solid #C8C8C8',
-          color:'#0F172A', fontSize:15, fontWeight:700,
-          padding:'13px 20px', borderRadius:14,
-          boxShadow:'0 8px 24px rgba(0,0,0,0.13)',
-          whiteSpace:'nowrap',
-          animation:'toastIn 0.25s ease both',
-        }}>
-          <div style={{
-            width:26, height:26, borderRadius:'50%',
-            background:'#DC2626',
-            display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
-          }}>
-            <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
-              <path d="M1 5L5 9L12 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          {toast}
-        </div>
-      )}
 
       {/* ── Trip date picker modal ── */}
       {modal==='tripPicker' && (
