@@ -371,7 +371,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:'#F0F4F8',
+    <div style={{ minHeight:'100vh', background:'#e8e8e8',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       boxSizing:'border-box', maxWidth:480, margin:'0 auto', position:'relative' }}>
 
@@ -388,6 +388,27 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .list-item { transition: background .1s; }
         .list-item:active { background: #F1F5F9 !important; }
+        .neu-tab {
+          background: #e8e8e8;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          transition: all 0.15s ease;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+          box-shadow: 3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff;
+          border-radius: 10px;
+        }
+        .neu-tab.active {
+          box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff;
+        }
+        .neu-tab:active {
+          box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff;
+        }
         .cat-scroll { overflow-x:auto; }
         @media (max-width:768px) {
           .cat-scroll { scrollbar-width:none; -ms-overflow-style:none; }
@@ -395,15 +416,15 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         }
         @media (min-width:769px) {
           .cat-scroll::-webkit-scrollbar { height:4px; }
-          .cat-scroll::-webkit-scrollbar-track { background:#F0F4F8; border-radius:2px; }
+          .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
           .cat-scroll::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:2px; }
         }
       `}</style>
 
       {/* ── 헤더 + 탭 ── */}
-      <div style={{ background:'#fff' }}>
+      <div style={{ background:'#e8e8e8', paddingBottom: 8 }}>
         {/* 브랜드 + 카운터 */}
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 0' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 12px' }}>
           <span onClick={handleLogoTap}
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
@@ -412,25 +433,23 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           </span>
         </div>
         {/* 탭 */}
-        <div style={{ display:'flex', padding:'8px 8px 0', gap:2, overflowX:'auto', scrollbarWidth:'none' }}>
+        <div style={{ display:'flex', padding:'0 10px', gap:8, overflowX:'auto', scrollbarWidth:'none' }}>
           {([
             { id:'bucketlist', icon:'ph:check-circle',  label:'버킷리스트' },
-            { id:'shopping',   icon:'ph:shopping-bag',  label:'호주쇼핑리스트' },
-            { id:'bingo',      icon:'ph:coffee',        label:'카페도장깨기' },
+            { id:'shopping',   icon:'ph:shopping-bag',  label:'쇼핑리스트' },
+            { id:'bingo',      icon:'ph:coffee',        label:'카페빙고게임' },
             { id:'community',  icon:'ph:chats-circle',  label:'채팅방' },
-            { id:'services',   icon:'ph:buildings',     label:'업체/서비스' },
+            { id:'services',   icon:'ph:buildings',     label:'업체리스트' },
           ] as { id: MainTab; icon: string; label: string }[]).map(tab => {
             const active = mainTab === tab.id
             return (
-              <button key={tab.id} onClick={() => setMainTab(tab.id)} style={{
-                flex:1, minWidth:0, height:48, border:'none', cursor:'pointer',
-                borderRadius:'6px 6px 0 0',
-                display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2,
-                background: active ? '#1B6EF3' : 'transparent',
-                borderBottom: active ? '2px solid #1B6EF3' : '2px solid transparent',
-              }}>
-                <Icon icon={tab.icon} width={16} height={16} color={active ? '#fff' : '#475569'} />
-                <span style={{ fontSize:10, fontWeight: active ? 700 : 500, color: active ? '#fff' : '#475569', whiteSpace:'nowrap' }}>
+              <button key={tab.id} onClick={() => setMainTab(tab.id)}
+                className={`neu-tab${active ? ' active' : ''}`}
+                style={{
+                  flex:1, minWidth:0, height:52,
+                }}>
+                <Icon icon={tab.icon} width={16} height={16} color={active ? '#1B6EF3' : '#94A3B8'} />
+                <span style={{ fontSize:9, fontWeight: active ? 700 : 500, color: active ? '#1B6EF3' : '#94A3B8', whiteSpace:'nowrap' }}>
                   {tab.label}
                 </span>
               </button>
