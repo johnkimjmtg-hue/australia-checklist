@@ -464,7 +464,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   return (
     <div ref={pageRef} style={{
       minHeight: embedded ? 'auto' : '100vh',
-      background: '#F0F4F8',
+      background: '#e8e8e8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       display: 'flex', flexDirection: 'column',
     }}>
@@ -538,7 +538,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       </div>}
 
       {/* ── 상황판 */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background:'#F0F4F8', padding:'12px 16px 0' }}>
+      <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'12px 16px 0' }}>
         {/* 도시 선택 */}
         <div style={{ display:'flex', gap:8, marginBottom:10 }}>
           {([
@@ -717,7 +717,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               width:'100%', maxWidth:390,
               maxHeight:'85vh', overflowY:'auto',
               borderRadius:'20px 20px 0 0',
-              background:'#F0F4F8',
+              background:'#e8e8e8',
               padding:'12px 12px 32px',
               boxSizing:'border-box',
             }}>

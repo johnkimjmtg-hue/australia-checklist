@@ -130,7 +130,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const isFiltered  = isSearch || isCatFilter
 
   return (
-    <div style={{ minHeight:'100vh', background:'#F0F4F8', fontFamily:ff, paddingBottom:40 }}>
+    <div style={{ minHeight:'100vh', background:'#e8e8e8', fontFamily:ff, paddingBottom:40 }}>
       <style>{`
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .cat-scroll { overflow-x:auto; }

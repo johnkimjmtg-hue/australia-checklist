@@ -79,7 +79,7 @@ export default function Shopping() {
 
   return (
     <div style={{
-      background:'#F0F4F8', minHeight:'100vh',
+      background:'#e8e8e8', minHeight:'100vh',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       paddingBottom: 80,
     }}>
@@ -112,20 +112,22 @@ export default function Shopping() {
 
       {/* ── 카테고리 탭 */}
       <div style={{
-        background:'#fff', borderBottom:'1px solid #E2E8F0',
+        background:'#e8e8e8', borderBottom:'1px solid #D1D9E3',
         position:'sticky', top:0, zIndex:20,
       }}>
         <div style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto' }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
-            flexShrink:0, height:34, padding:'0 14px', borderRadius:20, border:'none', cursor:'pointer',
-            background: selCat === null ? '#1B6EF3' : '#F1F5F9',
+            flexShrink:0, height:34, padding:'0 14px', borderRadius:20, cursor:'pointer',
+            background: selCat === null ? '#1B6EF3' : '#e8e8e8',
+            border: selCat === null ? '1.5px solid #1B6EF3' : '1.5px solid #CBD5E1',
             color: selCat === null ? '#fff' : '#475569',
             fontSize:12, fontWeight:700,
           }}>전체</button>
           {categories.map(cat => (
             <button key={cat.id} className="cat-btn" onClick={() => setSelCat(cat.id)} style={{
-              flexShrink:0, height:34, padding:'0 14px', borderRadius:20, border:'none', cursor:'pointer',
-              background: selCat === cat.id ? '#1B6EF3' : '#F1F5F9',
+              flexShrink:0, height:34, padding:'0 14px', borderRadius:20, cursor:'pointer',
+              background: selCat === cat.id ? '#1B6EF3' : '#e8e8e8',
+              border: selCat === cat.id ? '1.5px solid #1B6EF3' : '1.5px solid #CBD5E1',
               color: selCat === cat.id ? '#fff' : '#475569',
               fontSize:12, fontWeight:700, whiteSpace:'nowrap',
             }}>{cat.emoji} {cat.name}</button>

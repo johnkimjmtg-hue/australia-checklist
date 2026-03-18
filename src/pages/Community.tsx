@@ -263,7 +263,7 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
             <button key={ex} onClick={() => { setInput(ex); setError('') }} style={{
               fontSize: 11, fontWeight: 600, padding: '4px 10px',
               borderRadius: 20, border: '1px solid #E2E8F0',
-              background: '#F8FAFC', color: '#64748B', cursor: 'pointer',
+              background: '#e8e8e8', color: '#64748B', cursor: 'pointer',
             }}>{ex}</button>
           ))}
         </div>
@@ -549,7 +549,7 @@ export default function Community() {
 
   return (
     <div ref={pageRef} style={{
-      background: '#EEF2F7',
+      background: '#e8e8e8',
       fontFamily: ff,
       minHeight: '100%',
       paddingBottom: 80,
@@ -631,7 +631,7 @@ export default function Community() {
           <div style={{ padding: '0 14px 12px', borderTop: '1px solid #F1F5F9' }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              background: '#F8FAFC', borderRadius: 12, padding: '0 12px',
+              background: '#e8e8e8', borderRadius: 12, padding: '0 12px',
               height: 40, border: '1.5px solid #D1D9E3',
             }}>
               <Icon icon="ph:magnifying-glass" width={14} height={14} color="#94A3B8" />
@@ -740,7 +740,7 @@ export default function Community() {
                     <div style={{ flex: 1, height: 1, background: '#D1D9E3' }} />
                     <span style={{
                       fontSize: 11, fontWeight: 600, color: '#94A3B8',
-                      background: '#EEF2F7', padding: '2px 10px', borderRadius: 20,
+                      background: '#e8e8e8', padding: '2px 10px', borderRadius: 20,
                       border: '1px solid #D1D9E3',
                     }}>{formatDateLabel(msg.created_at)}</span>
                     <div style={{ flex: 1, height: 1, background: '#D1D9E3' }} />
