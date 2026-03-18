@@ -668,10 +668,10 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           {/* 타이틀 */}
           <div style={{ textAlign: 'center', marginBottom: 16 }}>
             <div style={{
-              fontSize: 28, fontWeight: 700, color: '#333',
-              letterSpacing: 6,
+              fontSize: 22, fontWeight: 700, color: '#333',
+              letterSpacing: 4,
               fontFamily: '"Josefin Sans", "Raleway", sans-serif',
-            }}>HOJUGAJA</div>
+            }}>HOJUGAJA.COM</div>
           </div>
 
           {/* 디스플레이 */}
@@ -690,7 +690,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           }}>
             <div style={{ fontSize: 22, marginBottom: 8 }}>🦘</div>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#2d3e1f', letterSpacing: 0.5 }}>
-              호주 여행/이민 필수 정보 어플
+              호주 여행·이민 필수 정보 사이트
             </div>
             <div style={{ fontSize: 12, color: '#4a5e32', marginTop: 8, lineHeight: 1.7 }}>
               호주의 모든 정보가 한곳으로 연결됩니다.<br/>
