@@ -25,7 +25,7 @@ export default function BusinessCard({ business }: Props) {
     display:'flex', alignItems:'center', justifyContent:'center', gap:5,
     height:36, padding:'0 14px', borderRadius:8,
     fontSize:12, fontWeight:700, cursor:'pointer',
-    border:'1.5px solid #D1D9E3', whiteSpace:'nowrap', fontFamily:ff,
+    border:'1px solid #C8C8C8', whiteSpace:'nowrap', fontFamily:ff,
     color:'#1E293B', background:'#fff',
   }
 
@@ -65,7 +65,7 @@ export default function BusinessCard({ business }: Props) {
     ) : null,
     kakao ? (
       <a key="kakao" href={`https://open.kakao.com/o/${kakao}`} target="_blank" rel="noreferrer"
-        style={{ ...btnBase, background:'#FEE500', color:'#3C1E1E', border:'1.5px solid #F0D800', textDecoration:'none' }}>
+        style={{ ...btnBase, background:'#FEE500', color:'#3C1E1E', border:'1px solid #F0D800', textDecoration:'none' }}>
         <Icon icon="ph:chat-circle" width={13} height={13} color="#3C1E1E" />카톡
       </a>
     ) : null,
@@ -91,7 +91,7 @@ export default function BusinessCard({ business }: Props) {
         background:'#fff', borderRadius:14,
         overflow:'hidden',
         borderLeft: is_featured ? '4px solid #1B6EF3' : '4px solid #CBD5E1',
-        border: '1px solid #E2E8F0',
+        border: '1px solid #C8C8C8',
         borderLeft: is_featured ? '4px solid #1B6EF3' : '4px solid #CBD5E1',
       }}>
         <div style={{ padding:'16px' }}>
