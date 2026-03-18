@@ -602,17 +602,21 @@ export default function Community() {
               setTimeout(() => searchInputRef.current?.focus(), 100)
             }} style={{
               width: 34, height: 34, borderRadius: '50%',
-              background: showSearch ? '#EFF6FF' : '#F1F5F9',
+              background: showSearch ? '#e8e8e8' : '#e8e8e8',
               border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: showSearch
+                ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
             }}>
               <Icon icon="ph:magnifying-glass" width={16} height={16} color={showSearch ? BLUE : '#64748B'} />
             </button>
             {myName && (
               <button onClick={() => setShowNameChange(true)} style={{
                 display: 'flex', alignItems: 'center', gap: 5,
-                background: '#F1F5F9', border: 'none', borderRadius: 20,
+                background: '#e8e8e8', border: 'none', borderRadius: 20,
                 padding: '6px 12px', cursor: 'pointer',
+                boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
               }}>
                 <div style={{
                   width: 20, height: 20, borderRadius: '50%',
@@ -656,8 +660,7 @@ export default function Community() {
             {searchQuery.trim() && (
               <div style={{
                 marginTop: 8, maxHeight: 360, overflowY: 'auto',
-                background: '#fff', borderRadius: 12, border: '1px solid #E2E8F0',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+                background: '#fff', borderRadius: 12, border: '1px solid #C8C8C8',
               }}>
                 {searchResults.length === 0 ? (
                   <div style={{ padding: '14px', textAlign: 'center', fontSize: 13, color: '#94A3B8' }}>
@@ -792,7 +795,7 @@ export default function Community() {
                           : (continuous ? '18px 18px 18px 4px' : '4px 18px 18px 18px'),
                         padding: '10px 14px',
                         fontSize: 14, lineHeight: 1.6,
-                        boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                        border: isMine ? 'none' : '1px solid #C8C8C8',
                         wordBreak: 'break-word',
                         whiteSpace: 'pre-wrap',
                       }}>
@@ -801,7 +804,7 @@ export default function Community() {
                           <div
                             onClick={() => scrollToMessage(msg.reply_to_id!)}
                             style={{
-                              background: isMine ? 'rgba(255,255,255,0.2)' : '#F1F5F9',
+                              background: isMine ? 'rgba(255,255,255,0.2)' : '#e8e8e8',
                               borderRadius: 8, padding: '6px 10px',
                               marginBottom: 8, cursor: 'pointer',
                             }}>
