@@ -620,7 +620,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
                   borderRadius:10,
                   overflow:'hidden',
                   cursor:'pointer',
-                  border: isHighlight ? '2px solid #EF4444' : '2px solid #C8C8C8',
+                  border: isHighlight ? '2px solid #EF4444' : '1px solid #C8C8C8',
                   background: '#fff',
                   boxShadow: isHighlight
                     ? '0 2px 10px rgba(239,68,68,0.20)'
