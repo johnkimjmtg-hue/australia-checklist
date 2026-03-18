@@ -26,14 +26,13 @@ export default function BusinessCard({ business }: Props) {
     height:36, padding:'0 14px', borderRadius:8,
     fontSize:12, fontWeight:700, cursor:'pointer',
     border:'1.5px solid #D1D9E3', whiteSpace:'nowrap', fontFamily:ff,
-    boxShadow:'0 2px 6px rgba(0,0,0,0.08)',
-    color:'#1E293B', background:'#fff',
+    color:'#1E293B', background:'#e8e8e8',
   }
 
   const btnBlue: React.CSSProperties = {
     ...btnBase,
-    background:'#1B6EF3', color:'#fff', border:'none',
-    boxShadow:'0 2px 8px rgba(27,110,243,0.25)',
+    border:'1.5px solid #1B6EF3',
+    color:'#1B6EF3', background:'#e8e8e8',
   }
 
   // 버튼 순서: 전화, 경로, 웹사이트, 카톡, 구글리뷰, 공유 (없는건 스킵)
@@ -66,7 +65,7 @@ export default function BusinessCard({ business }: Props) {
     ) : null,
     kakao ? (
       <a key="kakao" href={`https://open.kakao.com/o/${kakao}`} target="_blank" rel="noreferrer"
-        style={{ ...btnBase, background:'#FEE500', color:'#3C1E1E', border:'1.5px solid #F0D800', textDecoration:'none' }}>
+        style={{ ...btnBase, background:'#e8e8e8', color:'#3C1E1E', border:'1.5px solid #F0D800', textDecoration:'none' }}>
         <Icon icon="ph:chat-circle" width={13} height={13} color="#3C1E1E" />카톡
       </a>
     ) : null,
@@ -89,12 +88,11 @@ export default function BusinessCard({ business }: Props) {
       )}
 
       <div style={{
-        background:'#fff', borderRadius:14,
+        background:'#e8e8e8', borderRadius:14,
         boxShadow: is_featured
-          ? '0 4px 20px rgba(27,110,243,0.13),0 1px 4px rgba(0,0,0,0.07)'
-          : '0 4px 16px rgba(0,0,0,0.10)',
+          ? '4px 4px 10px #c5c5c5, -4px -4px 10px #ffffff'
+          : '3px 3px 8px #c5c5c5, -3px -3px 8px #ffffff',
         overflow:'hidden',
-        border:'1px solid #E2E8F0',
         borderLeft: is_featured ? '4px solid #1B6EF3' : '4px solid #CBD5E1',
       }}>
         <div style={{ padding:'16px' }}>
