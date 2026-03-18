@@ -460,7 +460,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
     setSubmitting(false)
   }
 
-  const iStyle: React.CSSProperties = { width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:12, padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff', boxSizing:'border-box', fontFamily:ff, outline:'none' }
+  const iStyle: React.CSSProperties = { width:'100%', height:44, border:'1px solid #C8C8C8', borderRadius:12, padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff', boxSizing:'border-box', fontFamily:ff, outline:'none' }
   const taStyle: React.CSSProperties = { ...iStyle, height:80, padding:'10px 12px', resize:'none' as any }
   const lbl = (t: string, s?: string) => <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:5 }}>{t} {s && <span style={{ fontWeight:500, color:'#94A3B8' }}>{s}</span>}</div>
   const businessCats = BCATS.filter(c => c.id !== 'all')
@@ -470,7 +470,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
       <div style={{ fontSize:48, marginBottom:16 }}>🎉</div>
       <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:8 }}>신청이 완료됐어요!</div>
       <div style={{ fontSize:13, color:'#64748B', lineHeight:1.6, marginBottom:24 }}>검토 후 등록해드릴게요.<br/>감사합니다 🙏</div>
-      <button onClick={onClose} style={{ width:'100%', height:48, background:BLUE, color:'#fff', border:'none', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
+      <button onClick={onClose} style={{ width:'100%', height:48, background:'#e8e8e8', color:'#1B6EF3', border:'none', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer', boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>확인</button>
     </div>
   )
 
@@ -482,7 +482,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
           {lbl('카테고리 *')}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
             {businessCats.map(cat => (
-              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:12, border:'none', cursor:'pointer', background: form.category===cat.id ? BLUE : '#fff', color: form.category===cat.id ? '#fff' : '#1E293B', fontSize:12, fontWeight:700, boxShadow: form.category===cat.id ? '0 2px 8px rgba(0,53,148,0.25)' : '0 1px 4px rgba(0,0,0,0.08)' }}>{cat.label}</button>
+              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:12, border:'none', cursor:'pointer', background:'#e8e8e8', color: form.category===cat.id ? '#1B6EF3' : '#64748B', fontSize:12, fontWeight: form.category===cat.id ? 700 : 500, boxShadow: form.category===cat.id ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff' : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>{cat.label}</button>
             ))}
           </div>
         </div>
@@ -496,7 +496,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
         <div>{lbl('웹사이트')}<input value={form.website} onChange={e => set('website', e.target.value)} placeholder="https://..." style={iStyle} /></div>
       </div>
       {error && <div style={{ marginTop:10, padding:'8px 12px', background:'rgba(239,68,68,0.08)', borderRadius:8, fontSize:12, color:'#DC2626', fontWeight:600 }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:BLUE, color:'#fff', border:'none', borderRadius:12, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)' }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:'#e8e8e8', color:'#1B6EF3', border:'none', borderRadius:12, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
     </div>
   )
 }
@@ -508,7 +508,7 @@ function SuggestionForm({ onClose }: { onClose: () => void }) {
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone]             = useState(false)
   const [error, setError]           = useState('')
-  const iStyle: React.CSSProperties = { width:'100%', height:44, border:'1px solid #E2E8F0', borderRadius:12, padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff', boxSizing:'border-box', fontFamily:ff, outline:'none' }
+  const iStyle: React.CSSProperties = { width:'100%', height:44, border:'1px solid #C8C8C8', borderRadius:12, padding:'0 12px', fontSize:14, color:'#1E293B', background:'#fff', boxSizing:'border-box', fontFamily:ff, outline:'none' }
   const taStyle: React.CSSProperties = { ...iStyle, height:110, padding:'12px', resize:'none' as any, lineHeight:1.6 }
   const handleSubmit = async () => {
     if (!suggestion.trim()) { setError('추천 내용을 입력해주세요'); return }
@@ -526,13 +526,13 @@ function SuggestionForm({ onClose }: { onClose: () => void }) {
       <div style={{ fontSize:48, marginBottom:16 }}>🙏</div>
       <div style={{ fontSize:18, fontWeight:800, color:'#1E293B', marginBottom:8 }}>감사합니다!</div>
       <div style={{ fontSize:13, color:'#64748B', lineHeight:1.7, marginBottom:24 }}>소중한 경험을 나눠주셨어요.<br/>채택되면 이메일로 알려드릴게요 😊</div>
-      <button onClick={onClose} style={{ width:'100%', height:48, background:BLUE, color:'#fff', border:'none', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>확인</button>
+      <button onClick={onClose} style={{ width:'100%', height:48, background:'#e8e8e8', color:'#1B6EF3', border:'none', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer', boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>확인</button>
     </div>
   )
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-      <div style={{ background:'rgba(0,53,148,0.05)', borderRadius:12, padding:'12px 14px' }}>
-        <div style={{ fontSize:13, color:BLUE, fontWeight:700, marginBottom:4 }}>💡 이런 것들을 추천해주세요</div>
+      <div style={{ background:'rgba(232,232,232,0.8)', borderRadius:12, padding:'12px 14px', border:'1px solid #C8C8C8' }}>
+        <div style={{ fontSize:13, color:'#1B6EF3', fontWeight:700, marginBottom:4 }}>💡 이런 것들을 추천해주세요</div>
         <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6 }}>호주에서 꼭 해봐야 할 것, 먹어봐야 할 것, 가봐야 할 곳!</div>
       </div>
       <div>
@@ -544,8 +544,8 @@ function SuggestionForm({ onClose }: { onClose: () => void }) {
         <input value={email} onChange={e => setEmail(e.target.value)} placeholder="example@email.com" type="email" style={iStyle} />
       </div>
       {error && <div style={{ padding:'8px 12px', background:'rgba(239,68,68,0.08)', borderRadius:8, fontSize:12, color:'#DC2626', fontWeight:600 }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', height:50, background:BLUE, color:'#fff', border:'none', borderRadius:12, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'0 4px 14px rgba(0,53,148,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:4 }}>
-        <Icon icon="ph:paper-plane-tilt" width={16} height={16} color="'${GOLD}'" />
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', height:50, background:'#e8e8e8', color:'#1B6EF3', border:'none', borderRadius:12, fontSize:15, fontWeight:800, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff', display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:4 }}>
+        <Icon icon="ph:paper-plane-tilt" width={16} height={16} color="#1B6EF3" />
         {submitting ? '제출 중...' : '추천 제출하기'}
       </button>
     </div>
@@ -714,7 +714,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>9<br/>준비중</button>
             {/* 4행 */}
             <button className="calc-btn calc-btn-accent" onClick={() => setShowSuggestion(true)}
-              style={{ height: 72, fontSize: 12 }}>*<br/>버킷리스트 추천</button>
+              style={{ height: 72, fontSize: 12 }}>*<br/>버킷리스트추천</button>
             <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>0<br/>준비중</button>
             <button className="calc-btn calc-btn-accent" onClick={() => setShowForm(true)}
               style={{ height: 72, fontSize: 12 }}>#<br/>업체등록신청</button>
@@ -726,11 +726,11 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {showSuggestion && (
         <div style={{ position:'fixed', inset:0, zIndex:500 }}>
           <div onClick={() => setShowSuggestion(false)} style={{ position:'absolute', inset:0, background:'rgba(10,20,40,0.6)' }}/>
-          <div style={{ position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:480, background:'#F1F5F9', borderRadius:'20px 20px 0 0', padding:'20px 20px 40px', maxHeight:'90vh', overflowY:'auto' }}>
-            <div style={{ width:36, height:4, background:'#CBD5E1', borderRadius:2, margin:'0 auto 20px' }}/>
+          <div style={{ position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:390, background:'#e8e8e8', borderRadius:'20px 20px 0 0', padding:'20px 20px 40px', maxHeight:'90vh', overflowY:'auto' }}>
+            <div style={{ width:36, height:4, background:'#C8C8C8', borderRadius:2, margin:'0 auto 20px' }}/>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
               <div>
-                <div style={{ fontSize:18, fontWeight:800, color:'#1E293B' }}>버킷리스트 추천</div>
+                <div style={{ fontSize:18, fontWeight:800, color:'#1E293B' }}>버킷리스트추천</div>
                 <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>채택되면 이메일로 알려드려요 😊</div>
               </div>
               <button onClick={() => setShowSuggestion(false)} style={{ background:'none', border:'none', cursor:'pointer', padding:4 }}>
@@ -746,8 +746,8 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
       {showForm && (
         <div style={{ position:'fixed', inset:0, zIndex:500 }}>
           <div onClick={() => setShowForm(false)} style={{ position:'absolute', inset:0, background:'rgba(10,20,40,0.6)' }}/>
-          <div style={{ position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:480, background:'#F1F5F9', borderRadius:'20px 20px 0 0', padding:'20px 20px 40px', maxHeight:'90vh', overflowY:'auto' }}>
-            <div style={{ width:36, height:4, background:'#CBD5E1', borderRadius:2, margin:'0 auto 20px' }}/>
+          <div style={{ position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:390, background:'#e8e8e8', borderRadius:'20px 20px 0 0', padding:'20px 20px 40px', maxHeight:'90vh', overflowY:'auto' }}>
+            <div style={{ width:36, height:4, background:'#C8C8C8', borderRadius:2, margin:'0 auto 20px' }}/>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
               <div>
                 <div style={{ fontSize:18, fontWeight:800, color:'#1E293B' }}>업체 등록 신청</div>
