@@ -839,25 +839,28 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         }} onClick={() => setShowMoreMenu(false)}>
           <div style={{
             width:'100%', maxWidth:390,
-            background:'#fff', borderRadius:'20px 20px 0 0',
+            background:'#e8e8e8', borderRadius:'20px 20px 0 0',
             padding:'20px 16px 36px',
-            boxShadow:'0 -4px 24px rgba(0,0,0,0.15)',
           }} onClick={e => e.stopPropagation()}>
-            <div style={{ width:40, height:4, borderRadius:2, background:'#E2E8F0', margin:'0 auto 20px' }}/>
+            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'0 auto 20px' }}/>
             <div style={{ fontSize:13, fontWeight:800, color:'#94A3B8', marginBottom:14, letterSpacing:0.5 }}>더보기</div>
             <button onClick={handleShare} style={{
               width:'100%', height:52, borderRadius:12, border:'none',
-              background:'#1B6EF3', color:'#fff',
+              background:'#e8e8e8', color:'#1B6EF3',
               fontSize:15, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
+              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              WebkitTapHighlightColor:'transparent',
             }}>
-              <Icon icon="ph:share-network" width={18} height={18} color="#fff" />공유하기
+              <Icon icon="ph:share-network" width={18} height={18} color="#1B6EF3" />공유하기
             </button>
             <button onClick={() => { setShowMoreMenu(false); setShowReset(true) }} style={{
-              width:'100%', height:52, borderRadius:12,
-              border:'1.5px solid #FECDD3', background:'#FFF5F5', color:'#DC2626',
+              width:'100%', height:52, borderRadius:12, border:'none',
+              background:'#e8e8e8', color:'#DC2626',
               fontSize:15, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:10, padding:'0 18px',
+              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              WebkitTapHighlightColor:'transparent',
             }}>
               <Icon icon="ph:arrow-counter-clockwise" width={18} height={18} color="#DC2626" />리셋하기
             </button>
