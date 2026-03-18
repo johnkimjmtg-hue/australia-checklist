@@ -2081,11 +2081,39 @@ function ShoppingTab() {
 
         {/* 구매처 */}
         <div>
-          <span style={labelStyle}>구매처 (쉼표로 구분)</span>
+          <span style={labelStyle}>구매처</span>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginTop:6 }}>
+            {['Coles', 'Woolworths', 'Aldi', 'Big W', 'Target', 'Kmart', 'Chemist Warehouse', 'Priceline', '로컬 약국', '건강식품점', '슈퍼마켓', '마켓', '리커샵', '기념품점', '백화점', 'Myer', 'David Jones', '면세점', '온라인'].map(place => {
+              const selected = form.where_to_buy.includes(place)
+              return (
+                <label key={place} style={{
+                  display:'flex', alignItems:'center', gap:5, cursor:'pointer',
+                  fontSize:12, fontWeight: selected ? 700 : 500,
+                  color: selected ? '#1B6EF3' : '#64748B',
+                  background: selected ? '#EFF6FF' : '#fff',
+                  border: selected ? '1.5px solid #1B6EF3' : '1.5px solid #D1D9E3',
+                  borderRadius:20, padding:'5px 12px', transition:'all 0.15s',
+                }}>
+                  <input type="checkbox" checked={selected}
+                    onChange={e => {
+                      if (e.target.checked) setForm(f => ({ ...f, where_to_buy: [...f.where_to_buy, place] }))
+                      else setForm(f => ({ ...f, where_to_buy: f.where_to_buy.filter(w => w !== place) }))
+                    }}
+                    style={{ display:'none' }}
+                  />
+                  {selected ? '✓ ' : ''}{place}
+                </label>
+              )
+            })}
+          </div>
           <input
-            value={form.where_to_buy.join(', ')}
-            onChange={e => setForm(f => ({...f, where_to_buy: e.target.value.split(',').map(s => s.trim()).filter(Boolean)}))}
-            style={inputStyle} placeholder="Chemist Warehouse, Woolworths"
+            value={form.where_to_buy.filter(w => !['Coles','Woolworths','Aldi','Big W','Target','Kmart','Chemist Warehouse','Priceline','로컬 약국','건강식품점','슈퍼마켓','마켓','리커샵','기념품점','백화점','Myer','David Jones','면세점','온라인'].includes(w)).join(', ')}
+            onChange={e => {
+              const preset = form.where_to_buy.filter(w => ['Coles','Woolworths','Aldi','Big W','Target','Kmart','Chemist Warehouse','Priceline','로컬 약국','건강식품점','슈퍼마켓','마켓','리커샵','기념품점','백화점','Myer','David Jones','면세점','온라인'].includes(w))
+              const custom = e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+              setForm(f => ({ ...f, where_to_buy: [...preset, ...custom] }))
+            }}
+            style={{ ...inputStyle, marginTop:8 }} placeholder="위에 없는 경우 직접 입력 (쉼표로 구분)"
           />
         </div>
 
