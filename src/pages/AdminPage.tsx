@@ -2100,8 +2100,8 @@ function ShoppingTab() {
                   display:'flex', alignItems:'center', gap:5, cursor:'pointer',
                   fontSize:12, fontWeight: selected ? 700 : 500,
                   color: selected ? '#1B6EF3' : '#64748B',
-                  background: selected ? '#EFF6FF' : '#F1F5F9',
-                  border: selected ? '1.5px solid #1B6EF3' : '1.5px solid #E2E8F0',
+                  background: selected ? '#EFF6FF' : '#fff',
+                  border: selected ? '1.5px solid #1B6EF3' : '1.5px solid #D1D9E3',
                   borderRadius:20, padding:'5px 12px',
                   transition:'all 0.15s',
                 }}>
