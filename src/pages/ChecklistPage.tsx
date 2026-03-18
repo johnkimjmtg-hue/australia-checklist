@@ -643,7 +643,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       setState(toggleItem(state, item.id))
                     }} style={{
                       width:22, height:22, borderRadius:4, flexShrink:0,
-                      border: checked ? 'none' : '1.5px solid #CBD5E1',
+                      border: checked ? 'none' : '1px solid #C8C8C8',
                       background: checked ? '#16A34A' : '#fff',
                       display:'flex', alignItems:'center', justifyContent:'center',
                       cursor:'pointer', padding:0,
@@ -1092,13 +1092,13 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
         {/* 월 네비게이션 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <button onClick={prevMonth} style={{
-            width: 32, height: 32, borderRadius: 6, border: '1px solid #E2E8F0',
-            background: '#F1F5F9', cursor: 'pointer', fontSize: 14, color: '#1B6EF3', fontWeight: 800,
+            width: 32, height: 32, borderRadius: 6, border: '1px solid #C8C8C8',
+            background: '#e8e8e8', cursor: 'pointer', fontSize: 14, color: '#1B6EF3', fontWeight: 800,
           }}>‹</button>
           <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{year}년 {month}월</div>
           <button onClick={nextMonth} style={{
-            width: 32, height: 32, borderRadius: 6, border: '1px solid #E2E8F0',
-            background: '#F1F5F9', cursor: 'pointer', fontSize: 14, color: '#1B6EF3', fontWeight: 800,
+            width: 32, height: 32, borderRadius: 6, border: '1px solid #C8C8C8',
+            background: '#e8e8e8', cursor: 'pointer', fontSize: 14, color: '#1B6EF3', fontWeight: 800,
           }}>›</button>
         </div>
 
@@ -1112,17 +1112,17 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
         {/* 선택된 날짜 표시 */}
         <div style={{
           marginTop: 12, padding: '10px 14px', borderRadius: 8,
-          background: selected ? 'rgba(27,110,243,0.06)' : '#F1F5F9',
+          background: selected ? 'rgba(27,110,243,0.06)' : '#e8e8e8',
           textAlign: 'center', fontSize: 14, fontWeight: 600,
           color: selected ? '#1B6EF3' : '#94A3B8',
-          border: selected ? '1px solid rgba(27,110,243,0.15)' : '1px solid transparent',
+          border: selected ? '1px solid #C8C8C8' : '1px solid #C8C8C8',
         }}>
           {selected ? `📅 ${selected}` : '날짜를 선택해주세요'}
         </div>
 
         <button onClick={() => selected && onSelect(selected)} style={{
           width: '100%', height: 54, borderRadius: 6, border: 'none', cursor: selected ? 'pointer' : 'default',
-          background: selected ? '#1B6EF3' : '#E2E8F0',
+          background: selected ? '#1B6EF3' : '#C8C8C8',
           color: selected ? '#fff' : '#94A3B8', fontSize: 15, fontWeight: 700,
           marginTop: 10, marginBottom: 4,
           boxShadow: selected ? '0 10px 15px rgba(0,0,0,0.10)' : 'none',
