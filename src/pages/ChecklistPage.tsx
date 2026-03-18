@@ -656,24 +656,40 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                               }}>{db.description}</span>
                             )}
                             {(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0 || db?.tips) && (
-                              <button
-                                onClick={async e => {
-                                  e.stopPropagation()
-                                  if (!db) return
-                                  setDetailItem(db)
-                                  if ((db.related_business_ids?.length ?? 0) > 0) {
-                                    const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
-                                    setDetailBizCards(data ?? [])
-                                  } else setDetailBizCards([])
-                                }}
-                                style={{
-                                  alignSelf:'flex-start', fontSize:10, fontWeight:700,
-                                  color:'#fff', background:'#1B6EF3',
-                                  border:'none', borderRadius:20, cursor:'pointer',
-                                  padding:'3px 10px', marginTop:3,
-                                }}>
-                                자세히 알아보기 ›
-                              </button>
+                              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:4 }}>
+                                {db?.address ? (() => {
+                                  const stateMap: Record<string,string> = {
+                                    'NSW':'시드니 지역', 'VIC':'멜번 지역', 'QLD':'브리즈번 지역',
+                                    'WA':'퍼스 지역', 'SA':'애들레이드 지역', 'TAS':'태즈매니아',
+                                    'ACT':'캔버라', 'NT':'노던 테리토리',
+                                  }
+                                  const matched = Object.entries(stateMap).find(([k]) => db.address!.toUpperCase().includes(k))
+                                  return matched ? (
+                                    <span style={{ fontSize:10, color:'#94A3B8', fontWeight:500, display:'flex', alignItems:'center', gap:3 }}>
+                                      <Icon icon="ph:map-pin" width={11} height={11} color="#94A3B8" />
+                                      {matched[1]}
+                                    </span>
+                                  ) : <span />
+                                })() : <span />}
+                                <button
+                                  onClick={async e => {
+                                    e.stopPropagation()
+                                    if (!db) return
+                                    setDetailItem(db)
+                                    if ((db.related_business_ids?.length ?? 0) > 0) {
+                                      const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
+                                      setDetailBizCards(data ?? [])
+                                    } else setDetailBizCards([])
+                                  }}
+                                  style={{
+                                    fontSize:10, fontWeight:700,
+                                    color:'#fff', background:'#1B6EF3',
+                                    border:'none', borderRadius:20, cursor:'pointer',
+                                    padding:'3px 10px',
+                                  }}>
+                                  자세히 알아보기 ›
+                                </button>
+                              </div>
                             )}
                           </>
                         )
