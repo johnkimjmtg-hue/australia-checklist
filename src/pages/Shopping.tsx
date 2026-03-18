@@ -159,7 +159,7 @@ export default function Shopping() {
               <span>⭐ 강력 추천</span>
               <div style={{ flex:1, height:1, background:'#E2E8F0' }} />
             </div>
-            <div className="featured-scroll" style={{ display:'flex', gap:10, paddingBottom:4, overflowX:'auto' }}>
+            <div className="featured-scroll" style={{ display:'flex', gap:10, paddingBottom:8, overflowX:'auto', scrollbarWidth:'thin', scrollbarColor:'#C8C8C8 #e8e8e8' }}>
               {featured.map(p => (
                 <div key={p.id} className="prod-card" onClick={() => setSelProduct(p)} style={{
                   flexShrink:0, width:160,
