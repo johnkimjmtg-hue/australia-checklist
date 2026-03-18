@@ -482,7 +482,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
           {lbl('카테고리 *')}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
             {businessCats.map(cat => (
-              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:12, border:'none', cursor:'pointer', background:'#e8e8e8', color: form.category===cat.id ? '#1B6EF3' : '#64748B', fontSize:12, fontWeight: form.category===cat.id ? 700 : 500, boxShadow: form.category===cat.id ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff' : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>{cat.label}</button>
+              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:12, border: form.category===cat.id ? '1.5px solid #1B6EF3' : '1.5px solid #C8C8C8', cursor:'pointer', background: form.category===cat.id ? '#EFF6FF' : '#fff', color: form.category===cat.id ? '#1B6EF3' : '#64748B', fontSize:12, fontWeight: form.category===cat.id ? 700 : 500 }}>{cat.label}</button>
             ))}
           </div>
         </div>
@@ -724,9 +724,9 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 
       {/* ── 모달: 버킷리스트 추천 ── */}
       {showSuggestion && (
-        <div style={{ position:'fixed', inset:0, zIndex:500 }}>
+        <div style={{ position:'fixed', inset:0, zIndex:500, display:'flex', alignItems:'flex-end', justifyContent:'center' }}>
           <div onClick={() => setShowSuggestion(false)} style={{ position:'absolute', inset:0, background:'rgba(10,20,40,0.6)' }}/>
-          <div style={{ position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:390, background:'#e8e8e8', borderRadius:'20px 20px 0 0', padding:'20px 20px 40px', maxHeight:'90vh', overflowY:'auto' }}>
+          <div style={{ position:'relative', width:'100%', maxWidth:390, background:'#e8e8e8', borderRadius:'20px 20px 0 0', padding:'20px 20px 40px', maxHeight:'90vh', overflowY:'auto', zIndex:1 }}>
             <div style={{ width:36, height:4, background:'#C8C8C8', borderRadius:2, margin:'0 auto 20px' }}/>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
               <div>
@@ -744,9 +744,9 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
 
       {/* ── 모달: 업체 등록 ── */}
       {showForm && (
-        <div style={{ position:'fixed', inset:0, zIndex:500 }}>
+        <div style={{ position:'fixed', inset:0, zIndex:500, display:'flex', alignItems:'flex-end', justifyContent:'center' }}>
           <div onClick={() => setShowForm(false)} style={{ position:'absolute', inset:0, background:'rgba(10,20,40,0.6)' }}/>
-          <div style={{ position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:390, background:'#e8e8e8', borderRadius:'20px 20px 0 0', padding:'20px 20px 40px', maxHeight:'90vh', overflowY:'auto' }}>
+          <div style={{ position:'relative', width:'100%', maxWidth:390, background:'#e8e8e8', borderRadius:'20px 20px 0 0', padding:'20px 20px 40px', maxHeight:'90vh', overflowY:'auto', zIndex:1 }}>
             <div style={{ width:36, height:4, background:'#C8C8C8', borderRadius:2, margin:'0 auto 20px' }}/>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
               <div>
