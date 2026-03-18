@@ -136,9 +136,8 @@ function NameChangePopup({ currentName, onClose, onSet }: {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }} onClick={onClose}>
       <div style={{
-        background: '#fff', borderRadius: 20, padding: '24px',
+        background: '#e8e8e8', borderRadius: 20, padding: '24px',
         width: 'calc(100% - 48px)', maxWidth: 340,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
       }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A' }}>닉네임 변경</div>
@@ -156,9 +155,10 @@ function NameChangePopup({ currentName, onClose, onSet }: {
           autoFocus
           style={{
             width: '100%', height: 48,
-            border: `1.5px solid ${error ? '#EF4444' : '#D1D9E3'}`,
+            border: `1px solid ${error ? '#EF4444' : '#C8C8C8'}`,
             borderRadius: 12, padding: '0 14px', fontSize: 15,
             color: '#0F172A', fontFamily: ff, outline: 'none',
+            background: '#fff',
             boxSizing: 'border-box',
           }}
         />
@@ -170,17 +170,21 @@ function NameChangePopup({ currentName, onClose, onSet }: {
 
         <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
           <button onClick={onClose} style={{
-            flex: 1, height: 48, borderRadius: 12, border: '1px solid #C8C8C8',
-            background: '#fff', color: '#64748B', fontSize: 14, fontWeight: 600,
+            flex: 1, height: 48, borderRadius: 12, border: 'none',
+            background: '#e8e8e8', color: '#64748B', fontSize: 14, fontWeight: 600,
             cursor: 'pointer', fontFamily: ff,
+            boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           }}>취소</button>
           <button onClick={handleSubmit} disabled={!input.trim() || checking} style={{
             flex: 1, height: 48, borderRadius: 12, border: 'none',
-            background: input.trim() && !checking ? BLUE : '#E2E8F0',
-            color: input.trim() && !checking ? '#fff' : '#94A3B8',
+            background: '#e8e8e8',
+            color: input.trim() && !checking ? BLUE : '#94A3B8',
             fontSize: 14, fontWeight: 700,
             cursor: input.trim() && !checking ? 'pointer' : 'default',
-            fontFamily: ff, transition: 'all 0.2s',
+            fontFamily: ff,
+            boxShadow: input.trim() && !checking
+              ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+              : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           }}>{checking ? '확인 중...' : '변경하기'}</button>
         </div>
       </div>
@@ -224,9 +228,8 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       <div style={{
-        background: '#fff', borderRadius: 20, padding: '28px 24px',
+        background: '#e8e8e8', borderRadius: 20, padding: '28px 24px',
         width: 'calc(100% - 48px)', maxWidth: 360,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
       }}>
         <div style={{ fontSize: 32, textAlign: 'center', marginBottom: 12 }}>💬</div>
         <div style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', textAlign: 'center', marginBottom: 6 }}>
@@ -245,9 +248,10 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
           autoFocus
           style={{
             width: '100%', height: 48,
-            border: `1.5px solid ${error ? '#EF4444' : '#D1D9E3'}`,
+            border: `1px solid ${error ? '#EF4444' : '#C8C8C8'}`,
             borderRadius: 12, padding: '0 14px', fontSize: 15,
             color: '#0F172A', fontFamily: ff, outline: 'none',
+            background: '#fff',
             boxSizing: 'border-box',
           }}
         />
@@ -273,11 +277,14 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
           disabled={!input.trim() || checking}
           style={{
             width: '100%', height: 50, borderRadius: 12, border: 'none',
-            background: input.trim() && !checking ? BLUE : '#E2E8F0',
-            color: input.trim() && !checking ? '#fff' : '#94A3B8',
+            background: '#e8e8e8',
+            color: input.trim() && !checking ? BLUE : '#94A3B8',
             fontSize: 15, fontWeight: 700,
             cursor: input.trim() && !checking ? 'pointer' : 'default',
-            fontFamily: ff, transition: 'all 0.2s',
+            fontFamily: ff,
+            boxShadow: input.trim() && !checking
+              ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+              : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           }}
         >{checking ? '확인 중...' : '입장하기 →'}</button>
       </div>
@@ -925,8 +932,7 @@ export default function Community() {
         {showEmoji && (
           <div ref={emojiPickerRef} style={{
             position: 'absolute', bottom: '100%', left: 14, right: 14,
-            background: '#fff', borderRadius: 14, padding: 12,
-            boxShadow: '0 -4px 20px rgba(0,0,0,0.12)',
+            background: '#e8e8e8', borderRadius: 14, padding: 12,
             border: '1px solid #C8C8C8', marginBottom: 6,
             display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4,
             maxHeight: 200, overflowY: 'auto',
