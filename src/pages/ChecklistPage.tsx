@@ -645,12 +645,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:4 }}>
                                 {region ? (
                                   <span style={{
-                                    fontSize:12, fontWeight:600, color: region.color,
-                                    background: region.bg, borderRadius:20,
-                                    padding:'3px 10px', display:'flex', alignItems:'center', gap:4,
-                                    flexShrink:0,
+                                    fontSize:11, fontWeight:600, color:'#94A3B8',
+                                    display:'flex', alignItems:'center', gap:3,
                                   }}>
-                                    <Icon icon={region.icon} width={12} height={12} color={region.color} />
+                                    <Icon icon={region.icon} width={11} height={11} color="#94A3B8" />
                                     {region.label}
                                   </span>
                                 ) : <span />}
@@ -666,7 +664,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                   }}
                                   style={{
                                     fontSize:12, fontWeight:600, color:'#475569',
-                                    background:'#fff', border:'1.5px solid #B8860B',
+                                    background:'#fff', border:'1px solid #C8C8C8',
                                     borderRadius:20, cursor:'pointer', padding:'3px 10px',
                                     flexShrink:0,
                                   }}>
