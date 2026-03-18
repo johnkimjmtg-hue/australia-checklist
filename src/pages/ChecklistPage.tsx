@@ -944,13 +944,13 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: 
               onClick={() => setActiveDayIdx(isActive ? null : idx)}
               style={{
                 minWidth:54, height:46, borderRadius:8, flexShrink:0,
-                border: isActive ? '2px solid #1B6EF3' : '2px solid transparent',
+                border: isActive ? '1px solid #1B6EF3' : '1px solid #C8C8C8',
                 cursor:'pointer',
-                background: bg,
-                color: isActive ? '#1B6EF3' : '#0F172A',
-                fontSize:11, fontWeight:700, position:'relative', textAlign:'center',
+                background: '#e8e8e8',
+                color: isActive ? '#1B6EF3' : '#64748B',
+                fontSize:11, fontWeight: isActive ? 700 : 500, position:'relative', textAlign:'center',
                 lineHeight:1.3, padding:'4px 2px',
-                boxShadow: isActive ? '0 2px 8px rgba(27,110,243,0.20)' : '0 1px 3px rgba(0,0,0,0.06)',
+                WebkitTapHighlightColor:'transparent',
               }}>
               <div>{idx+1}일차</div>
               <div style={{ fontSize:10, opacity:0.8 }}>{fmtMD(d)}</div>
