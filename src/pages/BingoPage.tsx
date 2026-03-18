@@ -464,7 +464,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   return (
     <div ref={pageRef} style={{
       minHeight: embedded ? 'auto' : '100vh',
-      background: '#e8e8e8',
+      background: '#F0F4F8',
       fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       display: 'flex', flexDirection: 'column',
     }}>
@@ -549,10 +549,14 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               flex:1, height:36, borderRadius:8, border:'none', cursor:'pointer',
               fontWeight: city===c.id ? 700 : 500,
               fontSize:13,
-              color: city===c.id ? '#fff' : '#64748B',
-              background: city===c.id ? '#1B6EF3' : '#fff',
-              boxShadow: city===c.id ? '0 2px 8px rgba(27,110,243,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
+              color: city===c.id ? '#1B6EF3' : '#94A3B8',
+              background: '#e8e8e8',
+              boxShadow: city===c.id
+                ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
               transition:'all 0.2s',
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation',
             }}>
               {c.label}
             </button>
@@ -717,7 +721,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               width:'100%', maxWidth:390,
               maxHeight:'85vh', overflowY:'auto',
               borderRadius:'20px 20px 0 0',
-              background:'#e8e8e8',
+              background:'#F0F4F8',
               padding:'12px 12px 32px',
               boxSizing:'border-box',
             }}>
