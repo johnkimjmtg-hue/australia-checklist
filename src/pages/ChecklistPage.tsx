@@ -503,7 +503,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           onMyListChange={handleMyListChange}
           onMyCheckedChange={handleMyCheckedChange}
           onBack={() => setMainTab('shopping')}
-          onLanding={() => setMainTab('bucketlist')}
+          onLanding={() => navigate('/')}
         />
       ) : mainTab === 'bingo' ? (
         <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
