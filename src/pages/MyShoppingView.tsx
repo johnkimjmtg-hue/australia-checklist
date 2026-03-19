@@ -127,7 +127,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
           <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
             <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
               <circle cx={50} cy={50} r={44} fill="none" stroke="#a8b498" strokeWidth={10}/>
-              <circle cx={50} cy={50} r={44} fill="none" stroke="#39d353" strokeWidth={10}
+              <circle cx={50} cy={50} r={44} fill="none" stroke="#FF6B9D" strokeWidth={10}
                 strokeDasharray={2 * Math.PI * 44}
                 strokeDashoffset={2 * Math.PI * 44 * (1 - pct / 100)}
                 strokeLinecap="round"
@@ -141,10 +141,16 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
           <div style={{ flex:1 }}>
             <div style={{ fontSize:20, fontWeight:800, color:'#2d3e1f', marginBottom:4, lineHeight:1.2 }}>내 쇼핑리스트</div>
             <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:4 }}>
-              <span style={{ fontSize:28, fontWeight:800, color:'#2d3e1f', lineHeight:1 }}>{checkedCount}</span>
-              <span style={{ fontSize:17, fontWeight:600, color:'#4a5e32' }}>/{total}개 완료</span>
+              <span style={{ fontSize:42, fontWeight:800, color:'#2d3e1f', lineHeight:1 }}>{checkedCount}</span>
+              <span style={{ fontSize:17, fontWeight:600, color:'#4a5e32' }}>/{total}개 구매 완료</span>
             </div>
-            <div style={{ fontSize:13, color:'#4a5e32', lineHeight:1.5 }}>찜한 상품을 체크하며 쇼핑하세요!</div>
+            <div style={{ fontSize:13, color:'#4a5e32', lineHeight:1.5 }}>
+              {pct === 100
+                ? '쇼핑 완료! 모든 상품을 구매했어요 🎉'
+                : pct > 0
+                ? '쇼핑 중이에요! 화이팅! 🛍️'
+                : '찜한 상품을 체크하며 쇼핑하세요!'}
+            </div>
           </div>
         </div>
       </div>
@@ -173,9 +179,9 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
               <div key={p.id} className="my-item" style={{
                 display:'flex', alignItems:'stretch',
                 borderRadius:14,
-                background: checked ? '#fff8e4' : '#fff',
+                background: checked ? '#fff0f5' : '#fff',
                 border:'1px solid #C8C8C8',
-                borderLeft: checked ? '4px solid #39d353' : '4px solid #CBD5E1',
+                borderLeft: checked ? '4px solid #FF6B9D' : '4px solid #CBD5E1',
                 transition:'all 0.3s', overflow:'hidden',
               }}>
                 {/* 이미지 6:4 */}
@@ -227,7 +233,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
                   <div onClick={() => toggleChecked(p.id)} style={{
                     width:26, height:26, borderRadius:6, flexShrink:0,
                     border: checked ? 'none' : '1.5px solid #C8C8C8',
-                    background: checked ? '#39d353' : '#fff',
+                    background: checked ? '#FF6B9D' : '#fff',
                     display:'flex', alignItems:'center', justifyContent:'center',
                     cursor:'pointer', transition:'all 0.15s',
                     boxShadow: checked ? 'none' : '1px 1px 3px #d0d0d0, -1px -1px 3px #ffffff',
@@ -251,16 +257,6 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
         )}
 
         {/* 전체 완료 축하 */}
-        {checkedCount === total && total > 0 && (
-          <div style={{
-            textAlign:'center', padding:'24px', marginTop:8,
-            background:'#f0fdf4', borderRadius:16, border:'1px solid #86EFAC',
-          }}>
-            <div style={{ fontSize:36, marginBottom:8 }}>🎉</div>
-            <div style={{ fontSize:17, fontWeight:800, color:'#16A34A' }}>쇼핑 완료!</div>
-            <div style={{ fontSize:13, color:'#4ADE80', marginTop:4 }}>모든 상품을 구매했어요</div>
-          </div>
-        )}
       </div>
 
       {/* ── 하단 버튼 */}
@@ -355,12 +351,12 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
                 myList.includes(selProduct.id) ? removeFromMyList(selProduct.id) : addToMyList(selProduct.id)
               }} style={{
                 width:'100%', height:50, borderRadius:12, border:'none', cursor:'pointer',
-                background: myList.includes(selProduct.id) ? '#f0fdf4' : '#39d353',
-                color: myList.includes(selProduct.id) ? '#16A34A' : '#fff',
+                background: myList.includes(selProduct.id) ? '#fff0f5' : '#FF6B9D',
+                color: myList.includes(selProduct.id) ? '#FF6B9D' : '#fff',
                 fontSize:15, fontWeight:700,
                 display:'flex', alignItems:'center', justifyContent:'center', gap:8,
                 marginBottom:10,
-                boxShadow: myList.includes(selProduct.id) ? 'inset 2px 2px 4px #d1fae5' : '0 4px 12px rgba(57,211,83,0.35)',
+                boxShadow: myList.includes(selProduct.id) ? 'inset 2px 2px 4px #d1fae5' : '0 4px 12px rgba(255,107,157,0.35)',
                 WebkitTapHighlightColor:'transparent',
               }}>
                 <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color={myList.includes(selProduct.id) ? '#16A34A' : '#fff'} />
@@ -469,7 +465,7 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
         overflow:'hidden', boxShadow:'0 20px 60px rgba(0,0,0,0.3)',
       }}>
         {/* 헤더 */}
-        <div style={{ background:'#39d353', padding:'20px 20px 16px', textAlign:'center' }}>
+        <div style={{ background:'#FF6B9D', padding:'20px 20px 16px', textAlign:'center' }}>
           <div style={{ fontSize:28, marginBottom:6 }}>🛍️</div>
           <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:2 }}>내 쇼핑리스트</div>
           <div style={{ fontSize:12, color:'rgba(255,255,255,0.85)' }}>{dateStr} · {checkedCount}/{total}개 완료</div>
@@ -478,7 +474,7 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
         {/* 진행률 바 */}
         <div style={{ background:'#d0d0d0', height:6 }}>
           <div style={{
-            height:'100%', background:'#39d353',
+            height:'100%', background:'#FF6B9D',
             width: total > 0 ? `${(checkedCount/total)*100}%` : '0%',
             transition:'width 0.4s ease',
           }} />
@@ -510,7 +506,7 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
               </div>
               <div style={{
                 width:22, height:22, borderRadius:6, flexShrink:0,
-                background: myChecked[p.id] ? '#39d353' : '#E2E8F0',
+                background: myChecked[p.id] ? '#FF6B9D' : '#E2E8F0',
                 display:'flex', alignItems:'center', justifyContent:'center',
               }}>
                 {myChecked[p.id] && (
@@ -538,9 +534,9 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
           }}>닫기</button>
           <button onClick={handleShare} style={{
             flex:2, height:48, borderRadius:10, border:'none',
-            background:'#39d353', color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer',
+            background:'#FF6B9D', color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer',
             display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-            boxShadow:'0 4px 12px rgba(57,211,83,0.4)',
+            boxShadow:'0 4px 12px rgba(255,107,157,0.4)',
           }}>
             <Icon icon="ph:share-network" width={18} height={18} color="#fff" />
             공유하기
