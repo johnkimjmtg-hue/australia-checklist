@@ -137,21 +137,8 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
           padding:'20px', display:'flex', alignItems:'center', gap:20,
           position:'relative', overflow:'hidden',
         }}>
-          {/* 원형 진행률 */}
-          <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
-            <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
-              <circle cx={50} cy={50} r={44} fill="none" stroke="#c898c8" strokeWidth={10}/>
-              <circle cx={50} cy={50} r={44} fill="none" stroke="#FF6B9D" strokeWidth={10}
-                strokeDasharray={2 * Math.PI * 44}
-                strokeDashoffset={2 * Math.PI * 44 * (1 - pct / 100)}
-                strokeLinecap="round"
-                style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)' }}
-              />
-            </svg>
-            <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <span style={{ fontSize:15, fontWeight:800, color:'#2d1f2d' }}>{pct}%</span>
-            </div>
-          </div>
+          {/* 선물박스 그리드 */}
+          <GiftBoxProgress total={total} checkedCount={checkedCount} myList={myList} myChecked={myChecked} />
           <div style={{ flex:1 }}>
             <div style={{ fontSize:20, fontWeight:800, color:'#2d1f2d', marginBottom:4, lineHeight:1.2 }}>내 쇼핑리스트</div>
             <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:4 }}>
@@ -568,5 +555,69 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
         </div>
       </div>
     </>
+  )
+}
+
+// ── 선물박스 프로그래스
+function GiftBoxProgress({ total, checkedCount, myList, myChecked }: {
+  total: number
+  checkedCount: number
+  myList: string[]
+  myChecked: Record<string, boolean>
+}) {
+  // 최대 12개까지 표시, 박스 크기 동적 조정
+  const displayCount = Math.min(total, 12)
+  const boxSize = displayCount <= 4 ? 40 : displayCount <= 6 ? 32 : displayCount <= 9 ? 26 : 22
+  const cols = displayCount <= 4 ? 2 : displayCount <= 9 ? 3 : 4
+
+  return (
+    <div style={{
+      flexShrink:0,
+      width: cols * (boxSize + 4),
+      display:'flex', flexWrap:'wrap', gap:4,
+      alignContent:'center',
+    }}>
+      <style>{`
+        @keyframes giftPop {
+          0%   { transform: scale(0.6); }
+          60%  { transform: scale(1.2); }
+          100% { transform: scale(1); }
+        }
+      `}</style>
+      {Array.from({ length: displayCount }).map((_, i) => {
+        const filled = i < checkedCount
+        return (
+          <svg key={i} viewBox="0 0 100 100" width={boxSize} height={boxSize}
+            style={{ animation: filled ? `giftPop 0.3s ease ${i * 0.05}s both` : 'none' }}>
+            {/* 박스 본체 */}
+            <rect x="10" y="38" width="80" height="55" rx="7"
+              fill={filled ? '#FF6B9D' : '#d8b8d8'} />
+            {/* 뚜껑 */}
+            <rect x="5" y="24" width="90" height="20" rx="6"
+              fill={filled ? '#FF6B9D' : '#d8b8d8'} />
+            {/* 리본 세로 */}
+            <rect x="44" y="24" width="12" height="69"
+              fill={filled ? '#fff' : '#b898b8'} />
+            {/* 리본 가로 */}
+            <rect x="5" y="47" width="90" height="12"
+              fill={filled ? '#fff' : '#b898b8'} />
+            {/* 리본 매듭 좌 */}
+            <ellipse cx="36" cy="22" rx="12" ry="8" transform="rotate(-20 36 22)"
+              fill={filled ? '#fff' : '#b898b8'} />
+            {/* 리본 매듭 우 */}
+            <ellipse cx="64" cy="22" rx="12" ry="8" transform="rotate(20 64 22)"
+              fill={filled ? '#fff' : '#b898b8'} />
+            {/* 매듭 중앙 */}
+            <circle cx="50" cy="22" r="7"
+              fill={filled ? '#FF6B9D' : '#d8b8d8'} stroke={filled ? '#fff' : '#b898b8'} strokeWidth="2" />
+          </svg>
+        )
+      })}
+      {total > 12 && (
+        <div style={{ fontSize:10, color:'#5a3a5a', fontWeight:700, width:'100%', textAlign:'center', marginTop:2 }}>
+          +{total - 12}개
+        </div>
+      )}
+    </div>
   )
 }
