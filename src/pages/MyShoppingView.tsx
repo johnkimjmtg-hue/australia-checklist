@@ -47,15 +47,10 @@ function saveMyChecked(c: Record<string, boolean>) {
 
 // ── Props
 type Props = {
-  onBack: () => void           // 쇼핑 페이지로 돌아가기
-  onShopping:  () => void
-  onBingo:     () => void
-  onCommunity: () => void
-  onServices:  () => void
-  onLanding:   () => void
+  onBack: () => void
 }
 
-export default function MyShoppingView({ onBack, onShopping, onBingo, onCommunity, onServices, onLanding }: Props) {
+export default function MyShoppingView({ onBack }: Props) {
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const [myList, setMyList]           = useState<string[]>(loadMyList)
   const [myChecked, setMyChecked]     = useState<Record<string, boolean>>(loadMyChecked)
@@ -101,63 +96,16 @@ export default function MyShoppingView({ onBack, onShopping, onBingo, onCommunit
 
   return (
     <div style={{
-      minHeight:'100vh', background:'#e8e8e8',
+      background:'#e8e8e8',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       maxWidth:480, margin:'0 auto', position:'relative',
     }}>
       <style>{`
-        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
-        @keyframes coinPop {
-          0%   { transform:translateY(8px) scale(0.8); opacity:0; }
-          60%  { transform:translateY(-3px) scale(1.1); opacity:1; }
-          100% { transform:translateY(0) scale(1); opacity:1; }
-        }
         .my-item { transition: all 0.2s ease; }
         .my-item:active { transform: scale(0.98); }
-        .neu-tab {
-          background:#e8e8e8; border:none; cursor:pointer;
-          display:flex; flex-direction:column; align-items:center; justify-content:center;
-          gap:3px; transition:all 0.15s ease; -webkit-tap-highlight-color:transparent;
-          touch-action:manipulation;
-          box-shadow:3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff;
-          border-radius:10px;
-        }
-        .neu-tab.active { box-shadow:inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff; }
       `}</style>
-
-      {/* ── 헤더 + 탭 */}
-      <div style={{ background:'#e8e8e8', paddingBottom:8 }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 12px' }}>
-          <span style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2 }}>HOJUGAJA</span>
-          <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>{checkedCount}/{total}</span>
-        </div>
-        {/* 탭 — 내쇼핑리스트 페이지에 있으므로 쇼핑 탭은 파란색+평평 */}
-        <div style={{ display:'flex', padding:'0 10px', gap:8, overflowX:'auto', scrollbarWidth:'none' }}>
-          {([
-            { id:'bucketlist', icon:'ph:check-circle',  label:'버킷리스트',   action: onLanding },
-            { id:'shopping',   icon:'ph:shopping-bag',  label:'쇼핑리스트',   action: onBack },
-            { id:'bingo',      icon:'ph:coffee',        label:'카페빙고게임',  action: onBingo },
-            { id:'community',  icon:'ph:chats-circle',  label:'채팅방',        action: onCommunity },
-            { id:'services',   icon:'ph:buildings',     label:'업체리스트',    action: onServices },
-          ]).map(tab => {
-            // 내쇼핑리스트 페이지에서 쇼핑 탭은 파란색+평평(눌리지 않음)
-            const isShoppingTab = tab.id === 'shopping'
-            const color = isShoppingTab ? '#1B6EF3' : '#94A3B8'
-            return (
-              <button key={tab.id} onClick={tab.action}
-                className="neu-tab"
-                style={{ flex:1, minWidth:0, height:52 }}>
-                <Icon icon={tab.icon} width={16} height={16} color={color} />
-                <span style={{ fontSize:9, fontWeight: isShoppingTab ? 700 : 500, color, whiteSpace:'nowrap' }}>
-                  {tab.label}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
 
       {/* ── 진행 카드 */}
       <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'16px 16px 0' }}>

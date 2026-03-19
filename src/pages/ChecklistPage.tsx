@@ -391,7 +391,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
           <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
-            {mainTab === 'services' ? `${bizCount}개 업체` : mainTab === 'bucketlist' ? `${total}개 버킷리스트` : mainTab === 'bingo' ? (bingoCity === 'melbourne' ? '멜번' : '시드니') : mainTab === 'shopping' ? `${shopCount}개 상품` : ''}
+            {mainTab === 'services' ? `${bizCount}개 업체` : mainTab === 'bucketlist' ? `${total}개 버킷리스트` : mainTab === 'bingo' ? (bingoCity === 'melbourne' ? '멜번' : '시드니') : mainTab === 'shopping' ? `${shopCount}개 상품` : mainTab === 'myshoppinglist' ? `${(() => { try { const l = JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]'); const c = JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}'); return `${l.filter((id:string)=>c[id]).length}/${l.length}` } catch { return '0/0' } })()}` : ''}
           </span>
         </div>
         {/* 탭 */}
@@ -477,14 +477,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : mainTab === 'shopping' ? (
         <Shopping onMyListChange={count => { setMyListCount(count) }} />
       ) : mainTab === 'myshoppinglist' ? (
-        <MyShoppingView
-          onBack={() => setMainTab('shopping')}
-          onShopping={() => setMainTab('shopping')}
-          onBingo={() => setMainTab('bingo')}
-          onCommunity={() => setMainTab('community')}
-          onServices={() => setMainTab('services')}
-          onLanding={() => setMainTab('bucketlist')}
-        />
+        <MyShoppingView onBack={() => setMainTab('shopping')} />
       ) : mainTab === 'bingo' ? (
         <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
       ) : mainTab === 'community' ? (
