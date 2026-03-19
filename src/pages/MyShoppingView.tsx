@@ -579,52 +579,74 @@ function GiftBoxProgress({ total, checkedCount }: {
     }}>
       <style>{`
         @keyframes giftPop {
-          0%   { transform: scale(0.5) rotate(-10deg); opacity:0.5; }
-          60%  { transform: scale(1.25) rotate(3deg); }
-          100% { transform: scale(1) rotate(0deg); opacity:1; }
+          0%   { transform: scale(0.5); opacity:0.5; }
+          65%  { transform: scale(1.2); }
+          100% { transform: scale(1); opacity:1; }
         }
       `}</style>
       {Array.from({ length: displayCount }).map((_, i) => {
         const filled = i < checkedCount
-        const box    = filled ? '#FF6B9D' : '#c8a8c8'
-        const boxD   = filled ? '#d94f85' : '#a888a8'
-        const boxL   = filled ? '#ffadd0' : '#ddc8dd'
-        const rib    = filled ? '#fff'    : '#e8d0e8'
-        const ribD   = filled ? '#f0d0e0' : '#d0b8d0'
-        const outline= filled ? '#c0346a' : '#907090'
+        // 색상 팔레트
+        const bodyMain = filled ? '#FF6B9D' : '#c8a8c8'
+        const bodyDark = filled ? '#e0437a' : '#a888a8'
+        const bodyLight= filled ? '#ffadd0' : '#dfc8df'
+        const lidMain  = filled ? '#FF85B3' : '#d4b4d4'
+        const lidDark  = filled ? '#e0437a' : '#a888a8'
+        const ribMain  = filled ? '#ffffff' : '#ead8ea'
+        const ribShad  = filled ? '#f0c0d8' : '#caaaca'
+        const stroke   = filled ? '#a0245a' : '#806080'
+
         return (
-          <svg key={i} viewBox="0 0 100 110" width={boxSize} height={boxSize * 1.1}
-            style={{ animation: filled ? `giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both` : 'none',
-                     filter: filled ? 'drop-shadow(0 3px 6px rgba(255,107,157,0.5))' : 'drop-shadow(0 2px 3px rgba(0,0,0,0.15))' }}>
+          <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize*1.15)}
+            style={{
+              animation: filled ? `giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both` : 'none',
+              filter: filled
+                ? 'drop-shadow(0 4px 8px rgba(255,107,157,0.55))'
+                : 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
+            }}>
 
-            {/* ── 뚜껑 윗면 (상단 사각형) */}
-            <rect x="8" y="16" width="84" height="22" rx="5" fill={box} stroke={outline} strokeWidth="3"/>
+            {/* ━━ 박스 본체 ━━ */}
+            {/* 본체 메인 */}
+            <rect x="10" y="42" width="80" height="62" rx="6" fill={bodyMain} stroke={stroke} strokeWidth="3.5"/>
+            {/* 본체 왼쪽 측면 음영 */}
+            <rect x="10" y="42" width="16" height="62" rx="3" fill={bodyDark} opacity="0.35"/>
+            {/* 본체 오른쪽 하이라이트 */}
+            <rect x="32" y="48" width="28" height="10" rx="4" fill={bodyLight} opacity="0.45"/>
+            {/* 본체 하단 음영 */}
+            <rect x="10" y="88" width="80" height="16" rx="3" fill={bodyDark} opacity="0.2"/>
+
+            {/* ━━ 뚜껑 ━━ */}
+            {/* 뚜껑 메인 */}
+            <rect x="6" y="24" width="88" height="22" rx="6" fill={lidMain} stroke={stroke} strokeWidth="3.5"/>
+            {/* 뚜껑 왼쪽 음영 */}
+            <rect x="6" y="24" width="16" height="22" rx="4" fill={lidDark} opacity="0.3"/>
             {/* 뚜껑 하이라이트 */}
-            <rect x="14" y="19" width="50" height="7" rx="3" fill={boxL} opacity="0.5"/>
+            <rect x="20" y="28" width="38" height="8" rx="4" fill={bodyLight} opacity="0.5"/>
 
-            {/* ── 박스 본체 */}
-            <rect x="12" y="36" width="76" height="58" rx="5" fill={box} stroke={outline} strokeWidth="3"/>
-            {/* 본체 왼쪽 음영 */}
-            <rect x="12" y="36" width="18" height="58" rx="3" fill={boxD} opacity="0.3"/>
-            {/* 본체 하이라이트 */}
-            <rect x="18" y="42" width="30" height="10" rx="3" fill={boxL} opacity="0.35"/>
+            {/* ━━ 리본 세로 ━━ */}
+            <rect x="43" y="24" width="14" height="80" fill={ribMain} stroke={stroke} strokeWidth="2"/>
+            {/* 리본 세로 음영 */}
+            <rect x="43" y="24" width="5" height="80" fill={ribShad} opacity="0.5"/>
 
-            {/* ── 리본 세로 */}
-            <rect x="44" y="36" width="12" height="58" fill={rib} stroke={outline} strokeWidth="1.5"/>
-            {/* ── 리본 가로 (뚜껑) */}
-            <rect x="8" y="20" width="84" height="12" fill={rib} stroke={outline} strokeWidth="1.5"/>
-            {/* 리본 음영 */}
-            <rect x="44" y="36" width="4" height="58" fill={ribD} opacity="0.5"/>
+            {/* ━━ 리본 가로 (뚜껑) ━━ */}
+            <rect x="6" y="29" width="88" height="12" fill={ribMain} stroke={stroke} strokeWidth="2"/>
+            {/* 리본 가로 음영 */}
+            <rect x="6" y="29" width="88" height="4" fill={ribShad} opacity="0.4"/>
 
-            {/* ── 나비매듭 왼쪽 */}
-            <ellipse cx="34" cy="16" rx="14" ry="9" transform="rotate(-15 34 16)" fill={rib} stroke={outline} strokeWidth="2"/>
-            <ellipse cx="34" cy="16" rx="8" ry="5" transform="rotate(-15 34 16)" fill={ribD} opacity="0.4"/>
-            {/* ── 나비매듭 오른쪽 */}
-            <ellipse cx="66" cy="16" rx="14" ry="9" transform="rotate(15 66 16)" fill={rib} stroke={outline} strokeWidth="2"/>
-            <ellipse cx="66" cy="16" rx="8" ry="5" transform="rotate(15 66 16)" fill={ribD} opacity="0.4"/>
-            {/* ── 매듭 중앙 */}
-            <circle cx="50" cy="16" r="7" fill={box} stroke={outline} strokeWidth="2.5"/>
-            <circle cx="50" cy="16" r="3.5" fill={boxL} opacity="0.6"/>
+            {/* ━━ 나비매듭 ━━ */}
+            {/* 왼쪽 날개 */}
+            <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z"
+              fill={ribMain} stroke={stroke} strokeWidth="2.5" strokeLinejoin="round"/>
+            <path d="M50,18 Q38,8 28,14 Q26,18 34,20 Q42,22 50,18Z"
+              fill={ribShad} opacity="0.35"/>
+            {/* 오른쪽 날개 */}
+            <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z"
+              fill={ribMain} stroke={stroke} strokeWidth="2.5" strokeLinejoin="round"/>
+            <path d="M50,18 Q62,8 72,14 Q74,18 66,20 Q58,22 50,18Z"
+              fill={ribShad} opacity="0.35"/>
+            {/* 매듭 중앙 */}
+            <circle cx="50" cy="19" r="7" fill={lidMain} stroke={stroke} strokeWidth="2.5"/>
+            <circle cx="48" cy="17" r="2.5" fill={bodyLight} opacity="0.6"/>
           </svg>
         )
       })}
