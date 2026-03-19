@@ -44,6 +44,7 @@ export default function Shopping() {
   const [loading, setLoading]       = useState(true)
   const [selCat, setSelCat]         = useState<number | null>(null)
   const [sortBy, setSortBy]         = useState<SortOption>('default')
+  const [search, setSearch]         = useState('')
   const [selProduct, setSelProduct] = useState<Product | null>(null)
 
   useEffect(() => {
@@ -63,11 +64,20 @@ export default function Shopping() {
 
   const filtered = useMemo(() => {
     let list = selCat ? products.filter(p => p.category_id === selCat) : products
+    if (search.trim()) {
+      const q = search.trim().toLowerCase()
+      list = list.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.brand.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.tags.some(t => t.toLowerCase().includes(q))
+      )
+    }
     if (sortBy === 'price_asc')  list = [...list].sort((a, b) => a.price_range.length - b.price_range.length)
     if (sortBy === 'price_desc') list = [...list].sort((a, b) => b.price_range.length - a.price_range.length)
     if (sortBy === 'name')       list = [...list].sort((a, b) => a.name.localeCompare(b.name))
     return list
-  }, [products, selCat, sortBy])
+  }, [products, selCat, sortBy, search])
 
   if (loading) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'60vh' }}>
@@ -157,6 +167,30 @@ export default function Shopping() {
       </div>
 
       <div style={{ padding:'14px 14px 0' }}>
+
+        {/* ── 검색창 */}
+        <div style={{
+          display:'flex', alignItems:'center', gap:8,
+          background:'#fff', border:'1px solid #C8C8C8', borderRadius:10,
+          padding:'0 12px', height:40, marginBottom:14,
+          boxShadow:'0 1px 4px rgba(0,0,0,0.06)',
+        }}>
+          <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="상품명, 브랜드, 태그 검색"
+            style={{
+              flex:1, border:'none', outline:'none',
+              fontSize:14, color:'#1E293B', background:'transparent',
+            }}
+          />
+          {search && (
+            <button onClick={() => setSearch('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex', alignItems:'center' }}>
+              <Icon icon="ph:x" width={14} height={14} color="#94A3B8" />
+            </button>
+          )}
+        </div>
 
         {/* ── 추천 상품 (전체 탭일 때만) */}
         {!selCat && featured.length > 0 && (
