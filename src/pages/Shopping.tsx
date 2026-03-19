@@ -153,12 +153,13 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
       <div style={{
         background:'#e8e8e8', borderBottom:'1px solid #D1D9E3',
         position:'sticky', top:0, zIndex:20,
+        display:'flex', alignItems:'center',
       }}>
-        <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto', scrollbarWidth:'thin', scrollbarColor:'#C8C8C8 #e8e8e8' }}>
-          {/* 찜 버튼 - 찜한 상품 있을 때만 표시 */}
-          {myList.length > 0 && onGoToMyList && (
+        {/* 찜 버튼 - 고정 */}
+        {myList.length > 0 && onGoToMyList && (
+          <div style={{ paddingLeft:14, paddingTop:10, paddingBottom:10, flexShrink:0 }}>
             <button className="cat-btn" onClick={onGoToMyList} style={{
-              flexShrink:0, height:34, padding:'0 12px', borderRadius:20, cursor:'pointer',
+              height:34, padding:'0 12px', borderRadius:20, cursor:'pointer',
               background: '#FF6B9D', border: 'none',
               color: '#fff',
               fontSize:12, fontWeight:700, whiteSpace:'nowrap',
@@ -171,7 +172,10 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
               </svg>
               {myList.length}
             </button>
-          )}
+          </div>
+        )}
+        {/* 카테고리 스크롤 */}
+        <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto', flex:1, scrollbarWidth:'thin', scrollbarColor:'#C8C8C8 #e8e8e8' }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
             flexShrink:0, height:34, padding:'0 14px', borderRadius:20, cursor:'pointer',
             background: '#e8e8e8', border: 'none',
