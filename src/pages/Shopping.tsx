@@ -38,7 +38,15 @@ const TAG_COLOR: Record<string, { bg: string; color: string }> = {
   '기념':   { bg: '#F0FDF4', color: '#15803D' },
 }
 
-export default function Shopping() {
+const MY_LIST_KEY = 'my-shopping-list'
+function loadMyList(): string[] {
+  try { return JSON.parse(localStorage.getItem(MY_LIST_KEY) ?? '[]') } catch { return [] }
+}
+function saveMyList(ids: string[]) {
+  try { localStorage.setItem(MY_LIST_KEY, JSON.stringify(ids)) } catch {}
+}
+
+export default function Shopping({ onMyListChange }: { onMyListChange?: (count: number) => void }) {
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts]     = useState<Product[]>([])
   const [loading, setLoading]       = useState(true)
@@ -46,6 +54,21 @@ export default function Shopping() {
   const [sortBy, setSortBy]         = useState<SortOption>('default')
   const [search, setSearch]         = useState('')
   const [selProduct, setSelProduct] = useState<Product | null>(null)
+  const [myList, setMyList]         = useState<string[]>(loadMyList)
+
+  const addToMyList = (id: string) => {
+    if (myList.includes(id)) return
+    const next = [...myList, id]
+    setMyList(next)
+    saveMyList(next)
+    onMyListChange?.(next.length)
+  }
+  const removeFromMyList = (id: string) => {
+    const next = myList.filter(i => i !== id)
+    setMyList(next)
+    saveMyList(next)
+    onMyListChange?.(next.length)
+  }
 
   useEffect(() => {
     const fetch = async () => {
@@ -201,12 +224,8 @@ export default function Shopping() {
             </div>
             <div className="featured-scroll" style={{ display:'flex', gap:10, paddingBottom:8, overflowX:'auto', scrollbarWidth:'thin', scrollbarColor:'#C8C8C8 #e8e8e8' }}>
               {featured.map(p => (
-                <div key={p.id} className="prod-card" onClick={() => setSelProduct(p)} style={{
-                  flexShrink:0, width:160,
-                  background:'#fff', borderRadius:14,
-                  overflow:'hidden', cursor:'pointer',
-                  border:'1px solid #C8C8C8',
-                }}>
+                <div key={p.id} style={{ flexShrink:0, width:160, background:'#fff', borderRadius:14, overflow:'hidden', border:'1px solid #C8C8C8', position:'relative' }}>
+                  <div className="prod-card" onClick={() => setSelProduct(p)} style={{ cursor:'pointer' }}>
                   {/* 이미지 */}
                   <div style={{
                     width:'100%', height:120,
@@ -234,6 +253,18 @@ export default function Shopping() {
                       color: PRICE_COLOR[p.price_range] ?? '#475569',
                     }}>{p.price_range} · {PRICE_LABEL[p.price_range]}</div>
                   </div>
+                  </div>
+                  {/* 찜 버튼 */}
+                  <button onClick={e => { e.stopPropagation(); myList.includes(p.id) ? removeFromMyList(p.id) : addToMyList(p.id) }} style={{
+                    position:'absolute', top:6, right:6,
+                    width:30, height:30, borderRadius:'50%', border:'none', cursor:'pointer',
+                    background: myList.includes(p.id) ? '#39d353' : '#39d353',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    boxShadow:'0 2px 6px rgba(0,0,0,0.2)',
+                    WebkitTapHighlightColor:'transparent',
+                  }}>
+                    <span style={{ fontSize:9, fontWeight:800, color:'#fff' }}>{myList.includes(p.id) ? '찜✓' : '찜'}</span>
+                  </button>
                 </div>
               ))}
             </div>
@@ -269,13 +300,14 @@ export default function Shopping() {
         {/* ── 상품 그리드 */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
           {filtered.map((p, i) => (
-            <div key={p.id} className="prod-card" onClick={() => setSelProduct(p)} style={{
+            <div key={p.id} style={{
               background:'#fff', borderRadius:14,
               border:'1px solid #C8C8C8',
-              overflow:'hidden', cursor:'pointer',
+              overflow:'hidden',
               animation:`fadeUp 0.25s ease ${i * 0.04}s both`,
-              border:'1px solid #C8C8C8',
+              position:'relative',
             }}>
+              <div className="prod-card" onClick={() => setSelProduct(p)} style={{ cursor:'pointer' }}>
               {/* 이미지 */}
               <div style={{
                 width:'100%', aspectRatio:'1',
@@ -313,6 +345,18 @@ export default function Shopping() {
                   )}
                 </div>
               </div>
+              </div>
+              {/* 찜 버튼 */}
+              <button onClick={e => { e.stopPropagation(); myList.includes(p.id) ? removeFromMyList(p.id) : addToMyList(p.id) }} style={{
+                position:'absolute', top:6, right:6,
+                width:30, height:30, borderRadius:'50%', border:'none', cursor:'pointer',
+                background:'#39d353',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                boxShadow:'0 2px 6px rgba(0,0,0,0.2)',
+                WebkitTapHighlightColor:'transparent',
+              }}>
+                <span style={{ fontSize:9, fontWeight:800, color:'#fff' }}>{myList.includes(p.id) ? '찜✓' : '찜'}</span>
+              </button>
             </div>
           ))}
         </div>
@@ -405,6 +449,21 @@ export default function Shopping() {
                   </div>
                 </div>
               )}
+
+              {/* 찜하기 버튼 */}
+              <button onClick={() => { myList.includes(selProduct.id) ? removeFromMyList(selProduct.id) : addToMyList(selProduct.id) }} style={{
+                width:'100%', height:50, borderRadius:12, border:'none', cursor:'pointer',
+                background: myList.includes(selProduct.id) ? '#f0fdf4' : '#39d353',
+                color: myList.includes(selProduct.id) ? '#16A34A' : '#fff',
+                fontSize:15, fontWeight:700,
+                display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+                marginBottom:10,
+                boxShadow: myList.includes(selProduct.id) ? 'inset 2px 2px 4px #d1fae5' : '0 4px 12px rgba(57,211,83,0.35)',
+                WebkitTapHighlightColor:'transparent',
+              }}>
+                <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color={myList.includes(selProduct.id) ? '#16A34A' : '#fff'} />
+                {myList.includes(selProduct.id) ? '찜 취소하기' : '내 쇼핑리스트에 찜하기'}
+              </button>
 
               <button onClick={() => setSelProduct(null)} style={{
                 width:'100%', height:50, borderRadius:12, border:'none',

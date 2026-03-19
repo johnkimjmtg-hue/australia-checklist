@@ -19,6 +19,7 @@ import BingoPage from './BingoPage'
 import BucketCheckView from './BucketCheckView'
 import Community from './Community'
 import Shopping from './Shopping'
+import MyShoppingView from './MyShoppingView'
 import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 
@@ -41,7 +42,7 @@ const PRICE_LABEL: Record<string, string> = { '$': '저렴', '$$': '보통', '$$
 
 type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker'
-type MainTab = 'bucketlist' | 'services' | 'shopping' | 'bingo' | 'community'
+type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'bingo' | 'community'
 
 export default function ChecklistPage({ state, setState, onLanding }: Props & { onLanding?: () => void }) {
   const [searchParams] = useSearchParams()
@@ -71,6 +72,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   const [bizCount, setBizCount] = useState(0)
   const [shopCount, setShopCount] = useState(0)
+  const [myListCount, setMyListCount] = useState<number>(() => {
+    try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]').length } catch { return 0 }
+  })
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
   const [detailBiz, setDetailBiz] = useState<Business|null>(null)
   const [detailItem, setDetailItem] = useState<DBItem|null>(null)
@@ -399,16 +403,68 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             { id:'community',  icon:'ph:chats-circle',  label:'채팅방' },
             { id:'services',   icon:'ph:buildings',     label:'업체리스트' },
           ] as { id: MainTab; icon: string; label: string }[]).map(tab => {
-            const active = mainTab === tab.id
+            const isShopping = tab.id === 'shopping'
+            const hasMyList  = isShopping && myListCount > 0
+
+            // 내쇼핑리스트 페이지에 있을 때 → 쇼핑 탭은 파란색+평평
+            const isMyShoppingPage = mainTab === 'myshoppinglist'
+
+            // 탭 클릭 동작
+            const handleClick = () => {
+              if (isShopping) {
+                if (hasMyList && mainTab === 'shopping') {
+                  // 쇼핑페이지 → 내쇼핑리스트 페이지
+                  setMainTab('myshoppinglist')
+                } else if (mainTab === 'myshoppinglist') {
+                  // 내쇼핑리스트 → 쇼핑 페이지
+                  setMainTab('shopping')
+                } else if (hasMyList) {
+                  // 다른 페이지에서 → 내쇼핑리스트 바로
+                  setMainTab('myshoppinglist')
+                } else {
+                  setMainTab('shopping')
+                }
+              } else {
+                setMainTab(tab.id as MainTab)
+              }
+            }
+
+            // 아이콘/라벨/색상 결정
+            let tabIcon  = tab.icon
+            let tabLabel = tab.label
+            let tabColor = '#94A3B8'
+            let isActive = false
+
+            if (isShopping) {
+              if (isMyShoppingPage) {
+                // 내쇼핑리스트 페이지에서 → 쇼핑백+파란색+평평
+                tabIcon  = 'ph:shopping-bag'
+                tabLabel = '쇼핑리스트'
+                tabColor = '#1B6EF3'
+                isActive = false
+              } else if (hasMyList) {
+                // 쇼핑페이지 or 다른페이지에서 리스트 있음 → 카트+녹색+평평
+                tabIcon  = 'ph:shopping-cart-simple-fill'
+                tabLabel = `내쇼핑리스트 ${myListCount}`
+                tabColor = mainTab === 'shopping' ? '#39d353' : '#94A3B8'
+                isActive = false
+              } else {
+                // 기본 상태
+                tabColor = mainTab === 'shopping' ? '#1B6EF3' : '#94A3B8'
+                isActive = mainTab === 'shopping'
+              }
+            } else {
+              isActive = mainTab === tab.id
+              tabColor = isActive ? '#1B6EF3' : '#94A3B8'
+            }
+
             return (
-              <button key={tab.id} onClick={() => setMainTab(tab.id)}
-                className={`neu-tab${active ? ' active' : ''}`}
-                style={{
-                  flex:1, minWidth:0, height:52,
-                }}>
-                <Icon icon={tab.icon} width={16} height={16} color={active ? '#1B6EF3' : '#94A3B8'} />
-                <span style={{ fontSize:9, fontWeight: active ? 700 : 500, color: active ? '#1B6EF3' : '#94A3B8', whiteSpace:'nowrap' }}>
-                  {tab.label}
+              <button key={tab.id} onClick={handleClick}
+                className={`neu-tab${isActive ? ' active' : ''}`}
+                style={{ flex:1, minWidth:0, height:52 }}>
+                <Icon icon={tabIcon} width={16} height={16} color={tabColor} />
+                <span style={{ fontSize:9, fontWeight: isActive || (isShopping && hasMyList) ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
+                  {tabLabel}
                 </span>
               </button>
             )
@@ -419,7 +475,16 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {mainTab === 'services' ? (
         <Services onSelectBusiness={() => {}} onBack={() => setMainTab('bucketlist')} />
       ) : mainTab === 'shopping' ? (
-        <Shopping />
+        <Shopping onMyListChange={count => { setMyListCount(count) }} />
+      ) : mainTab === 'myshoppinglist' ? (
+        <MyShoppingView
+          onBack={() => setMainTab('shopping')}
+          onShopping={() => setMainTab('shopping')}
+          onBingo={() => setMainTab('bingo')}
+          onCommunity={() => setMainTab('community')}
+          onServices={() => setMainTab('services')}
+          onLanding={() => setMainTab('bucketlist')}
+        />
       ) : mainTab === 'bingo' ? (
         <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
       ) : mainTab === 'community' ? (
