@@ -38,12 +38,11 @@ const TAG_COLOR: Record<string, { bg: string; color: string }> = {
   '기념':   { bg: '#F0FDF4', color: '#15803D' },
 }
 
-export default function Shopping({ myList, myChecked, onMyListChange, onMyCheckedChange, onGoToMyList }: {
+export default function Shopping({ myList, myChecked, onMyListChange, onMyCheckedChange }: {
   myList: string[]
   myChecked: Record<string, boolean>
   onMyListChange: (next: string[]) => void
   onMyCheckedChange: (next: Record<string, boolean>) => void
-  onGoToMyList?: () => void
 }) {
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts]     = useState<Product[]>([])
@@ -365,38 +364,6 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
           </div>
         )}
       </div>
-
-      {/* ── 플로팅 내 쇼핑리스트 버튼 */}
-      {onGoToMyList && myList.length > 0 && (
-        <button onClick={onGoToMyList} style={{
-          position:'fixed', bottom:88, right:20,
-          width:60, height:60, borderRadius:'50%',
-          backgroundColor:'#4b5cf6',
-          boxShadow:'0 4px 12px rgba(75,92,246,0.45)',
-          border:'none', cursor:'pointer',
-          display:'flex', alignItems:'center', justifyContent:'center',
-          zIndex:1000,
-          WebkitTapHighlightColor:'transparent',
-        }}>
-          <svg width={30} height={30} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 9L4.31818 19.3462C4.153 20.3664 4.93883 21 5.97727 21H18.0227C19.0612 21 19.847 20.3664 19.6818 19.3462L18 9"
-              stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M9 10V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V10"
-              stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <div style={{
-            position:'absolute', top:-5, right:-5,
-            backgroundColor:'red', color:'#fff',
-            width:22, height:22, borderRadius:'50%',
-            fontSize:13, fontWeight:800,
-            display:'flex', alignItems:'center', justifyContent:'center',
-            border:'2px solid #fff',
-            boxShadow:'0 2px 4px rgba(0,0,0,0.2)',
-          }}>
-            {myList.length}
-          </div>
-        </button>
-      )}
 
       {/* ── 상품 상세 바텀시트 */}
       {selProduct && (
