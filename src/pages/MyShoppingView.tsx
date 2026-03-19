@@ -567,15 +567,24 @@ function GiftBoxProgress({ total, checkedCount }: {
   myChecked: Record<string, boolean>
 }) {
   const displayCount = Math.min(total, 12)
-  const boxSize = displayCount <= 4 ? 44 : displayCount <= 6 ? 36 : displayCount <= 9 ? 30 : 24
-  const cols = displayCount <= 4 ? 2 : displayCount <= 9 ? 3 : 4
+
+  // 고정 영역 110x110 안에서 박스 크기/레이아웃 결정
+  const AREA = 110
+  const cols = displayCount === 1 ? 1 : displayCount <= 4 ? 2 : displayCount <= 9 ? 3 : 4
+  const rows = Math.ceil(displayCount / cols)
+  const gap = 4
+  const boxSize = Math.min(
+    Math.floor((AREA - gap * (cols - 1)) / cols),
+    Math.floor((AREA - gap * (rows - 1)) / rows),
+  )
 
   return (
     <div style={{
-      flexShrink:0,
-      width: cols * (boxSize + 6),
-      display:'flex', flexWrap:'wrap', gap:6,
-      alignContent:'center',
+      flexShrink: 0,
+      width: AREA, height: AREA,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     }}>
       <style>{`
         @keyframes giftPop {
@@ -584,74 +593,56 @@ function GiftBoxProgress({ total, checkedCount }: {
           100% { transform: scale(1); opacity:1; }
         }
       `}</style>
-      {Array.from({ length: displayCount }).map((_, i) => {
-        const filled = i < checkedCount
-        // 색상 팔레트
-        const bodyMain = filled ? '#FF6B9D' : '#c8a8c8'
-        const bodyDark = filled ? '#e0437a' : '#a888a8'
-        const bodyLight= filled ? '#ffadd0' : '#dfc8df'
-        const lidMain  = filled ? '#FF85B3' : '#d4b4d4'
-        const lidDark  = filled ? '#e0437a' : '#a888a8'
-        const ribMain  = filled ? '#ffffff' : '#ead8ea'
-        const ribShad  = filled ? '#f0c0d8' : '#caaaca'
-        const stroke   = filled ? '#a0245a' : '#806080'
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: gap,
+        width: cols * (boxSize + gap) - gap,
+        justifyContent: 'center',
+        alignContent: 'center',
+      }}>
+        {Array.from({ length: displayCount }).map((_, i) => {
+          const filled = i < checkedCount
+          const bodyMain = filled ? '#FF6B9D' : '#c8a8c8'
+          const bodyDark = filled ? '#e0437a' : '#a888a8'
+          const bodyLight= filled ? '#ffadd0' : '#dfc8df'
+          const lidMain  = filled ? '#FF85B3' : '#d4b4d4'
+          const lidDark  = filled ? '#e0437a' : '#a888a8'
+          const ribMain  = filled ? '#ffffff' : '#ead8ea'
+          const ribShad  = filled ? '#f0c0d8' : '#caaaca'
+          const stroke   = filled ? '#a0245a' : '#806080'
 
-        return (
-          <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize*1.15)}
-            style={{
-              animation: filled ? `giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both` : 'none',
-              filter: filled
-                ? 'drop-shadow(0 4px 8px rgba(255,107,157,0.55))'
-                : 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
-            }}>
-
-            {/* ━━ 박스 본체 ━━ */}
-            {/* 본체 메인 */}
-            <rect x="10" y="42" width="80" height="62" rx="6" fill={bodyMain} stroke={stroke} strokeWidth="3.5"/>
-            {/* 본체 왼쪽 측면 음영 */}
-            <rect x="10" y="42" width="16" height="62" rx="3" fill={bodyDark} opacity="0.35"/>
-            {/* 본체 오른쪽 하이라이트 */}
-            <rect x="32" y="48" width="28" height="10" rx="4" fill={bodyLight} opacity="0.45"/>
-            {/* 본체 하단 음영 */}
-            <rect x="10" y="88" width="80" height="16" rx="3" fill={bodyDark} opacity="0.2"/>
-
-            {/* ━━ 뚜껑 ━━ */}
-            {/* 뚜껑 메인 */}
-            <rect x="6" y="24" width="88" height="22" rx="6" fill={lidMain} stroke={stroke} strokeWidth="3.5"/>
-            {/* 뚜껑 왼쪽 음영 */}
-            <rect x="6" y="24" width="16" height="22" rx="4" fill={lidDark} opacity="0.3"/>
-            {/* 뚜껑 하이라이트 */}
-            <rect x="20" y="28" width="38" height="8" rx="4" fill={bodyLight} opacity="0.5"/>
-
-            {/* ━━ 리본 세로 ━━ */}
-            <rect x="43" y="24" width="14" height="80" fill={ribMain} stroke={stroke} strokeWidth="2"/>
-            {/* 리본 세로 음영 */}
-            <rect x="43" y="24" width="5" height="80" fill={ribShad} opacity="0.5"/>
-
-            {/* ━━ 리본 가로 (뚜껑) ━━ */}
-            <rect x="6" y="29" width="88" height="12" fill={ribMain} stroke={stroke} strokeWidth="2"/>
-            {/* 리본 가로 음영 */}
-            <rect x="6" y="29" width="88" height="4" fill={ribShad} opacity="0.4"/>
-
-            {/* ━━ 나비매듭 ━━ */}
-            {/* 왼쪽 날개 */}
-            <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z"
-              fill={ribMain} stroke={stroke} strokeWidth="2.5" strokeLinejoin="round"/>
-            <path d="M50,18 Q38,8 28,14 Q26,18 34,20 Q42,22 50,18Z"
-              fill={ribShad} opacity="0.35"/>
-            {/* 오른쪽 날개 */}
-            <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z"
-              fill={ribMain} stroke={stroke} strokeWidth="2.5" strokeLinejoin="round"/>
-            <path d="M50,18 Q62,8 72,14 Q74,18 66,20 Q58,22 50,18Z"
-              fill={ribShad} opacity="0.35"/>
-            {/* 매듭 중앙 */}
-            <circle cx="50" cy="19" r="7" fill={lidMain} stroke={stroke} strokeWidth="2.5"/>
-            <circle cx="48" cy="17" r="2.5" fill={bodyLight} opacity="0.6"/>
-          </svg>
-        )
-      })}
+          return (
+            <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize * 1.05)}
+              style={{
+                animation: filled ? `giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both` : 'none',
+                filter: filled
+                  ? 'drop-shadow(0 4px 8px rgba(255,107,157,0.55))'
+                  : 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
+              }}>
+              <rect x="10" y="42" width="80" height="62" rx="6" fill={bodyMain} stroke={stroke} strokeWidth="3.5"/>
+              <rect x="10" y="42" width="16" height="62" rx="3" fill={bodyDark} opacity="0.35"/>
+              <rect x="32" y="48" width="28" height="10" rx="4" fill={bodyLight} opacity="0.45"/>
+              <rect x="10" y="88" width="80" height="16" rx="3" fill={bodyDark} opacity="0.2"/>
+              <rect x="6" y="24" width="88" height="22" rx="6" fill={lidMain} stroke={stroke} strokeWidth="3.5"/>
+              <rect x="6" y="24" width="16" height="22" rx="4" fill={lidDark} opacity="0.3"/>
+              <rect x="20" y="28" width="38" height="8" rx="4" fill={bodyLight} opacity="0.5"/>
+              <rect x="43" y="24" width="14" height="80" fill={ribMain} stroke={stroke} strokeWidth="2"/>
+              <rect x="43" y="24" width="5" height="80" fill={ribShad} opacity="0.5"/>
+              <rect x="6" y="29" width="88" height="12" fill={ribMain} stroke={stroke} strokeWidth="2"/>
+              <rect x="6" y="29" width="88" height="4" fill={ribShad} opacity="0.4"/>
+              <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z" fill={ribMain} stroke={stroke} strokeWidth="2.5" strokeLinejoin="round"/>
+              <path d="M50,18 Q38,8 28,14 Q26,18 34,20 Q42,22 50,18Z" fill={ribShad} opacity="0.35"/>
+              <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z" fill={ribMain} stroke={stroke} strokeWidth="2.5" strokeLinejoin="round"/>
+              <path d="M50,18 Q62,8 72,14 Q74,18 66,20 Q58,22 50,18Z" fill={ribShad} opacity="0.35"/>
+              <circle cx="50" cy="19" r="7" fill={lidMain} stroke={stroke} strokeWidth="2.5"/>
+              <circle cx="48" cy="17" r="2.5" fill={bodyLight} opacity="0.6"/>
+            </svg>
+          )
+        })}
+      </div>
       {total > 12 && (
-        <div style={{ fontSize:10, color:'#5a3a5a', fontWeight:700, width:'100%', textAlign:'center', marginTop:2 }}>
+        <div style={{ fontSize:10, color:'#5a3a5a', fontWeight:700, textAlign:'center', marginTop:2 }}>
           +{total - 12}개
         </div>
       )}
