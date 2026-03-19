@@ -412,15 +412,13 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
               </svg>
             )}
           </div>
-          {isAchieved ? (
-            <span style={{
-              fontSize:10, fontWeight:700, color:'#44403C',
-              background:'rgba(68,64,60,0.10)', padding:'3px 6px',
-              borderRadius:6, flexShrink:0, whiteSpace:'nowrap',
-            }}>완료 ✓</span>
-          ) : (
-            <span style={{ height:22 }} />
-          )}
+          <span style={{
+            fontSize:10, fontWeight:700, padding:'3px 6px',
+            borderRadius:6, flexShrink:0, whiteSpace:'nowrap',
+            color: isAchieved ? '#44403C' : '#fff',
+            background: isAchieved ? 'rgba(68,64,60,0.10)' : '#fff',
+            transition:'all 0.15s',
+          }}>완료 ✓</span>
         </div>
       </div>
     )
