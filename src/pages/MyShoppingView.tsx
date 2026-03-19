@@ -150,7 +150,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
               {pct === 100
                 ? '쇼핑 완료! 모든 상품을 구매했어요 🎉'
                 : pct > 0
-                ? '쇼핑 중이에요! 화이팅! 🛍️'
+                ? '힘드시죠? 그래도 쇼핑은 계속되야됩니다. 화아팅!'
                 : '찜한 상품을 체크하며 쇼핑하세요!'}
             </div>
           </div>
