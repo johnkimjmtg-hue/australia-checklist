@@ -71,9 +71,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   const [bizCount, setBizCount] = useState(0)
   const [shopCount, setShopCount] = useState(0)
-  const [myListCount, setMyListCount] = useState<number>(() => {
-    try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]').length } catch { return 0 }
-  })
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
   const [detailBiz, setDetailBiz] = useState<Business|null>(null)
   const [detailItem, setDetailItem] = useState<DBItem|null>(null)
@@ -403,18 +400,15 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             { id:'services',   icon:'ph:buildings',     label:'업체리스트' },
           ] as { id: MainTab; icon: string; label: string }[]).map(tab => {
             const active = mainTab === tab.id
-            const isShopping = tab.id === 'shopping'
-            const hasMyList = isShopping && myListCount > 0
-            const tabIcon = hasMyList ? 'ph:shopping-cart-simple-fill' : tab.icon
-            const tabLabel = hasMyList ? `내쇼핑리스트 ${myListCount}` : tab.label
-            const tabColor = hasMyList ? '#D97706' : (active ? '#1B6EF3' : '#94A3B8')
             return (
               <button key={tab.id} onClick={() => setMainTab(tab.id)}
                 className={`neu-tab${active ? ' active' : ''}`}
-                style={{ flex:1, minWidth:0, height:52 }}>
-                <Icon icon={tabIcon} width={16} height={16} color={tabColor} />
-                <span style={{ fontSize:9, fontWeight: active || hasMyList ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
-                  {tabLabel}
+                style={{
+                  flex:1, minWidth:0, height:52,
+                }}>
+                <Icon icon={tab.icon} width={16} height={16} color={active ? '#1B6EF3' : '#94A3B8'} />
+                <span style={{ fontSize:9, fontWeight: active ? 700 : 500, color: active ? '#1B6EF3' : '#94A3B8', whiteSpace:'nowrap' }}>
+                  {tab.label}
                 </span>
               </button>
             )
@@ -425,7 +419,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {mainTab === 'services' ? (
         <Services onSelectBusiness={() => {}} onBack={() => setMainTab('bucketlist')} />
       ) : mainTab === 'shopping' ? (
-        <Shopping onMyListChange={setMyListCount} />
+        <Shopping />
       ) : mainTab === 'bingo' ? (
         <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
       ) : mainTab === 'community' ? (
