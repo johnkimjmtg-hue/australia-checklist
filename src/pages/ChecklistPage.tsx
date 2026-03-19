@@ -495,6 +495,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           myChecked={myChecked}
           onMyListChange={handleMyListChange}
           onMyCheckedChange={handleMyCheckedChange}
+          onGoToMyList={() => setMainTab('myshoppinglist')}
         />
       ) : mainTab === 'myshoppinglist' ? (
         <MyShoppingView

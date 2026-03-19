@@ -38,11 +38,12 @@ const TAG_COLOR: Record<string, { bg: string; color: string }> = {
   '기념':   { bg: '#F0FDF4', color: '#15803D' },
 }
 
-export default function Shopping({ myList, myChecked, onMyListChange, onMyCheckedChange }: {
+export default function Shopping({ myList, myChecked, onMyListChange, onMyCheckedChange, onGoToMyList }: {
   myList: string[]
   myChecked: Record<string, boolean>
   onMyListChange: (next: string[]) => void
   onMyCheckedChange: (next: Record<string, boolean>) => void
+  onGoToMyList?: () => void
 }) {
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts]     = useState<Product[]>([])
@@ -364,6 +365,30 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
           </div>
         )}
       </div>
+
+      {/* ── 플로팅 내 쇼핑리스트 버튼 */}
+      {onGoToMyList && myList.length > 0 && (
+        <button onClick={onGoToMyList} style={{
+          position:'fixed', bottom:88, right:20,
+          width:60, height:60, borderRadius:30,
+          backgroundColor:'#1B6EF3',
+          boxShadow:'0px 4px 12px rgba(0,0,0,0.25)',
+          border:'none', cursor:'pointer',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          zIndex:100,
+          WebkitTapHighlightColor:'transparent',
+        }}>
+          <Icon icon="ph:shopping-cart-simple" width={28} height={28} color="#fff" />
+          <div style={{
+            position:'absolute', top:0, right:0,
+            backgroundColor:'#FF4D4F', color:'#fff',
+            borderRadius:10, padding:'2px 6px',
+            fontSize:11, fontWeight:800, minWidth:18, textAlign:'center',
+          }}>
+            {myList.length}
+          </div>
+        </button>
+      )}
 
       {/* ── 상품 상세 바텀시트 */}
       {selProduct && (
