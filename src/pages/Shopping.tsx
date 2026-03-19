@@ -378,7 +378,12 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
           zIndex:1000,
           WebkitTapHighlightColor:'transparent',
         }}>
-          <span style={{ fontSize:28, lineHeight:1 }}>🛍️</span>
+          <svg width={30} height={30} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 9L4.31818 19.3462C4.153 20.3664 4.93883 21 5.97727 21H18.0227C19.0612 21 19.847 20.3664 19.6818 19.3462L18 9"
+              stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M9 10V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V10"
+              stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
           <div style={{
             position:'absolute', top:-5, right:-5,
             backgroundColor:'red', color:'#fff',
