@@ -449,12 +449,11 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
               {/* 찜하기 버튼 */}
               <button onClick={() => { myList.includes(selProduct.id) ? removeFromMyList(selProduct.id) : addToMyList(selProduct.id) }} style={{
                 width:'100%', height:50, borderRadius:12, border:'none', cursor:'pointer',
-                background: myList.includes(selProduct.id) ? '#fff0f5' : '#FF6B9D',
-                color: myList.includes(selProduct.id) ? '#FF6B9D' : '#fff',
+                background:'#e8e8e8', color:'#FF6B9D',
                 fontSize:15, fontWeight:700,
                 display:'flex', alignItems:'center', justifyContent:'center', gap:8,
                 marginBottom:10,
-                boxShadow: myList.includes(selProduct.id) ? 'inset 2px 2px 4px #f8c0d8' : '0 4px 12px rgba(255,107,157,0.35)',
+                boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                 WebkitTapHighlightColor:'transparent',
               }}>
                 <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color="#FF6B9D" />
@@ -463,10 +462,10 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
 
               <button onClick={() => setSelProduct(null)} style={{
                 width:'100%', height:50, borderRadius:12, border:'none',
-                background:'#e8e8e8', color:'#1B6EF3', fontSize:15, fontWeight:700, cursor:'pointer',
+                background:'#e8e8e8', color:'#94A3B8', fontSize:15, fontWeight:700, cursor:'pointer',
                 boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                 WebkitTapHighlightColor:'transparent',
-              }}>확인</button>
+              }}>닫기</button>
             </div>
           </div>
         </>
