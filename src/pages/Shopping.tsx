@@ -38,15 +38,12 @@ const TAG_COLOR: Record<string, { bg: string; color: string }> = {
   '기념':   { bg: '#F0FDF4', color: '#15803D' },
 }
 
-const MY_LIST_KEY = 'my-shopping-list'
-function loadMyList(): string[] {
-  try { return JSON.parse(localStorage.getItem(MY_LIST_KEY) ?? '[]') } catch { return [] }
-}
-function saveMyList(ids: string[]) {
-  try { localStorage.setItem(MY_LIST_KEY, JSON.stringify(ids)) } catch {}
-}
-
-export default function Shopping({ onMyListChange }: { onMyListChange?: (count: number) => void }) {
+export default function Shopping({ myList, myChecked, onMyListChange, onMyCheckedChange }: {
+  myList: string[]
+  myChecked: Record<string, boolean>
+  onMyListChange: (next: string[]) => void
+  onMyCheckedChange: (next: Record<string, boolean>) => void
+}) {
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts]     = useState<Product[]>([])
   const [loading, setLoading]       = useState(true)
@@ -54,20 +51,13 @@ export default function Shopping({ onMyListChange }: { onMyListChange?: (count: 
   const [sortBy, setSortBy]         = useState<SortOption>('default')
   const [search, setSearch]         = useState('')
   const [selProduct, setSelProduct] = useState<Product | null>(null)
-  const [myList, setMyList]         = useState<string[]>(loadMyList)
 
   const addToMyList = (id: string) => {
     if (myList.includes(id)) return
-    const next = [...myList, id]
-    setMyList(next)
-    saveMyList(next)
-    onMyListChange?.(next.length)
+    onMyListChange([...myList, id])
   }
   const removeFromMyList = (id: string) => {
-    const next = myList.filter(i => i !== id)
-    setMyList(next)
-    saveMyList(next)
-    onMyListChange?.(next.length)
+    onMyListChange(myList.filter(i => i !== id))
   }
 
   useEffect(() => {

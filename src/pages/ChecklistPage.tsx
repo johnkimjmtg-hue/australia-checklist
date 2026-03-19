@@ -72,9 +72,24 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   const [bizCount, setBizCount] = useState(0)
   const [shopCount, setShopCount] = useState(0)
-  const [myListCount, setMyListCount] = useState<number>(() => {
-    try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]').length } catch { return 0 }
+  const [myList, setMyList] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] }
   })
+  const [myChecked, setMyChecked] = useState<Record<string,boolean>>(() => {
+    try { return JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}') } catch { return {} }
+  })
+
+  const myListCount = myList.length
+  const myCheckedCount = myList.filter(id => myChecked[id]).length
+
+  const handleMyListChange = (next: string[]) => {
+    setMyList(next)
+    try { localStorage.setItem('my-shopping-list', JSON.stringify(next)) } catch {}
+  }
+  const handleMyCheckedChange = (next: Record<string,boolean>) => {
+    setMyChecked(next)
+    try { localStorage.setItem('my-shopping-checked', JSON.stringify(next)) } catch {}
+  }
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
   const [detailBiz, setDetailBiz] = useState<Business|null>(null)
   const [detailItem, setDetailItem] = useState<DBItem|null>(null)
@@ -391,7 +406,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
           >HOJUGAJA</span>
           <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
-            {mainTab === 'services' ? `${bizCount}개 업체` : mainTab === 'bucketlist' ? `${total}개 버킷리스트` : mainTab === 'bingo' ? (bingoCity === 'melbourne' ? '멜번' : '시드니') : mainTab === 'shopping' ? `${shopCount}개 상품` : mainTab === 'myshoppinglist' ? `${(() => { try { const l = JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]'); const c = JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}'); return `${l.filter((id:string)=>c[id]).length}/${l.length}` } catch { return '0/0' } })()}` : ''}
+            {mainTab === 'services' ? `${bizCount}개 업체` : mainTab === 'bucketlist' ? `${total}개 버킷리스트` : mainTab === 'bingo' ? (bingoCity === 'melbourne' ? '멜번' : '시드니') : mainTab === 'shopping' ? `${shopCount}개 상품` : mainTab === 'myshoppinglist' ? `${myCheckedCount}/${myListCount}` : ''}
           </span>
         </div>
         {/* 탭 */}
@@ -475,9 +490,20 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {mainTab === 'services' ? (
         <Services onSelectBusiness={() => {}} onBack={() => setMainTab('bucketlist')} />
       ) : mainTab === 'shopping' ? (
-        <Shopping onMyListChange={count => { setMyListCount(count) }} />
+        <Shopping
+          myList={myList}
+          myChecked={myChecked}
+          onMyListChange={handleMyListChange}
+          onMyCheckedChange={handleMyCheckedChange}
+        />
       ) : mainTab === 'myshoppinglist' ? (
-        <MyShoppingView onBack={() => setMainTab('shopping')} />
+        <MyShoppingView
+          myList={myList}
+          myChecked={myChecked}
+          onMyListChange={handleMyListChange}
+          onMyCheckedChange={handleMyCheckedChange}
+          onBack={() => setMainTab('shopping')}
+        />
       ) : mainTab === 'bingo' ? (
         <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
       ) : mainTab === 'community' ? (

@@ -29,31 +29,17 @@ const TAG_COLOR: Record<string, { bg: string; color: string }> = {
   '기념':    { bg: '#F0FDF4', color: '#15803D' },
 }
 
-const MY_LIST_KEY    = 'my-shopping-list'
-const MY_CHECKED_KEY = 'my-shopping-checked'
-
-export function loadMyList(): string[] {
-  try { return JSON.parse(localStorage.getItem(MY_LIST_KEY) ?? '[]') } catch { return [] }
-}
-export function saveMyList(ids: string[]) {
-  try { localStorage.setItem(MY_LIST_KEY, JSON.stringify(ids)) } catch {}
-}
-function loadMyChecked(): Record<string, boolean> {
-  try { return JSON.parse(localStorage.getItem(MY_CHECKED_KEY) ?? '{}') } catch { return {} }
-}
-function saveMyChecked(c: Record<string, boolean>) {
-  try { localStorage.setItem(MY_CHECKED_KEY, JSON.stringify(c)) } catch {}
-}
-
 // ── Props
 type Props = {
   onBack: () => void
+  myList: string[]
+  myChecked: Record<string, boolean>
+  onMyListChange: (next: string[]) => void
+  onMyCheckedChange: (next: Record<string, boolean>) => void
 }
 
-export default function MyShoppingView({ onBack }: Props) {
+export default function MyShoppingView({ onBack, myList, myChecked, onMyListChange, onMyCheckedChange }: Props) {
   const [allProducts, setAllProducts] = useState<Product[]>([])
-  const [myList, setMyList]           = useState<string[]>(loadMyList)
-  const [myChecked, setMyChecked]     = useState<Record<string, boolean>>(loadMyChecked)
   const [selProduct, setSelProduct]   = useState<Product | null>(null)
   const [loading, setLoading]         = useState(true)
   const [petalTrigger, setPetalTrigger] = useState(0)
@@ -72,30 +58,23 @@ export default function MyShoppingView({ onBack }: Props) {
   const pct          = total > 0 ? Math.round((checkedCount / total) * 100) : 0
 
   const removeFromMyList = (id: string) => {
-    const next = myList.filter(i => i !== id)
-    setMyList(next)
-    saveMyList(next)
+    onMyListChange(myList.filter(i => i !== id))
     const nextChecked = { ...myChecked }
     delete nextChecked[id]
-    setMyChecked(nextChecked)
-    saveMyChecked(nextChecked)
+    onMyCheckedChange(nextChecked)
   }
 
   const toggleChecked = (id: string) => {
     const wasChecked = !!myChecked[id]
     const next = { ...myChecked, [id]: !myChecked[id] }
     if (!next[id]) delete next[id]
-    setMyChecked(next)
-    saveMyChecked(next)
-    // 체크할 때만 꽃가루
+    onMyCheckedChange(next)
     if (!wasChecked) setPetalTrigger(t => t + 1)
   }
 
   const addToMyList = (id: string) => {
     if (myList.includes(id)) return
-    const next = [...myList, id]
-    setMyList(next)
-    saveMyList(next)
+    onMyListChange([...myList, id])
   }
 
   return (
