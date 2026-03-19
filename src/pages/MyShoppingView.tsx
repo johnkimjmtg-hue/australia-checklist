@@ -119,32 +119,41 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
       {/* ── 진행 카드 */}
       <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'16px 16px 0' }}>
         <div style={{
-          background:'#c8d4b8', borderRadius:12,
-          boxShadow:'inset 3px 3px 8px #a8b498, inset -2px -2px 6px #e8f4d8',
+          background:'#d8a0d8',
+          borderRadius:12,
+          boxShadow:'inset 5px 5px 15px rgba(0,0,0,0.25), inset -2px -2px 6px rgba(255,255,255,0.15)',
           padding:'20px', display:'flex', alignItems:'center', gap:20,
+          position:'relative', overflow:'hidden',
         }}>
+          {/* LCD 도트 오버레이 */}
+          <div style={{
+            position:'absolute', inset:0, pointerEvents:'none', borderRadius:12,
+            background:`linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.07) 50%),
+                        linear-gradient(90deg, rgba(255,0,0,0.02), rgba(0,255,0,0.01), rgba(0,0,255,0.02))`,
+            backgroundSize:'100% 3px, 3px 100%',
+          }} />
           {/* 원형 진행률 */}
           <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
             <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
-              <circle cx={50} cy={50} r={44} fill="none" stroke="#a8b498" strokeWidth={10}/>
+              <circle cx={50} cy={50} r={44} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth={10}/>
               <circle cx={50} cy={50} r={44} fill="none" stroke="#FF6B9D" strokeWidth={10}
                 strokeDasharray={2 * Math.PI * 44}
                 strokeDashoffset={2 * Math.PI * 44 * (1 - pct / 100)}
                 strokeLinecap="round"
-                style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)' }}
+                style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)', filter:'drop-shadow(0 0 4px rgba(255,107,157,0.6))' }}
               />
             </svg>
             <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <span style={{ fontSize:15, fontWeight:800, color:'#2d3e1f' }}>{pct}%</span>
+              <span style={{ fontSize:15, fontWeight:800, color:'#2a2a2a', fontFamily:"'Courier New', monospace", textShadow:'1px 1px 1px rgba(0,0,0,0.1)' }}>{pct}%</span>
             </div>
           </div>
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:20, fontWeight:800, color:'#2d3e1f', marginBottom:4, lineHeight:1.2 }}>내 쇼핑리스트</div>
+          <div style={{ flex:1, fontFamily:"'Courier New', monospace" }}>
+            <div style={{ fontSize:18, fontWeight:800, color:'#2a2a2a', marginBottom:4, lineHeight:1.2, textShadow:'1px 1px 1px rgba(0,0,0,0.1)' }}>내 쇼핑리스트</div>
             <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:4 }}>
-              <span style={{ fontSize:42, fontWeight:800, color:'#2d3e1f', lineHeight:1 }}>{checkedCount}</span>
-              <span style={{ fontSize:17, fontWeight:600, color:'#4a5e32' }}>/{total}개 구매 완료</span>
+              <span style={{ fontSize:42, fontWeight:800, color:'#2a2a2a', lineHeight:1, textShadow:'1px 1px 1px rgba(0,0,0,0.1)' }}>{checkedCount}</span>
+              <span style={{ fontSize:16, fontWeight:600, color:'#3a2a3a' }}>/{total}개 구매 완료</span>
             </div>
-            <div style={{ fontSize:13, color:'#4a5e32', lineHeight:1.5 }}>
+            <div style={{ fontSize:12, color:'#3a2a3a', lineHeight:1.5, textShadow:'1px 1px 1px rgba(0,0,0,0.08)' }}>
               {pct === 100
                 ? '쇼핑 완료! 모든 상품을 구매했어요 🎉'
                 : pct > 0
