@@ -61,7 +61,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [bingoCity, setBingoCity]     = useState<'melbourne'|'sydney'>('melbourne')
   const [mainTab, setMainTab]         = useState<MainTab>(() => {
     const tab = searchParams.get('tab')
-    if (tab === 'services' || tab === 'shopping' || tab === 'bingo' || tab === 'community') return tab
+    if (tab === 'services' || tab === 'shopping' || tab === 'myshoppinglist' || tab === 'bingo' || tab === 'community') return tab as MainTab
     return 'bucketlist'
   })
   const [showScheduleView, setShowScheduleView] = useState(!!trip)

@@ -702,7 +702,14 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {/* 1행 */}
             <button className="calc-btn" onClick={onStart} style={{ height: 72 }}>1<br/>버킷리스트</button>
-            <button className="calc-btn" onClick={() => navigate('/app?tab=shopping')} style={{ height: 72 }}>2<br/>쇼핑리스트</button>
+            <button className="calc-btn" onClick={() => {
+              try {
+                const list = JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]')
+                navigate(list.length > 0 ? '/app?tab=myshoppinglist' : '/app?tab=shopping')
+              } catch {
+                navigate('/app?tab=shopping')
+              }
+            }} style={{ height: 72 }}>2<br/>쇼핑리스트</button>
             <button className="calc-btn" onClick={() => navigate('/app?tab=bingo')} style={{ height: 72 }}>3<br/>카페빙고게임</button>
             {/* 2행 */}
             <button className="calc-btn" onClick={() => navigate('/app?tab=community')} style={{ height: 72 }}>4<br/>채팅방</button>
