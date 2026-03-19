@@ -165,50 +165,50 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
             <Icon icon="ph:shopping-cart-simple" width={48} height={48} color="#C8C8C8" />
             <div style={{ marginTop:12, fontSize:15, fontWeight:700, color:'#94A3B8' }}>찜한 상품이 없어요</div>
             <div style={{ marginTop:6, fontSize:13, color:'#C8C8C8' }}>쇼핑리스트에서 상품을 찜해보세요!</div>
-            <button onClick={onBack} style={{
-              marginTop:20, height:44, padding:'0 24px', borderRadius:10, border:'none',
-              background:'#39d353', color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer',
-              boxShadow:'0 4px 12px rgba(57,211,83,0.35)',
-            }}>쇼핑리스트 보러가기</button>
           </div>
         ) : (
           myProducts.map(p => {
             const checked = !!myChecked[p.id]
             return (
               <div key={p.id} className="my-item" style={{
-                display:'flex', alignItems:'stretch', gap:10,
-                padding:'12px 12px 12px 14px',
-                borderRadius:12,
+                display:'flex', alignItems:'stretch',
+                borderRadius:14,
                 background: checked ? '#fff8e4' : '#fff',
                 border:'1px solid #C8C8C8',
                 borderLeft: checked ? '4px solid #39d353' : '4px solid #CBD5E1',
-                transition:'all 0.3s',
+                transition:'all 0.3s', overflow:'hidden',
               }}>
-                {/* 이미지 */}
+                {/* 이미지 6:4 */}
                 <div onClick={() => setSelProduct(p)} style={{
-                  width:60, height:60, borderRadius:'50%', flexShrink:0,
+                  width:110, flexShrink:0,
                   background: p.image_url ? 'none' : '#f0f0f0',
-                  border:'1px solid #E2E8F0',
                   display:'flex', alignItems:'center', justifyContent:'center',
-                  overflow:'hidden', cursor:'pointer', alignSelf:'center',
+                  overflow:'hidden', cursor:'pointer',
                 }}>
                   {p.image_url
                     ? <img src={p.image_url} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                    : <Icon icon="ph:shopping-bag" width={24} height={24} color="#CBD5E1" />
+                    : <Icon icon="ph:shopping-bag" width={32} height={32} color="#CBD5E1" />
                   }
                 </div>
 
                 {/* 텍스트 */}
-                <div onClick={() => setSelProduct(p)} style={{ flex:1, minWidth:0, justifyContent:'center', display:'flex', flexDirection:'column', gap:2, cursor:'pointer' }}>
+                <div onClick={() => setSelProduct(p)} style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', justifyContent:'center', gap:4, cursor:'pointer', padding:'12px 8px 12px 12px' }}>
                   <span style={{
-                    fontSize:14, fontWeight: checked ? 700 : 500,
+                    fontSize:15, fontWeight: checked ? 700 : 600,
                     color: checked ? '#94A3B8' : '#0F172A',
                     textDecoration: checked ? 'line-through' : 'none',
                     lineHeight:1.4,
                     overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
                   }}>{p.name}</span>
-                  <span style={{ fontSize:11, color:'#94A3B8' }}>{p.brand}</span>
-                  <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:2 }}>
+                  {p.description && (
+                    <span style={{
+                      fontSize:11, color:'#94A3B8', lineHeight:1.4,
+                      overflow:'hidden', textOverflow:'ellipsis',
+                      display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical',
+                    }}>{p.description}</span>
+                  )}
+                  <span style={{ fontSize:11, color:'#B0B8C1' }}>{p.brand}</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:6 }}>
                     <span style={{ fontSize:11, fontWeight:800, color: checked ? '#CBD5E1' : PRICE_COLOR[p.price_range] ?? '#475569' }}>
                       {p.price_range} · {PRICE_LABEL[p.price_range]}
                     </span>
@@ -223,8 +223,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
                 </div>
 
                 {/* 오른쪽 - 체크박스 + 삭제 */}
-                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, gap:6, paddingTop:2, paddingBottom:2 }}>
-                  {/* 체크박스 */}
+                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, padding:'12px 12px 12px 0' }}>
                   <div onClick={() => toggleChecked(p.id)} style={{
                     width:26, height:26, borderRadius:6, flexShrink:0,
                     border: checked ? 'none' : '1.5px solid #C8C8C8',
@@ -239,12 +238,11 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
                       </svg>
                     )}
                   </div>
-                  {/* 삭제 */}
                   <button onClick={() => removeFromMyList(p.id)} style={{
                     background:'none', border:'none', cursor:'pointer', padding:2,
                     display:'flex', alignItems:'center',
                   }}>
-                    <Icon icon="ph:trash" width={14} height={14} color="#CBD5E1" />
+                    <Icon icon="ph:trash" width={18} height={18} color="#94A3B8" />
                   </button>
                 </div>
               </div>
