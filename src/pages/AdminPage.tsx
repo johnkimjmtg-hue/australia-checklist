@@ -873,7 +873,10 @@ function ItemsTab({ cats, items, setItems }: {
   const [businesses, setBusinesses] = useState<{id:string;name:string}[]>([])
   const [newSuburb, setNewSuburb]   = useState('')
   const [newDesc, setNewDesc]       = useState('')
+  const [newTips, setNewTips]       = useState('')
   const [newBizIds, setNewBizIds]   = useState<string[]>([])
+  const [newImgFile, setNewImgFile] = useState<File|null>(null)
+  const [newImgPreview, setNewImgPreview] = useState<string|null>(null)
   const [bizSearch, setBizSearch]   = useState('')
   const [bizFocused, setBizFocused] = useState(false)
 
@@ -895,17 +898,30 @@ function ItemsTab({ cats, items, setItems }: {
     const id = 'i_' + Date.now()
     const sort_order = catItems.length + 1
     setSaving(true)
+    let imageUrl: string | null = null
+    if (newImgFile) {
+      const ext = newImgFile.name.split('.').pop()
+      const path = `checklist/${id}_${Date.now()}.${ext}`
+      const { error: upErr } = await supabase.storage.from('shopping-images').upload(path, newImgFile, { upsert: true })
+      if (!upErr) {
+        const { data: { publicUrl } } = supabase.storage.from('shopping-images').getPublicUrl(path)
+        imageUrl = publicUrl
+      }
+    }
     const insertData: any = {
       id, category_id: selCat, label: newLabel.trim(),
       icon: newIcon, sort_order, is_active: true,
     }
     if (newSuburb.trim()) insertData.address = newSuburb.trim()
     if (newDesc.trim()) insertData.description = newDesc.trim()
+    if (newTips.trim()) insertData.tips = newTips.trim()
+    if (imageUrl) insertData.image_url = imageUrl
     if (newBizIds.length > 0) { insertData.related_business_id = newBizIds[0]; insertData.related_business_ids = newBizIds }
     const { error } = await supabase.from('checklist_items').insert(insertData)
     if (!error) {
       setItems([...items, { ...insertData }])
-      setNewLabel(''); setNewSuburb(''); setNewDesc(''); setNewBizIds([]); setBizSearch('')
+      setNewLabel(''); setNewSuburb(''); setNewDesc(''); setNewTips(''); setNewBizIds([]); setBizSearch('')
+      setNewImgFile(null); setNewImgPreview(null)
       showToast('항목 추가됨: ' + newLabel)
     } else showToast('오류: ' + error.message)
     setSaving(false)
@@ -1017,7 +1033,7 @@ function ItemsTab({ cats, items, setItems }: {
       {/* 새 항목 추가 */}
       <Card>
         <SectionTitle>새 항목 추가</SectionTitle>
-        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {/* 아이콘 + 이름 */}
           <div style={{ display:'flex', gap:8, alignItems:'center' }}>
             <IconPicker value={newIcon} onChange={setNewIcon} />
@@ -1026,16 +1042,50 @@ function ItemsTab({ cats, items, setItems }: {
               placeholder="버킷리스트 항목 이름 *"
               style={{ ...inputStyle, flex:1 }} />
           </div>
-          {/* Suburb */}
+          {/* 이미지 업로드 */}
+          <div>
+            <span style={{ fontSize:12, color:'#64748B', fontWeight:600 }}>🖼 이미지 (선택)</span>
+            <div style={{ marginTop:6, display:'flex', flexDirection:'column', gap:6 }}>
+              {newImgPreview && (
+                <div style={{ position:'relative', display:'inline-block' }}>
+                  <img src={newImgPreview} alt="" style={{ width:120, height:80, objectFit:'cover', borderRadius:8, border:'1px solid #E2E8F0' }} />
+                  <button onClick={() => { setNewImgFile(null); setNewImgPreview(null) }} style={{
+                    position:'absolute', top:4, right:4, background:'rgba(0,0,0,0.5)',
+                    border:'none', borderRadius:4, color:'#fff', fontSize:11, cursor:'pointer', padding:'2px 5px'
+                  }}>✕</button>
+                </div>
+              )}
+              <label style={{
+                display:'inline-block', padding:'6px 12px', borderRadius:8,
+                border:'1.5px dashed #CBD5E1', fontSize:12, color:'#64748B',
+                cursor:'pointer', background:'#fff',
+              }}>
+                {newImgPreview ? '이미지 교체' : '+ 이미지 업로드'}
+                <input type="file" accept="image/*" style={{ display:'none' }}
+                  onChange={e => {
+                    const f = e.target.files?.[0]
+                    if (f) { setNewImgFile(f); setNewImgPreview(URL.createObjectURL(f)) }
+                  }} />
+              </label>
+            </div>
+          </div>
+          {/* 주소 */}
           <input value={newSuburb} onChange={e=>setNewSuburb(e.target.value)}
-            placeholder="📍 Suburb (선택)"
+            placeholder="📍 주소 (선택) — 여기서 할 수 있어요 구글맵 연동"
             style={{ ...inputStyle, fontSize:13 }} />
           {/* 설명 */}
-          <input value={newDesc} onChange={e=>setNewDesc(e.target.value)}
-            placeholder="📝 한 줄 설명 (선택)"
-            style={{ ...inputStyle, fontSize:13 }} />
-          {/* 관련업체 검색 — 최대 3개 */}
+          <textarea value={newDesc} onChange={e=>setNewDesc(e.target.value)}
+            placeholder="📝 설명 (선택) — 왜 꼭 해야 하는지 어필하는 설명"
+            rows={4}
+            style={{ ...inputStyle, fontSize:13, resize:'vertical' }} />
+          {/* 팁 */}
+          <textarea value={newTips} onChange={e=>setNewTips(e.target.value)}
+            placeholder="💡 현지인 팁 (선택) — 예: 오전 일찍 가야 줄 짧아요"
+            rows={2}
+            style={{ ...inputStyle, fontSize:13, resize:'vertical' }} />
+          {/* 관련업체 검색 */}
           <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
+            <span style={{ fontSize:12, color:'#64748B', fontWeight:600 }}>🏢 관련업체 (최대 3개)</span>
             {newBizIds.map(id => {
               const biz = businesses.find(b => b.id === id)
               return biz ? (
@@ -1054,7 +1104,7 @@ function ItemsTab({ cats, items, setItems }: {
                   onChange={e => setBizSearch(e.target.value)}
                   onFocus={() => setBizFocused(true)}
                   onBlur={() => setTimeout(() => setBizFocused(false), 150)}
-                  placeholder="🏢 관련업체 검색 (최대 3개)"
+                  placeholder="업체명 검색..."
                   style={{ ...inputStyle, fontSize:13 }}
                 />
                 {filteredBiz.length > 0 && bizFocused && (
