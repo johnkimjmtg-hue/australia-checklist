@@ -204,11 +204,21 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
                   background: p.image_url ? 'none' : '#f0f0f0',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   overflow:'hidden', cursor:'pointer',
+                  position:'relative',
                 }}>
                   {p.image_url
                     ? <img src={p.image_url} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                     : <Icon icon="ph:shopping-bag" width={32} height={32} color="#CBD5E1" />
                   }
+                  {/* 돋보기 아이콘 */}
+                  <div style={{
+                    position:'absolute', top:6, right:6,
+                    width:24, height:24, borderRadius:'50%',
+                    background:'rgba(0,0,0,0.35)',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                  }}>
+                    <Icon icon="ph:magnifying-glass-bold" width={13} height={13} color="#fff" />
+                  </div>
                 </div>
 
                 {/* 텍스트 */}
