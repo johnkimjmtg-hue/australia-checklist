@@ -659,7 +659,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                 display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
                               }}>{db.description}</span>
                             )}
-                            )}
                             {hasDetail && (
                               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:4 }}>
                                 <button
