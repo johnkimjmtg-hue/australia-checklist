@@ -558,58 +558,73 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
   )
 }
 
+
 // ── 선물박스 프로그래스
-function GiftBoxProgress({ total, checkedCount, myList, myChecked }: {
+function GiftBoxProgress({ total, checkedCount }: {
   total: number
   checkedCount: number
   myList: string[]
   myChecked: Record<string, boolean>
 }) {
-  // 최대 12개까지 표시, 박스 크기 동적 조정
   const displayCount = Math.min(total, 12)
-  const boxSize = displayCount <= 4 ? 40 : displayCount <= 6 ? 32 : displayCount <= 9 ? 26 : 22
+  const boxSize = displayCount <= 4 ? 44 : displayCount <= 6 ? 36 : displayCount <= 9 ? 30 : 24
   const cols = displayCount <= 4 ? 2 : displayCount <= 9 ? 3 : 4
 
   return (
     <div style={{
       flexShrink:0,
-      width: cols * (boxSize + 4),
-      display:'flex', flexWrap:'wrap', gap:4,
+      width: cols * (boxSize + 6),
+      display:'flex', flexWrap:'wrap', gap:6,
       alignContent:'center',
     }}>
       <style>{`
         @keyframes giftPop {
-          0%   { transform: scale(0.6); }
-          60%  { transform: scale(1.2); }
-          100% { transform: scale(1); }
+          0%   { transform: scale(0.5) rotate(-10deg); opacity:0.5; }
+          60%  { transform: scale(1.25) rotate(3deg); }
+          100% { transform: scale(1) rotate(0deg); opacity:1; }
         }
       `}</style>
       {Array.from({ length: displayCount }).map((_, i) => {
         const filled = i < checkedCount
+        const box    = filled ? '#FF6B9D' : '#c8a8c8'
+        const boxD   = filled ? '#d94f85' : '#a888a8'
+        const boxL   = filled ? '#ffadd0' : '#ddc8dd'
+        const rib    = filled ? '#fff'    : '#e8d0e8'
+        const ribD   = filled ? '#f0d0e0' : '#d0b8d0'
+        const outline= filled ? '#c0346a' : '#907090'
         return (
-          <svg key={i} viewBox="0 0 100 100" width={boxSize} height={boxSize}
-            style={{ animation: filled ? `giftPop 0.3s ease ${i * 0.05}s both` : 'none' }}>
-            {/* 박스 본체 */}
-            <rect x="10" y="38" width="80" height="55" rx="7"
-              fill={filled ? '#FF6B9D' : '#d8b8d8'} />
-            {/* 뚜껑 */}
-            <rect x="5" y="24" width="90" height="20" rx="6"
-              fill={filled ? '#FF6B9D' : '#d8b8d8'} />
-            {/* 리본 세로 */}
-            <rect x="44" y="24" width="12" height="69"
-              fill={filled ? '#fff' : '#b898b8'} />
-            {/* 리본 가로 */}
-            <rect x="5" y="47" width="90" height="12"
-              fill={filled ? '#fff' : '#b898b8'} />
-            {/* 리본 매듭 좌 */}
-            <ellipse cx="36" cy="22" rx="12" ry="8" transform="rotate(-20 36 22)"
-              fill={filled ? '#fff' : '#b898b8'} />
-            {/* 리본 매듭 우 */}
-            <ellipse cx="64" cy="22" rx="12" ry="8" transform="rotate(20 64 22)"
-              fill={filled ? '#fff' : '#b898b8'} />
-            {/* 매듭 중앙 */}
-            <circle cx="50" cy="22" r="7"
-              fill={filled ? '#FF6B9D' : '#d8b8d8'} stroke={filled ? '#fff' : '#b898b8'} strokeWidth="2" />
+          <svg key={i} viewBox="0 0 100 110" width={boxSize} height={boxSize * 1.1}
+            style={{ animation: filled ? `giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both` : 'none',
+                     filter: filled ? 'drop-shadow(0 3px 6px rgba(255,107,157,0.5))' : 'drop-shadow(0 2px 3px rgba(0,0,0,0.15))' }}>
+
+            {/* ── 뚜껑 윗면 (상단 사각형) */}
+            <rect x="8" y="16" width="84" height="22" rx="5" fill={box} stroke={outline} strokeWidth="3"/>
+            {/* 뚜껑 하이라이트 */}
+            <rect x="14" y="19" width="50" height="7" rx="3" fill={boxL} opacity="0.5"/>
+
+            {/* ── 박스 본체 */}
+            <rect x="12" y="36" width="76" height="58" rx="5" fill={box} stroke={outline} strokeWidth="3"/>
+            {/* 본체 왼쪽 음영 */}
+            <rect x="12" y="36" width="18" height="58" rx="3" fill={boxD} opacity="0.3"/>
+            {/* 본체 하이라이트 */}
+            <rect x="18" y="42" width="30" height="10" rx="3" fill={boxL} opacity="0.35"/>
+
+            {/* ── 리본 세로 */}
+            <rect x="44" y="36" width="12" height="58" fill={rib} stroke={outline} strokeWidth="1.5"/>
+            {/* ── 리본 가로 (뚜껑) */}
+            <rect x="8" y="20" width="84" height="12" fill={rib} stroke={outline} strokeWidth="1.5"/>
+            {/* 리본 음영 */}
+            <rect x="44" y="36" width="4" height="58" fill={ribD} opacity="0.5"/>
+
+            {/* ── 나비매듭 왼쪽 */}
+            <ellipse cx="34" cy="16" rx="14" ry="9" transform="rotate(-15 34 16)" fill={rib} stroke={outline} strokeWidth="2"/>
+            <ellipse cx="34" cy="16" rx="8" ry="5" transform="rotate(-15 34 16)" fill={ribD} opacity="0.4"/>
+            {/* ── 나비매듭 오른쪽 */}
+            <ellipse cx="66" cy="16" rx="14" ry="9" transform="rotate(15 66 16)" fill={rib} stroke={outline} strokeWidth="2"/>
+            <ellipse cx="66" cy="16" rx="8" ry="5" transform="rotate(15 66 16)" fill={ribD} opacity="0.4"/>
+            {/* ── 매듭 중앙 */}
+            <circle cx="50" cy="16" r="7" fill={box} stroke={outline} strokeWidth="2.5"/>
+            <circle cx="50" cy="16" r="3.5" fill={boxL} opacity="0.6"/>
           </svg>
         )
       })}
