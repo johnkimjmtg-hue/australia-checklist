@@ -44,6 +44,17 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
   const [loading, setLoading]         = useState(true)
   const [petalTrigger, setPetalTrigger] = useState(0)
   const [showReceipt, setShowReceipt] = useState(false)
+  const pageRef = useRef<HTMLDivElement>(null)
+  const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
+    }
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [])
 
   useEffect(() => {
     supabase.from('shopping_products').select('*').eq('is_active', true).order('sort_order')
@@ -79,7 +90,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
   }
 
   return (
-    <div style={{
+    <div ref={pageRef} style={{
       background:'#e8e8e8', minHeight:'100vh',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       maxWidth:480, margin:'0 auto', position:'relative',
@@ -258,7 +269,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
       <div style={{
         position:'fixed', bottom:0,
         left:'50%', transform:'translateX(-50%)',
-        width:'100%', maxWidth:480,
+        width: footerWidth ?? '100%',
         padding:'12px 14px 20px',
         background:'#e8e8e8', zIndex:20, boxSizing:'border-box',
         display:'flex', gap:8, borderTop:'1px solid #C8C8C8',
