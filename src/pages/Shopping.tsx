@@ -454,10 +454,10 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
                 fontSize:15, fontWeight:700,
                 display:'flex', alignItems:'center', justifyContent:'center', gap:8,
                 marginBottom:10,
-                boxShadow: myList.includes(selProduct.id) ? 'inset 2px 2px 4px #d1fae5' : '0 4px 12px rgba(57,211,83,0.35)',
+                boxShadow: myList.includes(selProduct.id) ? 'inset 2px 2px 4px #f8c0d8' : '0 4px 12px rgba(255,107,157,0.35)',
                 WebkitTapHighlightColor:'transparent',
               }}>
-                <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color={myList.includes(selProduct.id) ? '#16A34A' : '#fff'} />
+                <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color="#FF6B9D" />
                 {myList.includes(selProduct.id) ? '찜 취소하기' : '내 쇼핑리스트에 찜하기'}
               </button>
 
