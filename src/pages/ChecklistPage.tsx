@@ -656,7 +656,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                               <span style={{
                                 fontSize:11, color:'#94A3B8', fontWeight:400, lineHeight:1.5,
                                 overflow:'hidden', textOverflow:'ellipsis',
-                                display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
+                                display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical',
                               }}>{db.description}</span>
                             )}
                             {hasDetail && (

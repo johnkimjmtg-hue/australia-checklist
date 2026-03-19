@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { CheckItem, ITEM_ICONS } from '../data/checklist'
 import { supabase } from '../lib/supabase'
 
-type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null }
+type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null; image_url?: string | null; tips?: string | null; related_product_ids?: string[] | null }
 import { AppState, TripInfo, getTripDays, fmtMD, dow } from '../store/state'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
@@ -34,6 +34,28 @@ const CAT_ICONS: Record<string,string> = {
 }
 function ItemIcon({ itemId, categoryId, color }: { itemId:string; categoryId:string; color:string }) {
   return <Icon icon={ITEM_ICONS[itemId] ?? CAT_ICONS[categoryId] ?? 'ph:star'} width={20} height={20} color={color} />
+}
+
+const TAG_COLOR: Record<string, { bg: string; color: string }> = {
+  '인기':      { bg:'#FEF3C7', color:'#B45309' },
+  '강추':      { bg:'#DCFCE7', color:'#15803D' },
+  '선물':      { bg:'#FCE7F3', color:'#BE185D' },
+  '프리미엄':  { bg:'#EDE9FE', color:'#7C3AED' },
+  '가성비':    { bg:'#DBEAFE', color:'#1D4ED8' },
+  '필수템':    { bg:'#FEE2E2', color:'#DC2626' },
+}
+const PRICE_COLOR: Record<string, string> = { '$': '#16A34A', '$$': '#D97706', '$$$': '#7C3AED' }
+const PRICE_LABEL: Record<string, string> = { '$': '저렴', '$$': '보통', '$$$': '고급' }
+
+const stateMap: Record<string, {label:string; color:string; bg:string; icon:string}> = {
+  'NSW': { label:'시드니',    color:'#fff', bg:'#B8860B', icon:'ph:house-line' },
+  'VIC': { label:'멜번',      color:'#fff', bg:'#1a237e', icon:'ph:tram' },
+  'QLD': { label:'브리즈번',  color:'#fff', bg:'#E65100', icon:'ph:sun' },
+  'WA':  { label:'퍼스',      color:'#fff', bg:'#0891B2', icon:'ph:waves' },
+  'SA':  { label:'애들레이드', color:'#fff', bg:'#BE185D', icon:'ph:wine' },
+  'TAS': { label:'태즈매니아', color:'#fff', bg:'#065F46', icon:'ph:tree' },
+  'ACT': { label:'캔버라',    color:'#fff', bg:'#374151', icon:'ph:flag' },
+  'NT':  { label:'다윈',      color:'#fff', bg:'#92400E', icon:'ph:compass' },
 }
 
 interface Particle { id:number; x:number; color:string; size:number; duration:number; delay:number }
@@ -265,79 +287,141 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
   const [detailBiz, setDetailBiz] = useState<any>(null)
+  const [detailItem, setDetailItem] = useState<DBItem|null>(null)
+  const [detailBizCards, setDetailBizCards] = useState<Business[]>([])
+  const [selProduct, setSelProduct] = useState<any|null>(null)
 
   const CheckRow = ({ item, day }: { item: typeof checkedItems[0]; day?: number }) => {
     const key = day !== undefined ? `${item.id}_${day}` : item.id
     const isAchieved = !!achieved[key]
+    const db = dbItems.find(d => d.id === item.id)
+    const regionKey = db?.address ? Object.keys(stateMap).find(k => db.address!.toUpperCase().includes(k)) : null
+    const region = regionKey ? stateMap[regionKey] : null
+    const hasDetail = !!(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0 || db?.tips)
     return (
       <div style={{
-        display:'flex',alignItems:'flex-start',gap:12,
-        padding:'12px 16px',margin:'0 16px',borderRadius:12,
+        display:'flex', alignItems:'stretch', gap:10,
+        padding:'12px 12px 12px 14px',
+        margin:'0 16px', borderRadius:12,
         background: isAchieved ? '#fff8e4' : '#fff',
         border:'1px solid #C8C8C8',
-        borderLeft: isAchieved ? '4px solid #16A34A' : '4px solid #C8C8C8',
-        minHeight:52,transition:'all 0.15s ease',
+        borderLeft: isAchieved ? '4px solid #16A34A' : '4px solid #CBD5E1',
+        transition:'all 0.3s',
       }}>
-        <div onClick={() => toggleAchieved(item.id, day)} style={{
-          width:22,height:22,borderRadius:4,flexShrink:0,
-          border: isAchieved ? 'none' : '1px solid #C8C8C8',
-          background: isAchieved ? '#16A34A' : '#fff',
-          display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s',
-          cursor:'pointer',
-        }}>
-          {isAchieved && (
-            <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
-              <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+        {/* 왼쪽 - 원형 이미지 or 아이콘 */}
+        {db?.image_url ? (
+          <img
+            src={db.image_url} alt=""
+            onClick={async e => {
+              e.stopPropagation()
+              if (!db) return
+              if ((db.related_product_ids?.length ?? 0) > 0) {
+                const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
+                if (data) setSelProduct(data)
+                return
+              }
+              setDetailItem(db)
+              if ((db.related_business_ids?.length ?? 0) > 0) {
+                const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
+                setDetailBizCards(data ?? [])
+              } else setDetailBizCards([])
+            }}
+            style={{ width:60, height:60, borderRadius:'50%', objectFit:'cover', flexShrink:0, cursor:'pointer', border:'1px solid #E2E8F0', alignSelf:'center' }}
+          />
+        ) : (
+          <div style={{
+            width:60, height:60, borderRadius:'50%', flexShrink:0,
+            background:'#f0f0f0', border:'1px solid #E2E8F0',
+            display:'flex', alignItems:'center', justifyContent:'center', alignSelf:'center',
+          }}>
+            <Icon
+              icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'}
+              width={24} height={24}
+              color={isAchieved ? '#78716C' : '#CBD5E1'}
+            />
+          </div>
+        )}
+
+        {/* 가운데 - 제목 + 설명 + 뱃지 */}
+        <div style={{ flex:1, display:'flex', flexDirection:'column', gap:3, minWidth:0, justifyContent:'center' }}>
+          <span style={{
+            fontSize:14, fontWeight: isAchieved ? 700 : 500,
+            color: isAchieved ? '#0F172A' : '#475569',
+            lineHeight:1.4,
+            display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden',
+          }}>{item.label}</span>
+          {db?.description && (
+            <span style={{
+              fontSize:11, color:'#94A3B8', fontWeight:400, lineHeight:1.5,
+              overflow:'hidden', textOverflow:'ellipsis',
+              display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical',
+            }}>{db.description}</span>
+          )}
+          {hasDetail && (
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:4 }}>
+              <button
+                onClick={async e => {
+                  e.stopPropagation()
+                  if (!db) return
+                  if ((db.related_product_ids?.length ?? 0) > 0) {
+                    const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
+                    if (data) setSelProduct(data)
+                    return
+                  }
+                  setDetailItem(db)
+                  if ((db.related_business_ids?.length ?? 0) > 0) {
+                    const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
+                    setDetailBizCards(data ?? [])
+                  } else setDetailBizCards([])
+                }}
+                style={{
+                  fontSize:11, fontWeight:600, color:'#1B6EF3',
+                  background:'#fff', border:'1px solid #C8C8C8',
+                  borderRadius:20, cursor:'pointer', padding:'3px 10px',
+                  flexShrink:0,
+                }}>
+                자세히 알아보기›
+              </button>
+              {region ? (
+                <span style={{
+                  fontSize:11, fontWeight:600, color:'#94A3B8',
+                  display:'flex', alignItems:'center', gap:3,
+                }}>
+                  <Icon icon={region.icon} width={11} height={11} color="#94A3B8" />
+                  {region.label}
+                </span>
+              ) : <span />}
+            </div>
           )}
         </div>
-        <ItemIcon itemId={item.id} categoryId={(item as any).categoryId ?? 'custom'} color={isAchieved ? '#78716C' : '#94A3B8'} />
-        <div style={{ flex:1, display:'flex', flexDirection:'column', gap:2, minWidth:0 }}>
-          <span style={{ fontSize:15,lineHeight:1.4,fontWeight:isAchieved?600:400,color:'#1E293B' }}>{item.label}</span>
-          {(() => {
-            const db = dbItems.find(d => d.id === item.id)
-            return (
-              <>
-                {db?.address && (
-                  <span onClick={e => { e.stopPropagation(); window.open(`https://maps.google.com/?q=${encodeURIComponent(db.address!)}`, '_blank') }}
-                    style={{ fontSize:11, color:'#1B6EF3', fontWeight:500, cursor:'pointer', textDecoration:'underline', textDecorationColor:'rgba(27,110,243,0.3)' }}>
-                    📍 {db.address}
-                  </span>
-                )}
-                {db?.description && (
-                  <span style={{ fontSize:11, color:'#94A3B8', fontWeight:400, overflow:'hidden', textOverflow:'ellipsis', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
-                    {db.description}
-                  </span>
-                )}
-                {((db?.related_business_ids?.length ?? 0) > 0 || db?.related_business_id) && (
-                  <div style={{ display:'flex', gap:4, flexWrap:'wrap', marginTop:2 }}>
-                    {(db?.related_business_ids?.length ? db.related_business_ids : db?.related_business_id ? [db.related_business_id] : []).map(bizId => (
-                      <button key={bizId}
-                        onClick={async e => {
-                          e.stopPropagation()
-                          setDetailBizId(bizId)
-                          const { data } = await supabase.from('businesses').select('*').eq('id', bizId).single()
-                          if (data) setDetailBiz(data)
-                        }}
-                        style={{
-                          display:'flex', alignItems:'center', gap:3,
-                          fontSize:10, fontWeight:700, color:'#1B6EF3',
-                          background:'rgba(27,110,243,0.08)', border:'none',
-                          borderRadius:4, padding:'2px 7px', cursor:'pointer',
-                        }}>
-                        <Icon icon="ph:buildings" width={11} height={11} color="#1B6EF3" />
-                        관련업체
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            )
-          })()}
+
+        {/* 오른쪽 - 체크박스 위, 완료 배지 아래 */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, gap:6, paddingTop:2, paddingBottom:2 }}>
+          <div onClick={() => toggleAchieved(item.id, day)} style={{
+            width:26, height:26, borderRadius:6, flexShrink:0,
+            border: isAchieved ? 'none' : '1.5px solid #C8C8C8',
+            background: isAchieved ? '#16A34A' : '#fff',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            cursor:'pointer', padding:0,
+            boxShadow: isAchieved ? 'none' : '1px 1px 3px #d0d0d0, -1px -1px 3px #ffffff',
+            transition:'all 0.15s',
+          }}>
+            {isAchieved && (
+              <svg width="12" height="9" viewBox="0 0 11 8" fill="none">
+                <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </div>
+          {isAchieved ? (
+            <span style={{
+              fontSize:10, fontWeight:700, color:'#44403C',
+              background:'rgba(68,64,60,0.10)', padding:'3px 6px',
+              borderRadius:6, flexShrink:0, whiteSpace:'nowrap',
+            }}>완료 ✓</span>
+          ) : (
+            <span style={{ height:22 }} />
+          )}
         </div>
-        {isAchieved && (
-          <span style={{ fontSize:11,fontWeight:600,color:'#44403C',background:'rgba(68,64,60,0.10)',padding:'3px 8px',borderRadius:4,flexShrink:0 }}>완료 ✓</span>
-        )}
       </div>
     )
   }
@@ -347,6 +431,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
+        @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         @keyframes confettiFall {
           0%   { transform:translateY(0) rotate(0deg); opacity:1; }
           100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
@@ -588,6 +673,147 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           onReset={() => { setShowAllDone(false); onDelete() }}
           onClose={() => setShowAllDone(false)}
         />
+      )}
+
+      {/* ── 쇼핑 상품 팝업 */}
+      {selProduct && (
+        <>
+          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600 }} />
+          <div style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:390, background:'#e8e8e8',
+            borderRadius:'20px 20px 0 0', zIndex:601,
+            animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
+          }}>
+            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'12px auto 0' }} />
+            <div style={{
+              width:'100%', height:220,
+              background: selProduct.image_url ? 'none' : 'linear-gradient(135deg, #e0e0e0, #d0d0d0)',
+              display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden',
+            }}>
+              {selProduct.image_url
+                ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                : <Icon icon="ph:shopping-bag" width={60} height={60} color="#94A3B8" />
+              }
+            </div>
+            <div style={{ padding:'16px 18px 40px' }}>
+              <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, alignItems:'center' }}>
+                {(selProduct.tags ?? []).map((tag: string) => (
+                  <span key={tag} style={{
+                    fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6,
+                    background: TAG_COLOR[tag]?.bg ?? '#e8e8e8',
+                    color: TAG_COLOR[tag]?.color ?? '#475569',
+                  }}>{tag}</span>
+                ))}
+                {selProduct.price_range && (
+                  <span style={{
+                    fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6,
+                    background:'#e8e8e8', color: PRICE_COLOR[selProduct.price_range] ?? '#475569',
+                    border:`1px solid ${PRICE_COLOR[selProduct.price_range] ?? '#C8C8C8'}`,
+                    marginLeft:'auto',
+                  }}>{selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}</span>
+                )}
+              </div>
+              <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', marginBottom:4 }}>{selProduct.name}</div>
+              {selProduct.brand && <div style={{ fontSize:13, color:'#64748B', marginBottom:12 }}>{selProduct.brand}</div>}
+              {selProduct.description && (
+                <div style={{ fontSize:13, color:'#334155', lineHeight:1.7, marginBottom:16 }}>{selProduct.description}</div>
+              )}
+              {(selProduct.where_to_buy ?? []).length > 0 && (
+                <div style={{ marginBottom:16 }}>
+                  <div style={{ fontSize:11, fontWeight:700, color:'#94A3B8', marginBottom:8 }}>어디서 살 수 있어요?</div>
+                  <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                    {selProduct.where_to_buy.map((store: string) => (
+                      <span key={store} style={{
+                        fontSize:11, fontWeight:600, padding:'5px 10px', borderRadius:8,
+                        background:'#e8e8e8', color:'#475569', border:'1px solid #C8C8C8',
+                      }}>🏪 {store}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button onClick={() => setSelProduct(null)} style={{
+                width:'100%', height:50, borderRadius:12, border:'none',
+                background:'#e8e8e8', color:'#1B6EF3', fontSize:15, fontWeight:700, cursor:'pointer',
+                boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              }}>확인</button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── 버킷리스트 상세 팝업 */}
+      {detailItem && (
+        <div onClick={() => setDetailItem(null)} style={{
+          position:'fixed', inset:0, zIndex:600,
+          background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)',
+          fontFamily:"'Pretendard','Noto Sans KR',sans-serif",
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:390,
+            background:'#e8e8e8', borderRadius:'20px 20px 0 0',
+            maxHeight:'88vh', overflowY:'auto',
+            animation:'slideUpSheet 0.25s ease',
+          }}>
+            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'12px auto 0' }} />
+            {detailItem.image_url && (
+              <div style={{ width:'100%', height:220, overflow:'hidden', marginTop:8 }}>
+                <img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+              </div>
+            )}
+            <div style={{ padding:'16px 18px 40px' }}>
+              <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', lineHeight:1.4, marginBottom:12 }}>
+                {detailItem.label}
+              </div>
+              {detailItem.description && (
+                <div style={{ fontSize:14, color:'#475569', lineHeight:1.7, marginBottom:16, whiteSpace:'pre-wrap' }}>
+                  {detailItem.description}
+                </div>
+              )}
+              {detailItem.tips && (
+                <div style={{
+                  background:'#fff', border:'1px solid #C8C8C8', borderRadius:12,
+                  padding:'12px 14px', marginBottom:16,
+                }}>
+                  <div style={{ fontSize:12, fontWeight:700, color:'#F59E0B', marginBottom:6 }}>💡 현지인 팁</div>
+                  <div style={{ fontSize:13, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
+                </div>
+              )}
+              {detailItem.address && (
+                <button
+                  onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')}
+                  style={{
+                    display:'flex', alignItems:'center', gap:8, width:'100%',
+                    background:'#fff', border:'1px solid #C8C8C8', borderRadius:12,
+                    padding:'12px 14px', marginBottom:16, cursor:'pointer', textAlign:'left',
+                  }}>
+                  <Icon icon="ph:map-pin" width={18} height={18} color="#1B6EF3" />
+                  <div>
+                    <div style={{ fontSize:11, color:'#94A3B8', fontWeight:500 }}>여기서 할 수 있어요</div>
+                    <div style={{ fontSize:13, color:'#1B6EF3', fontWeight:600, textDecoration:'underline' }}>{detailItem.address}</div>
+                  </div>
+                  <Icon icon="ph:arrow-square-out" width={14} height={14} color="#94A3B8" style={{ marginLeft:'auto' }} />
+                </button>
+              )}
+              {detailBizCards.length > 0 && (
+                <div style={{ marginBottom:16 }}>
+                  <div style={{ fontSize:12, fontWeight:700, color:'#64748B', marginBottom:8 }}>🏢 관련 업체</div>
+                  <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                    {detailBizCards.map(biz => (
+                      <BusinessCard key={biz.id} business={biz} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button onClick={() => setDetailItem(null)} style={{
+                width:'100%', height:48, borderRadius:12, border:'none',
+                background:'#e8e8e8', color:'#64748B', fontSize:14, fontWeight:700,
+                cursor:'pointer', boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              }}>닫기</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── 관련업체 팝업 */}
