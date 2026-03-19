@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 
@@ -56,6 +56,7 @@ export default function MyShoppingView({ onBack }: Props) {
   const [myChecked, setMyChecked]     = useState<Record<string, boolean>>(loadMyChecked)
   const [selProduct, setSelProduct]   = useState<Product | null>(null)
   const [loading, setLoading]         = useState(true)
+  const [petalTrigger, setPetalTrigger] = useState(0)
 
   useEffect(() => {
     supabase.from('shopping_products').select('*').eq('is_active', true).order('sort_order')
@@ -81,10 +82,13 @@ export default function MyShoppingView({ onBack }: Props) {
   }
 
   const toggleChecked = (id: string) => {
+    const wasChecked = !!myChecked[id]
     const next = { ...myChecked, [id]: !myChecked[id] }
     if (!next[id]) delete next[id]
     setMyChecked(next)
     saveMyChecked(next)
+    // 체크할 때만 꽃가루
+    if (!wasChecked) setPetalTrigger(t => t + 1)
   }
 
   const addToMyList = (id: string) => {
@@ -103,9 +107,23 @@ export default function MyShoppingView({ onBack }: Props) {
       <style>{`
         @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+        @keyframes petalFall {
+          0%   { transform: translateY(-20px) rotate(0deg) scale(1); opacity:1; }
+          80%  { opacity:1; }
+          100% { transform: translateY(180px) rotate(720deg) scale(0.5); opacity:0; }
+        }
+        @keyframes petalSway {
+          0%   { margin-left: 0px; }
+          25%  { margin-left: 12px; }
+          75%  { margin-left: -12px; }
+          100% { margin-left: 0px; }
+        }
         .my-item { transition: all 0.2s ease; }
         .my-item:active { transform: scale(0.98); }
       `}</style>
+
+      {/* 꽃가루 애니메이션 */}
+      <PetalBurst trigger={petalTrigger} />
 
       {/* ── 진행 카드 */}
       <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'16px 16px 0' }}>
@@ -349,6 +367,49 @@ export default function MyShoppingView({ onBack }: Props) {
           </div>
         </>
       )}
+    </div>
+  )
+}
+
+// ── 꽃가루 컴포넌트
+interface Petal { id: number; x: number; color: string; size: number; duration: number; delay: number; shape: string }
+
+function PetalBurst({ trigger }: { trigger: number }) {
+  const [petals, setPetals] = useState<Petal[]>([])
+  const prev = useRef(0)
+
+  useEffect(() => {
+    if (trigger === 0 || trigger === prev.current) return
+    prev.current = trigger
+    const colors = ['#FF6B9D','#FF9EC4','#FFB3D9','#FF85B3','#FFC1D9','#FF4D94','#FFAAD4','#39d353','#7FFFB2','#FFCD00','#FFE566','#A78BFA']
+    const shapes = ['🌸','🌺','🌼','🌻','🌷','✿','❀','🎀','💮']
+    setPetals(Array.from({ length: 30 }, (_, i) => ({
+      id: Date.now() + i,
+      x: 10 + Math.random() * 80,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: 12 + Math.random() * 14,
+      duration: 1.2 + Math.random() * 0.8,
+      delay: Math.random() * 0.5,
+      shape: shapes[Math.floor(Math.random() * shapes.length)],
+    })))
+    setTimeout(() => setPetals([]), 3000)
+  }, [trigger])
+
+  if (!petals.length) return null
+  return (
+    <div style={{ position:'fixed', top:0, left:0, width:'100%', height:'100%', pointerEvents:'none', zIndex:999, overflow:'hidden' }}>
+      {petals.map(p => (
+        <div key={p.id} style={{
+          position:'absolute',
+          top: -20,
+          left: `${p.x}%`,
+          fontSize: p.size,
+          animation: `petalFall ${p.duration}s ease-in ${p.delay}s forwards, petalSway ${p.duration * 0.5}s ease-in-out ${p.delay}s infinite`,
+          userSelect:'none',
+        }}>
+          {p.shape}
+        </div>
+      ))}
     </div>
   )
 }
