@@ -244,18 +244,16 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
                 <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, padding:'12px 12px 12px 0' }}>
                   {/* 구매 배지 */}
                   <div onClick={() => toggleChecked(p.id)} style={{
-                    display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-                    width:44, height:44, borderRadius:10, cursor:'pointer',
+                    display:'flex', alignItems:'center', gap:3,
+                    padding:'4px 8px', borderRadius:20, cursor:'pointer',
                     background: checked ? '#FF6B9D' : '#f0f0f0',
-                    border: checked ? 'none' : '1.5px solid #D0D0D0',
-                    boxShadow: checked ? '0 2px 8px rgba(255,107,157,0.4)' : '1px 1px 3px #d0d0d0, -1px -1px 3px #ffffff',
-                    transition:'all 0.2s',
-                    gap:2,
+                    border: `1px solid ${checked ? '#FF6B9D' : '#D0D0D0'}`,
+                    transition:'all 0.2s', whiteSpace:'nowrap',
                   }}>
-                    <svg width="14" height="11" viewBox="0 0 11 8" fill="none">
-                      <path d="M1 4L4 7L10 1" stroke={checked ? '#fff' : '#C8C8C8'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
+                      <path d="M1 4L4 7L10 1" stroke={checked ? '#fff' : '#C8C8C8'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    <span style={{ fontSize:9, fontWeight:800, color: checked ? '#fff' : '#B0B0B0', letterSpacing:0.3 }}>구매</span>
+                    <span style={{ fontSize:10, fontWeight:700, color: checked ? '#fff' : '#B0B0B0' }}>구매</span>
                   </div>
                   {/* 삭제 */}
                   <button onClick={() => setDeleteConfirmId(p.id)} style={{

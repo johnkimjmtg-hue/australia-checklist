@@ -420,18 +420,16 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, gap:6, paddingTop:2, paddingBottom:2 }}>
           {/* 완료 배지 */}
           <div onClick={() => toggleAchieved(item.id, day)} style={{
-            display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-            width:44, height:44, borderRadius:10, cursor:'pointer',
+            display:'flex', alignItems:'center', gap:3,
+            padding:'4px 8px', borderRadius:20, cursor:'pointer',
             background: isAchieved ? '#16A34A' : '#f0f0f0',
-            border: isAchieved ? 'none' : '1.5px solid #D0D0D0',
-            boxShadow: isAchieved ? '0 2px 8px rgba(22,163,74,0.4)' : '1px 1px 3px #d0d0d0, -1px -1px 3px #ffffff',
-            transition:'all 0.2s',
-            gap:2,
+            border: `1px solid ${isAchieved ? '#16A34A' : '#D0D0D0'}`,
+            transition:'all 0.2s', whiteSpace:'nowrap',
           }}>
-            <svg width="14" height="11" viewBox="0 0 11 8" fill="none">
-              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#C8C8C8'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
+              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#C8C8C8'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <span style={{ fontSize:9, fontWeight:800, color: isAchieved ? '#fff' : '#B0B0B0', letterSpacing:0.3 }}>완료</span>
+            <span style={{ fontSize:10, fontWeight:700, color: isAchieved ? '#fff' : '#B0B0B0' }}>완료</span>
           </div>
           {/* 삭제 */}
           <button onClick={() => setDeleteItemId(item.id)} style={{
