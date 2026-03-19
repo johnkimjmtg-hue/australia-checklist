@@ -143,7 +143,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
           <div style={{ flex:1 }}>
             <div style={{ fontSize:20, fontWeight:800, color:'#2d1f2d', marginBottom:4, lineHeight:1.2 }}>내 쇼핑리스트</div>
             <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:4 }}>
-              <span style={{ fontSize:42, fontWeight:800, color:'#2d1f2d', lineHeight:1 }}>{checkedCount}</span>
+              <span style={{ fontSize:28, fontWeight:800, color:'#2d1f2d', lineHeight:1 }}>{checkedCount}</span>
               <span style={{ fontSize:17, fontWeight:600, color:'#5a3a5a' }}>/{total}개 구매 완료</span>
             </div>
             <div style={{ fontSize:13, color:'#5a3a5a', lineHeight:1.5 }}>
