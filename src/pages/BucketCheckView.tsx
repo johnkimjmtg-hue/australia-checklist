@@ -697,7 +697,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
               zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
               boxShadow:'0 20px 60px rgba(0,0,0,0.25)',
             }}>
-              <div style={{ fontSize:36, marginBottom:12 }}>🗑️</div>
               <div style={{ fontSize:16, fontWeight:800, color:'#0F172A', marginBottom:8 }}>항목을 삭제할까요?</div>
               {item && (
                 <div style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.5 }}>

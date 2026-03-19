@@ -316,7 +316,6 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
               zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
               boxShadow:'0 20px 60px rgba(0,0,0,0.25)',
             }}>
-              <div style={{ fontSize:36, marginBottom:12 }}>🗑️</div>
               <div style={{ fontSize:16, fontWeight:800, color:'#0F172A', marginBottom:8 }}>상품을 삭제할까요?</div>
               {p && <div style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.5 }}>
                 <span style={{ fontWeight:700, color:'#FF6B9D' }}>{p.name}</span>을<br/>내 쇼핑리스트에서 삭제합니다.
@@ -640,10 +639,10 @@ function GiftBoxProgress({ total, checkedCount }: {
           const filled = i < checkedCount
           // 켜진 상태 (구매완료): 핑크 단색
           // 꺼진 상태 (미구매): 어두운 퍼플 단색 — 불꺼진 전광판
-          const body = filled ? '#FF6B9D' : '#c4a8c4'
-          const lid  = filled ? '#FF85B3' : '#d0b4d0'
-          const rib  = filled ? '#ffffff' : '#e8d8e8'
-          const knot = filled ? '#FF6B9D' : '#c4a8c4'
+          const body = filled ? '#FF6B9D' : '#c8b8c8'
+          const lid  = filled ? '#FF85B3' : '#c8b8c8'
+          const rib  = filled ? '#ffffff' : '#c8b8c8'
+          const knot = filled ? '#FF6B9D' : '#c8b8c8'
 
           return (
             <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize * 1.05)}
