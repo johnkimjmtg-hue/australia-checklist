@@ -248,12 +248,15 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
                   <button onClick={e => { e.stopPropagation(); myList.includes(p.id) ? removeFromMyList(p.id) : addToMyList(p.id) }} style={{
                     position:'absolute', top:6, right:6,
                     width:30, height:30, borderRadius:'50%', border:'none', cursor:'pointer',
-                    background: myList.includes(p.id) ? '#39d353' : '#39d353',
+                    background:'#39d353',
                     display:'flex', alignItems:'center', justifyContent:'center',
                     boxShadow:'0 2px 6px rgba(0,0,0,0.2)',
                     WebkitTapHighlightColor:'transparent',
                   }}>
-                    <span style={{ fontSize:9, fontWeight:800, color:'#fff' }}>{myList.includes(p.id) ? '찜✓' : '찜'}</span>
+                    {myList.includes(p.id)
+                      ? <Icon icon="ph:check-bold" width={16} height={16} color="#fff" />
+                      : <span style={{ fontSize:12, fontWeight:800, color:'#fff' }}>찜</span>
+                    }
                   </button>
                 </div>
               ))}
@@ -345,7 +348,10 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
                 boxShadow:'0 2px 6px rgba(0,0,0,0.2)',
                 WebkitTapHighlightColor:'transparent',
               }}>
-                <span style={{ fontSize:9, fontWeight:800, color:'#fff' }}>{myList.includes(p.id) ? '찜✓' : '찜'}</span>
+                {myList.includes(p.id)
+                  ? <Icon icon="ph:check-bold" width={16} height={16} color="#fff" />
+                  : <span style={{ fontSize:12, fontWeight:800, color:'#fff' }}>찜</span>
+                }
               </button>
             </div>
           ))}
