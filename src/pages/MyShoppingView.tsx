@@ -283,10 +283,21 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         background:'#e8e8e8', zIndex:20, boxSizing:'border-box',
         display:'flex', gap:8, borderTop:'1px solid #C8C8C8',
       }}>
+        <button onClick={onBack} style={{
+          flex:1, height:44, borderRadius:8, border:'none',
+          background:'#e8e8e8', color:'#64748B',
+          fontSize:14, fontWeight:700, cursor:'pointer',
+          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+          WebkitTapHighlightColor:'transparent',
+        }}>
+          <Icon icon="ph:shopping-bag" width={18} height={18} color="#64748B" />
+          쇼핑리스트
+        </button>
         <button onClick={onLanding} style={{
           flex:1, height:44, borderRadius:8, border:'none',
           background:'#e8e8e8', color:'#1B6EF3',
-          fontSize:15, fontWeight:700, cursor:'pointer',
+          fontSize:14, fontWeight:700, cursor:'pointer',
           boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
           WebkitTapHighlightColor:'transparent',
@@ -327,15 +338,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
               boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
             }}>
               <Icon icon="ph:share-network" width={18} height={18} color="#1B6EF3" />공유하기
-            </button>
-            <button onClick={() => { setShowMoreMenu(false); onBack() }} style={{
-              width:'100%', height:52, borderRadius:12, border:'none',
-              background:'#e8e8e8', color:'#64748B',
-              fontSize:15, fontWeight:700, cursor:'pointer',
-              display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
-              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-            }}>
-              <Icon icon="ph:shopping-bag" width={18} height={18} color="#64748B" />쇼핑으로 돌아가기
             </button>
             <button onClick={() => { setShowMoreMenu(false); setShowDeleteAll(true) }} style={{
               width:'100%', height:52, borderRadius:12, border:'none',
