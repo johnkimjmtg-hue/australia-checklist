@@ -639,10 +639,10 @@ function GiftBoxProgress({ total, checkedCount }: {
           const filled = i < checkedCount
           // 켜진 상태 (구매완료): 핑크 단색
           // 꺼진 상태 (미구매): 어두운 퍼플 단색 — 불꺼진 전광판
-          const body = filled ? '#FF6B9D' : '#c8b8c8'
-          const lid  = filled ? '#FF85B3' : '#c8b8c8'
-          const rib  = filled ? '#ffffff' : '#c8b8c8'
-          const knot = filled ? '#FF6B9D' : '#c8b8c8'
+          const body = filled ? '#FF6B9D' : '#c4a8c4'
+          const lid  = filled ? '#FF85B3' : '#d0b4d0'
+          const rib  = filled ? '#ffffff' : '#e8d8e8'
+          const knot = filled ? '#FF6B9D' : '#c4a8c4'
 
           return (
             <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize * 1.05)}
