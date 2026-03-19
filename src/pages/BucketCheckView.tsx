@@ -687,8 +687,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         </div>
       )}
 
-      )}
-
       {/* ── 아이템 삭제 확인 팝업 */}
       {deleteItemId && (() => {
         const item = allItems.find(i => i.id === deleteItemId)
