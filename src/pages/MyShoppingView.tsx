@@ -283,17 +283,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         background:'#e8e8e8', zIndex:20, boxSizing:'border-box',
         display:'flex', gap:8, borderTop:'1px solid #C8C8C8',
       }}>
-        <button onClick={onBack} style={{
-          flex:1, height:44, borderRadius:8, border:'none',
-          background:'#e8e8e8', color:'#64748B',
-          fontSize:14, fontWeight:700, cursor:'pointer',
-          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-          display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-          WebkitTapHighlightColor:'transparent',
-        }}>
-          <Icon icon="ph:shopping-bag" width={18} height={18} color="#64748B" />
-          쇼핑리스트
-        </button>
         <button onClick={onLanding} style={{
           flex:1, height:44, borderRadius:8, border:'none',
           background:'#e8e8e8', color:'#1B6EF3',
@@ -304,6 +293,17 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         }}>
           <Icon icon="ph:check-circle" width={18} height={18} color="#1B6EF3" />
           저장하고 나가기
+        </button>
+        <button onClick={onBack} style={{
+          flex:1, height:44, borderRadius:8, border:'none',
+          background:'#e8e8e8', color:'#64748B',
+          fontSize:14, fontWeight:700, cursor:'pointer',
+          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+          WebkitTapHighlightColor:'transparent',
+        }}>
+          <Icon icon="ph:shopping-bag" width={18} height={18} color="#64748B" />
+          상품 추가하기
         </button>
         <button onClick={() => setShowMoreMenu(true)} style={{
           width:44, height:44, borderRadius:12, flexShrink:0,
