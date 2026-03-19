@@ -421,15 +421,15 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           {/* 완료 배지 */}
           <div onClick={() => toggleAchieved(item.id, day)} style={{
             display:'flex', alignItems:'center', gap:3,
-            padding:'4px 8px', borderRadius:20, cursor:'pointer',
+            padding:'4px 8px', borderRadius:6, cursor:'pointer',
             background: isAchieved ? '#16A34A' : '#f0f0f0',
             border: `1px solid ${isAchieved ? '#16A34A' : '#D0D0D0'}`,
             transition:'all 0.2s', whiteSpace:'nowrap',
           }}>
+            <span style={{ fontSize:10, fontWeight:700, color: isAchieved ? '#fff' : '#B0B0B0' }}>완료</span>
             <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
               <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#C8C8C8'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <span style={{ fontSize:10, fontWeight:700, color: isAchieved ? '#fff' : '#B0B0B0' }}>완료</span>
           </div>
           {/* 삭제 */}
           <button onClick={() => setDeleteItemId(item.id)} style={{

@@ -245,15 +245,15 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
                   {/* 구매 배지 */}
                   <div onClick={() => toggleChecked(p.id)} style={{
                     display:'flex', alignItems:'center', gap:3,
-                    padding:'4px 8px', borderRadius:20, cursor:'pointer',
+                    padding:'4px 8px', borderRadius:6, cursor:'pointer',
                     background: checked ? '#FF6B9D' : '#f0f0f0',
                     border: `1px solid ${checked ? '#FF6B9D' : '#D0D0D0'}`,
                     transition:'all 0.2s', whiteSpace:'nowrap',
                   }}>
+                    <span style={{ fontSize:10, fontWeight:700, color: checked ? '#fff' : '#B0B0B0' }}>구매</span>
                     <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
                       <path d="M1 4L4 7L10 1" stroke={checked ? '#fff' : '#C8C8C8'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    <span style={{ fontSize:10, fontWeight:700, color: checked ? '#fff' : '#B0B0B0' }}>구매</span>
                   </div>
                   {/* 삭제 */}
                   <button onClick={() => setDeleteConfirmId(p.id)} style={{
@@ -638,40 +638,33 @@ function GiftBoxProgress({ total, checkedCount }: {
       }}>
         {Array.from({ length: displayCount }).map((_, i) => {
           const filled = i < checkedCount
-          const bodyMain = filled ? '#FF6B9D' : '#e0d0e0'
-          const bodyDark = filled ? '#e0437a' : '#c8b0c8'
-          const bodyLight= filled ? '#ffadd0' : '#ede0ed'
-          const lidMain  = filled ? '#FF85B3' : '#e8d8e8'
-          const lidDark  = filled ? '#e0437a' : '#c8b0c8'
-          const ribMain  = filled ? '#ffffff' : '#f5eef5'
-          const ribShad  = filled ? '#f0c0d8' : '#ddd0dd'
-          const stroke   = filled ? '#a0245a' : '#b090b0'
+          // 켜진 상태 (구매완료): 핑크 단색
+          // 꺼진 상태 (미구매): 어두운 퍼플 단색 — 불꺼진 전광판
+          const body = filled ? '#FF6B9D' : '#c4a8c4'
+          const lid  = filled ? '#FF85B3' : '#d0b4d0'
+          const rib  = filled ? '#ffffff' : '#e8d8e8'
+          const knot = filled ? '#FF6B9D' : '#c4a8c4'
 
           return (
             <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize * 1.05)}
               style={{
                 animation: filled ? `giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both` : 'none',
-                filter: filled
-                  ? 'drop-shadow(0 4px 8px rgba(255,107,157,0.55))'
-                  : 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
+                filter: filled ? 'drop-shadow(0 3px 8px rgba(255,107,157,0.5))' : 'none',
               }}>
-              <rect x="10" y="42" width="80" height="62" rx="6" fill={bodyMain} stroke={stroke} strokeWidth="3.5"/>
-              <rect x="10" y="42" width="16" height="62" rx="3" fill={bodyDark} opacity="0.35"/>
-              <rect x="32" y="48" width="28" height="10" rx="4" fill={bodyLight} opacity="0.45"/>
-              <rect x="10" y="88" width="80" height="16" rx="3" fill={bodyDark} opacity="0.2"/>
-              <rect x="6" y="24" width="88" height="22" rx="6" fill={lidMain} stroke={stroke} strokeWidth="3.5"/>
-              <rect x="6" y="24" width="16" height="22" rx="4" fill={lidDark} opacity="0.3"/>
-              <rect x="20" y="28" width="38" height="8" rx="4" fill={bodyLight} opacity="0.5"/>
-              <rect x="43" y="24" width="14" height="80" fill={ribMain} stroke={stroke} strokeWidth="2"/>
-              <rect x="43" y="24" width="5" height="80" fill={ribShad} opacity="0.5"/>
-              <rect x="6" y="29" width="88" height="12" fill={ribMain} stroke={stroke} strokeWidth="2"/>
-              <rect x="6" y="29" width="88" height="4" fill={ribShad} opacity="0.4"/>
-              <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z" fill={ribMain} stroke={stroke} strokeWidth="2.5" strokeLinejoin="round"/>
-              <path d="M50,18 Q38,8 28,14 Q26,18 34,20 Q42,22 50,18Z" fill={ribShad} opacity="0.35"/>
-              <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z" fill={ribMain} stroke={stroke} strokeWidth="2.5" strokeLinejoin="round"/>
-              <path d="M50,18 Q62,8 72,14 Q74,18 66,20 Q58,22 50,18Z" fill={ribShad} opacity="0.35"/>
-              <circle cx="50" cy="19" r="7" fill={lidMain} stroke={stroke} strokeWidth="2.5"/>
-              <circle cx="48" cy="17" r="2.5" fill={bodyLight} opacity="0.6"/>
+              {/* 박스 본체 */}
+              <rect x="10" y="42" width="80" height="62" rx="5" fill={body}/>
+              {/* 뚜껑 */}
+              <rect x="6" y="24" width="88" height="22" rx="5" fill={lid}/>
+              {/* 리본 세로 */}
+              <rect x="43" y="24" width="14" height="80" fill={rib}/>
+              {/* 리본 가로 */}
+              <rect x="6" y="29" width="88" height="12" fill={rib}/>
+              {/* 나비매듭 왼쪽 */}
+              <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z" fill={rib}/>
+              {/* 나비매듭 오른쪽 */}
+              <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z" fill={rib}/>
+              {/* 매듭 중앙 */}
+              <circle cx="50" cy="19" r="7" fill={knot}/>
             </svg>
           )
         })}
