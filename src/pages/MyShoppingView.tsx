@@ -45,6 +45,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
   const [petalTrigger, setPetalTrigger] = useState(0)
   const [showReceipt, setShowReceipt] = useState(false)
   const [msgIndex, setMsgIndex] = useState(0)
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   const SHOPPING_MSGS = [
     '지갑이 열릴 준비가 됐나요?',
@@ -239,23 +240,25 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
                   </div>
                 </div>
 
-                {/* 오른쪽 - 체크박스 + 삭제 */}
+                {/* 오른쪽 - 구매 배지 + 삭제 */}
                 <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, padding:'12px 12px 12px 0' }}>
+                  {/* 구매 배지 */}
                   <div onClick={() => toggleChecked(p.id)} style={{
-                    width:26, height:26, borderRadius:6, flexShrink:0,
-                    border: checked ? 'none' : '1.5px solid #C8C8C8',
-                    background: checked ? '#FF6B9D' : '#fff',
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                    cursor:'pointer', transition:'all 0.15s',
-                    boxShadow: checked ? 'none' : '1px 1px 3px #d0d0d0, -1px -1px 3px #ffffff',
+                    display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+                    width:44, height:44, borderRadius:10, cursor:'pointer',
+                    background: checked ? '#FF6B9D' : '#f0f0f0',
+                    border: checked ? 'none' : '1.5px solid #D0D0D0',
+                    boxShadow: checked ? '0 2px 8px rgba(255,107,157,0.4)' : '1px 1px 3px #d0d0d0, -1px -1px 3px #ffffff',
+                    transition:'all 0.2s',
+                    gap:2,
                   }}>
-                    {checked && (
-                      <svg width="12" height="9" viewBox="0 0 11 8" fill="none">
-                        <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
+                    <svg width="14" height="11" viewBox="0 0 11 8" fill="none">
+                      <path d="M1 4L4 7L10 1" stroke={checked ? '#fff' : '#C8C8C8'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <span style={{ fontSize:9, fontWeight:800, color: checked ? '#fff' : '#B0B0B0', letterSpacing:0.3 }}>구매</span>
                   </div>
-                  <button onClick={() => removeFromMyList(p.id)} style={{
+                  {/* 삭제 */}
+                  <button onClick={() => setDeleteConfirmId(p.id)} style={{
                     background:'none', border:'none', cursor:'pointer', padding:2,
                     display:'flex', alignItems:'center',
                   }}>
@@ -302,6 +305,40 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
           공유하기
         </button>
       </div>
+
+      {/* ── 삭제 확인 팝업 */}
+      {deleteConfirmId && (() => {
+        const p = myProducts.find(x => x.id === deleteConfirmId)
+        return (
+          <>
+            <div onClick={() => setDeleteConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:700 }} />
+            <div style={{
+              position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+              background:'#e8e8e8', borderRadius:20, padding:'28px 24px 20px',
+              zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+              boxShadow:'0 20px 60px rgba(0,0,0,0.25)',
+            }}>
+              <div style={{ fontSize:36, marginBottom:12 }}>🗑️</div>
+              <div style={{ fontSize:16, fontWeight:800, color:'#0F172A', marginBottom:8 }}>상품을 삭제할까요?</div>
+              {p && <div style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.5 }}>
+                <span style={{ fontWeight:700, color:'#FF6B9D' }}>{p.name}</span>을<br/>내 쇼핑리스트에서 삭제합니다.
+              </div>}
+              <div style={{ display:'flex', gap:8 }}>
+                <button onClick={() => setDeleteConfirmId(null)} style={{
+                  flex:1, height:48, borderRadius:10, border:'none',
+                  background:'#e8e8e8', color:'#64748B', fontSize:14, fontWeight:600, cursor:'pointer',
+                  boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                }}>취소</button>
+                <button onClick={() => { removeFromMyList(deleteConfirmId); setDeleteConfirmId(null) }} style={{
+                  flex:2, height:48, borderRadius:10, border:'none',
+                  background:'#e8e8e8', color:'#DC2626', fontSize:14, fontWeight:700, cursor:'pointer',
+                  boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                }}>삭제하기</button>
+              </div>
+            </div>
+          </>
+        )
+      })()}
 
       {/* ── 공유 영수증 모달 */}
       {showReceipt && (

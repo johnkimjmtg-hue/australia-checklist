@@ -190,6 +190,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   const [showDelete, setShowDelete]   = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const prevAchieved = useRef(0)
   const logoTapCount = useRef(0)
@@ -278,6 +279,25 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   }, [achievedCount, total])
 
   const isRowDone = (id: string, day?: number) => !!achieved[getKey(id, day)]
+
+  const deleteItem = (id: string) => {
+    // selected, schedules에서 제거
+    const newSelected = { ...state.selected }
+    delete newSelected[id]
+    const newSchedules = { ...state.schedules }
+    delete newSchedules[id]
+    // customItems에서도 제거 (커스텀 항목인 경우)
+    const newCustomItems = state.customItems.filter(c => c.id !== id)
+    const next = { ...state, selected: newSelected, schedules: newSchedules, customItems: newCustomItems }
+    setState(next)
+    try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
+    // achieved에서도 제거
+    const newAchieved = { ...achieved }
+    Object.keys(newAchieved).forEach(k => { if (k === id || k.startsWith(id + '_')) delete newAchieved[k] })
+    setAchieved(newAchieved)
+    try { localStorage.setItem('bucket-achieved', JSON.stringify(newAchieved)) } catch {}
+    onAchievedChange?.(newAchieved)
+  }
   const filterRow = (id: string, day?: number) =>
     filter==='done' ? isRowDone(id, day) : filter==='todo' ? !isRowDone(id, day) : true
 
@@ -396,30 +416,30 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           )}
         </div>
 
-        {/* 오른쪽 - 체크박스 위, 완료 배지 아래 */}
+        {/* 오른쪽 - 완료 배지 + 삭제 */}
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, gap:6, paddingTop:2, paddingBottom:2 }}>
+          {/* 완료 배지 */}
           <div onClick={() => toggleAchieved(item.id, day)} style={{
-            width:26, height:26, borderRadius:6, flexShrink:0,
-            border: isAchieved ? 'none' : '1.5px solid #C8C8C8',
-            background: isAchieved ? '#16A34A' : '#fff',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            cursor:'pointer', padding:0,
-            boxShadow: isAchieved ? 'none' : '1px 1px 3px #d0d0d0, -1px -1px 3px #ffffff',
-            transition:'all 0.15s',
+            display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+            width:44, height:44, borderRadius:10, cursor:'pointer',
+            background: isAchieved ? '#16A34A' : '#f0f0f0',
+            border: isAchieved ? 'none' : '1.5px solid #D0D0D0',
+            boxShadow: isAchieved ? '0 2px 8px rgba(22,163,74,0.4)' : '1px 1px 3px #d0d0d0, -1px -1px 3px #ffffff',
+            transition:'all 0.2s',
+            gap:2,
           }}>
-            {isAchieved && (
-              <svg width="12" height="9" viewBox="0 0 11 8" fill="none">
-                <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            )}
+            <svg width="14" height="11" viewBox="0 0 11 8" fill="none">
+              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#C8C8C8'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span style={{ fontSize:9, fontWeight:800, color: isAchieved ? '#fff' : '#B0B0B0', letterSpacing:0.3 }}>완료</span>
           </div>
-          <span style={{
-            fontSize:10, fontWeight:700, padding:'3px 6px',
-            borderRadius:6, flexShrink:0, whiteSpace:'nowrap',
-            color: isAchieved ? '#44403C' : '#fff',
-            background: isAchieved ? 'rgba(68,64,60,0.10)' : '#fff',
-            transition:'all 0.15s',
-          }}>완료 ✓</span>
+          {/* 삭제 */}
+          <button onClick={() => setDeleteItemId(item.id)} style={{
+            background:'none', border:'none', cursor:'pointer', padding:2,
+            display:'flex', alignItems:'center',
+          }}>
+            <Icon icon="ph:trash" width={18} height={18} color="#94A3B8" />
+          </button>
         </div>
       </div>
     )
@@ -666,6 +686,44 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           </div>
         </div>
       )}
+
+      )}
+
+      {/* ── 아이템 삭제 확인 팝업 */}
+      {deleteItemId && (() => {
+        const item = allItems.find(i => i.id === deleteItemId)
+        return (
+          <>
+            <div onClick={() => setDeleteItemId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:700 }} />
+            <div style={{
+              position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+              background:'#e8e8e8', borderRadius:20, padding:'28px 24px 20px',
+              zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+              boxShadow:'0 20px 60px rgba(0,0,0,0.25)',
+            }}>
+              <div style={{ fontSize:36, marginBottom:12 }}>🗑️</div>
+              <div style={{ fontSize:16, fontWeight:800, color:'#0F172A', marginBottom:8 }}>항목을 삭제할까요?</div>
+              {item && (
+                <div style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.5 }}>
+                  <span style={{ fontWeight:700, color:'#1B6EF3' }}>{item.label}</span>을<br/>버킷리스트에서 삭제합니다.
+                </div>
+              )}
+              <div style={{ display:'flex', gap:8 }}>
+                <button onClick={() => setDeleteItemId(null)} style={{
+                  flex:1, height:48, borderRadius:10, border:'none',
+                  background:'#e8e8e8', color:'#64748B', fontSize:14, fontWeight:600, cursor:'pointer',
+                  boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                }}>취소</button>
+                <button onClick={() => { deleteItem(deleteItemId); setDeleteItemId(null) }} style={{
+                  flex:2, height:48, borderRadius:10, border:'none',
+                  background:'#e8e8e8', color:'#DC2626', fontSize:14, fontWeight:700, cursor:'pointer',
+                  boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                }}>삭제하기</button>
+              </div>
+            </div>
+          </>
+        )
+      })()}
 
       {showDelete && (
         <DeleteModal
