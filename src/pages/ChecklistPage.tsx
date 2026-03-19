@@ -688,10 +688,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                 </button>
                                 {region ? (
                                   <span style={{
-                                    fontSize:11, fontWeight:600, color:'#94A3B8',
+                                    fontSize:11, fontWeight:600, color:'#64748B',
                                     display:'flex', alignItems:'center', gap:3,
                                   }}>
-                                    <Icon icon={region.icon} width={11} height={11} color="#94A3B8" />
+                                    <Icon icon="ph:map-pin" width={11} height={11} color="#EF4444" />
                                     {region.label}
                                   </span>
                                 ) : <span />}
