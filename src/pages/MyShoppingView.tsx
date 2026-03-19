@@ -603,14 +603,14 @@ function GiftBoxProgress({ total, checkedCount }: {
       }}>
         {Array.from({ length: displayCount }).map((_, i) => {
           const filled = i < checkedCount
-          const bodyMain = filled ? '#FF6B9D' : '#c8a8c8'
-          const bodyDark = filled ? '#e0437a' : '#a888a8'
-          const bodyLight= filled ? '#ffadd0' : '#dfc8df'
-          const lidMain  = filled ? '#FF85B3' : '#d4b4d4'
-          const lidDark  = filled ? '#e0437a' : '#a888a8'
-          const ribMain  = filled ? '#ffffff' : '#ead8ea'
-          const ribShad  = filled ? '#f0c0d8' : '#caaaca'
-          const stroke   = filled ? '#a0245a' : '#806080'
+          const bodyMain = filled ? '#FF6B9D' : '#e0d0e0'
+          const bodyDark = filled ? '#e0437a' : '#c8b0c8'
+          const bodyLight= filled ? '#ffadd0' : '#ede0ed'
+          const lidMain  = filled ? '#FF85B3' : '#e8d8e8'
+          const lidDark  = filled ? '#e0437a' : '#c8b0c8'
+          const ribMain  = filled ? '#ffffff' : '#f5eef5'
+          const ribShad  = filled ? '#f0c0d8' : '#ddd0dd'
+          const stroke   = filled ? '#a0245a' : '#b090b0'
 
           return (
             <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize * 1.05)}
