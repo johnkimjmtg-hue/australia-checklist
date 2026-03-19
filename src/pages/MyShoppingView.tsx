@@ -44,6 +44,15 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
   const [loading, setLoading]         = useState(true)
   const [petalTrigger, setPetalTrigger] = useState(0)
   const [showReceipt, setShowReceipt] = useState(false)
+  const [msgIndex, setMsgIndex] = useState(0)
+
+  const SHOPPING_MSGS = [
+    '지갑이 열릴 준비가 됐나요?',
+    '카트에 담아요, 후회는 나중에!',
+    '쇼핑은 멈출 수 없어요!',
+    '조금만 더, 거의 다 왔어요!',
+    '오늘의 득템을 향해!',
+  ]
   const pageRef = useRef<HTMLDivElement>(null)
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
 
@@ -81,7 +90,10 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
     const next = { ...myChecked, [id]: !myChecked[id] }
     if (!next[id]) delete next[id]
     onMyCheckedChange(next)
-    if (!wasChecked) setPetalTrigger(t => t + 1)
+    if (!wasChecked) {
+      setPetalTrigger(t => t + 1)
+      setMsgIndex(i => (i + 1) % 5)
+    }
   }
 
   const addToMyList = (id: string) => {
@@ -119,16 +131,16 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
       {/* ── 진행 카드 */}
       <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'16px 16px 0' }}>
         <div style={{
-          background:'#d8a0d8',
+          background:'#e8b8e8',
           borderRadius:12,
-          boxShadow:'inset 3px 3px 8px #b878b8, inset -2px -2px 6px #f0c8f0',
+          boxShadow:'inset 3px 3px 8px #c898c8, inset -2px -2px 6px #f8d8f8',
           padding:'20px', display:'flex', alignItems:'center', gap:20,
           position:'relative', overflow:'hidden',
         }}>
           {/* 원형 진행률 */}
           <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
             <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
-              <circle cx={50} cy={50} r={44} fill="none" stroke="#b878b8" strokeWidth={10}/>
+              <circle cx={50} cy={50} r={44} fill="none" stroke="#c898c8" strokeWidth={10}/>
               <circle cx={50} cy={50} r={44} fill="none" stroke="#FF6B9D" strokeWidth={10}
                 strokeDasharray={2 * Math.PI * 44}
                 strokeDashoffset={2 * Math.PI * 44 * (1 - pct / 100)}
@@ -150,7 +162,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
               {pct === 100
                 ? '쇼핑 완료! 모든 상품을 구매했어요 🎉'
                 : pct > 0
-                ? '힘드시죠? 그래도 쇼핑은 계속되야됩니다. 화아팅!'
+                ? SHOPPING_MSGS[msgIndex]
                 : '찜한 상품을 체크하며 쇼핑하세요!'}
             </div>
           </div>
