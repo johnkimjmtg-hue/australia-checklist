@@ -396,20 +396,19 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
                 myList.includes(selProduct.id) ? removeFromMyList(selProduct.id) : addToMyList(selProduct.id)
               }} style={{
                 width:'100%', height:50, borderRadius:12, border:'none', cursor:'pointer',
-                background: myList.includes(selProduct.id) ? '#fff0f5' : '#FF6B9D',
-                color: myList.includes(selProduct.id) ? '#FF6B9D' : '#fff',
+                background:'#e8e8e8', color:'#FF6B9D',
                 fontSize:15, fontWeight:700,
                 display:'flex', alignItems:'center', justifyContent:'center', gap:8,
                 marginBottom:10,
-                boxShadow: myList.includes(selProduct.id) ? 'inset 2px 2px 4px #d1fae5' : '0 4px 12px rgba(255,107,157,0.35)',
+                boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                 WebkitTapHighlightColor:'transparent',
               }}>
-                <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color={myList.includes(selProduct.id) ? '#16A34A' : '#fff'} />
+                <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color="#FF6B9D" />
                 {myList.includes(selProduct.id) ? '찜 취소하기' : '내 쇼핑리스트에 찜하기'}
               </button>
               <button onClick={() => setSelProduct(null)} style={{
-                width:'100%', height:44, borderRadius:12, border:'none',
-                background:'#e8e8e8', color:'#94A3B8', fontSize:14, fontWeight:600, cursor:'pointer',
+                width:'100%', height:50, borderRadius:12, border:'none',
+                background:'#e8e8e8', color:'#94A3B8', fontSize:15, fontWeight:700, cursor:'pointer',
                 boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                 WebkitTapHighlightColor:'transparent',
               }}>닫기</button>
