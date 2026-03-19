@@ -354,9 +354,10 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             <span style={{
               fontSize:11, color:'#94A3B8', fontWeight:400, lineHeight:1.5,
               overflow:'hidden', textOverflow:'ellipsis',
-              display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
+              display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical',
             }}>{db.description}</span>
           )}
+
           {hasDetail && (
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:4 }}>
               <button
