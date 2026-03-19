@@ -482,13 +482,19 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 			{ id:'services',   icon:'ph:buildings',    label:'업체리스트', action: onServices },
           ]).map(tab => {
             const active = tab.id === 'bucketlist'
+            const isShopping = tab.id === 'shopping'
+            const myListCount = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]').length } catch { return 0 } })()
+            const hasMyList = isShopping && myListCount > 0
+            const tabIcon = hasMyList ? 'ph:shopping-cart-simple-fill' : tab.icon
+            const tabLabel = hasMyList ? `내쇼핑리스트 ${myListCount}` : tab.label
+            const tabColor = hasMyList ? '#FFCD00' : (active ? '#1B6EF3' : '#94A3B8')
             return (
               <button key={tab.id} onClick={tab.action}
                 className={`neu-tab${active ? ' active' : ''}`}
                 style={{ flex:1, minWidth:0, height:52 }}>
-                <Icon icon={tab.icon} width={16} height={16} color={active ? '#1B6EF3' : '#94A3B8'} />
-                <span style={{ fontSize:9, fontWeight: active ? 700 : 500, color: active ? '#1B6EF3' : '#94A3B8', whiteSpace:'nowrap' }}>
-                  {tab.label}
+                <Icon icon={tabIcon} width={16} height={16} color={tabColor} />
+                <span style={{ fontSize:9, fontWeight: active || hasMyList ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
+                  {tabLabel}
                 </span>
               </button>
             )
