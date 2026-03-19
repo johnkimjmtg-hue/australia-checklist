@@ -407,7 +407,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             const hasMyList = isShopping && myListCount > 0
             const tabIcon = hasMyList ? 'ph:shopping-cart-simple-fill' : tab.icon
             const tabLabel = hasMyList ? `내쇼핑리스트 ${myListCount}` : tab.label
-            const tabColor = hasMyList ? '#FFCD00' : (active ? '#1B6EF3' : '#94A3B8')
+            const tabColor = hasMyList ? '#D97706' : (active ? '#1B6EF3' : '#94A3B8')
             return (
               <button key={tab.id} onClick={() => setMainTab(tab.id)}
                 className={`neu-tab${active ? ' active' : ''}`}

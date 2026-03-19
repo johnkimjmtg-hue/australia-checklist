@@ -487,7 +487,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             const hasMyList = isShopping && myListCount > 0
             const tabIcon = hasMyList ? 'ph:shopping-cart-simple-fill' : tab.icon
             const tabLabel = hasMyList ? `내쇼핑리스트 ${myListCount}` : tab.label
-            const tabColor = hasMyList ? '#FFCD00' : (active ? '#1B6EF3' : '#94A3B8')
+            const tabColor = hasMyList ? '#D97706' : (active ? '#1B6EF3' : '#94A3B8')
             return (
               <button key={tab.id} onClick={tab.action}
                 className={`neu-tab${active ? ' active' : ''}`}
