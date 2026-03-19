@@ -247,8 +247,8 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
                   {/* 찜 버튼 */}
                   <button onClick={e => { e.stopPropagation(); myList.includes(p.id) ? removeFromMyList(p.id) : addToMyList(p.id) }} style={{
                     position:'absolute', top:6, right:6,
-                    width:30, height:30, borderRadius:'50%', border:'none', cursor:'pointer',
-                    background:'#39d353',
+                    width:26, height:26, borderRadius:'50%', border:'none', cursor:'pointer',
+                    background:'#FF6B9D',
                     display:'flex', alignItems:'center', justifyContent:'center',
                     boxShadow:'0 2px 6px rgba(0,0,0,0.2)',
                     WebkitTapHighlightColor:'transparent',
@@ -342,8 +342,8 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
               {/* 찜 버튼 */}
               <button onClick={e => { e.stopPropagation(); myList.includes(p.id) ? removeFromMyList(p.id) : addToMyList(p.id) }} style={{
                 position:'absolute', top:6, right:6,
-                width:30, height:30, borderRadius:'50%', border:'none', cursor:'pointer',
-                background:'#39d353',
+                width:26, height:26, borderRadius:'50%', border:'none', cursor:'pointer',
+                background:'#FF6B9D',
                 display:'flex', alignItems:'center', justifyContent:'center',
                 boxShadow:'0 2px 6px rgba(0,0,0,0.2)',
                 WebkitTapHighlightColor:'transparent',
@@ -449,8 +449,8 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
               {/* 찜하기 버튼 */}
               <button onClick={() => { myList.includes(selProduct.id) ? removeFromMyList(selProduct.id) : addToMyList(selProduct.id) }} style={{
                 width:'100%', height:50, borderRadius:12, border:'none', cursor:'pointer',
-                background: myList.includes(selProduct.id) ? '#f0fdf4' : '#39d353',
-                color: myList.includes(selProduct.id) ? '#16A34A' : '#fff',
+                background: myList.includes(selProduct.id) ? '#fff0f5' : '#FF6B9D',
+                color: myList.includes(selProduct.id) ? '#FF6B9D' : '#fff',
                 fontSize:15, fontWeight:700,
                 display:'flex', alignItems:'center', justifyContent:'center', gap:8,
                 marginBottom:10,
