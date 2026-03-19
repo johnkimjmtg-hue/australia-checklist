@@ -43,6 +43,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
   const [selProduct, setSelProduct]   = useState<Product | null>(null)
   const [loading, setLoading]         = useState(true)
   const [petalTrigger, setPetalTrigger] = useState(0)
+  const [showReceipt, setShowReceipt] = useState(false)
 
   useEffect(() => {
     supabase.from('shopping_products').select('*').eq('is_active', true).order('sort_order')
@@ -273,7 +274,25 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
           <Icon icon="ph:shopping-bag" width={18} height={18} color="#1B6EF3" />
           쇼핑리스트 보기
         </button>
+        <button onClick={() => setShowReceipt(true)} style={{
+          width:44, height:44, borderRadius:12, flexShrink:0,
+          border:'none', background:'#e8e8e8',
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          WebkitTapHighlightColor:'transparent',
+        }}>
+          <Icon icon="ph:share-network" width={20} height={20} color="#64748B" />
+        </button>
       </div>
+
+      {/* ── 공유 영수증 모달 */}
+      {showReceipt && (
+        <ShoppingReceiptModal
+          myProducts={myProducts}
+          myChecked={myChecked}
+          onClose={() => setShowReceipt(false)}
+        />
+      )}
 
       {/* ── 상품 상세 팝업 */}
       {selProduct && (
@@ -390,5 +409,133 @@ function PetalBurst({ trigger }: { trigger: number }) {
         </div>
       ))}
     </div>
+  )
+}
+
+// ── 공유 영수증 모달
+const PRICE_LABEL_R: Record<string, string> = { '$': '저렴', '$$': '보통', '$$$': '프리미엄' }
+const PRICE_COLOR_R: Record<string, string> = { '$': '#16A34A', '$$': '#D97706', '$$$': '#7C3AED' }
+
+function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
+  myProducts: any[]
+  myChecked: Record<string, boolean>
+  onClose: () => void
+}) {
+  const checkedCount = myProducts.filter(p => myChecked[p.id]).length
+  const total = myProducts.length
+  const now = new Date()
+  const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`
+  const siteUrl = 'https://hojugaja.com/app?tab=shopping'
+
+  const handleShare = async () => {
+    const text = [
+      '🛍️ 내 호주 쇼핑리스트',
+      '',
+      ...myProducts.map(p => `${myChecked[p.id] ? '✅' : '⬜'} ${p.name} (${p.brand})`),
+      '',
+      `${checkedCount}/${total}개 완료`,
+      '',
+      `호주 쇼핑리스트 구경하기 👉 ${siteUrl}`,
+    ].join('\n')
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: '내 호주 쇼핑리스트', text })
+      } else {
+        await navigator.clipboard.writeText(text)
+        alert('클립보드에 복사됐어요!')
+      }
+    } catch {}
+  }
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.65)', zIndex:700 }} />
+      <div style={{
+        position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+        width:'calc(100% - 40px)', maxWidth:340,
+        background:'#e8e8e8', borderRadius:20, zIndex:701,
+        overflow:'hidden', boxShadow:'0 20px 60px rgba(0,0,0,0.3)',
+      }}>
+        {/* 헤더 */}
+        <div style={{ background:'#39d353', padding:'20px 20px 16px', textAlign:'center' }}>
+          <div style={{ fontSize:28, marginBottom:6 }}>🛍️</div>
+          <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:2 }}>내 쇼핑리스트</div>
+          <div style={{ fontSize:12, color:'rgba(255,255,255,0.85)' }}>{dateStr} · {checkedCount}/{total}개 완료</div>
+        </div>
+
+        {/* 진행률 바 */}
+        <div style={{ background:'#d0d0d0', height:6 }}>
+          <div style={{
+            height:'100%', background:'#39d353',
+            width: total > 0 ? `${(checkedCount/total)*100}%` : '0%',
+            transition:'width 0.4s ease',
+          }} />
+        </div>
+
+        {/* 상품 목록 */}
+        <div style={{ maxHeight:280, overflowY:'auto', padding:'12px 16px' }}>
+          {myProducts.map(p => (
+            <div key={p.id} style={{
+              display:'flex', alignItems:'center', gap:10,
+              padding:'8px 0', borderBottom:'1px solid #E2E8F0',
+            }}>
+              <div style={{ width:36, height:36, borderRadius:8, overflow:'hidden', flexShrink:0, background:'#f0f0f0', border:'1px solid #E2E8F0', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                {p.image_url
+                  ? <img src={p.image_url} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                  : <span style={{ fontSize:16 }}>🛍️</span>
+                }
+              </div>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{
+                  fontSize:13, fontWeight:600,
+                  color: myChecked[p.id] ? '#94A3B8' : '#0F172A',
+                  textDecoration: myChecked[p.id] ? 'line-through' : 'none',
+                  overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+                }}>{p.name}</div>
+                <div style={{ fontSize:11, color: PRICE_COLOR_R[p.price_range] ?? '#475569', fontWeight:700 }}>
+                  {p.price_range} · {PRICE_LABEL_R[p.price_range]}
+                </div>
+              </div>
+              <div style={{
+                width:22, height:22, borderRadius:6, flexShrink:0,
+                background: myChecked[p.id] ? '#39d353' : '#E2E8F0',
+                display:'flex', alignItems:'center', justifyContent:'center',
+              }}>
+                {myChecked[p.id] && (
+                  <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
+                    <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 사이트 링크 */}
+        <div style={{ margin:'0 16px 12px', padding:'10px 12px', background:'#fff', borderRadius:10, border:'1px solid #E2E8F0' }}>
+          <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600, marginBottom:2 }}>🔗 같이 쇼핑해요!</div>
+          <div style={{ fontSize:12, color:'#1B6EF3', fontWeight:600 }}>{siteUrl}</div>
+        </div>
+
+        {/* 버튼 */}
+        <div style={{ display:'flex', gap:8, padding:'0 16px 20px' }}>
+          <button onClick={onClose} style={{
+            flex:1, height:48, borderRadius:10, border:'none',
+            background:'#e8e8e8', color:'#64748B', fontSize:14, fontWeight:600, cursor:'pointer',
+            boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          }}>닫기</button>
+          <button onClick={handleShare} style={{
+            flex:2, height:48, borderRadius:10, border:'none',
+            background:'#39d353', color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer',
+            display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+            boxShadow:'0 4px 12px rgba(57,211,83,0.4)',
+          }}>
+            <Icon icon="ph:share-network" width={18} height={18} color="#fff" />
+            공유하기
+          </button>
+        </div>
+      </div>
+    </>
   )
 }
