@@ -618,10 +618,21 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         display:'flex', gap:8,
         borderTop:'1px solid #C8C8C8',
       }}>
+        <button onClick={onEdit} style={{
+          flex:1, height:44, borderRadius:8, border:'none',
+          background:'#e8e8e8', color:'#64748B',
+          fontSize:14, fontWeight:700, cursor:'pointer',
+          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+          WebkitTapHighlightColor:'transparent',
+        }}>
+          <Icon icon="ph:pencil-simple" width={18} height={18} color="#64748B" />
+          리스트 수정하기
+        </button>
         <button onClick={onLanding} style={{
           flex:1, height:44, borderRadius:8, border:'none',
           background:'#e8e8e8', color:'#1B6EF3',
-          fontSize:15, fontWeight:700, cursor:'pointer',
+          fontSize:14, fontWeight:700, cursor:'pointer',
           boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
           WebkitTapHighlightColor:'transparent',
@@ -663,15 +674,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             }}>
               <Icon icon="ph:share-network" width={18} height={18} color="#1B6EF3" />공유하기
             </button>
-            <button onClick={() => { setShowMoreMenu(false); onEdit() }} style={{
-              width:'100%', height:52, borderRadius:12, border:'none',
-              background:'#e8e8e8', color:'#64748B',
-              fontSize:15, fontWeight:700, cursor:'pointer',
-              display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
-              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-            }}>
-              <Icon icon="ph:pencil-simple" width={18} height={18} color="#64748B" />수정하기
-            </button>
             <button onClick={() => { setShowMoreMenu(false); setShowDelete(true) }} style={{
               width:'100%', height:52, borderRadius:12, border:'none',
               background:'#e8e8e8', color:'#DC2626',
@@ -679,7 +681,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
               display:'flex', alignItems:'center', gap:10, padding:'0 18px',
               boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
             }}>
-              <Icon icon="ph:trash" width={18} height={18} color="#DC2626" />삭제하기
+              <Icon icon="ph:trash" width={18} height={18} color="#DC2626" />리스트 삭제하기
             </button>
           </div>
         </div>
