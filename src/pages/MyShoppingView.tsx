@@ -123,20 +123,9 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
           boxShadow:'inset 3px 3px 8px #a8b498, inset -2px -2px 6px #e8f4d8',
           padding:'20px', display:'flex', alignItems:'center', gap:20,
         }}>
-          {/* 원형 진행률 */}
-          <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
-            <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
-              <circle cx={50} cy={50} r={44} fill="none" stroke="#a8b498" strokeWidth={10}/>
-              <circle cx={50} cy={50} r={44} fill="none" stroke="#FF6B9D" strokeWidth={10}
-                strokeDasharray={2 * Math.PI * 44}
-                strokeDashoffset={2 * Math.PI * 44 * (1 - pct / 100)}
-                strokeLinecap="round"
-                style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)' }}
-              />
-            </svg>
-            <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <span style={{ fontSize:15, fontWeight:800, color:'#2d3e1f' }}>{pct}%</span>
-            </div>
+          {/* 영수증 */}
+          <div style={{ flexShrink:0, width:90 }}>
+            <ReceiptProgress products={myProducts} myChecked={myChecked} />
           </div>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:20, fontWeight:800, color:'#2d3e1f', marginBottom:4, lineHeight:1.2 }}>내 쇼핑리스트</div>
@@ -544,5 +533,109 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
         </div>
       </div>
     </>
+  )
+}
+
+// ── 영수증 프로그래스 컴포넌트
+function ReceiptProgress({ products, myChecked }: { products: any[], myChecked: Record<string,boolean> }) {
+  const total = products.length
+  const checked = products.filter(p => myChecked[p.id]).length
+  const isPaid = total > 0 && checked === total
+  // 영수증에 표시할 최대 라인 수
+  const MAX_LINES = 6
+  const lines = products.slice(0, MAX_LINES)
+
+  return (
+    <div style={{ position:'relative', width:90 }}>
+      {/* 영수증 본체 */}
+      <div style={{
+        background:'#fff',
+        borderRadius:'4px 4px 0 0',
+        boxShadow:'0 2px 8px rgba(0,0,0,0.15)',
+        overflow:'hidden',
+        fontFamily:'monospace',
+      }}>
+        {/* 영수증 헤더 */}
+        <div style={{ background:'#FF6B9D', padding:'6px 8px', textAlign:'center' }}>
+          <div style={{ fontSize:9, fontWeight:800, color:'#fff', letterSpacing:1 }}>HOJUGAJA</div>
+          <div style={{ fontSize:7, color:'rgba(255,255,255,0.8)' }}>🛍️ 쇼핑리스트</div>
+        </div>
+        {/* 구분선 */}
+        <div style={{ borderBottom:'1px dashed #E2E8F0', margin:'0 6px' }} />
+        {/* 상품 라인들 */}
+        <div style={{ padding:'4px 6px', minHeight:60 }}>
+          {lines.map((p, i) => {
+            const done = !!myChecked[p.id]
+            return (
+              <div key={p.id} style={{
+                display:'flex', alignItems:'center', gap:4,
+                marginBottom:3,
+                animation: `receiptLine 0.3s ease ${i * 0.08}s both`,
+              }}>
+                <span style={{ fontSize:8, color: done ? '#FF6B9D' : '#CBD5E1', flexShrink:0 }}>
+                  {done ? '✓' : '○'}
+                </span>
+                <span style={{
+                  fontSize:8, color: done ? '#475569' : '#94A3B8',
+                  overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+                  flex:1, textDecoration: done ? 'line-through' : 'none',
+                }}>{p.name}</span>
+              </div>
+            )
+          })}
+          {total > MAX_LINES && (
+            <div style={{ fontSize:7, color:'#94A3B8', textAlign:'center', marginTop:2 }}>
+              +{total - MAX_LINES}개 더
+            </div>
+          )}
+          {total === 0 && (
+            <div style={{ fontSize:8, color:'#CBD5E1', textAlign:'center', padding:'8px 0' }}>
+              상품 없음
+            </div>
+          )}
+        </div>
+        {/* 구분선 */}
+        <div style={{ borderBottom:'1px dashed #E2E8F0', margin:'0 6px' }} />
+        {/* 합계 */}
+        <div style={{ padding:'4px 6px 6px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <span style={{ fontSize:8, fontWeight:700, color:'#475569' }}>합계</span>
+          <span style={{ fontSize:9, fontWeight:800, color:'#FF6B9D' }}>{checked}/{total}</span>
+        </div>
+
+        {/* PAID 스탬프 */}
+        {isPaid && (
+          <div style={{
+            position:'absolute', top:'50%', left:'50%',
+            transform:'translate(-50%,-50%) rotate(-15deg)',
+            border:'2px solid #FF6B9D', borderRadius:4,
+            padding:'2px 6px', pointerEvents:'none',
+            animation:'paidStamp 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both',
+          }}>
+            <span style={{ fontSize:13, fontWeight:900, color:'#FF6B9D', letterSpacing:1 }}>PAID</span>
+          </div>
+        )}
+      </div>
+
+      {/* 영수증 하단 톱니 */}
+      <div style={{ display:'flex', overflow:'hidden', lineHeight:0 }}>
+        {Array.from({ length: 9 }).map((_, i) => (
+          <div key={i} style={{
+            width:10, height:5, borderRadius:'0 0 5px 5px',
+            background:'#e8e8e8', flexShrink:0,
+          }} />
+        ))}
+      </div>
+
+      <style>{`
+        @keyframes receiptLine {
+          from { opacity:0; transform:translateY(-4px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
+        @keyframes paidStamp {
+          from { opacity:0; transform:translate(-50%,-50%) rotate(-15deg) scale(2); }
+          to   { opacity:1; transform:translate(-50%,-50%) rotate(-15deg) scale(1); }
+        }
+      `}</style>
+    </div>
   )
 }
