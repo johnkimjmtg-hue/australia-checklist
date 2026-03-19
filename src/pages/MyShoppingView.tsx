@@ -80,7 +80,7 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
 
   return (
     <div style={{
-      background:'#e8e8e8',
+      background:'#e8e8e8', minHeight:'100vh',
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       maxWidth:480, margin:'0 auto', position:'relative',
     }}>
@@ -275,13 +275,15 @@ export default function MyShoppingView({ onBack, myList, myChecked, onMyListChan
           쇼핑리스트 보기
         </button>
         <button onClick={() => setShowReceipt(true)} style={{
-          width:44, height:44, borderRadius:12, flexShrink:0,
-          border:'none', background:'#e8e8e8',
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+          flex:1, height:44, borderRadius:8, border:'none',
+          background:'#e8e8e8', color:'#64748B',
+          fontSize:15, fontWeight:700, cursor:'pointer',
           boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          display:'flex', alignItems:'center', justifyContent:'center', gap:7,
           WebkitTapHighlightColor:'transparent',
         }}>
-          <Icon icon="ph:share-network" width={20} height={20} color="#64748B" />
+          <Icon icon="ph:share-network" width={18} height={18} color="#64748B" />
+          공유하기
         </button>
       </div>
 
