@@ -370,20 +370,53 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
       {onGoToMyList && myList.length > 0 && (
         <button onClick={onGoToMyList} style={{
           position:'fixed', bottom:88, right:20,
-          width:60, height:60, borderRadius:30,
-          backgroundColor:'#1B6EF3',
-          boxShadow:'0px 4px 12px rgba(0,0,0,0.25)',
-          border:'none', cursor:'pointer',
-          display:'flex', alignItems:'center', justifyContent:'center',
+          width:64, height:64, borderRadius:32,
+          border:'none', cursor:'pointer', padding:0,
+          background:'transparent',
           zIndex:100,
           WebkitTapHighlightColor:'transparent',
         }}>
-          <Icon icon="ph:shopping-cart-simple" width={28} height={28} color="#fff" />
+          <svg viewBox="0 0 64 64" width={64} height={64} style={{ display:'block' }}>
+            {/* 원형 배경 - 3D 그라데이션 */}
+            <defs>
+              <radialGradient id="btnGrad" cx="40%" cy="30%" r="65%">
+                <stop offset="0%" stopColor="#4D8EF7"/>
+                <stop offset="100%" stopColor="#1240C0"/>
+              </radialGradient>
+              <radialGradient id="bagGrad" cx="35%" cy="25%" r="70%">
+                <stop offset="0%" stopColor="#ffffff"/>
+                <stop offset="100%" stopColor="#dde8ff"/>
+              </radialGradient>
+            </defs>
+            {/* 원 바닥 그림자 */}
+            <ellipse cx="32" cy="60" rx="24" ry="4" fill="rgba(0,0,0,0.2)"/>
+            {/* 원형 배경 */}
+            <circle cx="32" cy="30" r="28" fill="url(#btnGrad)"/>
+            {/* 원 상단 하이라이트 */}
+            <ellipse cx="26" cy="18" rx="12" ry="6" fill="rgba(255,255,255,0.18)"/>
+
+            {/* 쇼핑백 본체 */}
+            <rect x="18" y="28" width="28" height="22" rx="3" fill="url(#bagGrad)"/>
+            {/* 쇼핑백 본체 하단 음영 */}
+            <rect x="18" y="42" width="28" height="8" rx="2" fill="rgba(100,140,220,0.2)"/>
+            {/* 쇼핑백 상단 바 */}
+            <rect x="16" y="24" width="32" height="7" rx="2.5" fill="rgba(255,255,255,0.95)"/>
+            {/* 손잡이 왼쪽 */}
+            <path d="M24,24 Q24,16 28,16 Q32,16 32,20" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="2.5" strokeLinecap="round"/>
+            {/* 손잡이 오른쪽 */}
+            <path d="M32,20 Q32,16 36,16 Q40,16 40,24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="2.5" strokeLinecap="round"/>
+            {/* 잠금 버클 */}
+            <rect x="28" y="34" width="8" height="6" rx="3" fill="rgba(100,140,220,0.35)"/>
+            <rect x="30" y="36" width="4" height="2" rx="1" fill="rgba(255,255,255,0.7)"/>
+          </svg>
+          {/* 뱃지 */}
           <div style={{
-            position:'absolute', top:0, right:0,
+            position:'absolute', top:2, right:2,
             backgroundColor:'#FF4D4F', color:'#fff',
             borderRadius:10, padding:'2px 6px',
             fontSize:11, fontWeight:800, minWidth:18, textAlign:'center',
+            boxShadow:'0 2px 4px rgba(0,0,0,0.3)',
+            border:'1.5px solid #fff',
           }}>
             {myList.length}
           </div>
