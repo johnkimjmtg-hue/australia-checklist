@@ -110,12 +110,12 @@ export default function MyShoppingView({ onBack }: Props) {
         @keyframes petalFall {
           0%   { transform: translateY(-20px) rotate(0deg) scale(1); opacity:1; }
           80%  { opacity:1; }
-          100% { transform: translateY(180px) rotate(720deg) scale(0.5); opacity:0; }
+          100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity:0; }
         }
         @keyframes petalSway {
           0%   { margin-left: 0px; }
-          25%  { margin-left: 12px; }
-          75%  { margin-left: -12px; }
+          25%  { margin-left: 20px; }
+          75%  { margin-left: -20px; }
           100% { margin-left: 0px; }
         }
         .my-item { transition: all 0.2s ease; }
@@ -388,7 +388,7 @@ function PetalBurst({ trigger }: { trigger: number }) {
       x: 10 + Math.random() * 80,
       color: colors[Math.floor(Math.random() * colors.length)],
       size: 12 + Math.random() * 14,
-      duration: 1.2 + Math.random() * 0.8,
+      duration: 2.5 + Math.random() * 1.5,
       delay: Math.random() * 0.5,
       shape: shapes[Math.floor(Math.random() * shapes.length)],
     })))
