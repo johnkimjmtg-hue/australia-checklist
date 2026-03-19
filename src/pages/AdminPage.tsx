@@ -1333,7 +1333,7 @@ function EditBizMultiSearch({ businesses, values, onChange }: {
           />
           {filtered.length > 0 && focused && (
             <div style={{
-              position:'fixed', zIndex:9999,
+              position:'absolute', top:'100%', left:0, right:0, zIndex:9999,
               background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',
               border:'1px solid #E2E8F0', overflow:'hidden',
             }}>
@@ -1388,7 +1388,7 @@ function EditProdMultiSearch({ products, values, onChange }: {
           />
           {filtered.length > 0 && focused && (
             <div style={{
-              position:'fixed', zIndex:9999,
+              position:'absolute', top:'100%', left:0, right:0, zIndex:9999,
               background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',
               border:'1px solid #E2E8F0', overflow:'hidden',
             }}>
