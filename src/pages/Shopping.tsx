@@ -166,11 +166,8 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
               WebkitTapHighlightColor: 'transparent',
               display:'flex', alignItems:'center', gap:5,
             }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M6 9L4.31818 19.3462C4.153 20.3664 4.93883 21 5.97727 21H18.0227C19.0612 21 19.847 20.3664 19.6818 19.3462L18 9"
-                  stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M9 10V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V10"
-                  stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg width="14" height="14" viewBox="0 0 256 256" fill="none">
+                <path fill="#fff" d="M224,56H175.4A48,48,0,0,0,80.6,56H32A16,16,0,0,0,16,72V200a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V72A16,16,0,0,0,224,56ZM128,32a32,32,0,0,1,30.86,24H97.14A32,32,0,0,1,128,32Zm0,120a48,48,0,0,1-48-48,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0A48,48,0,0,1,128,152Z"/>
               </svg>
               {myList.length}
             </button>
