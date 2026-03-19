@@ -35,7 +35,7 @@ const EMPTY_FORM = {
 
 // ── 체크리스트 타입 (DB 기반)
 type Cat  = { id:string; label:string; emoji:string; sort_order:number }
-type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean; address?:string|null; description?:string|null; related_business_id?:string|null; related_business_ids?:string[]|null; image_url?:string|null; tips?:string|null }
+type Item = { id:string; category_id:string; label:string; icon:string|null; sort_order:number; is_active:boolean; address?:string|null; description?:string|null; related_business_id?:string|null; related_business_ids?:string[]|null; image_url?:string|null; tips?:string|null; related_product_ids?:string[]|null }
 
 const EMOJI_MAP: [string[], string][] = [
   [['크림','로션','에센스','토너','팩'], '🧴'],
@@ -871,6 +871,7 @@ function ItemsTab({ cats, items, setItems }: {
   const [editLabel, setEditLabel] = useState('')
   const [expandedId, setExpandedId] = useState<string|null>(null)
   const [businesses, setBusinesses] = useState<{id:string;name:string}[]>([])
+  const [products, setProducts]     = useState<{id:string;name:string}[]>([])
   const [newSuburb, setNewSuburb]   = useState('')
   const [newDesc, setNewDesc]       = useState('')
   const [newTips, setNewTips]       = useState('')
@@ -883,6 +884,8 @@ function ItemsTab({ cats, items, setItems }: {
   useEffect(() => {
     supabase.from('businesses').select('id, name').eq('is_active', true).order('name')
       .then(({ data }) => { if (data) setBusinesses(data) })
+    supabase.from('shopping_products').select('id, name').eq('is_active', true).order('name')
+      .then(({ data }) => { if (data) setProducts(data) })
   }, [])
 
   const filteredBiz = businesses
@@ -952,6 +955,12 @@ function ItemsTab({ cats, items, setItems }: {
   async function saveRelatedBiz(id: string, ids: string[]) {
     await supabase.from('checklist_items').update({ related_business_ids: ids }).eq('id', id)
     setItems(items.map(i => i.id===id ? {...i, related_business_ids: ids} : i))
+    showToast('저장됨')
+  }
+
+  async function saveRelatedProducts(id: string, ids: string[]) {
+    await supabase.from('checklist_items').update({ related_product_ids: ids }).eq('id', id)
+    setItems(items.map(i => i.id===id ? {...i, related_product_ids: ids} : i))
     showToast('저장됨')
   }
 
@@ -1261,6 +1270,15 @@ function ItemsTab({ cats, items, setItems }: {
                     onChange={ids => saveRelatedBiz(item.id, ids)}
                   />
                 </div>
+                {/* 관련 쇼핑 상품 */}
+                <div style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
+                  <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0, paddingTop:6 }}>🛍 관련상품</span>
+                  <EditProdMultiSearch
+                    products={products}
+                    values={item.related_product_ids ?? []}
+                    onChange={ids => saveRelatedProducts(item.id, ids)}
+                  />
+                </div>
               </div>
             )}
               </div>
@@ -1335,7 +1353,60 @@ function EditBizMultiSearch({ businesses, values, onChange }: {
   )
 }
 
-function EditBizSearch({ businesses, value, onChange }: {
+function EditProdMultiSearch({ products, values, onChange }: {
+  products: {id:string;name:string}[]
+  values: string[]
+  onChange: (ids: string[]) => void
+}) {
+  const [search, setSearch] = useState('')
+  const [focused, setFocused] = useState(false)
+  const filtered = focused
+    ? products.filter(p => !values.includes(p.id) && (!search || p.name.toLowerCase().includes(search.toLowerCase()))).slice(0, 8)
+    : []
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', gap:4 }}>
+      {values.map(id => {
+        const prod = products.find(p => p.id === id)
+        return prod ? (
+          <div key={id} style={{ display:'flex', alignItems:'center', gap:6,
+            background:'rgba(234,88,12,0.08)', borderRadius:6, padding:'4px 8px' }}>
+            <span style={{ flex:1, fontSize:12, color:'#EA580C', fontWeight:600 }}>🛍 {prod.name}</span>
+            <button onMouseDown={() => onChange(values.filter(i => i !== id))}
+              style={{ background:'none', border:'none', color:'#aaa', cursor:'pointer', fontSize:12 }}>✕</button>
+          </div>
+        ) : null
+      })}
+      {values.length < 5 && (
+        <div style={{ position:'relative' }}>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setTimeout(() => setFocused(false), 150)}
+            placeholder="상품명 검색... (최대 5개)"
+            style={{ ...inputStyle, fontSize:12, padding:'5px 8px' }}
+          />
+          {filtered.length > 0 && focused && (
+            <div style={{
+              position:'fixed', zIndex:9999,
+              background:'#fff', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)',
+              border:'1px solid #E2E8F0', overflow:'hidden',
+            }}>
+              {filtered.map(p => (
+                <div key={p.id}
+                  onMouseDown={() => { onChange([...values, p.id]); setSearch('') }}
+                  style={{ padding:'8px 12px', fontSize:12, cursor:'pointer', borderBottom:'1px solid #F1F5F9' }}
+                  onMouseEnter={e => (e.currentTarget.style.background='#F8FAFC')}
+                  onMouseLeave={e => (e.currentTarget.style.background='#fff')}
+                >{p.name}</div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
   businesses: {id:string;name:string}[]
   value: string
   onChange: (val: string) => void

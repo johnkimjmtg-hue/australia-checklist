@@ -5,7 +5,7 @@ import { CheckItem } from '../data/checklist'
 import { supabase } from '../lib/supabase'
 
 type Category = { id: string; label: string; emoji: string; sort_order: number }
-type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null; image_url?: string | null; tips?: string | null }
+type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null; image_url?: string | null; tips?: string | null; related_product_ids?: string[] | null }
 import {
   AppState, TripInfo,
   toggleItem, setSchedule, setCategory, addCustom,
@@ -27,6 +27,17 @@ const CAT_ICON_MAP: Record<string,string> = {
   admin:'ph:files',people:'ph:users',parenting:'ph:baby',places:'ph:map-pin',
   schedule:'ph:calendar',custom:'ph:star',
 }
+
+const TAG_COLOR: Record<string, { bg: string; color: string }> = {
+  '인기':      { bg:'#FEF3C7', color:'#B45309' },
+  '강추':      { bg:'#DCFCE7', color:'#15803D' },
+  '선물':      { bg:'#FCE7F3', color:'#BE185D' },
+  '프리미엄':  { bg:'#EDE9FE', color:'#7C3AED' },
+  '가성비':    { bg:'#DBEAFE', color:'#1D4ED8' },
+  '필수템':    { bg:'#FEE2E2', color:'#DC2626' },
+}
+const PRICE_COLOR: Record<string, string> = { '$': '#16A34A', '$$': '#D97706', '$$$': '#7C3AED' }
+const PRICE_LABEL: Record<string, string> = { '$': '저렴', '$$': '보통', '$$$': '고급' }
 
 type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker'
@@ -64,6 +75,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [detailBiz, setDetailBiz] = useState<Business|null>(null)
   const [detailItem, setDetailItem] = useState<DBItem|null>(null)
   const [detailBizCards, setDetailBizCards] = useState<Business[]>([])
+  const [selProduct, setSelProduct] = useState<any|null>(null)
 
   useEffect(() => {
     async function fetchBizCount() {
@@ -586,6 +598,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                           src={db.image_url} alt=""
                           onClick={async e => {
                             e.stopPropagation()
+                            if (!db) return
+                            if ((db.related_product_ids?.length ?? 0) > 0) {
+                              const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
+                              if (data) setSelProduct(data)
+                              return
+                            }
                             setDetailItem(db)
                             if ((db.related_business_ids?.length ?? 0) > 0) {
                               const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
@@ -647,6 +665,13 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                   onClick={async e => {
                                     e.stopPropagation()
                                     if (!db) return
+                                    // 관련 상품이 있으면 첫 번째 상품 팝업으로
+                                    if ((db.related_product_ids?.length ?? 0) > 0) {
+                                      const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
+                                      if (data) setSelProduct(data)
+                                      return
+                                    }
+                                    // 없으면 일반 상세 팝업
                                     setDetailItem(db)
                                     if ((db.related_business_ids?.length ?? 0) > 0) {
                                       const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
@@ -813,6 +838,73 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
           achieved={achieved}
           onClose={() => setShowReceipt(false)} onReset={() => setModal('confirmReset')} />
+      )}
+
+      {/* 쇼핑 상품 팝업 */}
+      {selProduct && (
+        <>
+          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600 }} />
+          <div style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:390, background:'#e8e8e8',
+            borderRadius:'20px 20px 0 0', zIndex:601,
+            animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
+          }}>
+            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'12px auto 0' }} />
+            <div style={{
+              width:'100%', height:220,
+              background: selProduct.image_url ? 'none' : 'linear-gradient(135deg, #e0e0e0, #d0d0d0)',
+              display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden',
+            }}>
+              {selProduct.image_url
+                ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                : <Icon icon="ph:shopping-bag" width={60} height={60} color="#94A3B8" />
+              }
+            </div>
+            <div style={{ padding:'16px 18px 40px' }}>
+              <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, alignItems:'center' }}>
+                {(selProduct.tags ?? []).map((tag: string) => (
+                  <span key={tag} style={{
+                    fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6,
+                    background: TAG_COLOR[tag]?.bg ?? '#e8e8e8',
+                    color: TAG_COLOR[tag]?.color ?? '#475569',
+                  }}>{tag}</span>
+                ))}
+                {selProduct.price_range && (
+                  <span style={{
+                    fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6,
+                    background:'#e8e8e8', color: PRICE_COLOR[selProduct.price_range] ?? '#475569',
+                    border:`1px solid ${PRICE_COLOR[selProduct.price_range] ?? '#C8C8C8'}`,
+                    marginLeft:'auto',
+                  }}>{selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}</span>
+                )}
+              </div>
+              <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', marginBottom:4 }}>{selProduct.name}</div>
+              {selProduct.brand && <div style={{ fontSize:13, color:'#64748B', marginBottom:12 }}>{selProduct.brand}</div>}
+              {selProduct.description && (
+                <div style={{ fontSize:13, color:'#334155', lineHeight:1.7, marginBottom:16 }}>{selProduct.description}</div>
+              )}
+              {(selProduct.where_to_buy ?? []).length > 0 && (
+                <div style={{ marginBottom:16 }}>
+                  <div style={{ fontSize:11, fontWeight:700, color:'#94A3B8', marginBottom:8 }}>어디서 살 수 있어요?</div>
+                  <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                    {selProduct.where_to_buy.map((store: string) => (
+                      <span key={store} style={{
+                        fontSize:11, fontWeight:600, padding:'5px 10px', borderRadius:8,
+                        background:'#e8e8e8', color:'#475569', border:'1px solid #C8C8C8',
+                      }}>🏪 {store}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button onClick={() => setSelProduct(null)} style={{
+                width:'100%', height:50, borderRadius:12, border:'none',
+                background:'#e8e8e8', color:'#1B6EF3', fontSize:15, fontWeight:700, cursor:'pointer',
+                boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              }}>확인</button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* 버킷리스트 상세 팝업 */}
