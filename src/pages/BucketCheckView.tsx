@@ -486,7 +486,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             const myListCount = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]').length } catch { return 0 } })()
             const hasMyList = isShopping && myListCount > 0
             // 다른페이지(버킷체크뷰)에서: 리스트 있으면 카트+회색, 없으면 기본
-            const tabIcon  = hasMyList ? 'ph:shopping-cart-simple-fill' : tab.icon
+            const tabIcon  = hasMyList ? 'ph:shopping-cart-simple' : tab.icon
             const tabLabel = hasMyList ? `내쇼핑리스트 ${myListCount}` : tab.label
             const tabColor = active ? '#1B6EF3' : '#94A3B8'
             return (
