@@ -387,7 +387,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                   fontSize:11, fontWeight:600, color:'#64748B',
                   display:'flex', alignItems:'center', gap:3,
                 }}>
-                  <Icon icon="ph:map-pin" width={11} height={11} color="#EF4444" />
+                  <Icon icon="ph:map-pin-fill" width={11} height={11} color="#EF4444" />
                   {region.label}
                 </span>
               ) : <span />}
