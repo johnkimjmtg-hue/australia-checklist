@@ -461,7 +461,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 // 쇼핑페이지 or 다른페이지에서 리스트 있음 → 카트+녹색+평평
                 tabIcon  = 'ph:shopping-cart-simple'
                 tabLabel = `내쇼핑리스트 ${myListCount}`
-                tabColor = mainTab === 'shopping' ? '#39d353' : '#94A3B8'
+                tabColor = mainTab === 'shopping' ? '#FF6B9D' : '#94A3B8'
                 isActive = false
               } else {
                 // 기본 상태
