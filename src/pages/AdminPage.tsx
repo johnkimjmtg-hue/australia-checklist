@@ -1407,6 +1407,8 @@ function EditProdMultiSearch({ products, values, onChange }: {
     </div>
   )
 }
+
+function EditBizSearch({ businesses, value, onChange }: {
   businesses: {id:string;name:string}[]
   value: string
   onChange: (val: string) => void
