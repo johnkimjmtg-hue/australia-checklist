@@ -678,25 +678,55 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           <div style={{
             background:'#c8d4b8',
             borderRadius: 12,
-            padding: '30px 16px',
+            padding: '0',
             marginBottom: 20,
             boxShadow: 'inset 3px 3px 8px #a8b498, inset -2px -2px 6px #e8f4d8',
             textAlign: 'center',
-            minHeight: 150,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
+            height: 150,
+            overflow: 'hidden',
+            position: 'relative',
           }}>
-            <div style={{ fontSize: 22, marginBottom: 8 }}>🦘</div>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#2d3e1f', letterSpacing: 0.5 }}>
-              호주 여행·이민 필수 정보 사이트
-            </div>
-            <div style={{ fontSize: 12, color: '#4a5e32', marginTop: 8, lineHeight: 1.7 }}>
-              호주의 모든 정보가 한곳으로 연결됩니다.<br/>
-              열심히 업데이트 중...
+            <style>{`
+              @keyframes scrollUpLoop {
+                0%   { transform: translateY(0); }
+                100% { transform: translateY(-50%); }
+              }
+              .notice-loop {
+                animation: scrollUpLoop 22s linear infinite;
+                display: flex;
+                flex-direction: column;
+              }
+            `}</style>
+            <div className="notice-loop">
+              {[0,1].map(k => (
+                <div key={k} style={{ padding:'16px 16px', boxSizing:'border-box' as any }}>
+                  <div style={{ display:'flex', justifyContent:'center', marginBottom:8 }}>
+                    <Icon icon="mdi:kangaroo" width={30} height={30} color="#2d3e1f" />
+                  </div>
+                  <div style={{ fontSize:13, fontWeight:800, color:'#2d3e1f', marginBottom:8 }}>
+                    호주가자에 오신 것을 환영합니다!
+                  </div>
+                  <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8, marginBottom:8 }}>
+                    호주 여행·이민을 준비하시는 분들을 위한<br/>
+                    <strong>무료 정보 제공 사이트</strong>입니다.
+                  </div>
+                  <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8, marginBottom:8 }}>
+                    버킷리스트·쇼핑리스트·업체 정보까지<br/>
+                    호주의 모든 정보를 한곳에서 확인하세요.
+                  </div>
+                  <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8, marginBottom:8 }}>
+                    📢 호주 현지 업체 등록은 <strong>무료</strong>이며,<br/>
+                    등록된 업체는 사이트 내 우선 노출됩니다.
+                  </div>
+                  <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8 }}>
+                    업체 등록 및 문의는<br/>
+                    <strong>hojugaja.com</strong> 에서 해주세요. 🙌
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
+
 
           {/* 버튼 그리드 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
