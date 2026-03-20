@@ -625,7 +625,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                           boxShadow:'inset 1px 1px 3px #d0d0d0',
                         }}>
                           <input
-                            autoFocus
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
                             placeholder="검색"
