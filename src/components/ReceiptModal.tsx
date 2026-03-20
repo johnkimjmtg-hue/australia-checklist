@@ -74,9 +74,11 @@ export default function ReceiptModal({ state, trip, issuedAt, achieved, dbItems,
           try {
             // 미리 만들어둔 blob으로 즉시 공유 — 제스처 컨텍스트 유지
             if (navigator.share && navigator.canShare?.({ files: [new File([blobRef.current], 'test.png', { type:'image/png' })] })) {
-              await navigator.share({ files: [new File([blobRef.current], 'korea-receipt.png', { type: 'image/png' })] })
+              await navigator.share({
+                files: [new File([blobRef.current], 'korea-receipt.png', { type: 'image/png' })],
+                text: '나만의 호주 버킷리스트 👉 https://hojugaja.com',
+              })
             } else if (navigator.share) {
-              // 파일 공유 미지원 시 URL로 대체
               await navigator.share({ title: '호주 버킷리스트', url: 'https://hojugaja.com' })
             } else {
               // 공유 미지원 시 이미지 저장
