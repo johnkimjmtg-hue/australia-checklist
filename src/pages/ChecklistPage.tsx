@@ -672,7 +672,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   })}
                 </div>
               </div>
-                </div>
               )
             })()}
           </div>
