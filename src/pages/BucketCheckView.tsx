@@ -320,50 +320,40 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
     const hasDetail = !!(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0 || db?.tips)
     return (
       <div style={{
-        display:'flex', alignItems:'stretch', gap:10,
-        padding:'12px 12px 12px 14px',
+        display:'flex', alignItems:'stretch',
         margin:'0 16px', borderRadius:12,
         background: isAchieved ? '#fff8e4' : '#fff',
         border:'1px solid #C8C8C8',
         borderLeft: isAchieved ? '4px solid #16A34A' : '4px solid #CBD5E1',
-        transition:'all 0.3s',
+        transition:'all 0.3s', overflow:'hidden',
       }}>
-        {/* 왼쪽 - 원형 이미지 or 아이콘 */}
-        {db?.image_url ? (
-          <img
-            src={db.image_url} alt=""
-            onClick={async e => {
-              e.stopPropagation()
-              if (!db) return
-              if ((db.related_product_ids?.length ?? 0) > 0) {
-                const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
-                if (data) setSelProduct(data)
-                return
-              }
-              setDetailItem(db)
-              if ((db.related_business_ids?.length ?? 0) > 0) {
-                const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
-                setDetailBizCards(data ?? [])
-              } else setDetailBizCards([])
-            }}
-            style={{ width:60, height:60, borderRadius:10, objectFit:'cover', flexShrink:0, cursor:'pointer', alignSelf:'center' }}
-          />
-        ) : (
-          <div style={{
-            width:60, height:60, borderRadius:10, flexShrink:0,
-            background:'#f0f0f0', overflow:'hidden',
-            display:'flex', alignItems:'center', justifyContent:'center', alignSelf:'center',
-          }}>
-            <Icon
-              icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'}
-              width={24} height={24}
-              color={isAchieved ? '#78716C' : '#CBD5E1'}
-            />
-          </div>
-        )}
+        {/* 왼쪽 - 이미지 꽉 채우기 */}
+        <div onClick={async e => {
+          e.stopPropagation()
+          if (!db) return
+          if ((db.related_product_ids?.length ?? 0) > 0) {
+            const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
+            if (data) setSelProduct(data)
+            return
+          }
+          setDetailItem(db)
+          if ((db.related_business_ids?.length ?? 0) > 0) {
+            const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
+            setDetailBizCards(data ?? [])
+          } else setDetailBizCards([])
+        }} style={{
+          width:80, flexShrink:0, cursor: db ? 'pointer' : 'default',
+          background:'#f0f0f0', overflow:'hidden',
+          display:'flex', alignItems:'center', justifyContent:'center',
+        }}>
+          {db?.image_url
+            ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+            : <Icon icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'} width={28} height={28} color={isAchieved ? '#78716C' : '#CBD5E1'} />
+          }
+        </div>
 
         {/* 가운데 - 제목 + 설명 + 뱃지 */}
-        <div style={{ flex:1, display:'flex', flexDirection:'column', gap:3, minWidth:0, justifyContent:'center' }}>
+        <div style={{ flex:1, display:'flex', flexDirection:'column', gap:3, minWidth:0, justifyContent:'center', padding:'10px 8px 10px 12px' }}>
           <span style={{
             fontSize:14, fontWeight: isAchieved ? 700 : 500,
             color: isAchieved ? '#0F172A' : '#475569',
@@ -417,7 +407,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         </div>
 
         {/* 오른쪽 - 완료 배지 + 삭제 */}
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, gap:6, paddingTop:2, paddingBottom:2 }}>
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, gap:6, padding:'10px 12px 10px 0' }}>
           {/* 완료 배지 */}
           <div onClick={() => toggleAchieved(item.id, day)} style={{
             display:'flex', alignItems:'center', gap:3,
