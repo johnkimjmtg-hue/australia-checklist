@@ -1,8 +1,8 @@
 import { AppState, TripInfo, getTripDays, fmtMD, dow } from '../store/state'
-import { ITEMS } from '../data/checklist'
 import { Icon } from '@iconify/react'
 
-type Props = { state: AppState; trip: TripInfo; achieved: Record<string,boolean> }
+type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null; image_url?: string | null; tips?: string | null; related_product_ids?: string[] | null }
+type Props = { state: AppState; trip: TripInfo; achieved: Record<string,boolean>; dbItems?: DBItem[] }
 
 /* 아이템별 단색 아이콘 — BucketCheckView와 동일 */
 const ITEM_ICONS: Record<string, string> = {
@@ -80,8 +80,14 @@ function CoinStack({ count, total }: { count:number; total:number }) {
   )
 }
 
-export default function BucketSharePaper({ state, trip, achieved }: Props) {
-  const allItems      = [...ITEMS, ...state.customItems.map(c => ({ ...c, categoryId: c.categoryId ?? 'custom' }))]
+export default function BucketSharePaper({ state, trip, achieved, dbItems = [] }: Props) {
+  const dbItemsAsCheckItems = dbItems.map(i => ({
+    id: i.id,
+    categoryId: i.category_id,
+    label: i.label,
+    emoji: '📌',
+  }))
+  const allItems      = [...dbItemsAsCheckItems, ...state.customItems.map(c => ({ ...c, categoryId: c.categoryId ?? 'custom' }))]
   const checkedItems  = allItems.filter(i => state.selected[i.id])
   const tripDays      = getTripDays(trip)
 

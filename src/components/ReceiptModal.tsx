@@ -8,13 +8,14 @@ type Props = {
   trip: TripInfo
   issuedAt: string
   achieved: Record<string,boolean>
+  dbItems?: any[]
   onClose: () => void
   onReset: () => void
 }
 
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
 
-export default function ReceiptModal({ state, trip, issuedAt, achieved, onClose, onReset }: Props) {
+export default function ReceiptModal({ state, trip, issuedAt, achieved, dbItems, onClose, onReset }: Props) {
   const [saving, setSaving]   = useState(false)
   const [sharing, setSharing] = useState(false)
 
@@ -31,7 +32,7 @@ export default function ReceiptModal({ state, trip, issuedAt, achieved, onClose,
           boxShadow:'0 2px 8px rgba(27,110,243,0.12)',
         }}>✕</button>
         <div style={{ animation:'fadeInUp 0.3s ease' }}>
-          <BucketSharePaper state={state} trip={trip} achieved={achieved} />
+          <BucketSharePaper state={state} trip={trip} achieved={achieved} dbItems={dbItems} />
         </div>
       </div>
 

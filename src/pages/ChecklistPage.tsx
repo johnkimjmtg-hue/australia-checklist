@@ -334,7 +334,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         />
         {showReceipt && trip && (
           <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
-            achieved={achieved}
+            achieved={achieved} dbItems={dbItems}
             onClose={() => setShowReceipt(false)} onReset={() => { setShowReceipt(false); doReset() }} />
         )}
       </>
@@ -922,7 +922,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
       {showReceipt && trip && (
         <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
-          achieved={achieved}
+          achieved={achieved} dbItems={dbItems}
           onClose={() => setShowReceipt(false)} onReset={() => setModal('confirmReset')} />
       )}
 
