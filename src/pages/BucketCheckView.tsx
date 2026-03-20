@@ -346,11 +346,11 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                 setDetailBizCards(data ?? [])
               } else setDetailBizCards([])
             }}
-            style={{ width:60, height:60, borderRadius:'50%', objectFit:'cover', flexShrink:0, cursor:'pointer', border:'1px solid #E2E8F0', alignSelf:'center' }}
+            style={{ width:60, height:60, borderRadius:10, objectFit:'cover', flexShrink:0, cursor:'pointer', border:'1px solid #E2E8F0', alignSelf:'center' }}
           />
         ) : (
           <div style={{
-            width:60, height:60, borderRadius:'50%', flexShrink:0,
+            width:60, height:60, borderRadius:10, flexShrink:0,
             background:'#f0f0f0', border:'1px solid #E2E8F0',
             display:'flex', alignItems:'center', justifyContent:'center', alignSelf:'center',
           }}>
