@@ -595,49 +595,48 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               const allCats = customCat ? [...nonCustomCats, customCat] : nonCustomCats
               return (
                 <>
-                  {/* 검색창 슬라이드 */}
-                  {showSearch && (
-                    <div style={{ padding:'0 16px 8px', display:'flex', alignItems:'center', gap:8 }}>
-                      <div style={{
-                        flex:1, display:'flex', alignItems:'center', gap:8,
-                        background:'#fff', borderRadius:10, padding:'0 12px',
-                        border:'1px solid #C8C8C8', height:38,
-                        boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
-                      }}>
-                        <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
-                        <input
-                          autoFocus
-                          value={searchQuery}
-                          onChange={e => setSearchQuery(e.target.value)}
-                          placeholder="제목, 내용, 위치 검색"
-                          style={{ flex:1, border:'none', outline:'none', fontSize:14, color:'#1E293B', background:'transparent' }}
-                        />
-                        {searchQuery && (
-                          <button onClick={() => setSearchQuery('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex', alignItems:'center' }}>
-                            <Icon icon="ph:x" width={14} height={14} color="#94A3B8" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )}
+
                   <div style={{ display:'flex', alignItems:'center' }}>
                     {/* 카테고리 스크롤 (검색 버튼 포함) */}
                     <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'8px 16px 10px', overflowX:'auto', flex:1, alignItems:'center' }}>
                       {/* 검색 버튼 */}
                       <button className="chip-btn" onClick={() => { setShowSearch(v => !v); if (showSearch) setSearchQuery('') }} style={{
                         height:36, padding:'0 12px', borderRadius:8, border:'none',
-                        background: showSearch ? '#e6a800' : '#FFCD00',
-                        cursor:'pointer', color:'#fff',
+                        background:'#e8e8e8', cursor:'pointer',
+                        color: showSearch ? '#FFCD00' : '#64748B',
                         fontSize:12, fontWeight:700,
                         display:'flex', alignItems:'center', gap:5, flexShrink:0,
                         boxShadow: showSearch
-                          ? 'inset 3px 3px 6px #c5a800, inset -3px -3px 6px #ffe033'
+                          ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
                           : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                         WebkitTapHighlightColor:'transparent',
                       }}>
-                        <Icon icon="ph:magnifying-glass" width={14} height={14} color="#fff" />
+                        <Icon icon="ph:magnifying-glass" width={14} height={14} color={showSearch ? '#FFCD00' : '#64748B'} />
                         검색
                       </button>
+                      {/* 검색창 - 인라인으로 카테고리 밀기 */}
+                      {showSearch && (
+                        <div style={{
+                          display:'flex', alignItems:'center', gap:6,
+                          background:'#fff', borderRadius:8, padding:'0 10px',
+                          height:36, flexShrink:0, width:160,
+                          border:'1px solid #C8C8C8',
+                          boxShadow:'inset 1px 1px 3px #d0d0d0',
+                        }}>
+                          <input
+                            autoFocus
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            placeholder="검색"
+                            style={{ flex:1, border:'none', outline:'none', fontSize:13, color:'#1E293B', background:'transparent', minWidth:0 }}
+                          />
+                          {searchQuery && (
+                            <button onClick={() => setSearchQuery('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex', alignItems:'center', flexShrink:0 }}>
+                              <Icon icon="ph:x" width={13} height={13} color="#94A3B8" />
+                            </button>
+                          )}
+                        </div>
+                      )}
                   {allCats.map(cat => {
                     const isActive = activeCategory === cat.id
                     const catDone  = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id]).length
