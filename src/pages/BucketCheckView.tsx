@@ -360,50 +360,48 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             lineHeight:1.4,
             display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden',
           }}>{item.label}</span>
-          {(db?.description || hasDetail) && (
-            <div style={{ position:'relative' }}>
-              <span style={{
-                fontSize:11, color:'#94A3B8', fontWeight:400, lineHeight:1.5,
-                display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
-                overflow:'hidden',
-              }}>
-                {db?.description ?? ''}
-                {hasDetail && (
-                  <button
-                    onClick={async e => {
-                      e.stopPropagation()
-                      if (!db) return
-                      if ((db.related_product_ids?.length ?? 0) > 0) {
-                        const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
-                        if (data) setSelProduct(data)
-                        return
-                      }
-                      setDetailItem(db)
-                      if ((db.related_business_ids?.length ?? 0) > 0) {
-                        const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
-                        setDetailBizCards(data ?? [])
-                      } else setDetailBizCards([])
-                    }}
-                    style={{
-                      fontSize:11, fontWeight:700, color:'#1B6EF3',
-                      background:'none', border:'none',
-                      cursor:'pointer', padding:'0 0 0 2px',
-                      display:'inline',
-                    }}>
-                    더보기 ›
-                  </button>
-                )}
-                {region && (
-                  <span style={{
-                    fontSize:11, fontWeight:600, color:'#64748B',
-                    display:'inline-flex', alignItems:'center', gap:2,
-                    marginLeft:4,
-                  }}>
-                    <Icon icon="ph:map-pin-fill" width={10} height={10} color="#EF4444" />
-                    {region.label}
-                  </span>
-                )}
-              </span>
+          {db?.description && (
+            <span style={{
+              fontSize:11, color:'#94A3B8', fontWeight:400, lineHeight:1.5,
+              overflow:'hidden', textOverflow:'ellipsis',
+              display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical',
+            }}>{db.description}</span>
+          )}
+
+          {hasDetail && (
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:4 }}>
+              <button
+                onClick={async e => {
+                  e.stopPropagation()
+                  if (!db) return
+                  if ((db.related_product_ids?.length ?? 0) > 0) {
+                    const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
+                    if (data) setSelProduct(data)
+                    return
+                  }
+                  setDetailItem(db)
+                  if ((db.related_business_ids?.length ?? 0) > 0) {
+                    const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
+                    setDetailBizCards(data ?? [])
+                  } else setDetailBizCards([])
+                }}
+                style={{
+                  fontSize:11, fontWeight:600, color:'#1B6EF3',
+                  background:'#fff', border:'1px solid #C8C8C8',
+                  borderRadius:20, cursor:'pointer', padding:'3px 10px',
+                  flexShrink:0,
+                }}>
+                자세히 알아보기›
+              </button>
+              {region ? (
+                <span style={{
+                  fontSize:11, fontWeight:600, color:'#64748B',
+                  display:'flex', alignItems:'center', gap:3,
+                }}>
+                  <Icon icon="ph:map-pin-fill" width={11} height={11} color="#EF4444" />
+                  {region.label}
+                </span>
+              ) : <span />}
             </div>
           )}
         </div>
