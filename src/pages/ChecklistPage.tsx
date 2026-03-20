@@ -68,6 +68,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [scheduleSelectedItem, setScheduleSelectedItem] = useState<string|null>(null)
   const [scrollTrigger, setScrollTrigger] = useState(0)
   const [logoTapCount, setLogoTapCount] = useState(0)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearch, setShowSearch] = useState(false)
   const logoTapTimer = useRef<any>(null)
 
   const [bizCount, setBizCount] = useState(0)
@@ -187,6 +189,20 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     : (CATEGORIES[0]?.id ?? 'cafe')
   const allItems = [...ITEMS, ...state.customItems.map(c => ({ ...c, emoji:'📝' }))]
   const catItems = allItems.filter(i => i.categoryId === activeCategory)
+
+  // 검색 필터링 — 검색어 있으면 전체 항목에서 제목/설명/주소 검색
+  const searchResults = searchQuery.trim()
+    ? allItems.filter(i => {
+        const q = searchQuery.trim().toLowerCase()
+        const db = dbItems.find(d => d.id === i.id)
+        return (
+          i.label.toLowerCase().includes(q) ||
+          (db?.description ?? '').toLowerCase().includes(q) ||
+          (db?.address ?? '').toLowerCase().includes(q) ||
+          (db?.tips ?? '').toLowerCase().includes(q)
+        )
+      })
+    : null
   const done  = Object.keys(state.selected).length
   const total = allItems.length
   const unscheduledCount = Object.keys(state.selected).filter(id => !(state.schedules[id]?.length)).length
@@ -578,7 +594,52 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               const customCat = CATEGORIES.find(c => c.id === 'custom')
               const allCats = customCat ? [...nonCustomCats, customCat] : nonCustomCats
               return (
-                <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'8px 16px 10px' }}>
+                <>
+                  {/* 검색창 슬라이드 */}
+                  {showSearch && (
+                    <div style={{ padding:'0 16px 8px', display:'flex', alignItems:'center', gap:8 }}>
+                      <div style={{
+                        flex:1, display:'flex', alignItems:'center', gap:8,
+                        background:'#fff', borderRadius:10, padding:'0 12px',
+                        border:'1px solid #C8C8C8', height:38,
+                        boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
+                      }}>
+                        <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
+                        <input
+                          autoFocus
+                          value={searchQuery}
+                          onChange={e => setSearchQuery(e.target.value)}
+                          placeholder="제목, 내용, 위치 검색"
+                          style={{ flex:1, border:'none', outline:'none', fontSize:14, color:'#1E293B', background:'transparent' }}
+                        />
+                        {searchQuery && (
+                          <button onClick={() => setSearchQuery('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex', alignItems:'center' }}>
+                            <Icon icon="ph:x" width={14} height={14} color="#94A3B8" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <div style={{ display:'flex', alignItems:'center' }}>
+                    {/* 검색 버튼 고정 */}
+                    <div style={{ paddingLeft:16, paddingTop:8, paddingBottom:10, flexShrink:0 }}>
+                      <button className="chip-btn" onClick={() => { setShowSearch(v => !v); if (showSearch) setSearchQuery('') }} style={{
+                        height:36, padding:'0 12px', borderRadius:8, border:'none',
+                        background:'#e8e8e8', cursor:'pointer',
+                        color: showSearch ? '#1B6EF3' : '#64748B',
+                        fontSize:12, fontWeight: showSearch ? 700 : 500,
+                        display:'flex', alignItems:'center', gap:5, flexShrink:0,
+                        boxShadow: showSearch
+                          ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                          : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                        WebkitTapHighlightColor:'transparent',
+                      }}>
+                        <Icon icon="ph:magnifying-glass" width={14} height={14} color={showSearch ? '#1B6EF3' : '#64748B'} />
+                        검색
+                      </button>
+                    </div>
+                    {/* 카테고리 스크롤 */}
+                    <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'8px 16px 10px', overflowX:'auto', flex:1 }}>
                   {allCats.map(cat => {
                     const isActive = activeCategory === cat.id
                     const catDone  = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id]).length
@@ -613,6 +674,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     )
                   })}
                 </div>
+              </div>
+                </>
               )
             })()}
           </div>
@@ -656,7 +719,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
             {/* Items list — card style */}
             <div style={{ display:'flex', flexDirection:'column', gap:8, padding:'0 16px 106px' }}>
-              {catItems.map(item => {
+              {searchResults !== null && searchResults.length === 0 && (
+                <div style={{ textAlign:'center', padding:'40px 0', color:'#94A3B8', fontSize:14 }}>
+                  검색 결과가 없어요
+                </div>
+              )}
+              {(searchResults ?? catItems).map(item => {
                 const checked  = !!state.selected[item.id]
                 const dayCount = (state.schedules[item.id] ?? []).length
                 const needsSch = checked && dayCount===0
