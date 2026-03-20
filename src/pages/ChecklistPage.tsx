@@ -622,7 +622,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   )}
                   <div style={{ display:'flex', alignItems:'center' }}>
                     {/* 검색 버튼 고정 */}
-                    <div style={{ paddingLeft:16, paddingTop:8, paddingBottom:10, flexShrink:0 }}>
+                    <div style={{ padding:'8px 0 10px 16px', flexShrink:0 }}>
                       <button className="chip-btn" onClick={() => { setShowSearch(v => !v); if (showSearch) setSearchQuery('') }} style={{
                         height:36, padding:'0 12px', borderRadius:8, border:'none',
                         background:'#e8e8e8', cursor:'pointer',
@@ -639,7 +639,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       </button>
                     </div>
                     {/* 카테고리 스크롤 */}
-                    <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'8px 16px 10px', overflowX:'auto', flex:1 }}>
+                    <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'8px 16px 10px 6px', overflowX:'auto', flex:1 }}>
                   {allCats.map(cat => {
                     const isActive = activeCategory === cat.id
                     const catDone  = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id]).length
