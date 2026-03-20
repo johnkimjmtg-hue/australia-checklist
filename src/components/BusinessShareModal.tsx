@@ -1,15 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { Business } from '../lib/businessService'
 
 type Props = { business: Business; onClose: () => void }
 
 const ff = '-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif'
-const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
 
 export default function BusinessShareModal({ business, onClose }: Props) {
   const [saving, setSaving]   = useState(false)
   const [sharing, setSharing] = useState(false)
+  const [ready, setReady]     = useState(false)
+  const blobRef = useRef<Blob | null>(null)
 
   const { name, description, phone, website, kakao, address, city, is_featured, tags } = business
   const fullAddress = [address, city].filter(Boolean).join(', ')
@@ -32,10 +33,19 @@ export default function BusinessShareModal({ business, onClose }: Props) {
     return blob
   }
 
+  // 모달 열리면 미리 캡처
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const blob = await capture()
+      blobRef.current = blob
+      setReady(true)
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [])
+
   const handleSave = async () => {
-    if (isIOS()) { handleShare(); return }
     setSaving(true)
-    const blob = await capture()
+    const blob = blobRef.current ?? await capture()
     if (blob) {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -45,15 +55,21 @@ export default function BusinessShareModal({ business, onClose }: Props) {
   }
 
   const handleShare = async () => {
+    if (!blobRef.current) return
     setSharing(true)
-    const blob = await capture()
-    if (blob) {
-      try {
-        await navigator.share({ files: [new File([blob], `${name}.png`, { type: 'image/png' })] })
-      } catch {
-        alert('공유가 지원되지 않는 환경입니다.\n이미지를 저장 후 직접 공유해주세요.')
+    try {
+      const file = new File([blobRef.current], `${name}.png`, { type: 'image/png' })
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          text: `호주 여행정보 사이트 👉 https://hojugaja.com`,
+        })
+      } else if (navigator.share) {
+        await navigator.share({ title: name, url: 'https://hojugaja.com' })
+      } else {
+        await handleSave()
       }
-    }
+    } catch {}
     setSharing(false)
   }
 
@@ -142,7 +158,9 @@ export default function BusinessShareModal({ business, onClose }: Props) {
           <div style={{ background:'linear-gradient(135deg, #1B6EF3, #1565C0)', borderRadius:14, padding:'12px 18px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
             <div>
               <div style={{ fontSize:12, fontWeight:800, color:'#fff', letterSpacing:-0.3 }}>호주가자</div>
-              <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginTop:2 }}>여행 버킷리스트 🦘</div>
+              <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginTop:2, display:'flex', alignItems:'center', gap:4 }}>
+                호주 여행 정보 사이트 <Icon icon="mdi:kangaroo" width={13} height={13} color="#fff" />
+              </div>
             </div>
             <div style={{ textAlign:'right' }}>
               <div style={{ fontSize:11, fontWeight:700, color:'#FFCD00' }}>www.hojugaja.com</div>
@@ -161,18 +179,20 @@ export default function BusinessShareModal({ business, onClose }: Props) {
         borderTop:'1.5px solid #D1D9E3', boxShadow:'0 -4px 16px rgba(0,0,0,0.08)',
         display:'flex', gap:8, zIndex:2,
       }}>
-        <button onClick={handleSave} disabled={saving || sharing} style={{
-          flex:1, height:46, borderRadius:12, cursor:'pointer',
+        <button onClick={handleSave} disabled={saving || sharing || !ready} style={{
+          flex:1, height:46, borderRadius:12, cursor: ready ? 'pointer' : 'default',
           border:'1.5px solid #D1D9E3', background:'#fff',
           fontWeight:700, fontSize:13, color:'#1B6EF3', fontFamily:ff,
           boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
-        }}>{saving ? '저장 중...' : '이미지 저장'}</button>
-        <button onClick={handleShare} disabled={saving || sharing} style={{
-          flex:1, height:46, borderRadius:12, cursor:'pointer',
+          opacity: ready ? 1 : 0.5,
+        }}>{saving ? '저장 중...' : !ready ? '준비 중...' : '이미지 저장'}</button>
+        <button onClick={handleShare} disabled={saving || sharing || !ready} style={{
+          flex:1, height:46, borderRadius:12, cursor: ready ? 'pointer' : 'default',
           border:'none', background:'linear-gradient(160deg,#4B8EF5,#1B6EF3)',
           fontWeight:700, fontSize:13, color:'#fff', fontFamily:ff,
           boxShadow:'0 4px 14px rgba(27,110,243,0.35)',
-        }}>{sharing ? '공유 중...' : '공유하기'}</button>
+          opacity: ready ? 1 : 0.5,
+        }}>{sharing ? '공유 중...' : !ready ? '준비 중...' : '공유하기'}</button>
       </div>
     </div>
   )
