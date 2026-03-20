@@ -90,27 +90,16 @@ export default function BusinessShareModal({ business, onClose }: Props) {
 
         {/* ── 공유 카드 ── */}
         <div id="business-share-card" style={{
-          width:320, background:'#E8EDF3', padding:'12px',
+          width:320, background:'#e8e8e8', padding:'12px',
           borderRadius:20, fontFamily:ff,
         }}>
 
           {/* 업체 정보 카드 */}
-          <div style={{ background:'#fff', borderRadius:14, overflow:'hidden', marginBottom:8, boxShadow:'0 4px 16px rgba(0,0,0,0.10)', border:'1px solid #E2E8F0', borderLeft:'4px solid #1B6EF3' }}>
+          <div style={{ background:'#fff', borderRadius:14, overflow:'hidden', marginBottom:8, boxShadow:'0 2px 12px rgba(0,0,0,0.08)', borderLeft:'4px solid #1B6EF3' }}>
 
-            {/* 업체명 헤더 */}
-            <div style={{ padding:'18px 18px 14px', borderBottom:'1.5px solid #F1F5F9' }}>
-              <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom: fullAddress ? 6 : 0 }}>
-                <div style={{ fontSize:20, fontWeight:900, color:'#0F172A', flex:1, lineHeight:1.2 }}>{name}</div>
-                {is_featured && (
-                  <div style={{ background:'#1B6EF3', color:'#FFCD00', fontSize:10, fontWeight:800, borderRadius:20, padding:'4px 10px', flexShrink:0, marginLeft:8, marginTop:2 }}>추천</div>
-                )}
-              </div>
-              {fullAddress && (
-                <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom: tags?.length ? 10 : 0 }}>
-                  <Icon icon="ph:map-pin-simple" width={13} height={13} color="#94A3B8" />
-                  <span style={{ fontSize:12, color:'#64748B', fontWeight:500 }}>{fullAddress}</span>
-                </div>
-              )}
+            {/* 업체명 + 태그 */}
+            <div style={{ padding:'16px 16px 12px', borderBottom:'1px solid #F1F5F9' }}>
+              <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', lineHeight:1.3, marginBottom:8 }}>{name}</div>
               {tags && tags.length > 0 && (
                 <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
                   {tags.map(tag => (
@@ -121,33 +110,33 @@ export default function BusinessShareModal({ business, onClose }: Props) {
             </div>
 
             {/* 설명 + 연락처 */}
-            <div style={{ padding:'14px 18px' }}>
+            <div style={{ padding:'12px 16px' }}>
               {description && (
                 <div style={{ fontSize:12, color:'#475569', lineHeight:1.7, marginBottom:12 }}>{description}</div>
               )}
-              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              <div style={{ display:'flex', flexDirection:'column', gap:7 }}>
+                {fullAddress && (
+                  <div style={{ display:'flex', alignItems:'flex-start', gap:8 }}>
+                    <Icon icon="ph:map-pin-simple" width={14} height={14} color="#94A3B8" style={{ flexShrink:0, marginTop:2 }} />
+                    <span style={{ fontSize:12, color:'#475569', lineHeight:1.5 }}>{fullAddress}</span>
+                  </div>
+                )}
                 {phone && (
-                  <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ width:26, height:26, borderRadius:7, background:'#E8EDF3', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                      <Icon icon="ph:phone" width={13} height={13} color="#64748B" />
-                    </div>
-                    <span style={{ fontSize:13, color:'#1E293B', fontWeight:600 }}>{phone}</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <Icon icon="ph:phone" width={14} height={14} color="#94A3B8" />
+                    <span style={{ fontSize:12, color:'#1E293B', fontWeight:600 }}>{phone}</span>
                   </div>
                 )}
                 {kakao && (
-                  <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ width:26, height:26, borderRadius:7, background:'#E8EDF3', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                      <Icon icon="ph:chat-circle" width={13} height={13} color="#64748B" />
-                    </div>
-                    <span style={{ fontSize:13, color:'#1E293B', fontWeight:600 }}>카카오톡: {kakao}</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <Icon icon="ph:chat-circle" width={14} height={14} color="#94A3B8" />
+                    <span style={{ fontSize:12, color:'#1E293B', fontWeight:600 }}>카카오톡: {kakao}</span>
                   </div>
                 )}
                 {website && (
-                  <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ width:26, height:26, borderRadius:7, background:'#E8EDF3', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                      <Icon icon="ph:globe" width={13} height={13} color="#64748B" />
-                    </div>
-                    <span style={{ fontSize:13, color:'#1B6EF3', fontWeight:600 }}>{website}</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <Icon icon="ph:globe" width={14} height={14} color="#94A3B8" />
+                    <span style={{ fontSize:12, color:'#1B6EF3', fontWeight:600 }}>{website}</span>
                   </div>
                 )}
               </div>
