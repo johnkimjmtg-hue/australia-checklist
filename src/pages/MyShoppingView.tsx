@@ -703,7 +703,7 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:390, padding:'10px 14px 26px',
-        background:'rgba(232,237,243,0.97)', backdropFilter:'blur(12px)',
+        background:'#e8e8e8',
         borderTop:'1.5px solid #D1D9E3', boxShadow:'0 -4px 16px rgba(0,0,0,0.08)',
         display:'flex', gap:8, zIndex:2,
       }}>

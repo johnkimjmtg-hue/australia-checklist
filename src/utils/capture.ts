@@ -21,7 +21,7 @@ export async function downloadPng() {
   const blob: Blob = await new Promise(res => canvas.toBlob((b: Blob) => res(b), 'image/png'))
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
-  a.href = url; a.download = `korea-receipt_${fmtCompact(new Date())}.png`
+  a.href = url; a.download = `호주버킷리스트.png`
   a.click(); URL.revokeObjectURL(url)
 }
 
@@ -36,7 +36,7 @@ export async function sharePng(): Promise<boolean> {
   (el as HTMLElement).style.borderRadius = prevRadius
   const blob: Blob = await new Promise(res => canvas.toBlob((b: Blob) => res(b), 'image/png'))
   try {
-    await navigator.share({ files: [new File([blob], 'korea-receipt.png', { type: 'image/png' })] })
+    await navigator.share({ files: [new File([blob], '호주버킷리스트.png', { type: 'image/png' })] })
     return true
   } catch { return false }
 }
@@ -44,7 +44,7 @@ export async function sharePng(): Promise<boolean> {
 export async function shareBlobDirect(blob: Blob): Promise<boolean> {
   if (!navigator.share) return false
   try {
-    await navigator.share({ files: [new File([blob], 'korea-receipt.png', { type: 'image/png' })] })
+    await navigator.share({ files: [new File([blob], '호주버킷리스트.png', { type: 'image/png' })] })
     return true
   } catch { return false }
 }
