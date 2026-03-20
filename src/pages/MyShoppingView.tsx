@@ -20,13 +20,24 @@ interface Product {
 const PRICE_LABEL: Record<string, string> = { '$': '저렴', '$$': '보통', '$$$': '프리미엄' }
 const PRICE_COLOR: Record<string, string> = { '$': '#16A34A', '$$': '#D97706', '$$$': '#7C3AED' }
 const TAG_COLOR: Record<string, { bg: string; color: string }> = {
-  '인기':    { bg: '#FEF3C7', color: '#D97706' },
-  '강추':    { bg: '#DCFCE7', color: '#16A34A' },
-  '필수템':  { bg: '#FEE2E2', color: '#DC2626' },
-  '선물용':  { bg: '#EDE9FE', color: '#7C3AED' },
-  '프리미엄':{ bg: '#F0F9FF', color: '#0369A1' },
-  '체험':    { bg: '#FFF7ED', color: '#C2410C' },
-  '기념':    { bg: '#F0FDF4', color: '#15803D' },
+  '인기':          { bg: '#FEF3C7', color: '#D97706' },
+  '강추':          { bg: '#DCFCE7', color: '#16A34A' },
+  '필수템':        { bg: '#FEE2E2', color: '#DC2626' },
+  '선물용':        { bg: '#EDE9FE', color: '#7C3AED' },
+  '선물':          { bg: '#EDE9FE', color: '#7C3AED' },
+  '프리미엄':      { bg: '#F0F9FF', color: '#0369A1' },
+  '체험':          { bg: '#FFF7ED', color: '#C2410C' },
+  '기념':          { bg: '#F0FDF4', color: '#15803D' },
+  '가성비':        { bg: '#FFF1F2', color: '#E11D48' },
+  '안사면 후회':   { bg: '#FFF7ED', color: '#EA580C' },
+  '없어서 못삼':   { bg: '#FDF4FF', color: '#A21CAF' },
+  '한국보다 저렴': { bg: '#F0FDF4', color: '#15803D' },
+  '호주 한정':     { bg: '#EFF6FF', color: '#1D4ED8' },
+  '약국 인기':     { bg: '#ECFDF5', color: '#059669' },
+  '마트 필수':     { bg: '#FFFBEB', color: '#B45309' },
+  '현지인 추천':   { bg: '#FFF1F2', color: '#BE123C' },
+  '유아동':        { bg: '#F0F9FF', color: '#0284C7' },
+  '건강식품':      { bg: '#F0FDF4', color: '#16A34A' },
 }
 
 // ── Props
