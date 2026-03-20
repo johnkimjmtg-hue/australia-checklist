@@ -1059,7 +1059,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:390,
             background:'#e8e8e8', borderRadius:'20px 20px 0 0',
-            maxHeight:'88vh', overflowY:'auto',
+            maxHeight:'85vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease',
           }}>
             {/* 핸들 */}
