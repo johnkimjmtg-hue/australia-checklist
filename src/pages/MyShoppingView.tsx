@@ -590,7 +590,7 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
     if (blob) {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
-      a.href = url; a.download = '내쇼핑리스트.png'; a.click(); URL.revokeObjectURL(url)
+      a.href = url; a.download = '호주쇼핑리스트.png'; a.click(); URL.revokeObjectURL(url)
     }
     setSaving(false)
   }
@@ -599,7 +599,7 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
     if (!blobRef.current) return
     setSharing(true)
     try {
-      const file = new File([blobRef.current], '내쇼핑리스트.png', { type: 'image/png' })
+      const file = new File([blobRef.current], '호주쇼핑리스트.png', { type: 'image/png' })
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], text: '호주 여행정보 사이트 👉 https://hojugaja.com/app?tab=shopping' })
       } else if (navigator.share) {
@@ -674,7 +674,7 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
                   </div>
                   {/* 텍스트 */}
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:12, fontWeight:600, color: done ? '#94A3B8' : '#0F172A', textDecoration: done ? 'line-through' : 'none', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
+                    <div style={{ fontSize:12, fontWeight:600, color: done ? '#94A3B8' : '#0F172A', textDecoration: done ? 'line-through' : 'none', lineHeight:1.4 }}>{p.name}</div>
                     <div style={{ fontSize:10, color: PRICE_COLOR_R[p.price_range] ?? '#475569', fontWeight:700 }}>{p.price_range} · {PRICE_LABEL_R[p.price_range]}</div>
                   </div>
                   {done && <span style={{ fontSize:9, fontWeight:700, color:'#FF6B9D', background:'#fff0f5', padding:'2px 6px', borderRadius:4, flexShrink:0 }}>구매✓</span>}
