@@ -621,25 +621,23 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     </div>
                   )}
                   <div style={{ display:'flex', alignItems:'center' }}>
-                    {/* 검색 버튼 고정 */}
-                    <div style={{ padding:'8px 0 10px 16px', flexShrink:0 }}>
+                    {/* 카테고리 스크롤 (검색 버튼 포함) */}
+                    <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'8px 16px 10px', overflowX:'auto', flex:1 }}>
+                      {/* 검색 버튼 */}
                       <button className="chip-btn" onClick={() => { setShowSearch(v => !v); if (showSearch) setSearchQuery('') }} style={{
                         height:36, padding:'0 12px', borderRadius:8, border:'none',
-                        background:'#e8e8e8', cursor:'pointer',
-                        color: showSearch ? '#1B6EF3' : '#64748B',
-                        fontSize:12, fontWeight: showSearch ? 700 : 500,
+                        background: showSearch ? '#e6a800' : '#FFCD00',
+                        cursor:'pointer', color:'#fff',
+                        fontSize:12, fontWeight:700,
                         display:'flex', alignItems:'center', gap:5, flexShrink:0,
                         boxShadow: showSearch
-                          ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                          ? 'inset 3px 3px 6px #c5a800, inset -3px -3px 6px #ffe033'
                           : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                         WebkitTapHighlightColor:'transparent',
                       }}>
-                        <Icon icon="ph:magnifying-glass" width={14} height={14} color={showSearch ? '#1B6EF3' : '#64748B'} />
+                        <Icon icon="ph:magnifying-glass" width={14} height={14} color="#fff" />
                         검색
                       </button>
-                    </div>
-                    {/* 카테고리 스크롤 */}
-                    <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'8px 16px 10px 6px', overflowX:'auto', flex:1 }}>
                   {allCats.map(cat => {
                     const isActive = activeCategory === cat.id
                     const catDone  = allItems.filter(i => i.categoryId===cat.id && state.selected[i.id]).length
