@@ -95,7 +95,7 @@ export default function BusinessShareModal({ business, onClose }: Props) {
         }}>
 
           {/* 업체 정보 카드 */}
-          <div style={{ background:'#fff', borderRadius:14, overflow:'hidden', marginBottom:8, boxShadow:'0 2px 12px rgba(0,0,0,0.08)', borderLeft:'4px solid #1B6EF3' }}>
+          <div style={{ background:'#fff', borderRadius:14, overflow:'hidden', marginBottom:8, boxShadow:'0 2px 12px rgba(0,0,0,0.08)' }}>
 
             {/* 업체명 + 태그 */}
             <div style={{ padding:'16px 16px 12px', borderBottom:'1px solid #F1F5F9' }}>
