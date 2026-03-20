@@ -594,7 +594,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               const customCat = CATEGORIES.find(c => c.id === 'custom')
               const allCats = customCat ? [...nonCustomCats, customCat] : nonCustomCats
               return (
-                <>
+                <div>
 
                   <div style={{ display:'flex', alignItems:'center' }}>
                     {/* 카테고리 스크롤 (검색 버튼 포함) */}
@@ -673,7 +673,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   })}
                 </div>
               </div>
-                </>
+                </div>
               )
             })()}
           </div>
