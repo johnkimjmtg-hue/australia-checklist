@@ -717,11 +717,11 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
                   <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8, marginBottom:8 }}>
                     📢 호주 현지 업체 등록은 <strong>무료</strong>이며,<br/>
                     등록된 업체는 사이트 내 우선 노출됩니다.<br/>
-                    아래 <strong>업체등록신청</strong> 버튼을 이용해주세요.
+                    아래 <strong>#업체등록신청</strong> 버튼을 이용해주세요.
                   </div>
                   <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8, marginBottom:8 }}>
                     추천하고 싶은 버킷리스트 항목이 있다면<br/>
-                    아래 <strong>추천등록</strong> 버튼으로 알려주세요. 😊
+                    아래 <strong>*버킷리스트추천</strong> 버튼으로 알려주세요. 😊
                   </div>
                   <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8 }}>
                     🚀 더 많은 서비스를 준비 중입니다.<br/>
