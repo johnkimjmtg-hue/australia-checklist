@@ -233,23 +233,23 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
   const [sharedIconMap, setSharedIconMap] = useState<Record<string,string>>({})
   const [clLoading,     setClLoading]     = useState(true)
 
-  useEffect(() => {
-    const fetchCL = async () => {
-      const [{ data: cats }, { data: items }] = await Promise.all([
-        supabase.from('checklist_categories').select('*').order('sort_order'),
-        supabase.from('checklist_items').select('*').order('sort_order'),
-      ])
-      if (cats) setSharedCats(cats)
-      if (items) {
-        setSharedItems(items)
-        const iconMap: Record<string,string> = {}
-        items.forEach((i: Item) => { if (i.icon) iconMap[i.id] = i.icon })
-        setSharedIconMap(iconMap)
-      }
-      setClLoading(false)
+  const fetchCL = async () => {
+    setClLoading(true)
+    const [{ data: cats }, { data: items }] = await Promise.all([
+      supabase.from('checklist_categories').select('*').order('sort_order'),
+      supabase.from('checklist_items').select('*').order('sort_order'),
+    ])
+    if (cats) setSharedCats(cats)
+    if (items) {
+      setSharedItems(items)
+      const iconMap: Record<string,string> = {}
+      items.forEach((i: Item) => { if (i.icon) iconMap[i.id] = i.icon })
+      setSharedIconMap(iconMap)
     }
-    fetchCL()
-  }, [])
+    setClLoading(false)
+  }
+
+  useEffect(() => { fetchCL() }, [])
 
   function handleLogin() {
     if (pw === ADMIN_PASSWORD) { setAuthed(true); setPwError(false) }
@@ -290,6 +290,7 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
       fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       paddingBottom:72,
     }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       {/* 헤더 */}
       <div style={{
         background:'#1B6EF3', color:'#fff',
@@ -349,6 +350,20 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
             )}
           </button>
         ))}
+        {/* 새로고침 버튼 */}
+        <button onClick={fetchCL} disabled={clLoading} style={{
+          width:52, border:'none', background:'none', cursor:'pointer',
+          padding:'8px 2px 6px',
+          display:'flex', flexDirection:'column', alignItems:'center', gap:3,
+          color: clLoading ? '#C8C8C8' : '#16A34A',
+          borderLeft:'1px solid #E8EDF3',
+        }}>
+          <Icon icon={clLoading ? 'ph:spinner' : 'ph:arrow-clockwise'} width={22} height={22}
+            color={clLoading ? '#C8C8C8' : '#16A34A'}
+            style={clLoading ? { animation:'spin 1s linear infinite' } : {}}
+          />
+          <span style={{ fontSize:9, fontWeight:700, lineHeight:1 }}>새로고침</span>
+        </button>
       </div>
     </div>
   )
