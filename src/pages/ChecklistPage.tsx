@@ -622,7 +622,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   )}
                   <div style={{ display:'flex', alignItems:'center' }}>
                     {/* 카테고리 스크롤 (검색 버튼 포함) */}
-                    <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'8px 16px 10px', overflowX:'auto', flex:1 }}>
+                    <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'8px 16px 10px', overflowX:'auto', flex:1, alignItems:'center' }}>
                       {/* 검색 버튼 */}
                       <button className="chip-btn" onClick={() => { setShowSearch(v => !v); if (showSearch) setSearchQuery('') }} style={{
                         height:36, padding:'0 12px', borderRadius:8, border:'none',
