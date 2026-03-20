@@ -168,7 +168,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
       }}>
         {/* 찜 버튼 - 고정 */}
         {myList.length > 0 && onGoToMyList && (
-          <div style={{ paddingLeft:14, paddingTop:10, paddingBottom:10, flexShrink:0 }}>
+          <div style={{ paddingLeft:14, paddingTop:10, paddingBottom:10, flexShrink:0, display:'flex', alignItems:'center' }}>
             <button className="cat-btn" onClick={onGoToMyList} style={{
               height:34, padding:'0 12px', borderRadius:20, cursor:'pointer',
               background: '#FF6B9D', border: 'none',
