@@ -732,11 +732,11 @@ function GiftBoxProgress({ total, checkedCount }: {
   myList: string[]
   myChecked: Record<string, boolean>
 }) {
-  const displayCount = Math.min(total, 12)
+  const displayCount = Math.min(total, 16)
 
   // 고정 영역 110x110 안에서 박스 크기/레이아웃 결정
   const AREA = 110
-  const cols = displayCount === 1 ? 1 : displayCount <= 4 ? 2 : displayCount <= 9 ? 3 : 4
+  const cols = displayCount === 1 ? 1 : displayCount <= 4 ? 2 : displayCount <= 9 ? 3 : displayCount <= 16 ? 4 : 4
   const rows = Math.ceil(displayCount / cols)
   const gap = 4
   const boxSize = Math.min(
@@ -800,9 +800,9 @@ function GiftBoxProgress({ total, checkedCount }: {
           )
         })}
       </div>
-      {total > 12 && (
+      {total > 16 && (
         <div style={{ fontSize:10, color:'#5a3a5a', fontWeight:700, textAlign:'center', marginTop:2 }}>
-          +{total - 12}개
+          +{total - 16}개
         </div>
       )}
     </div>
@@ -811,9 +811,9 @@ function GiftBoxProgress({ total, checkedCount }: {
 
 // ── 공유 카드용 미니 선물박스 그리드
 function MiniGiftGrid({ total, checkedCount }: { total: number; checkedCount: number }) {
-  const displayCount = Math.min(total, 12)
+  const displayCount = Math.min(total, 16)
   const AREA = 80
-  const cols = displayCount === 1 ? 1 : displayCount <= 4 ? 2 : displayCount <= 9 ? 3 : 4
+  const cols = displayCount === 1 ? 1 : displayCount <= 4 ? 2 : displayCount <= 9 ? 3 : displayCount <= 16 ? 4 : 4
   const rows = Math.ceil(displayCount / cols)
   const gap = 3
   const boxSize = Math.min(
