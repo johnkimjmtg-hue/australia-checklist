@@ -804,7 +804,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:390,
             background:'#e8e8e8', borderRadius:'20px 20px 0 0',
-            maxHeight:'88vh', overflowY:'auto',
+            maxHeight:'85vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease',
           }}>
             <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'12px auto 0' }} />
