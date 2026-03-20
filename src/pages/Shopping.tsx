@@ -49,11 +49,12 @@ const TAG_COLOR: Record<string, { bg: string; color: string }> = {
   '건강식품':      { bg: '#F0FDF4', color: '#16A34A' },
 }
 
-export default function Shopping({ myList, myChecked, onMyListChange, onMyCheckedChange }: {
+export default function Shopping({ myList, myChecked, onMyListChange, onMyCheckedChange, onGoToMyList }: {
   myList: string[]
   myChecked: Record<string, boolean>
   onMyListChange: (next: string[]) => void
   onMyCheckedChange: (next: Record<string, boolean>) => void
+  onGoToMyList?: () => void
 }) {
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts]     = useState<Product[]>([])
@@ -163,8 +164,29 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
       <div style={{
         background:'#e8e8e8', borderBottom:'1px solid #D1D9E3',
         position:'sticky', top:0, zIndex:20,
+        display:'flex', alignItems:'center',
       }}>
-        <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto', scrollbarWidth:'thin', scrollbarColor:'#C8C8C8 #e8e8e8' }}>
+        {/* 찜 버튼 - 고정 */}
+        {myList.length > 0 && onGoToMyList && (
+          <div style={{ paddingLeft:14, paddingTop:10, paddingBottom:10, flexShrink:0 }}>
+            <button className="cat-btn" onClick={onGoToMyList} style={{
+              height:34, padding:'0 12px', borderRadius:20, cursor:'pointer',
+              background: '#FF6B9D', border: 'none',
+              color: '#fff',
+              fontSize:12, fontWeight:700, whiteSpace:'nowrap',
+              boxShadow:'0 3px 8px rgba(255,107,157,0.4)',
+              WebkitTapHighlightColor: 'transparent',
+              display:'flex', alignItems:'center', gap:5,
+            }}>
+              <svg width="14" height="14" viewBox="0 0 256 256" fill="none">
+                <path fill="#fff" d="M224,56H175.4A48,48,0,0,0,80.6,56H32A16,16,0,0,0,16,72V200a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V72A16,16,0,0,0,224,56ZM128,32a32,32,0,0,1,30.86,24H97.14A32,32,0,0,1,128,32Zm0,120a48,48,0,0,1-48-48,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0A48,48,0,0,1,128,152Z"/>
+              </svg>
+              {myList.length}
+            </button>
+          </div>
+        )}
+        {/* 카테고리 스크롤 */}
+        <div className="cat-scroll" style={{ display:'flex', gap:6, padding:'10px 14px', overflowX:'auto', flex:1, scrollbarWidth:'thin', scrollbarColor:'#C8C8C8 #e8e8e8' }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
             flexShrink:0, height:34, padding:'0 14px', borderRadius:20, cursor:'pointer',
             background: '#e8e8e8', border: 'none',
