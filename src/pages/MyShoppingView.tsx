@@ -634,19 +634,8 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
             boxShadow:'inset 3px 3px 8px #c898c8, inset -2px -2px 6px #f8d8f8',
             padding:'16px', display:'flex', alignItems:'center', gap:16,
           }}>
-            {/* 원형 프로그래스 */}
-            <div style={{ position:'relative', width:72, height:72, flexShrink:0 }}>
-              <svg width={72} height={72} viewBox="0 0 72 72" style={{ transform:'rotate(-90deg)' }}>
-                <circle cx={36} cy={36} r={30} fill="none" stroke="#c898c8" strokeWidth={7}/>
-                <circle cx={36} cy={36} r={30} fill="none" stroke="#FF6B9D" strokeWidth={7}
-                  strokeDasharray={2 * Math.PI * 30}
-                  strokeDashoffset={2 * Math.PI * 30 * (1 - pct / 100)}
-                  strokeLinecap="round"/>
-              </svg>
-              <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <span style={{ fontSize:12, fontWeight:800, color:'#2d1f2d' }}>{pct}%</span>
-              </div>
-            </div>
+            {/* 선물박스 그리드 */}
+            <MiniGiftGrid total={total} checkedCount={checkedCount} />
             <div style={{ flex:1 }}>
               <div style={{ fontSize:15, fontWeight:800, color:'#2d1f2d', marginBottom:2 }}>내 쇼핑리스트</div>
               <div style={{ fontSize:11, color:'#5a3a5a', marginBottom:4 }}>{dateStr}</div>
@@ -718,19 +707,17 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
         borderTop:'1.5px solid #D1D9E3', boxShadow:'0 -4px 16px rgba(0,0,0,0.08)',
         display:'flex', gap:8, zIndex:2,
       }}>
-        <button onClick={handleSave} disabled={saving || !ready} style={{
-          flex:1, height:46, borderRadius:12, cursor: ready ? 'pointer' : 'default',
+        <button onClick={handleSave} disabled={saving} style={{
+          flex:1, height:46, borderRadius:12, cursor:'pointer',
           border:'1.5px solid #D1D9E3', background:'#fff',
           fontWeight:700, fontSize:13, color:'#FF6B9D',
           boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
-          opacity: ready ? 1 : 0.5,
         }}>{saving ? '저장 중...' : !ready ? '준비 중...' : '이미지 저장'}</button>
-        <button onClick={handleShare} disabled={sharing || !ready} style={{
-          flex:1, height:46, borderRadius:12, cursor: ready ? 'pointer' : 'default',
+        <button onClick={handleShare} disabled={sharing} style={{
+          flex:1, height:46, borderRadius:12, cursor:'pointer',
           border:'none', background:'linear-gradient(160deg, #FF85B3, #FF6B9D)',
           fontWeight:700, fontSize:13, color:'#fff',
           boxShadow:'0 4px 14px rgba(255,107,157,0.4)',
-          opacity: ready ? 1 : 0.5,
         }}>{sharing ? '공유 중...' : !ready ? '준비 중...' : '공유하기'}</button>
       </div>
     </div>
@@ -818,6 +805,43 @@ function GiftBoxProgress({ total, checkedCount }: {
           +{total - 12}개
         </div>
       )}
+    </div>
+  )
+}
+
+// ── 공유 카드용 미니 선물박스 그리드
+function MiniGiftGrid({ total, checkedCount }: { total: number; checkedCount: number }) {
+  const displayCount = Math.min(total, 12)
+  const AREA = 80
+  const cols = displayCount === 1 ? 1 : displayCount <= 4 ? 2 : displayCount <= 9 ? 3 : 4
+  const rows = Math.ceil(displayCount / cols)
+  const gap = 3
+  const boxSize = Math.min(
+    Math.floor((AREA - gap * (cols - 1)) / cols),
+    Math.floor((AREA - gap * (rows - 1)) / rows),
+  )
+  return (
+    <div style={{ flexShrink:0, width:AREA, height:AREA, display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ display:'flex', flexWrap:'wrap', gap, width: cols * (boxSize + gap) - gap, justifyContent:'center', alignContent:'center' }}>
+        {Array.from({ length: displayCount }).map((_, i) => {
+          const filled = i < checkedCount
+          const body = filled ? '#FF6B9D' : '#c4a8c4'
+          const lid  = filled ? '#FF85B3' : '#d0b4d0'
+          const rib  = filled ? '#ffffff' : '#e8d8e8'
+          const knot = filled ? '#FF6B9D' : '#c4a8c4'
+          return (
+            <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize * 1.05)}>
+              <rect x="10" y="42" width="80" height="62" rx="5" fill={body}/>
+              <rect x="6" y="24" width="88" height="22" rx="5" fill={lid}/>
+              <rect x="43" y="24" width="14" height="80" fill={rib}/>
+              <rect x="6" y="29" width="88" height="12" fill={rib}/>
+              <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z" fill={rib}/>
+              <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z" fill={rib}/>
+              <circle cx="50" cy="19" r="7" fill={knot}/>
+            </svg>
+          )
+        })}
+      </div>
     </div>
   )
 }
