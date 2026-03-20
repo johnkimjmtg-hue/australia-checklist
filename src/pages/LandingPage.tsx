@@ -762,6 +762,65 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
               style={{ height: 72, fontSize: 12 }}>#<br/>업체등록신청</button>
           </div>
         </div>
+
+        {/* ── 메모지 ── */}
+        <div style={{ width:'100%', maxWidth:380, margin:'0 auto', marginTop:-10, paddingBottom:40 }}>
+          <svg width="100%" viewBox="0 0 380 300" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <style>{'@import url(\'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap\');'}</style>
+            </defs>
+            <g transform="rotate(-1.2, 190, 150)">
+              <rect x="6" y="12" width="368" height="278" rx="3" fill="#c8c8c0" opacity="0.4"/>
+              <rect x="2" y="8" width="368" height="278" rx="3" fill="#fffef5"/>
+              <line x1="38" y1="8" x2="38" y2="286" stroke="#f4a0a0" stroke-width="1.2"/>
+              <line x1="2"  y1="52" x2="370" y2="52"  stroke="#d0d8e8" stroke-width="0.7"/>
+              <line x1="2"  y1="80" x2="370" y2="80"  stroke="#d0d8e8" stroke-width="0.7"/>
+              <line x1="2"  y1="108" x2="370" y2="108" stroke="#d0d8e8" stroke-width="0.7"/>
+              <line x1="2"  y1="136" x2="370" y2="136" stroke="#d0d8e8" stroke-width="0.7"/>
+              <line x1="2"  y1="164" x2="370" y2="164" stroke="#d0d8e8" stroke-width="0.7"/>
+              <line x1="2"  y1="192" x2="370" y2="192" stroke="#d0d8e8" stroke-width="0.7"/>
+              <line x1="2"  y1="220" x2="370" y2="220" stroke="#d0d8e8" stroke-width="0.7"/>
+              <line x1="2"  y1="248" x2="370" y2="248" stroke="#d0d8e8" stroke-width="0.7"/>
+
+              <text x="50" y="38" font-family="'Patrick Hand', cursive" font-size="16" font-weight="700" fill="#2244aa" transform="rotate(0.3,50,38)">호주 가기 전 할 일 체크!</text>
+              <path d="M50,43 Q200,47 340,43" fill="none" stroke="#2244aa" stroke-width="1.4"/>
+
+              <rect x="44" y="59" width="12" height="12" rx="2" fill="none" stroke="#555" stroke-width="1.4" transform="rotate(-0.5,50,65)"/>
+              <path d="M45,65 L49,69 L56,60" fill="none" stroke="#1B6EF3" stroke-width="2" stroke-linecap="round"/>
+              <text x="64" y="70" font-family="'Patrick Hand', cursive" font-size="13" fill="#333" transform="rotate(0.3,64,70)">비자 신청하기</text>
+
+              <rect x="44" y="87" width="12" height="12" rx="2" fill="none" stroke="#555" stroke-width="1.4" transform="rotate(0.8,50,93)"/>
+              <path d="M45,93 L49,97 L56,88" fill="none" stroke="#1B6EF3" stroke-width="2" stroke-linecap="round"/>
+              <text x="64" y="98" font-family="'Patrick Hand', cursive" font-size="13" fill="#333" transform="rotate(-0.3,64,98)">항공권 예약</text>
+
+              <rect x="44" y="115" width="12" height="12" rx="2" fill="none" stroke="#555" stroke-width="1.4" transform="rotate(-0.7,50,121)"/>
+              <text x="64" y="126" font-family="'Patrick Hand', cursive" font-size="13" fill="#333" transform="rotate(0.5,64,126)">숙소 예약하기</text>
+
+              <rect x="44" y="143" width="12" height="12" rx="2" fill="none" stroke="#555" stroke-width="1.4" transform="rotate(0.4,50,149)"/>
+              <text x="64" y="154" font-family="'Patrick Hand', cursive" font-size="13" fill="#333" transform="rotate(-0.4,64,154)">쇼핑 리스트 작성</text>
+              <text x="224" y="154" font-family="'Patrick Hand', cursive" font-size="11" fill="#1B6EF3" transform="rotate(-0.4,224,154)">← hojugaja!</text>
+
+              <rect x="44" y="171" width="12" height="12" rx="2" fill="none" stroke="#555" stroke-width="1.4" transform="rotate(-0.6,50,177)"/>
+              <text x="64" y="182" font-family="'Patrick Hand', cursive" font-size="13" fill="#333" transform="rotate(0.6,64,182)">맛집 버킷리스트 만들기</text>
+
+              <rect x="44" y="199" width="12" height="12" rx="2" fill="none" stroke="#555" stroke-width="1.4" transform="rotate(0.5,50,205)"/>
+              <text x="64" y="210" font-family="'Patrick Hand', cursive" font-size="13" fill="#333" transform="rotate(-0.5,64,210)">현지 업체 정보 확인하기</text>
+
+              <rect x="44" y="227" width="12" height="12" rx="2" fill="none" stroke="#555" stroke-width="1.4" transform="rotate(-0.3,50,233)"/>
+              <text x="64" y="238" font-family="'Patrick Hand', cursive" font-size="13" fill="#333" transform="rotate(0.4,64,238)">환전 &amp; 유심 준비</text>
+
+              <text x="14" y="158" font-family="'Patrick Hand', cursive" font-size="16" fill="#f4a040" transform="rotate(-8,14,158)">★</text>
+              <text x="11" y="172" font-family="'Patrick Hand', cursive" font-size="10" fill="#999" transform="rotate(4,11,172)">중요!</text>
+
+              <text x="290" y="258" font-family="'Patrick Hand', cursive" font-size="11" fill="#bbb" transform="rotate(6,290,258)">호주 가자~✈</text>
+              <path d="M288,262 Q310,255 322,264" fill="none" stroke="#ccc" stroke-width="0.8"/>
+
+              <path d="M370,8 L350,8 L350,28 Z" fill="#e8e8d8"/>
+              <path d="M370,8 L350,28 L370,28" fill="#f0f0e0"/>
+              <line x1="350" y1="8" x2="370" y2="28" stroke="#ccc" stroke-width="0.8"/>
+            </g>
+          </svg>
+        </div>
       </div>
 
       {/* ── 모달: 버킷리스트 추천 ── */}
