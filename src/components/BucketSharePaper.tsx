@@ -240,7 +240,9 @@ export default function BucketSharePaper({ state, trip, achieved, dbItems = [] }
       }}>
         <div>
           <div style={{ fontSize:12,fontWeight:800,color:'#fff',letterSpacing:-0.3 }}>호주가자</div>
-          <div style={{ fontSize:10,color:'rgba(255,255,255,0.7)',marginTop:2 }}>여행 버킷리스트 🦘</div>
+          <div style={{ fontSize:10,color:'rgba(255,255,255,0.7)',marginTop:2,display:'flex',alignItems:'center',gap:4 }}>
+            호주 여행 정보 사이트 <Icon icon="mdi:kangaroo" width={14} height={14} color="#fff" />
+          </div>
         </div>
         <div style={{ textAlign:'right' }}>
           <div style={{ fontSize:11,fontWeight:700,color:'#FFCD00' }}>www.hojugaja.com</div>
