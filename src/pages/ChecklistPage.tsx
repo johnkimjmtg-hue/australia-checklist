@@ -602,8 +602,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       {/* 검색 버튼 */}
                       <button className="chip-btn" onClick={() => { setShowSearch(v => !v); if (showSearch) setSearchQuery('') }} style={{
                         height:36, padding:'0 12px', borderRadius:8, border:'none',
-                        background:'#e8e8e8', cursor:'pointer',
-                        color: showSearch ? '#FFCD00' : '#64748B',
+                        background: showSearch ? '#e8e8e8' : '#FFCD00',
+                        cursor:'pointer',
+                        color: showSearch ? '#FFCD00' : '#fff',
                         fontSize:12, fontWeight:700,
                         display:'flex', alignItems:'center', gap:5, flexShrink:0,
                         boxShadow: showSearch
@@ -611,7 +612,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                           : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                         WebkitTapHighlightColor:'transparent',
                       }}>
-                        <Icon icon="ph:magnifying-glass" width={14} height={14} color={showSearch ? '#FFCD00' : '#64748B'} />
+                        <Icon icon="ph:magnifying-glass" width={14} height={14} color={showSearch ? '#FFCD00' : '#fff'} />
                         검색
                       </button>
                       {/* 검색창 - 인라인으로 카테고리 밀기 */}
@@ -619,7 +620,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                         <div style={{
                           display:'flex', alignItems:'center', gap:6,
                           background:'#fff', borderRadius:8, padding:'0 10px',
-                          height:36, flexShrink:0, width:160,
+                          height:36, flexShrink:0, width:320,
                           border:'1px solid #C8C8C8',
                           boxShadow:'inset 1px 1px 3px #d0d0d0',
                         }}>
