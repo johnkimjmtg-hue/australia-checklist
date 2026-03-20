@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import BucketSharePaper from './BucketSharePaper'
-import { downloadPng, sharePng } from '../utils/capture'
+import { captureBlob, downloadPng } from '../utils/capture'
 import { AppState, TripInfo } from '../store/state'
 
 type Props = {
@@ -16,8 +16,20 @@ type Props = {
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
 
 export default function ReceiptModal({ state, trip, issuedAt, achieved, dbItems, onClose, onReset }: Props) {
-  const [saving, setSaving]   = useState(false)
-  const [sharing, setSharing] = useState(false)
+  const [saving, setSaving]     = useState(false)
+  const [sharing, setSharing]   = useState(false)
+  const [ready, setReady]       = useState(false)
+  const blobRef = useRef<Blob | null>(null)
+
+  // 모달 열리면 미리 캡처
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const blob = await captureBlob()
+      blobRef.current = blob
+      setReady(true)
+    }, 400) // 렌더링 완료 후 캡처
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <div style={{ position:'fixed', inset:0, zIndex:400, animation:'fadeIn 0.2s ease' }}>
@@ -46,30 +58,39 @@ export default function ReceiptModal({ state, trip, issuedAt, achieved, dbItems,
       }}>
         <button onClick={async () => {
           setSaving(true)
-          if (isIOS()) {
-            const ok = await sharePng()
-            if (!ok) alert('공유가 지원되지 않는 환경입니다.\n이미지를 저장 후 직접 공유해주세요.')
-          } else {
-            await downloadPng()
-          }
+          await downloadPng()
           setSaving(false)
-        }} disabled={saving} style={{
-          flex:1, height:46, borderRadius:12, cursor:'pointer',
+        }} disabled={saving || !ready} style={{
+          flex:1, height:46, borderRadius:12, cursor: ready ? 'pointer' : 'default',
           border:'1.5px solid #D1D9E3', background:'#fff',
           fontWeight:700, fontSize:13, color:'#1B6EF3',
           boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
-        }}>{saving ? '저장 중...' : '이미지 저장'}</button>
+          opacity: ready ? 1 : 0.5,
+        }}>{saving ? '저장 중...' : !ready ? '준비 중...' : '이미지 저장'}</button>
+
         <button onClick={async () => {
+          if (!blobRef.current) return
           setSharing(true)
-          const ok = await sharePng()
-          if (!ok) alert('공유가 지원되지 않는 환경입니다.\n이미지를 저장 후 직접 공유해주세요.')
+          try {
+            // 미리 만들어둔 blob으로 즉시 공유 — 제스처 컨텍스트 유지
+            if (navigator.share && navigator.canShare?.({ files: [new File([blobRef.current], 'test.png', { type:'image/png' })] })) {
+              await navigator.share({ files: [new File([blobRef.current], 'korea-receipt.png', { type: 'image/png' })] })
+            } else if (navigator.share) {
+              // 파일 공유 미지원 시 URL로 대체
+              await navigator.share({ title: '호주 버킷리스트', url: 'https://hojugaja.com' })
+            } else {
+              // 공유 미지원 시 이미지 저장
+              await downloadPng()
+            }
+          } catch {}
           setSharing(false)
-        }} disabled={sharing} style={{
-          flex:1, height:46, borderRadius:12, cursor:'pointer',
+        }} disabled={sharing || !ready} style={{
+          flex:1, height:46, borderRadius:12, cursor: ready ? 'pointer' : 'default',
           border:'none', background:'linear-gradient(160deg,#4B8EF5,#1B6EF3)',
           fontWeight:700, fontSize:13, color:'#fff',
           boxShadow:'0 4px 14px rgba(27,110,243,0.35)',
-        }}>{sharing ? '공유 중...' : '공유하기'}</button>
+          opacity: ready ? 1 : 0.5,
+        }}>{sharing ? '공유 중...' : !ready ? '준비 중...' : '공유하기'}</button>
       </div>
     </div>
   )
