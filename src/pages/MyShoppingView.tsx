@@ -261,12 +261,12 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                     display:'flex', alignItems:'center', gap:3,
                     padding:'4px 8px', borderRadius:6, cursor:'pointer',
                     background: checked ? '#FF6B9D' : '#f0f0f0',
-                    border: `1px solid ${checked ? '#FF6B9D' : '#D0D0D0'}`,
+                    border: `1px solid ${checked ? '#FF6B9D' : '#FF6B9D'}`,
                     transition:'all 0.2s', whiteSpace:'nowrap',
                   }}>
-                    <span style={{ fontSize:10, fontWeight:700, color: checked ? '#fff' : '#B0B0B0' }}>구매</span>
+                    <span style={{ fontSize:10, fontWeight:700, color: checked ? '#fff' : '#FF6B9D' }}>구매</span>
                     <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
-                      <path d="M1 4L4 7L10 1" stroke={checked ? '#fff' : '#C8C8C8'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M1 4L4 7L10 1" stroke={checked ? '#fff' : '#FF6B9D'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
                   {/* 삭제 */}

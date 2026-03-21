@@ -190,7 +190,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   const [showDelete, setShowDelete]   = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
-  const [deleteItemId, setDeleteItemId] = useState<{ id: string; day?: number } | null>(null)
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const prevAchieved = useRef(0)
   const logoTapCount = useRef(0)
@@ -280,45 +280,20 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
   const isRowDone = (id: string, day?: number) => !!achieved[getKey(id, day)]
 
-  const deleteItem = (id: string, day?: number) => {
+  const deleteItem = (id: string) => {
+    // selected, schedules에서 제거
+    const newSelected = { ...state.selected }
+    delete newSelected[id]
+    const newSchedules = { ...state.schedules }
+    delete newSchedules[id]
+    // customItems에서도 제거 (커스텀 항목인 경우)
+    const newCustomItems = state.customItems.filter(c => c.id !== id)
+    const next = { ...state, selected: newSelected, schedules: newSchedules, customItems: newCustomItems }
+    setState(next)
+    try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
+    // achieved에서도 제거
     const newAchieved = { ...achieved }
-
-    if (day !== undefined) {
-      // 특정 날짜만 삭제 — schedules에서 해당 day만 제거
-      const newSchedules = { ...state.schedules }
-      const days = (newSchedules[id] ?? []).filter(d => d !== day)
-      if (days.length === 0) {
-        // 남은 일정이 없으면 selected에서도 제거
-        const newSelected = { ...state.selected }
-        delete newSelected[id]
-        delete newSchedules[id]
-        const newCustomItems = state.customItems.filter(c => c.id !== id)
-        const next = { ...state, selected: newSelected, schedules: newSchedules, customItems: newCustomItems }
-        setState(next)
-        try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
-      } else {
-        newSchedules[id] = days
-        const next = { ...state, schedules: newSchedules }
-        setState(next)
-        try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
-      }
-      // achieved에서 해당 day 키만 제거
-      const key = `${id}_${day}`
-      delete newAchieved[key]
-    } else {
-      // 날짜 미지정 아이템 삭제
-      const newSelected = { ...state.selected }
-      delete newSelected[id]
-      const newSchedules = { ...state.schedules }
-      delete newSchedules[id]
-      const newCustomItems = state.customItems.filter(c => c.id !== id)
-      const next = { ...state, selected: newSelected, schedules: newSchedules, customItems: newCustomItems }
-      setState(next)
-      try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
-      // achieved에서 관련 키 전부 제거
-      Object.keys(newAchieved).forEach(k => { if (k === id || k.startsWith(id + '_')) delete newAchieved[k] })
-    }
-
+    Object.keys(newAchieved).forEach(k => { if (k === id || k.startsWith(id + '_')) delete newAchieved[k] })
     setAchieved(newAchieved)
     try { localStorage.setItem('bucket-achieved', JSON.stringify(newAchieved)) } catch {}
     onAchievedChange?.(newAchieved)
@@ -438,16 +413,16 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             display:'flex', alignItems:'center', gap:3,
             padding:'4px 8px', borderRadius:6, cursor:'pointer',
             background: isAchieved ? '#16A34A' : '#f0f0f0',
-            border: `1px solid ${isAchieved ? '#16A34A' : '#D0D0D0'}`,
+            border: `1px solid ${isAchieved ? '#16A34A' : '#16A34A'}`,
             transition:'all 0.2s', whiteSpace:'nowrap',
           }}>
-            <span style={{ fontSize:10, fontWeight:700, color: isAchieved ? '#fff' : '#B0B0B0' }}>완료</span>
+            <span style={{ fontSize:10, fontWeight:700, color: isAchieved ? '#fff' : '#16A34A' }}>완료</span>
             <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
-              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#C8C8C8'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#16A34A'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           {/* 삭제 */}
-          <button onClick={() => setDeleteItemId({ id: item.id, day })} style={{
+          <button onClick={() => setDeleteItemId(item.id)} style={{
             background:'none', border:'none', cursor:'pointer', padding:2,
             display:'flex', alignItems:'center',
           }}>
@@ -704,7 +679,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       {/* ── 아이템 삭제 확인 팝업 */}
       {deleteItemId && (() => {
-        const item = allItems.find(i => i.id === deleteItemId.id)
+        const item = allItems.find(i => i.id === deleteItemId)
         return (
           <>
             <div onClick={() => setDeleteItemId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:700 }} />
@@ -726,7 +701,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                   background:'#e8e8e8', color:'#64748B', fontSize:14, fontWeight:600, cursor:'pointer',
                   boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                 }}>취소</button>
-                <button onClick={() => { deleteItem(deleteItemId.id, deleteItemId.day); setDeleteItemId(null) }} style={{
+                <button onClick={() => { deleteItem(deleteItemId); setDeleteItemId(null) }} style={{
                   flex:2, height:48, borderRadius:10, border:'none',
                   background:'#e8e8e8', color:'#DC2626', fontSize:14, fontWeight:700, cursor:'pointer',
                   boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
