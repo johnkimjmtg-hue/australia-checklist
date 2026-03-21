@@ -396,6 +396,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         .neu-tab:active {
           box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff;
         }
+        .tab-scroll { overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; }
+        .tab-scroll::-webkit-scrollbar { display:none; }
         .cat-scroll { overflow-x:auto; }
         .day-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:#C8C8C8 #e8e8e8; }
         .day-scroll::-webkit-scrollbar { height:4px; }
@@ -426,7 +428,24 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           </span>
         </div>
         {/* 탭 */}
-        <div style={{ display:'flex', padding:'0 10px', gap:8, overflowX:'auto', scrollbarWidth:'none' }}>
+        <div className="tab-scroll" style={{ display:'flex', padding:'0 10px', gap:8 }}>
+          {/* 홈 탭 */}
+          <button onClick={() => navigate('/')}
+            className="neu-tab"
+            style={{ minWidth:72, flexShrink:0, height:52 }}>
+            <div style={{
+              width:32, height:20, borderRadius:4,
+              background:'#c8d4b8',
+              boxShadow:'inset 1px 1px 3px #a8b498, inset -1px -1px 2px #e8f4d8',
+              display:'flex', alignItems:'center', justifyContent:'center', gap:2,
+            }}>
+              <div style={{ width:4, height:10, borderRadius:1, background:'#4a7a1e', opacity:0.7 }} />
+              <div style={{ width:4, height:14, borderRadius:1, background:'#4a7a1e' }} />
+              <div style={{ width:4, height:8, borderRadius:1, background:'#4a7a1e', opacity:0.5 }} />
+              <div style={{ width:4, height:12, borderRadius:1, background:'#4a7a1e', opacity:0.8 }} />
+            </div>
+            <span style={{ fontSize:11, fontWeight:500, color:'#64748B', whiteSpace:'nowrap' }}>홈</span>
+          </button>
           {([
             { id:'bucketlist', icon:'ph:check-circle',  label:'버킷리스트' },
             { id:'shopping',   icon:'ph:shopping-bag',  label:'쇼핑리스트' },
@@ -463,7 +482,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             // 아이콘/라벨/색상 결정
             let tabIcon  = tab.icon
             let tabLabel = tab.label
-            let tabColor = '#94A3B8'
+            let tabColor = '#64748B'
             let isActive = false
 
             if (isShopping) {
@@ -492,9 +511,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             return (
               <button key={tab.id} onClick={handleClick}
                 className={`neu-tab${isActive ? ' active' : ''}`}
-                style={{ flex:1, minWidth:0, height:52 }}>
+                style={{ minWidth:72, flexShrink:0, height:52 }}>
                 <Icon icon={tabIcon} width={16} height={16} color={tabColor} />
-                <span style={{ fontSize:9, fontWeight: isActive || (isShopping && hasMyList) ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
+                <span style={{ fontSize:11, fontWeight: isActive || (isShopping && hasMyList) ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
                   {tabLabel}
                 </span>
               </button>
