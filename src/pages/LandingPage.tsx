@@ -753,7 +753,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             `}</style>
 
             {/* 헤더 */}
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 12px 6px' }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 12px 8px' }}>
               <div style={{ fontSize:10, fontWeight:800, color:'#2d3e1f', letterSpacing:2, fontFamily:'monospace' }}>나의 호주가자</div>
               <div style={{ display:'flex', alignItems:'center', gap:5 }}>
                 <span style={{ fontSize:9, color:'#4a5e32', letterSpacing:1, fontFamily:'monospace' }}>LIVE</span>
@@ -761,7 +761,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
               </div>
             </div>
             {/* 헤더 아래 여백 있는 구분선 */}
-            <div style={{ height:1, background:'#a8b498', margin:'0 12px 8px' }} />
+            <div style={{ height:1, background:'#a8b498', margin:'0 12px 10px' }} />
 
             {/* 통계 4칸 그리드 — 고정 */}
             <LcdStats />
@@ -770,7 +770,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             <div style={{ height:1, background:'#a8b498', margin:'8px 12px' }} />
 
             {/* 공지 스크롤 */}
-            <div style={{ height:60, overflow:'hidden', padding:'6px 12px 10px' }}>
+            <div style={{ height:72, overflow:'hidden', padding:'6px 12px 0' }}>
               <div className="notice-loop">
                 {[0,1].map(k => (
                   <div key={k}>
@@ -794,7 +794,11 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
                 ))}
               </div>
             </div>
-          </div>          {/* 버튼 그리드 */}
+            {/* 스크롤 아래 여백 */}
+            <div style={{ height:12 }} />
+          </div>
+
+          {/* 버튼 그리드 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {/* 1행 */}
             <button className="calc-btn" onClick={onStart} style={{ height: 72 }}>1<br/>버킷리스트</button>
