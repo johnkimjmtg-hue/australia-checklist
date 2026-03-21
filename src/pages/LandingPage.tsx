@@ -612,13 +612,20 @@ function LcdStats() {
   ]
 
   return (
-    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:1, background:'#a8b498', margin:'0 0 0 0' }}>
+    <div style={{ padding:'10px 12px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
       {rows.map((r, i) => (
-        <div key={i} style={{ background:'#c8d4b8', padding:'8px 10px', display:'flex', alignItems:'center', gap:8 }}>
-          <Icon icon={r.icon} width={20} height={20} color="#4a7a1e" style={{ flexShrink:0 }} />
+        <div key={i} style={{
+          background:'#b8c8a8',
+          border:'1px solid #a8b498',
+          borderRadius:8,
+          padding:'8px 10px',
+          display:'flex', alignItems:'center', gap:8,
+          boxShadow:'inset 1px 1px 3px #a0b490, inset -1px -1px 3px #d0e4c0',
+        }}>
+          <Icon icon={r.icon} width={22} height={22} color="#4a7a1e" style={{ flexShrink:0 }} />
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ fontSize:9, color:'#4a5e32', letterSpacing:0.5, fontFamily:'monospace', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{r.label}</div>
-            <div style={{ fontSize:13, fontWeight:800, color:'#2d3e1f', fontFamily:'monospace', letterSpacing:1 }}>
+            <div style={{ fontSize:14, fontWeight:800, color:'#2d3e1f', fontFamily:'monospace', letterSpacing:1 }}>
               {r.done}<span style={{ fontSize:9, color:'#4a5e32' }}>/{r.total}</span>
             </div>
             <div style={{ height:3, background:'#a8b498', borderRadius:2, marginTop:3, overflow:'hidden' }}>
@@ -753,7 +760,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             <div style={{ height:1, background:'#a8b498', margin:'0 12px' }} />
 
             {/* 공지 스크롤 */}
-            <div style={{ height:60, overflow:'hidden', padding:'0 12px' }}>
+            <div style={{ height:60, overflow:'hidden', padding:'6px 12px 10px' }}>
               <div className="notice-loop">
                 {[0,1].map(k => (
                   <div key={k}>
