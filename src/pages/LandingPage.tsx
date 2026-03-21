@@ -689,8 +689,8 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'stretch',
-        padding: '32px 0',
+        alignItems: 'center',
+        padding: '16px 0',
         boxSizing: 'border-box' as any,
       }}>
         <style>{`
@@ -731,42 +731,21 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         {/* 계산기 본체 */}
         <div style={{
           background:'#e8e8e8',
-          borderRadius: 0,
-          padding: '20px 20px 28px',
-          boxShadow: 'none',
-          maxWidth: 420,
-          width: '100%',
+          borderRadius: 24,
+          padding: '20px 20px 24px',
+          boxShadow: '8px 8px 16px #c5c5c5, -8px -8px 16px #ffffff',
+          maxWidth: 380,
+          width: 'calc(100% - 32px)',
           margin: '0 auto',
           boxSizing: 'border-box' as any,
         }}>
-          {/* 상단 디테일 — 솔라패널 + 스위치 */}
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14, padding:'0 4px' }}>
-            <div>
-              <div style={{ fontSize:10, fontWeight:800, color:'#555', letterSpacing:2, fontFamily:'"Josefin Sans", sans-serif' }}>HOJUGAJA</div>
-              <div style={{ fontSize:7, color:'#999', letterSpacing:1 }}>DIGITAL PLANNER</div>
-            </div>
-            <div style={{ display:'flex', gap:2 }}>
-              {[0,1,2,3,4,5,6,7].map(i => (
-                <div key={i} style={{ width:13, height:18, borderRadius:2, background: i%2===0 ? '#4a5568' : '#2d3748', boxShadow:'inset 0 1px 2px rgba(0,0,0,0.3)' }} />
-              ))}
-            </div>
-            <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
-              <div style={{ width:30, height:11, borderRadius:6, background:'#c8c8c0', boxShadow:'inset 1px 1px 3px #a8a8a0', position:'relative' }}>
-                <div style={{ position:'absolute', left:2, top:2, width:9, height:7, borderRadius:4, background:'#e8e8e8', boxShadow:'1px 1px 2px #a0a0a0' }} />
-              </div>
-              <div style={{ width:30, height:11, borderRadius:6, background:'#c8c8c0', boxShadow:'inset 1px 1px 3px #a8a8a0', position:'relative' }}>
-                <div style={{ position:'absolute', right:2, top:2, width:9, height:7, borderRadius:4, background:'#1B6EF3', boxShadow:'1px 1px 2px #0d4fc2' }} />
-              </div>
-            </div>
-          </div>
-
           {/* 타이틀 */}
-          <div style={{ textAlign: 'center', marginBottom: 14 }}>
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
             <div style={{
-              fontSize: 20, fontWeight: 700, color: '#333',
+              fontSize: 22, fontWeight: 700, color: '#333',
               letterSpacing: 4,
               fontFamily: '"Josefin Sans", "Raleway", sans-serif',
-            }} onClick={handleLogoTap}>HOJUGAJA.COM</div>
+            }}>HOJUGAJA.COM</div>
           </div>
 
           {/* 디스플레이 */}
