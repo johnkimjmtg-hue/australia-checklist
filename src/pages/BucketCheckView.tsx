@@ -386,12 +386,12 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                   } else setDetailBizCards([])
                 }}
                 style={{
-                  fontSize:11, fontWeight:600, color:'#1B6EF3',
-                  background:'#fff', border:'1px solid #C8C8C8',
-                  borderRadius:20, cursor:'pointer', padding:'3px 10px',
+                  fontSize:11, fontWeight:600, color:'#64748B',
+                  background:'none', border:'none',
+                  cursor:'pointer', padding:0,
                   flexShrink:0,
                 }}>
-                자세히 알아보기›
+                자세히 알아보기 ›
               </button>
               {region ? (
                 <span style={{
@@ -413,12 +413,12 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             display:'flex', alignItems:'center', gap:3,
             padding:'4px 8px', borderRadius:6, cursor:'pointer',
             background: isAchieved ? '#16A34A' : '#f0f0f0',
-            border: `1px solid ${isAchieved ? '#16A34A' : '#16A34A'}`,
+            border: `1px solid ${isAchieved ? '#16A34A' : '#D0D0D0'}`,
             transition:'all 0.2s', whiteSpace:'nowrap',
           }}>
-            <span style={{ fontSize:10, fontWeight:700, color: isAchieved ? '#fff' : '#16A34A' }}>완료</span>
+            <span style={{ fontSize:10, fontWeight:700, color: isAchieved ? '#fff' : '#B0B0B0' }}>완료</span>
             <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
-              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#16A34A'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#C8C8C8'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           {/* 삭제 */}

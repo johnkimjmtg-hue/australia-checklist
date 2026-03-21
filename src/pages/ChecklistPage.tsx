@@ -820,12 +820,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                                     } else setDetailBizCards([])
                                   }}
                                   style={{
-                                    fontSize:11, fontWeight:600, color:'#1B6EF3',
-                                    background:'#fff', border:'1px solid #C8C8C8',
-                                    borderRadius:20, cursor:'pointer', padding:'3px 10px',
+                                    fontSize:11, fontWeight:600, color:'#64748B',
+                                    background:'none', border:'none',
+                                    cursor:'pointer', padding:0,
                                     flexShrink:0,
                                   }}>
-                                  자세히 알아보기›
+                                  자세히 알아보기 ›
                                 </button>
                                 {region ? (
                                   <span style={{
@@ -1259,7 +1259,7 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: 
               <span key={item.id} style={{
                 background:'rgba(27,110,243,0.08)', borderRadius:6,
                 padding:'3px 9px', fontSize:11, color:'#1B6EF3', fontWeight:600,
-              }}>{item.label.includes(',') ? item.label.split(',')[0].trim() : item.label}</span>
+              }}>{item.label}</span>
             ))}
           </div>
         )}
