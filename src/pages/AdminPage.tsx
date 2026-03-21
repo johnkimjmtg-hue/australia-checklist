@@ -885,6 +885,10 @@ function ItemsTab({ cats, items, setItems }: {
   const [editId, setEditId]     = useState<string|null>(null)
   const [editLabel, setEditLabel] = useState('')
   const [deleteConfirmId, setDeleteConfirmId] = useState<string|null>(null)
+  const [detailEdits, setDetailEdits] = useState<Record<string, {address:string; description:string; tips:string}>>({})
+
+  const getDetailEdit = (item: Item) => detailEdits[item.id] ?? { address: item.address ?? '', description: item.description ?? '', tips: item.tips ?? '' }
+  const setDetailEdit = (id: string, field: string, val: string) => setDetailEdits(prev => ({ ...prev, [id]: { ...getDetailEdit(items.find(i=>i.id===id)!), [field]: val } }))
   const [expandedId, setExpandedId] = useState<string|null>(null)
   const [businesses, setBusinesses] = useState<{id:string;name:string}[]>([])
   const [products, setProducts]     = useState<{id:string;name:string}[]>([])
@@ -1195,7 +1199,7 @@ function ItemsTab({ cats, items, setItems }: {
             const isOver = dragOverIdx === idx
             const isEditing = editId === item.id
             return (
-              <div key={item.id} style={{ borderRadius:10 }}>
+              <div key={item.id} style={{ borderRadius:10, position:'relative' }}>
               <div
                 draggable
                 onDragStart={() => handleDragStart(idx)}
@@ -1213,26 +1217,26 @@ function ItemsTab({ cats, items, setItems }: {
                 <span style={{ color:'#aaa', fontSize:14, userSelect:'none' }}>⠿</span>
                 <IconPicker value={item.icon || 'ph:star'} onChange={icon => updateIcon(item.id, icon)} />
                 {isEditing ? (
-                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:4 }}>
+                  <div style={{ position:'absolute', left:0, right:0, top:0, background:'#fafafa', borderRadius:10, border:'2px solid #1B6EF3', padding:'10px 12px', zIndex:10, display:'flex', flexDirection:'column', gap:6 }}>
                     <input
                       value={editLabel}
                       onChange={e => setEditLabel(e.target.value)}
                       onKeyDown={e => { if(e.key==='Escape') setEditId(null) }}
                       autoFocus
-                      style={{ ...inputStyle, fontSize:13, padding:'4px 8px', width:'100%' }}
+                      style={{ ...inputStyle, fontSize:13, padding:'6px 8px', width:'100%', boxSizing:'border-box' as any }}
                     />
                     <div style={{ display:'flex', gap:6 }}>
                       <button onClick={() => saveLabel(item.id)}
-                        style={{ ...btnPrimary, padding:'4px 12px', fontSize:12 }}>적용하기</button>
+                        style={{ ...btnPrimary, padding:'6px 14px', fontSize:12 }}>적용하기</button>
                       <button onClick={() => setEditId(null)}
-                        style={{ background:'none', border:'1px solid #ccc', borderRadius:6, padding:'4px 10px', fontSize:12, cursor:'pointer', color:'#666' }}>취소</button>
+                        style={{ background:'none', border:'1px solid #ccc', borderRadius:6, padding:'6px 10px', fontSize:12, cursor:'pointer', color:'#666' }}>취소</button>
                     </div>
                   </div>
                 ) : (
                   <span
                     onClick={() => { setEditId(item.id); setEditLabel(item.label) }}
-                    style={{ flex:1, fontSize:13, color:'#222', cursor:'text', wordBreak:'break-all', lineHeight:1.5 }}
-                    title="클릭하여 수정"
+                    style={{ flex:1, fontSize:13, color:'#222', cursor:'text', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}
+                    title={item.label}
                   >{item.label}</span>
                 )}
                 <button
@@ -1284,8 +1288,8 @@ function ItemsTab({ cats, items, setItems }: {
                 <div style={{ display:'flex', gap:8, alignItems:'center' }}>
                   <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0 }}>📍 Suburb</span>
                   <input
-                    defaultValue={item.address ?? ''}
-                    onBlur={e => saveDetail(item.id, 'address', e.target.value)}
+                    value={getDetailEdit(item).address}
+                    onChange={e => setDetailEdit(item.id, 'address', e.target.value)}
                     placeholder="예: Surry Hills NSW 2010"
                     style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px' }}
                   />
@@ -1294,8 +1298,8 @@ function ItemsTab({ cats, items, setItems }: {
                 <div style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
                   <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0, paddingTop:6 }}>📝 설명</span>
                   <textarea
-                    defaultValue={item.description ?? ''}
-                    onBlur={e => saveDetail(item.id, 'description', e.target.value)}
+                    value={getDetailEdit(item).description}
+                    onChange={e => setDetailEdit(item.id, 'description', e.target.value)}
                     placeholder="왜 호주에서 꼭 해야 하는지 어필하는 설명 (길게 써도 됩니다)"
                     rows={5}
                     style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px', resize:'vertical' }}
@@ -1305,8 +1309,8 @@ function ItemsTab({ cats, items, setItems }: {
                 <div style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
                   <span style={{ fontSize:12, color:'#64748B', fontWeight:600, width:70, flexShrink:0, paddingTop:6 }}>💡 팁</span>
                   <textarea
-                    defaultValue={item.tips ?? ''}
-                    onBlur={e => saveDetail(item.id, 'tips', e.target.value)}
+                    value={getDetailEdit(item).tips}
+                    onChange={e => setDetailEdit(item.id, 'tips', e.target.value)}
                     placeholder="현지인 꿀팁 (예: 오전 일찍 가야 줄 짧아요)"
                     rows={2}
                     style={{ ...inputStyle, flex:1, fontSize:12, padding:'5px 8px', resize:'vertical' }}
@@ -1329,6 +1333,19 @@ function ItemsTab({ cats, items, setItems }: {
                     values={item.related_product_ids ?? []}
                     onChange={ids => saveRelatedProducts(item.id, ids)}
                   />
+                </div>
+                {/* 적용하기 버튼 */}
+                <div style={{ display:'flex', justifyContent:'flex-end', paddingTop:4 }}>
+                  <button
+                    onClick={async () => {
+                      const edit = getDetailEdit(item)
+                      await saveDetail(item.id, 'address', edit.address)
+                      await saveDetail(item.id, 'description', edit.description)
+                      await saveDetail(item.id, 'tips', edit.tips)
+                      showToast('✅ 상세정보 저장됨')
+                    }}
+                    style={{ ...btnPrimary, padding:'8px 20px', fontSize:13 }}
+                  >적용하기</button>
                 </div>
               </div>
             )}
