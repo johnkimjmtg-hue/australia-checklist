@@ -424,7 +424,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             // 아이콘/라벨/색상 결정
             let tabIcon  = tab.icon
             let tabLabel = tab.label
-            let tabColor = '#94A3B8'
+            let tabColor = '#64748B'
             let isActive = false
 
             if (isShopping) {
@@ -438,16 +438,16 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 // 쇼핑페이지 or 다른페이지에서 리스트 있음 → 카트+녹색+평평
                 tabIcon  = 'ph:shopping-cart-simple'
                 tabLabel = `내쇼핑리스트 ${myListCount}`
-                tabColor = mainTab === 'shopping' ? '#FF6B9D' : '#94A3B8'
+                tabColor = mainTab === 'shopping' ? '#FF6B9D' : '#64748B'
                 isActive = false
               } else {
                 // 기본 상태
-                tabColor = mainTab === 'shopping' ? '#1B6EF3' : '#94A3B8'
+                tabColor = mainTab === 'shopping' ? '#1B6EF3' : '#64748B'
                 isActive = mainTab === 'shopping'
               }
             } else {
               isActive = mainTab === tab.id
-              tabColor = isActive ? '#1B6EF3' : '#94A3B8'
+              tabColor = isActive ? '#1B6EF3' : '#64748B'
             }
 
             return (
@@ -524,7 +524,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:'#e8e8e8' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 20px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                <span style={{ fontSize:14, fontWeight:700, color: done>0 ? '#1B6EF3' : '#94A3B8' }}>
+                <span style={{ fontSize:14, fontWeight:700, color: done>0 ? '#1B6EF3' : '#64748B' }}>
                   {done>0 ? `${done}개 선택됨` : (trip ? '항목을 선택하세요' : '여행 일정을 설정하세요')}
                 </span>
                 {unscheduledCount>0 && (
@@ -538,7 +538,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 <button onClick={handleOpenTripPicker} style={{
                   height:34, padding:'0 14px', borderRadius:8, border:'none',
                   background: '#e8e8e8',
-                  color: tripLabel ? '#16A34A' : '#94A3B8',
+                  color: tripLabel ? '#16A34A' : '#64748B',
                   fontSize:13, fontWeight:700, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:5,
                   boxShadow: tripLabel
@@ -547,13 +547,13 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   animation: !tripLabel ? 'pulse 1.4s ease-in-out infinite' : 'none',
                   WebkitTapHighlightColor:'transparent',
                 }}>
-                  <Icon icon="ph:airplane-takeoff" width={15} height={15} color={tripLabel ? '#16A34A' : '#94A3B8'} />
+                  <Icon icon="ph:airplane-takeoff" width={15} height={15} color={tripLabel ? '#16A34A' : '#64748B'} />
                   {tripLabel ?? '여행일정 설정'}
                 </button>
                 <button onClick={() => setShowScheduleView(v=>!v)} style={{
                   height:34, padding:'0 14px', borderRadius:8, border:'none',
                   background: '#e8e8e8',
-                  color: showScheduleView ? '#1B6EF3' : '#94A3B8',
+                  color: showScheduleView ? '#1B6EF3' : '#64748B',
                   fontSize:13, fontWeight:700, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:5,
                   boxShadow: showScheduleView
@@ -561,7 +561,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                   WebkitTapHighlightColor:'transparent',
                 }}>
-                  <Icon icon="ph:list-checks" width={15} height={15} color={showScheduleView ? '#1B6EF3' : '#94A3B8'} />
+                  <Icon icon="ph:list-checks" width={15} height={15} color={showScheduleView ? '#1B6EF3' : '#64748B'} />
                   일정보기
                 </button>
               </div>
@@ -647,7 +647,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                         display:'flex', alignItems:'center', justifyContent:'center', gap: isCustom ? 4 : 0,
                         WebkitTapHighlightColor:'transparent',
                       }}>
-                        {isCustom && <Icon icon="ph:pencil-simple" width={11} height={11} color={isActive ? '#FFCD00' : '#94A3B8'} />}
+                        {isCustom && <Icon icon="ph:pencil-simple" width={11} height={11} color={isActive ? '#FFCD00' : '#64748B'} />}
                         {cat.label}
                         {catDone>0 && (
                           <span style={{
@@ -707,7 +707,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             {/* Items list — card style */}
             <div style={{ display:'flex', flexDirection:'column', gap:8, padding:'0 16px 106px' }}>
               {searchResults !== null && searchResults.length === 0 && (
-                <div style={{ textAlign:'center', padding:'40px 0', color:'#94A3B8', fontSize:14 }}>
+                <div style={{ textAlign:'center', padding:'40px 0', color:'#64748B', fontSize:14 }}>
                   검색 결과가 없어요
                 </div>
               )}
@@ -787,7 +787,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                           <>
                             {db?.description && (
                               <span style={{
-                                fontSize:11, color:'#94A3B8', fontWeight:400, lineHeight:1.5,
+                                fontSize:11, color:'#64748B', fontWeight:400, lineHeight:1.5,
                                 overflow:'hidden', textOverflow:'ellipsis',
                                 display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical',
                               }}>{db.description}</span>
@@ -909,7 +909,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               }}>버킷리스트 발행하기</button>
               <button onClick={() => setModal('confirmReset')} style={{
                 flex:2, height:44,
-                background:'#e8e8e8', color:'#94A3B8',
+                background:'#e8e8e8', color:'#64748B',
                 border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer',
                 boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                 WebkitTapHighlightColor:'transparent',
@@ -1019,7 +1019,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               )}
               {(selProduct.where_to_buy ?? []).length > 0 && (
                 <div style={{ marginBottom:16 }}>
-                  <div style={{ fontSize:11, fontWeight:700, color:'#94A3B8', marginBottom:8 }}>어디서 살 수 있어요?</div>
+                  <div style={{ fontSize:11, fontWeight:700, color:'#64748B', marginBottom:8 }}>어디서 살 수 있어요?</div>
                   <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
                     {selProduct.where_to_buy.map((store: string) => (
                       <span key={store} style={{
@@ -1096,7 +1096,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   }}>
                   <Icon icon="ph:map-pin" width={18} height={18} color="#1B6EF3" />
                   <div>
-                    <div style={{ fontSize:11, color:'#94A3B8', fontWeight:500 }}>여기서 할 수 있어요</div>
+                    <div style={{ fontSize:11, color:'#64748B', fontWeight:500 }}>여기서 할 수 있어요</div>
                     <div style={{ fontSize:13, color:'#1B6EF3', fontWeight:600, textDecoration:'underline' }}>{detailItem.address}</div>
                   </div>
                   <Icon icon="ph:arrow-square-out" width={14} height={14} color="#94A3B8" style={{ marginLeft:'auto' }} />
@@ -1140,11 +1140,11 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           }}>
             <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:8 }}>
               <button onClick={() => { setDetailBizId(null); setDetailBiz(null) }}
-                style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', color:'#94A3B8' }}>✕</button>
+                style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', color:'#64748B' }}>✕</button>
             </div>
             {detailBiz
               ? <BusinessCard business={detailBiz} />
-              : <div style={{ textAlign:'center', padding:24, color:'#94A3B8', fontSize:14 }}>불러오는 중...</div>
+              : <div style={{ textAlign:'center', padding:24, color:'#64748B', fontSize:14 }}>불러오는 중...</div>
             }
           </div>
         </div>
@@ -1240,11 +1240,11 @@ function ScheduleGrid({ state, trip, allItems, selectedItemId, scrollTrigger }: 
       {/* 선택된 날짜의 아이템 목록 */}
       <div style={{ marginTop:8, minHeight:30 }}>
         {activeDayIdx === null ? (
-          <p style={{ fontSize:11, color:'#94A3B8', textAlign:'center', padding:'6px 0' }}>
+          <p style={{ fontSize:11, color:'#64748B', textAlign:'center', padding:'6px 0' }}>
             날짜를 눌러 할당된 항목을 확인하세요
           </p>
         ) : dayItems.length === 0 ? (
-          <p style={{ fontSize:11, color:'#94A3B8', textAlign:'center', padding:'6px 0' }}>항목의 "+일정" 버튼으로 추가하세요</p>
+          <p style={{ fontSize:11, color:'#64748B', textAlign:'center', padding:'6px 0' }}>항목의 "+일정" 버튼으로 추가하세요</p>
         ) : (
           <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
             {dayItems.map(item => (
@@ -1385,7 +1385,7 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
           marginTop: 12, padding: '10px 14px', borderRadius: 8,
           background: selected ? 'rgba(27,110,243,0.06)' : '#e8e8e8',
           textAlign: 'center', fontSize: 14, fontWeight: 600,
-          color: selected ? '#1B6EF3' : '#94A3B8',
+          color: selected ? '#1B6EF3' : '#64748B',
           border: selected ? '1px solid #C8C8C8' : '1px solid #C8C8C8',
         }}>
           {selected ? `📅 ${selected}` : '날짜를 선택해주세요'}
@@ -1394,7 +1394,7 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }:
         <button onClick={() => selected && onSelect(selected)} style={{
           width: '100%', height: 54, borderRadius: 6, border: 'none', cursor: selected ? 'pointer' : 'default',
           background: '#e8e8e8',
-          color: selected ? '#1B6EF3' : '#94A3B8', fontSize: 15, fontWeight: 700,
+          color: selected ? '#1B6EF3' : '#64748B', fontSize: 15, fontWeight: 700,
           marginTop: 10, marginBottom: 4,
           boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           WebkitTapHighlightColor: 'transparent',
