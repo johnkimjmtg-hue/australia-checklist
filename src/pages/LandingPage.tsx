@@ -612,27 +612,36 @@ function LcdStats() {
   ]
 
   return (
-    <div style={{ padding:'8px 12px 4px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
-      {rows.map((r, i) => (
-        <div key={i} style={{
-          background:'#c8d4b8',
-          border:'1px solid #a8b498',
-          borderRadius:8,
-          padding:'8px 10px',
-          display:'flex', alignItems:'center', gap:8,
-        }}>
-          <Icon icon={r.icon} width={22} height={22} color="#4a7a1e" style={{ flexShrink:0 }} />
-          <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize:9, color:'#4a5e32', letterSpacing:0.5, fontFamily:'monospace', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{r.label}</div>
-            <div style={{ fontSize:14, fontWeight:800, color:'#2d3e1f', fontFamily:'monospace', letterSpacing:1 }}>
-              {r.done}<span style={{ fontSize:9, color:'#4a5e32' }}>/{r.total}</span>
-            </div>
-            <div style={{ height:3, background:'#a8b498', borderRadius:2, marginTop:3, overflow:'hidden' }}>
-              <div style={{ height:'100%', width:`${r.pct}%`, background:'#4a7a1e', borderRadius:2 }} />
+    <div style={{ padding:'0 12px 0' }}>
+      {/* 큰 사각형 하나에 4구획 */}
+      <div style={{
+        border:'1px solid #a8b498',
+        borderRadius:8,
+        overflow:'hidden',
+        display:'grid',
+        gridTemplateColumns:'1fr 1fr',
+      }}>
+        {rows.map((r, i) => (
+          <div key={i} style={{
+            background:'#c8d4b8',
+            padding:'8px 10px',
+            display:'flex', alignItems:'center', gap:8,
+            borderRight:  i % 2 === 0 ? '1px solid #a8b498' : 'none',
+            borderBottom: i < 2       ? '1px solid #a8b498' : 'none',
+          }}>
+            <Icon icon={r.icon} width={22} height={22} color="#4a7a1e" style={{ flexShrink:0 }} />
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontSize:9, color:'#4a5e32', letterSpacing:0.5, fontFamily:'monospace', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{r.label}</div>
+              <div style={{ fontSize:14, fontWeight:800, color:'#2d3e1f', fontFamily:'monospace', letterSpacing:1 }}>
+                {r.done}<span style={{ fontSize:9, color:'#4a5e32' }}>/{r.total}</span>
+              </div>
+              <div style={{ height:3, background:'#a8b498', borderRadius:2, marginTop:3, overflow:'hidden' }}>
+                <div style={{ height:'100%', width:`${r.pct}%`, background:'#4a7a1e', borderRadius:2 }} />
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }
@@ -744,19 +753,21 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
             `}</style>
 
             {/* 헤더 */}
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 12px 6px', borderBottom:'1px solid #a8b498' }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 12px 6px' }}>
               <div style={{ fontSize:10, fontWeight:800, color:'#2d3e1f', letterSpacing:2, fontFamily:'monospace' }}>나의 호주가자</div>
               <div style={{ display:'flex', alignItems:'center', gap:5 }}>
                 <span style={{ fontSize:9, color:'#4a5e32', letterSpacing:1, fontFamily:'monospace' }}>LIVE</span>
                 <div className="lcd-blink" style={{ width:6, height:6, borderRadius:'50%', background:'#4a7a1e' }} />
               </div>
             </div>
+            {/* 헤더 아래 여백 있는 구분선 */}
+            <div style={{ height:1, background:'#a8b498', margin:'0 12px 8px' }} />
 
             {/* 통계 4칸 그리드 — 고정 */}
             <LcdStats />
 
             {/* 구분선 */}
-            <div style={{ height:1, background:'#a8b498', margin:'0 12px' }} />
+            <div style={{ height:1, background:'#a8b498', margin:'8px 12px' }} />
 
             {/* 공지 스크롤 */}
             <div style={{ height:60, overflow:'hidden', padding:'6px 12px 10px' }}>
