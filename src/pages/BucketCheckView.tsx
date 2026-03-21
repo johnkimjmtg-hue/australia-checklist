@@ -20,6 +20,10 @@ type Props = {
   onEdit:     () => void
   onDelete:   () => void
   onShare:    () => void
+  onServices:  () => void
+  onShopping:  () => void
+  onBingo:     () => void
+  onCommunity: () => void
   onLanding:   () => void
 }
 
@@ -180,7 +184,7 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=
   )
 }
 
-export default function BucketCheckView({ state, trip, setState, items, dbItems, onAchievedChange, onEdit, onDelete, onShare, onLanding }: Props) {
+export default function BucketCheckView({ state, trip, setState, items, dbItems, onAchievedChange, onEdit, onDelete, onShare, onServices, onShopping, onBingo, onCommunity, onLanding }: Props) {
   const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
@@ -464,9 +468,68 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           60%  { transform:translateY(-3px) scale(1.1); opacity:1; }
           100% { transform:translateY(0) scale(1); opacity:1; }
         }
+        .neu-tab {
+          background: #e8e8e8;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          transition: all 0.15s ease;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+          box-shadow: 3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff;
+          border-radius: 10px;
+        }
+        .neu-tab.active {
+          box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff;
+        }
+        .neu-tab:active {
+          box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff;
+        }
       `}</style>
 
       <Confetti trigger={confettiTrigger} />
+
+      {/* ══ 헤더 + 탭 ══ */}
+      <div style={{ background:'#e8e8e8', paddingBottom:8 }}>
+        <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px 12px' }}>
+          <span onClick={handleLogoTap}
+            style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}
+          >HOJUGAJA</span>
+          <span style={{ fontSize:13,color:'#64748B',fontWeight:600 }}>{achievedCount}/{total}</span>
+        </div>
+        <div style={{ display:'flex', padding:'0 10px', gap:8, overflowX:'auto', scrollbarWidth:'none' }}>
+          {([
+            { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트', action: () => {} },
+			{ id:'shopping',   icon:'ph:shopping-bag', label:'쇼핑리스트', action: onShopping },
+			{ id:'bingo',      icon:'ph:coffee',       label:'카페빙고게임', action: onBingo },
+			{ id:'community',  icon:'ph:chats-circle', label:'채팅방', action: onCommunity },
+			{ id:'services',   icon:'ph:buildings',    label:'업체리스트', action: onServices },
+          ]).map(tab => {
+            const active = tab.id === 'bucketlist'
+            const isShopping = tab.id === 'shopping'
+            const myListCount = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]').length } catch { return 0 } })()
+            const hasMyList = isShopping && myListCount > 0
+            // 다른페이지(버킷체크뷰)에서: 리스트 있으면 카트+회색, 없으면 기본
+            const tabIcon  = hasMyList ? 'ph:shopping-cart-simple' : tab.icon
+            const tabLabel = hasMyList ? `내쇼핑리스트 ${myListCount}` : tab.label
+            const tabColor = active ? '#1B6EF3' : '#94A3B8'
+            return (
+              <button key={tab.id} onClick={tab.action}
+                className={`neu-tab${active ? ' active' : ''}`}
+                style={{ flex:1, minWidth:0, height:52 }}>
+                <Icon icon={tabIcon} width={16} height={16} color={tabColor} />
+                <span style={{ fontSize:9, fontWeight: active ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
+                  {tabLabel}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
       {/* ══ 진행 카드 ══ */}
       <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'16px 16px 0' }}>
