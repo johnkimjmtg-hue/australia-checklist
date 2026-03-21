@@ -342,10 +342,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             setIssuedAt(at)
             setShowReceipt(true)
           }}
-          onServices={() => setMainTab('services')}
-          onShopping={() => setMainTab(myListCount > 0 ? 'myshoppinglist' : 'shopping')}
-          onBingo={() => setMainTab('bingo')}
-          onCommunity={() => setMainTab('community')}
           onLanding={() => onLanding?.()}
         />
         {showReceipt && trip && (
