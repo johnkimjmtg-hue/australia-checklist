@@ -884,6 +884,7 @@ function ItemsTab({ cats, items, setItems }: {
   const [dragOverIdx, setDragOverIdx] = useState<number|null>(null)
   const [editId, setEditId]     = useState<string|null>(null)
   const [editLabel, setEditLabel] = useState('')
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string|null>(null)
   const [expandedId, setExpandedId] = useState<string|null>(null)
   const [businesses, setBusinesses] = useState<{id:string;name:string}[]>([])
   const [products, setProducts]     = useState<{id:string;name:string}[]>([])
@@ -946,7 +947,6 @@ function ItemsTab({ cats, items, setItems }: {
   }
 
   async function deleteItem(id: string) {
-    if (!confirm('이 항목을 삭제할까요?')) return
     await supabase.from('checklist_items').delete().eq('id', id)
     setItems(items.filter(i => i.id !== id))
     showToast('항목 삭제됨')
@@ -1033,6 +1033,38 @@ function ItemsTab({ cats, items, setItems }: {
   return (
     <>
       {toast && <Toast msg={toast} />}
+
+      {/* 삭제 확인 팝업 */}
+      {deleteConfirmId && (() => {
+        const item = items.find(i => i.id === deleteConfirmId)
+        return (
+          <>
+            <div onClick={() => setDeleteConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:800 }} />
+            <div style={{
+              position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+              background:'#fff', borderRadius:16, padding:'24px 20px', zIndex:801,
+              width:'calc(100% - 48px)', maxWidth:320, boxShadow:'0 8px 32px rgba(0,0,0,0.2)',
+            }}>
+              <div style={{ fontSize:16, fontWeight:800, color:'#0F172A', marginBottom:8 }}>항목을 삭제할까요?</div>
+              <div style={{ fontSize:13, color:'#64748B', lineHeight:1.6, marginBottom:20 }}>
+                <span style={{ fontWeight:700, color:'#1B6EF3' }}>{item?.label}</span><br/>
+                삭제하면 복구할 수 없습니다.
+              </div>
+              <div style={{ display:'flex', gap:8 }}>
+                <button onClick={() => setDeleteConfirmId(null)} style={{
+                  flex:1, height:44, borderRadius:10, border:'1px solid #C8C8C8',
+                  background:'#fff', fontSize:14, fontWeight:600, cursor:'pointer', color:'#64748B',
+                }}>취소</button>
+                <button onClick={() => { deleteItem(deleteConfirmId); setDeleteConfirmId(null) }} style={{
+                  flex:1, height:44, borderRadius:10, border:'none',
+                  background:'#DC2626', fontSize:14, fontWeight:700, cursor:'pointer', color:'#fff',
+                }}>삭제하기</button>
+              </div>
+            </div>
+          </>
+        )
+      })()}
+
       {/* 카테고리 선택 */}
       <Card>
         <SectionTitle>카테고리 선택</SectionTitle>
@@ -1181,23 +1213,27 @@ function ItemsTab({ cats, items, setItems }: {
                 <span style={{ color:'#aaa', fontSize:14, userSelect:'none' }}>⠿</span>
                 <IconPicker value={item.icon || 'ph:star'} onChange={icon => updateIcon(item.id, icon)} />
                 {isEditing ? (
-                  <input
-                    value={editLabel}
-                    onChange={e => setEditLabel(e.target.value)}
-                    onKeyDown={e => { if(e.key==='Enter') saveLabel(item.id); if(e.key==='Escape') setEditId(null) }}
-                    autoFocus
-                    style={{ ...inputStyle, flex:1, fontSize:13, padding:'4px 8px' }}
-                  />
+                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:4 }}>
+                    <input
+                      value={editLabel}
+                      onChange={e => setEditLabel(e.target.value)}
+                      onKeyDown={e => { if(e.key==='Escape') setEditId(null) }}
+                      autoFocus
+                      style={{ ...inputStyle, fontSize:13, padding:'4px 8px', width:'100%' }}
+                    />
+                    <div style={{ display:'flex', gap:6 }}>
+                      <button onClick={() => saveLabel(item.id)}
+                        style={{ ...btnPrimary, padding:'4px 12px', fontSize:12 }}>적용하기</button>
+                      <button onClick={() => setEditId(null)}
+                        style={{ background:'none', border:'1px solid #ccc', borderRadius:6, padding:'4px 10px', fontSize:12, cursor:'pointer', color:'#666' }}>취소</button>
+                    </div>
+                  </div>
                 ) : (
                   <span
                     onClick={() => { setEditId(item.id); setEditLabel(item.label) }}
-                    style={{ flex:1, fontSize:13, color:'#222', cursor:'text' }}
+                    style={{ flex:1, fontSize:13, color:'#222', cursor:'text', wordBreak:'break-all', lineHeight:1.5 }}
                     title="클릭하여 수정"
                   >{item.label}</span>
-                )}
-                {isEditing && (
-                  <button onClick={() => saveLabel(item.id)}
-                    style={{ ...btnPrimary, padding:'4px 10px', fontSize:12 }}>저장</button>
                 )}
                 <button
                   onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
@@ -1210,7 +1246,7 @@ function ItemsTab({ cats, items, setItems }: {
                   style={{ background:'none', border:'none', cursor:'pointer', fontSize:16, opacity:0.7 }}>
                   {item.is_active ? '✅' : '⬜'}
                 </button>
-                <button onClick={() => deleteItem(item.id)}
+                <button onClick={() => setDeleteConfirmId(item.id)}
                   style={{ background:'none', border:'none', color:'#e05252', cursor:'pointer', fontSize:14 }}>✕</button>
               </div>
             {/* 상세정보 편집 패널 */}
