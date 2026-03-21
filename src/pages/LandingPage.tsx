@@ -612,15 +612,14 @@ function LcdStats() {
   ]
 
   return (
-    <div style={{ padding:'10px 12px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+    <div style={{ padding:'8px 12px 4px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
       {rows.map((r, i) => (
         <div key={i} style={{
-          background:'#b8c8a8',
+          background:'#c8d4b8',
           border:'1px solid #a8b498',
           borderRadius:8,
           padding:'8px 10px',
           display:'flex', alignItems:'center', gap:8,
-          boxShadow:'inset 1px 1px 3px #a0b490, inset -1px -1px 3px #d0e4c0',
         }}>
           <Icon icon={r.icon} width={22} height={22} color="#4a7a1e" style={{ flexShrink:0 }} />
           <div style={{ flex:1, minWidth:0 }}>
