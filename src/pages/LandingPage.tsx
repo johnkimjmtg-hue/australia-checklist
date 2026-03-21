@@ -592,11 +592,29 @@ function ChatBubble() {
 // ══════════════════════════════════════════════════
 // ── LCD 통계 컴포넌트
 function LcdStats() {
-  const bucketDone = (() => {
-    try { const s = JSON.parse(localStorage.getItem('korea-receipt') ?? '{}'); return Object.keys(s.achieved ?? s.selected ?? {}).length } catch { return 0 }
-  })()
-  const bucketTotal = (() => {
-    try { const s = JSON.parse(localStorage.getItem('korea-receipt') ?? '{}'); return Object.keys(s.selected ?? {}).length } catch { return 0 }
+  const { bucketDone, bucketTotal } = (() => {
+    try {
+      const state = JSON.parse(localStorage.getItem('korea-receipt') ?? '{}')
+      const achieved = JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}')
+      const selected: Record<string,boolean> = state.selected ?? {}
+      const schedules: Record<string,number[]> = state.schedules ?? {}
+      // row 기준 total (같은 아이템이 8일이면 8개)
+      let total = 0
+      let done = 0
+      Object.keys(selected).forEach(id => {
+        const days = schedules[id] ?? []
+        if (days.length === 0) {
+          total++
+          if (achieved[id]) done++
+        } else {
+          days.forEach(d => {
+            total++
+            if (achieved[`${id}_${d}`]) done++
+          })
+        }
+      })
+      return { bucketDone: done, bucketTotal: total }
+    } catch { return { bucketDone: 0, bucketTotal: 0 } }
   })()
   const shopList    = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]').length } catch { return 0 } })()
   const shopDone    = (() => { try { return Object.keys(JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}')).filter(k => JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}')[k]).length } catch { return 0 } })()
