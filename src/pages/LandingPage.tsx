@@ -672,7 +672,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: '40px 0',
+        padding: '16px 0',
         boxSizing: 'border-box' as any,
       }}>
         <style>{`
@@ -717,7 +717,7 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           padding: '20px 20px 24px',
           boxShadow: '8px 8px 16px #c5c5c5, -8px -8px 16px #ffffff',
           maxWidth: 380,
-          width: '100%',
+          width: 'calc(100% - 32px)',
           margin: '0 auto',
           boxSizing: 'border-box' as any,
         }}>
