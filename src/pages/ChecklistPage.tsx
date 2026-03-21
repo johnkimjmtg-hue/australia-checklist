@@ -317,45 +317,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   // ── 발행된 버킷리스트 → 체크 화면 분기 ──
   const isIssued = !!state.meta.lastIssuedAt
-  if (mainTab === 'bucketlist' && isIssued && trip) {
-    return (
-      <>
-        <BucketCheckView
-          state={state}
-          trip={trip}
-          setState={setState}
-          items={ITEMS}
-          dbItems={dbItems}
-          onAchievedChange={setAchieved}
-          onEdit={() => {
-            setShowReceipt(false)
-            const next = { ...state, meta: { ...state.meta, lastIssuedAt: undefined } }
-            setState(next)
-            try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
-            // 버킷체크뷰 달성 기록도 초기화 (수정 모드로 돌아가면 진행률 리셋)
-            try { localStorage.removeItem('bucket-achieved') } catch {}
-            setAchieved({})
-          }}
-          onDelete={doReset}
-          onShare={() => {
-            const at = state.meta.lastIssuedAt ?? issuedAt
-            setIssuedAt(at)
-            setShowReceipt(true)
-          }}
-          onServices={() => setMainTab('services')}
-          onShopping={() => setMainTab(myListCount > 0 ? 'myshoppinglist' : 'shopping')}
-          onBingo={() => setMainTab('bingo')}
-          onCommunity={() => setMainTab('community')}
-          onLanding={() => onLanding?.()}
-        />
-        {showReceipt && trip && (
-          <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
-            achieved={achieved} dbItems={dbItems}
-            onClose={() => setShowReceipt(false)} onReset={() => { setShowReceipt(false); doReset() }} />
-        )}
-      </>
-    )
-  }
 
   return (
     <div style={{ minHeight:'100vh', background:'#e8e8e8',
@@ -526,6 +487,37 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
       ) : mainTab === 'community' ? (
         <Community />
+      ) : (mainTab === 'bucketlist' && isIssued && trip) ? (
+        <>
+          <BucketCheckView
+            state={state}
+            trip={trip}
+            setState={setState}
+            items={ITEMS}
+            dbItems={dbItems}
+            onAchievedChange={setAchieved}
+            onEdit={() => {
+              setShowReceipt(false)
+              const next = { ...state, meta: { ...state.meta, lastIssuedAt: undefined } }
+              setState(next)
+              try { localStorage.setItem('korea-receipt', JSON.stringify(next)) } catch {}
+              try { localStorage.removeItem('bucket-achieved') } catch {}
+              setAchieved({})
+            }}
+            onDelete={doReset}
+            onShare={() => {
+              const at = state.meta.lastIssuedAt ?? issuedAt
+              setIssuedAt(at)
+              setShowReceipt(true)
+            }}
+            onLanding={() => onLanding?.()}
+          />
+          {showReceipt && trip && (
+            <ReceiptModal state={state} trip={trip} issuedAt={issuedAt}
+              achieved={achieved} dbItems={dbItems}
+              onClose={() => setShowReceipt(false)} onReset={() => { setShowReceipt(false); doReset() }} />
+          )}
+        </>
       ) : (
         <>
           {/* ── SUB HEADER (버튼들) — 스크롤 시 사라짐 ── */}
