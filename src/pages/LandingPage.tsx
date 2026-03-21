@@ -590,6 +590,47 @@ function ChatBubble() {
 // ══════════════════════════════════════════════════
 // ── 메인 컴포넌트
 // ══════════════════════════════════════════════════
+// ── LCD 통계 컴포넌트
+function LcdStats() {
+  const bucketDone = (() => {
+    try { const s = JSON.parse(localStorage.getItem('korea-receipt') ?? '{}'); return Object.keys(s.achieved ?? s.selected ?? {}).length } catch { return 0 }
+  })()
+  const bucketTotal = (() => {
+    try { const s = JSON.parse(localStorage.getItem('korea-receipt') ?? '{}'); return Object.keys(s.selected ?? {}).length } catch { return 0 }
+  })()
+  const shopList    = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]').length } catch { return 0 } })()
+  const shopDone    = (() => { try { return Object.keys(JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}')).filter(k => JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}')[k]).length } catch { return 0 } })()
+  const melDone     = (() => { try { return JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]').length } catch { return 0 } })()
+  const sydDone     = (() => { try { return JSON.parse(localStorage.getItem('bingo-sydney') ?? '[]').length } catch { return 0 } })()
+  const BINGO_TOTAL = 25
+
+  const rows = [
+    { icon:'ph:check-circle', label:'버킷리스트', done: bucketDone, total: bucketTotal || 0, pct: bucketTotal ? Math.round(bucketDone/bucketTotal*100) : 0 },
+    { icon:'ph:shopping-bag', label:'쇼핑리스트',  done: shopDone,   total: shopList,         pct: shopList   ? Math.round(shopDone/shopList*100)     : 0 },
+    { icon:'ph:coffee',       label:'시드니 카페 빙고', done: sydDone, total: BINGO_TOTAL,    pct: Math.round(sydDone/BINGO_TOTAL*100) },
+    { icon:'ph:coffee',       label:'멜번 카페 빙고',  done: melDone, total: BINGO_TOTAL,    pct: Math.round(melDone/BINGO_TOTAL*100) },
+  ]
+
+  return (
+    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:1, background:'#a8b498', margin:'0 0 0 0' }}>
+      {rows.map((r, i) => (
+        <div key={i} style={{ background:'#c8d4b8', padding:'8px 10px', display:'flex', alignItems:'center', gap:8 }}>
+          <Icon icon={r.icon} width={20} height={20} color="#4a7a1e" style={{ flexShrink:0 }} />
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ fontSize:9, color:'#4a5e32', letterSpacing:0.5, fontFamily:'monospace', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{r.label}</div>
+            <div style={{ fontSize:13, fontWeight:800, color:'#2d3e1f', fontFamily:'monospace', letterSpacing:1 }}>
+              {r.done}<span style={{ fontSize:9, color:'#4a5e32' }}>/{r.total}</span>
+            </div>
+            <div style={{ height:3, background:'#a8b498', borderRadius:2, marginTop:3, overflow:'hidden' }}>
+              <div style={{ height:'100%', width:`${r.pct}%`, background:'#4a7a1e', borderRadius:2 }} />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function LandingPage({ state, onStart, onServices }: Props) {
   const navigate = useNavigate()
   const [showForm, setShowForm]             = useState(false)
@@ -678,13 +719,9 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           <div style={{
             background:'#c8d4b8',
             borderRadius: 12,
-            padding: '0',
             marginBottom: 20,
             boxShadow: 'inset 3px 3px 8px #a8b498, inset -2px -2px 6px #e8f4d8',
-            textAlign: 'center',
-            height: 150,
             overflow: 'hidden',
-            position: 'relative',
           }}>
             <style>{`
               @keyframes scrollUpLoop {
@@ -696,44 +733,51 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
                 display: flex;
                 flex-direction: column;
               }
+              @keyframes lcdblink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+              .lcd-blink { animation: lcdblink 1.2s step-end infinite; }
             `}</style>
-            <div className="notice-loop">
-              {[0,1].map(k => (
-                <div key={k} style={{ padding:'16px 16px', boxSizing:'border-box' as any }}>
-                  <div style={{ display:'flex', justifyContent:'center', marginBottom:8 }}>
-                    <Icon icon="mdi:kangaroo" width={30} height={30} color="#2d3e1f" />
-                  </div>
-                  <div style={{ fontSize:13, fontWeight:800, color:'#2d3e1f', marginBottom:8 }}>
-                    호주가자에 오신 것을 환영합니다!
-                  </div>
-                  <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8, marginBottom:8 }}>
-                    호주 여행·이민을 준비하시는 분들을 위한<br/>
-                    <strong>무료 정보 제공 사이트</strong>입니다.
-                  </div>
-                  <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8, marginBottom:8 }}>
-                    버킷리스트·쇼핑리스트·업체 정보까지<br/>
-                    호주의 모든 정보를 한곳에서 확인하세요.
-                  </div>
-                  <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8, marginBottom:8 }}>
-                    📢 호주 현지 업체 등록은 <strong>무료</strong>이며,<br/>
-                    등록된 업체는 사이트 내 우선 노출됩니다.<br/>
-                    아래 <strong>#업체등록신청</strong> 버튼을 이용해주세요.
-                  </div>
-                  <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8, marginBottom:8 }}>
-                    추천하고 싶은 버킷리스트 항목이 있다면<br/>
-                    아래 <strong>*버킷리스트추천</strong> 버튼으로 알려주세요. 😊
-                  </div>
-                  <div style={{ fontSize:11, color:'#4a5e32', lineHeight:1.8 }}>
-                    🚀 더 많은 서비스를 준비 중입니다.<br/>
-                    많은 기대 부탁드립니다!
-                  </div>
-                </div>
-              ))}
+
+            {/* 헤더 */}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 12px 6px', borderBottom:'1px solid #a8b498' }}>
+              <div style={{ fontSize:10, fontWeight:800, color:'#2d3e1f', letterSpacing:2, fontFamily:'monospace' }}>나의 호주가자</div>
+              <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                <span style={{ fontSize:9, color:'#4a5e32', letterSpacing:1, fontFamily:'monospace' }}>LIVE</span>
+                <div className="lcd-blink" style={{ width:6, height:6, borderRadius:'50%', background:'#4a7a1e' }} />
+              </div>
             </div>
-          </div>
 
+            {/* 통계 4칸 그리드 — 고정 */}
+            <LcdStats />
 
-          {/* 버튼 그리드 */}
+            {/* 구분선 */}
+            <div style={{ height:1, background:'#a8b498', margin:'0 12px' }} />
+
+            {/* 공지 스크롤 */}
+            <div style={{ height:60, overflow:'hidden', padding:'0 12px' }}>
+              <div className="notice-loop">
+                {[0,1].map(k => (
+                  <div key={k}>
+                    {[
+                      { hi:true,  text:'> 호주가자에 오신 것을 환영합니다!' },
+                      { hi:false, text:'  호주 여행·이민 무료 정보 제공 사이트' },
+                      { hi:true,  text:'> 업체 등록은 무료 · 우선 노출 보장' },
+                      { hi:false, text:'  아래 #업체등록신청 버튼 이용하세요' },
+                      { hi:true,  text:'> 버킷리스트 추천이 있으신가요?' },
+                      { hi:false, text:'  *버킷리스트추천 버튼을 눌러주세요' },
+                      { hi:true,  text:'> 더 많은 서비스 준비 중입니다 :)' },
+                    ].map((line, i) => (
+                      <div key={i} style={{
+                        fontSize:10, lineHeight:1.9, fontFamily:'monospace',
+                        letterSpacing:0.3, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
+                        color: line.hi ? '#2d3e1f' : '#4a5e32',
+                        fontWeight: line.hi ? 800 : 400,
+                      }}>{line.text}</div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>          {/* 버튼 그리드 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {/* 1행 */}
             <button className="calc-btn" onClick={onStart} style={{ height: 72 }}>1<br/>버킷리스트</button>
