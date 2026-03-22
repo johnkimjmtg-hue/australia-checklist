@@ -305,13 +305,14 @@ export default function NearbyMap({ onBack }: Props) {
           <div style={{
             position:'fixed', bottom:0,
             left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:480,
+            width:'100%', maxWidth:390,
             background:'#e8e8e8',
             borderRadius:'20px 20px 0 0',
             zIndex:501,
             animation:'slideUpSheet 0.25s ease',
             maxHeight:'75vh',
             overflowY:'auto',
+            boxSizing:'border-box',
             paddingBottom:32,
           }}>
             {/* 핸들 바 */}
