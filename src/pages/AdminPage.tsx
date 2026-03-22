@@ -1027,29 +1027,18 @@ function ItemsTab({ cats, items, setItems }: {
 
   async function uploadItemImage(id: string, file: File) {
     setSaving(true)
-    // 기존 이미지 Storage에서 삭제
-    const existing = items.find(i => i.id === id)
-    if (existing?.image_url) {
-      const oldPath = existing.image_url.split('/storage/v1/object/public/shopping-images/')[1]
-      if (oldPath) await supabase.storage.from('shopping-images').remove([decodeURIComponent(oldPath)])
+    try {
+      const publicUrl = await uploadToCloudinary(file, 'checklist')
+      await supabase.from('checklist_items').update({ image_url: publicUrl }).eq('id', id)
+      setItems(items.map(i => i.id===id ? {...i, image_url: publicUrl} : i))
+      showToast('이미지 저장됨')
+    } catch {
+      showToast('이미지 업로드 실패')
     }
-    const ext = file.name.split('.').pop()
-    const path = `checklist/${id}_${Date.now()}.${ext}`
-    const { error: upErr } = await supabase.storage.from('shopping-images').upload(path, file, { upsert: true })
-    if (upErr) { showToast('이미지 업로드 실패'); setSaving(false); return }
-    const { data: { publicUrl } } = supabase.storage.from('shopping-images').getPublicUrl(path)
-    await supabase.from('checklist_items').update({ image_url: publicUrl }).eq('id', id)
-    setItems(items.map(i => i.id===id ? {...i, image_url: publicUrl} : i))
-    showToast('이미지 저장됨')
     setSaving(false)
   }
 
   async function deleteItemImage(id: string) {
-    const existing = items.find(i => i.id === id)
-    if (existing?.image_url) {
-      const oldPath = existing.image_url.split('/storage/v1/object/public/shopping-images/')[1]
-      if (oldPath) await supabase.storage.from('shopping-images').remove([decodeURIComponent(oldPath)])
-    }
     await supabase.from('checklist_items').update({ image_url: null }).eq('id', id)
     setItems(items.map(i => i.id===id ? {...i, image_url: null} : i))
     showToast('이미지 삭제됨')
@@ -2851,6 +2840,7 @@ function GoogleMappingTab() {
 
       {/* ── 좌표 자동 입력 섹션 */}
       <ShoppingImageMigrationSection ff={ff} />
+      <ChecklistImageMigrationSection ff={ff} />
 
       <GeocodingSection ff={ff} />
 
@@ -2922,6 +2912,99 @@ function ShoppingImageMigrationSection({ ff }: { ff: string }) {
         display:'flex', alignItems:'center', justifyContent:'center', gap:8,
       }}>
         {running ? `🖼 이전 중... ${done}${total !== null ? '/' + total : ''}개` : '🖼 Cloudinary 이전 시작'}
+      </button>
+      {error && <div style={{ background:'#FEE2E2', borderRadius:10, padding:'12px 14px', marginBottom:16, fontSize:13, color:'#DC2626' }}>❌ {error}</div>}
+      {results.length > 0 && (
+        <>
+          <div style={{ display:'flex', gap:8, marginBottom:12 }}>
+            <div style={{ flex:1, background:'#DCFCE7', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#16A34A' }}>{succeeded}</div>
+              <div style={{ fontSize:11, color:'#16A34A', fontWeight:600 }}>완료</div>
+            </div>
+            <div style={{ flex:1, background:'#FEE2E2', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#DC2626' }}>{failed}</div>
+              <div style={{ fontSize:11, color:'#DC2626', fontWeight:600 }}>실패</div>
+            </div>
+            <div style={{ flex:1, background:'#F1F5F9', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#475569' }}>{results.length}</div>
+              <div style={{ fontSize:11, color:'#475569', fontWeight:600 }}>처리됨</div>
+            </div>
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:6, maxHeight:300, overflowY:'auto' }}>
+            {results.map((r, i) => (
+              <div key={i} style={{ background:'#fff', borderRadius:10, padding:'10px 14px', border:'1px solid ' + (r.status.startsWith('✅') ? '#DCFCE7' : '#FEE2E2'), display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div style={{ fontSize:13, fontWeight:700, color:'#0F172A' }}>{r.name}</div>
+                <div style={{ fontSize:12, fontWeight:700 }}>{r.status}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+
+function ChecklistImageMigrationSection({ ff }: { ff: string }) {
+  const [running, setRunning] = useState(false)
+  const [results, setResults] = useState<{ name: string; status: string }[]>([])
+  const [total, setTotal] = useState<number | null>(null)
+  const [done, setDone] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleRun = async () => {
+    if (!confirm('Supabase Storage 체크리스트 이미지를 Cloudinary로 이전할까요?')) return
+    setRunning(true); setResults([]); setError(null); setDone(0)
+    try {
+      const { data: items, error: fetchErr } = await supabase
+        .from('checklist_items')
+        .select('id, label, image_url')
+        .not('image_url', 'is', null)
+        .ilike('image_url', '%supabase%')
+      if (fetchErr) throw new Error(fetchErr.message)
+      setTotal(items.length)
+      const BATCH = 5
+      for (let i = 0; i < items.length; i += BATCH) {
+        const batch = items.slice(i, i + BATCH)
+        await Promise.all(batch.map(async (item: any) => {
+          try {
+            const res = await fetch(item.image_url)
+            if (!res.ok) throw new Error('fetch 실패')
+            const blob = await res.blob()
+            const newUrl = await uploadToCloudinary(blob, 'checklist')
+            await supabase.from('checklist_items').update({ image_url: newUrl }).eq('id', item.id)
+            setResults(prev => [...prev, { name: item.label, status: '✅ 완료' }])
+          } catch (e: any) {
+            setResults(prev => [...prev, { name: item.label, status: '❌ 실패: ' + String(e?.message ?? e) }])
+          }
+          setDone(prev => prev + 1)
+        }))
+        if (i + BATCH < items.length) await new Promise(r => setTimeout(r, 300))
+      }
+    } catch (e: any) {
+      setError(String(e?.message ?? e))
+    }
+    setRunning(false)
+  }
+
+  const succeeded = results.filter(r => r.status.startsWith('✅')).length
+  const failed    = results.filter(r => !r.status.startsWith('✅')).length
+
+  return (
+    <div style={{ marginBottom:24, fontFamily: ff }}>
+      <div style={{ background:'#F0FDF4', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
+        <div style={{ fontWeight:800, color:'#16A34A', marginBottom:4 }}>✅ 체크리스트 이미지 Cloudinary 이전</div>
+        Supabase Storage 체크리스트 아이템 이미지를 Cloudinary로 이전합니다.<br />
+        이전 후 DB의 image_url이 Cloudinary URL로 자동 업데이트됩니다.
+      </div>
+      <button onClick={handleRun} disabled={running} style={{
+        width:'100%', height:48, borderRadius:12, border:'none',
+        background: running ? '#94A3B8' : '#16A34A',
+        color:'#fff', fontSize:15, fontWeight:700,
+        cursor: running ? 'default' : 'pointer', marginBottom:16,
+        display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+      }}>
+        {running ? `✅ 이전 중... ${done}${total !== null ? '/' + total : ''}개` : '✅ Cloudinary 이전 시작'}
       </button>
       {error && <div style={{ background:'#FEE2E2', borderRadius:10, padding:'12px 14px', marginBottom:16, fontSize:13, color:'#DC2626' }}>❌ {error}</div>}
       {results.length > 0 && (
