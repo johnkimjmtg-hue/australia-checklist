@@ -90,7 +90,13 @@ export default function NearbyMap({ onBack }: Props) {
         if (infoRef.current) infoRef.current.close()
       }
     }
-    return () => { delete (window as any).__nearbySelectBiz }
+    ;(window as any).__nearbyCloseInfo = () => {
+      if (infoRef.current) infoRef.current.close()
+    }
+    return () => {
+      delete (window as any).__nearbySelectBiz
+      delete (window as any).__nearbyCloseInfo
+    }
   }, [allBiz])
 
   // DB 최초 1회 로드
@@ -223,15 +229,26 @@ export default function NearbyMap({ onBack }: Props) {
         if (infoRef.current) {
           infoRef.current.close()
           infoRef.current.setContent(`
-            <div style="font-family:-apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;padding:4px 2px;min-width:140px">
-              <div style="font-size:13px;font-weight:800;color:#0F172A;margin-bottom:8px">${biz.name}</div>
-              <button
-                onclick="window.__nearbySelectBiz('${biz.id}')"
-                style="width:100%;padding:7px 0;background:#1B6EF3;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit"
-              >자세히 보기 →</button>
+            <div style="font-family:-apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;padding:2px;min-width:160px">
+              <div style="font-size:13px;font-weight:800;color:#0F172A;margin-bottom:6px">${biz.name}</div>
+              <div style="display:flex;gap:6px">
+                <button
+                  onclick="window.__nearbySelectBiz('${biz.id}')"
+                  style="flex:1;padding:6px 0;background:#1B6EF3;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit"
+                >자세히 보기 →</button>
+                <button
+                  onclick="window.__nearbyCloseInfo()"
+                  style="padding:6px 10px;background:#e8e8e8;color:#64748B;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit"
+                >닫기</button>
+              </div>
             </div>
           `)
           infoRef.current.open({ map: mapObj.current, anchor: marker })
+          // 기본 X 버튼 숨기기
+          setTimeout(() => {
+            const closeBtn = document.querySelector('.gm-ui-hover-effect') as HTMLElement
+            if (closeBtn) closeBtn.style.display = 'none'
+          }, 50)
         }
       })
 
