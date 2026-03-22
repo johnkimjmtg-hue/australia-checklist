@@ -603,11 +603,7 @@ export default function Community() {
               <Icon icon="mdi:kangaroo" width={22} height={22} color="#fff" />
             </div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 채팅방</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981' }} />
-                <div style={{ fontSize: 11, color: '#10B981', fontWeight: 600 }}>{onlineCount}명 접속 중</div>
-              </div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 단톡방</div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

@@ -1994,6 +1994,21 @@ function CommunityTab() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [confirmCommentId, setConfirmCommentId] = useState<{postId:string; commentId:string} | null>(null)
+  const [onlineCount, setOnlineCount] = useState(0)
+
+  // Realtime presence로 접속자 수 추적
+  useEffect(() => {
+    const channel = supabase.channel('community-room', { config: { presence: { key: 'admin' } } })
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState()
+        setOnlineCount(Object.keys(state).length)
+      })
+      .subscribe(async status => {
+        if (status === 'SUBSCRIBED') await channel.track({ joined_at: Date.now() })
+      })
+    return () => { supabase.removeChannel(channel) }
+  }, [])
 
   const fetchAll = async () => {
     setLoading(true)
@@ -2046,8 +2061,14 @@ function CommunityTab() {
 
   return (
     <div>
-      <div style={{ fontSize:13, fontWeight:700, color:'#1E293B', marginBottom:12 }}>
-        커뮤니티 게시글 관리 <span style={{ color:'#94A3B8', fontWeight:500 }}>({posts.length}개)</span>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
+        <div style={{ fontSize:13, fontWeight:700, color:'#1E293B' }}>
+          커뮤니티 게시글 관리 <span style={{ color:'#94A3B8', fontWeight:500 }}>({posts.length}개)</span>
+        </div>
+        <div style={{ display:'flex', alignItems:'center', gap:5, background:'#ECFDF5', borderRadius:20, padding:'4px 12px' }}>
+          <div style={{ width:6, height:6, borderRadius:'50%', background:'#10B981' }} />
+          <span style={{ fontSize:12, fontWeight:700, color:'#10B981' }}>{onlineCount}명 접속 중</span>
+        </div>
       </div>
 
       {posts.map(post => (
