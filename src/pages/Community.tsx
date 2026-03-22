@@ -461,6 +461,15 @@ export default function Community() {
     setSearchResults(results)
   }
 
+  // 원글 ID → 답글 ID 목록 맵
+  const repliesMap = messages.reduce<Record<string, string[]>>((acc, m) => {
+    if (m.reply_to_id) {
+      if (!acc[m.reply_to_id]) acc[m.reply_to_id] = []
+      acc[m.reply_to_id].push(m.id)
+    }
+    return acc
+  }, {})
+
   const scrollToMessage = (id: string) => {
     const el = document.getElementById(`msg-${id}`)
     if (el) {
@@ -825,6 +834,21 @@ export default function Community() {
                           </div>
                         )}
                         {msg.text}
+                        {/* 답글 뱃지 — 원글에 답글이 있을 때 표시 */}
+                        {!msg.reply_to_id && repliesMap[msg.id]?.length > 0 && (
+                          <div
+                            onClick={() => scrollToMessage(repliesMap[msg.id][0])}
+                            style={{
+                              marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4,
+                              background: isMine ? 'rgba(255,255,255,0.2)' : 'rgba(27,110,243,0.08)',
+                              borderRadius: 20, padding: '3px 10px',
+                              cursor: 'pointer', fontSize: 11, fontWeight: 700,
+                              color: isMine ? 'rgba(255,255,255,0.9)' : BLUE,
+                            }}
+                          >
+                            ↩ 답글 {repliesMap[msg.id].length}개
+                          </div>
+                        )}
                       </div>
 
                       {/* 시간 + 좋아요 */}
