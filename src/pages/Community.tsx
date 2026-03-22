@@ -1120,7 +1120,7 @@ export default function Community() {
                 transition:'background 0.2s',
               }}>
                 {uploading
-                  ? <Icon icon="ph:spinner" width={16} height={16} color="#fff" style={{ animation:'spin 1s linear infinite' }} />
+                  ? <Icon icon="ph:spinner" width={16} height={16} color="#fff" style={{ animation: "spin 1s linear infinite" }} />
                   : <Icon icon="ph:paper-plane-right-fill" width={16} height={16} color="#fff" />
                 }
               </button>
