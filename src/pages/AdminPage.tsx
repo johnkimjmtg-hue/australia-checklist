@@ -2832,7 +2832,7 @@ function GeocodingSection({ ff }: { ff: string }) {
         const batch = bizList.slice(i, i + BATCH)
         await Promise.all(batch.map(async (biz: any) => {
           try {
-            const query = encodeURIComponent(`${biz.address}, ${biz.city}, Australia`)
+            const query = encodeURIComponent(`${biz.address}, Australia`)
             const res = await fetch(
               `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${GOOGLE_KEY}`
             )
