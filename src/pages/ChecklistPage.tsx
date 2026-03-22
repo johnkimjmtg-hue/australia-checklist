@@ -129,19 +129,38 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   }, [])
 
   useEffect(() => {
+    let channel: any
     async function fetchTodayPosts() {
       try {
         const { supabase } = await import('../lib/supabase')
         const today = new Date()
         today.setHours(0, 0, 0, 0)
+        const todayStr = today.toISOString()
+
         const { count } = await supabase
           .from('community_posts')
           .select('*', { count: 'exact', head: true })
-          .gte('created_at', today.toISOString())
+          .gte('created_at', todayStr)
         if (count !== null) setTodayPostCount(count)
+
+        // Realtime 구독 — 새 글 INSERT 시 카운트 +1
+        channel = supabase
+          .channel('today-posts')
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'community_posts',
+          }, (payload: any) => {
+            const createdAt = new Date(payload.new.created_at)
+            if (createdAt >= today) {
+              setTodayPostCount(prev => prev + 1)
+            }
+          })
+          .subscribe()
       } catch {}
     }
     fetchTodayPosts()
+    return () => { if (channel) channel.unsubscribe() }
   }, [])
 
   useEffect(() => {
