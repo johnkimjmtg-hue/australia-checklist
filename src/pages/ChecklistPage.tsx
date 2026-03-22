@@ -391,11 +391,11 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <div style={{ display:'flex', padding:'0 10px', gap:8, overflowX:'auto', scrollbarWidth:'none' }}>
           {([
             { id:'bucketlist', icon:'ph:check-circle',  label:'버킷리스트' },
-            { id:'shopping',   icon:'ph:shopping-bag',  label:'쇼핑리스트' },
-            { id:'bingo',      icon:'ph:coffee',        label:'카페빙고게임' },
-            { id:'community',  icon:'ph:chats-circle',  label:'채팅방' },
             { id:'services',   icon:'ph:buildings',     label:'업체리스트' },
             { id:'nearby',     icon:'ph:map-pin',       label:'내주변' },
+            { id:'shopping',   icon:'ph:shopping-bag',  label:'쇼핑리스트' },
+            { id:'bingo',      icon:'ph:coffee',        label:'카페빙고게임' },
+            { id:'community',  icon:'ph:chats-circle',  label:'나도한마디' },
           ] as { id: MainTab; icon: string; label: string }[]).map(tab => {
             const isShopping = tab.id === 'shopping'
             const hasMyList  = isShopping && myListCount > 0
@@ -457,7 +457,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 className={`neu-tab${isActive ? ' active' : ''}`}
                 style={{ flex:1, minWidth:0, height:52 }}>
                 <Icon icon={tabIcon} width={16} height={16} color={tabColor} />
-                <span style={{ fontSize:10, fontWeight: isActive ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
+                <span style={{ fontSize:10, fontWeight: isActive || (isShopping && hasMyList) ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
                   {tabLabel}
                 </span>
               </button>
