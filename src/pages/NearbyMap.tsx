@@ -72,8 +72,8 @@ export default function NearbyMap({ onBack }: Props) {
   const markersRef  = useRef<any[]>([])
   const myMarkerRef = useRef<any>(null)
 
-  const [category, setCategory] = useState<string>('all')
-  const [radius, setRadius]     = useState<RadiusOption>(5)
+  const [category, setCategory] = useState<string>('cafe')
+  const [radius, setRadius]     = useState<RadiusOption>(30)
   const [allBiz, setAllBiz]     = useState<Business[]>([])
   const [loading, setLoading]   = useState(true)
   const [locError, setLocError] = useState('')
