@@ -38,6 +38,16 @@ function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
 }
 
+const MY_LOCATION_SVG = encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 100 100">' +
+  '<ellipse cx="50" cy="90" rx="15" ry="5" fill="rgba(0,0,0,0.2)"/>' +
+  '<path d="M 50 20 C 42 20, 38 25, 38 32 L 38 60 C 38 65, 42 68, 45 68 L 45 85 C 45 88, 55 88, 55 85 L 55 68 C 58 68, 62 65, 62 60 L 62 32 C 62 25, 58 20, 50 20 Z" fill="#1B6EF3" stroke="#fff" stroke-width="2"/>' +
+  '<circle cx="50" cy="15" r="8" fill="#1B6EF3" stroke="#fff" stroke-width="2"/>' +
+  '<line x1="38" y1="35" x2="28" y2="52" stroke="#1B6EF3" stroke-width="5" stroke-linecap="round"/>' +
+  '<line x1="62" y1="35" x2="72" y2="52" stroke="#1B6EF3" stroke-width="5" stroke-linecap="round"/>' +
+  '</svg>'
+)
+
 let _mapsPromise: Promise<void> | null = null
 function loadGoogleMaps(): Promise<void> {
   if (_mapsPromise) return _mapsPromise
@@ -68,7 +78,6 @@ export default function NearbyMap({ onBack }: Props) {
   const [selBiz, setSelBiz]     = useState<Business | null>(null)
   const [myPos, setMyPos]       = useState<{ lat: number; lng: number } | null>(null)
 
-  // DB 최초 1회 로드
   useEffect(() => {
     getBusinesses().then(data => {
       setAllBiz(data.filter(b => (b as any).latitude && (b as any).longitude))
@@ -125,19 +134,9 @@ export default function NearbyMap({ onBack }: Props) {
               position: { lat: myLat, lng: myLng },
               map: mapObj.current,
               icon: {
-                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">
-                    <ellipse cx="18" cy="40" rx="8" ry="3" fill="rgba(0,0,0,0.15)"/>
-                    <circle cx="18" cy="8" r="6" fill="#1B6EF3" stroke="#fff" stroke-width="2"/>
-                    <path d="M8 28 Q8 18 18 18 Q28 18 28 28 L26 36 Q22 38 18 38 Q14 38 10 36 Z" fill="#1B6EF3" stroke="#fff" stroke-width="1.5"/>
-                    <line x1="8" y1="22" x2="4" y2="30" stroke="#1B6EF3" stroke-width="3" stroke-linecap="round"/>
-                    <line x1="28" y1="22" x2="32" y2="30" stroke="#1B6EF3" stroke-width="3" stroke-linecap="round"/>
-                    <line x1="14" y1="36" x2="12" y2="44" stroke="#1B6EF3" stroke-width="3" stroke-linecap="round"/>
-                    <line x1="22" y1="36" x2="24" y2="44" stroke="#1B6EF3" stroke-width="3" stroke-linecap="round"/>
-                  </svg>
-                `),
-                scaledSize: new google.maps.Size(36, 44),
-                anchor: new google.maps.Point(18, 44),
+                url: 'data:image/svg+xml;charset=UTF-8,' + MY_LOCATION_SVG,
+                scaledSize: new google.maps.Size(40, 40),
+                anchor: new google.maps.Point(20, 40),
               },
               title: '내 위치',
               zIndex: 999,
@@ -251,7 +250,6 @@ export default function NearbyMap({ onBack }: Props) {
       <div style={{ flex:1, position:'relative' }}>
         <div ref={mapRef} style={{ width:'100%', height:'100%' }} />
 
-        {/* 로딩 */}
         {loading && (
           <div style={{
             position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center',
@@ -261,7 +259,6 @@ export default function NearbyMap({ onBack }: Props) {
           </div>
         )}
 
-        {/* 위치 오류 */}
         {locError && (
           <div style={{
             position:'absolute', top:12, left:12, right:72,
@@ -271,7 +268,6 @@ export default function NearbyMap({ onBack }: Props) {
           }}>⚠️ {locError}</div>
         )}
 
-        {/* 업체 수 뱃지 */}
         <div style={{
           position:'absolute', top:12, right:12,
           background:'#fff', borderRadius:20, padding:'4px 12px',
@@ -281,7 +277,6 @@ export default function NearbyMap({ onBack }: Props) {
           {filtered.length}개
         </div>
 
-        {/* 내 위치로 이동 버튼 */}
         {myPos && (
           <button onClick={() => mapObj.current?.panTo(myPos)} style={{
             position:'absolute', bottom:16, right:12,
@@ -296,19 +291,13 @@ export default function NearbyMap({ onBack }: Props) {
         )}
       </div>
 
-      {/* 업체 바텀시트 — BusinessCard 사용 */}
+      {/* 업체 바텀시트 */}
       {selBiz && (
         <>
-          {/* 딤 배경 */}
           <div
             onClick={() => setSelBiz(null)}
-            style={{
-              position:'fixed', inset:0,
-              background:'rgba(0,0,0,0.35)',
-              zIndex:500,
-            }}
+            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.35)', zIndex:500 }}
           />
-          {/* 바텀시트 */}
           <div style={{
             position:'fixed', bottom:0,
             left:'50%', transform:'translateX(-50%)',
@@ -322,17 +311,12 @@ export default function NearbyMap({ onBack }: Props) {
             boxSizing:'border-box',
             paddingBottom:32,
           }}>
-            {/* 핸들 바 */}
             <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'12px auto 16px' }} />
-
-            {/* 거리 표시 */}
             {myPos && (
               <div style={{ textAlign:'center', fontSize:12, color:'#94A3B8', fontWeight:600, marginBottom:10 }}>
                 📍 내 위치에서 {getDistanceKm(myPos.lat, myPos.lng, (selBiz as any).latitude, (selBiz as any).longitude).toFixed(1)}km
               </div>
             )}
-
-            {/* BusinessCard */}
             <div style={{ padding:'0 12px' }}>
               <BusinessCard business={selBiz} />
             </div>
