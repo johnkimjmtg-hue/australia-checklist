@@ -856,6 +856,21 @@ export default function Community() {
 
                   <div style={{ maxWidth: '72%', display: 'flex', flexDirection: 'column', alignItems: isMine ? 'flex-end' : 'flex-start' }}>
 
+                    {/* 이미지 — 버블 밖, 텍스트 버블 위에 */}
+                    {msg.image_url && (
+                      <img
+                        src={msg.image_url}
+                        alt=""
+                        onClick={() => setFullscreenImg(msg.image_url!)}
+                        style={{
+                          maxWidth: 220, maxHeight: 220, borderRadius: 12,
+                          objectFit: 'cover', cursor: 'pointer', display: 'block',
+                          marginBottom: msg.text ? 4 : 0,
+                          border: '1px solid rgba(0,0,0,0.08)',
+                        }}
+                      />
+                    )}
+
                     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, flexDirection: isMine ? 'row-reverse' : 'row' }}>
                       {/* 말풍선 */}
                       <div style={{
@@ -888,21 +903,6 @@ export default function Community() {
                           </div>
                         )}
                         {msg.text}
-                        {/* 이미지 */}
-                        {msg.image_url && (
-                          <div style={{ marginTop: msg.text ? 8 : 0 }}>
-                            <img
-                              src={msg.image_url}
-                              alt=""
-                              onClick={() => setFullscreenImg(msg.image_url!)}
-                              style={{
-                                maxWidth: 200, maxHeight: 200, borderRadius: 8,
-                                objectFit: 'cover', cursor: 'pointer', display: 'block',
-                                border: '1px solid rgba(0,0,0,0.08)',
-                              }}
-                            />
-                          </div>
-                        )}
                         {/* 답글 뱃지 — 원글에 답글이 있을 때 표시 */}
                         {!msg.reply_to_id && repliesMap[msg.id]?.length > 0 && (
                           <div
@@ -1082,14 +1082,6 @@ export default function Community() {
             marginBottom: 2,
           }}>🙂</button>
 
-          <button onClick={() => fileInputRef.current?.click()} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            padding: 0, flexShrink: 0, lineHeight: 1, marginBottom: 2,
-            opacity: imgFile ? 1 : 0.5,
-          }}>
-            <Icon icon="ph:image" width={22} height={22} color={imgFile ? BLUE : '#94A3B8'} />
-          </button>
-
           <textarea
             ref={textareaRef}
             value={newText}
@@ -1109,6 +1101,14 @@ export default function Community() {
             className="chat-textarea"
             style={{ fontSize: 14, color: '#1E293B', lineHeight: 1.6, minHeight: 24, maxHeight: 120 }}
           />
+
+          <button onClick={() => fileInputRef.current?.click()} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: 0, flexShrink: 0, lineHeight: 1, marginBottom: 2,
+            opacity: imgFile ? 1 : 0.5,
+          }}>
+            <Icon icon="ph:image" width={22} height={22} color={imgFile ? BLUE : '#94A3B8'} />
+          </button>
 
           <button onClick={handlePost} disabled={uploading} style={{
             width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
@@ -1131,13 +1131,14 @@ export default function Community() {
           />
         )}
 
-        {/* 풀스크린 이미지 뷰어 */}
-        {fullscreenImg && (
+        {/* 풀스크린 이미지 뷰어 — createPortal로 body에 직접 렌더링 */}
+        {fullscreenImg && createPortal(
           <div
             onClick={() => setFullscreenImg(null)}
             style={{
-              position: 'fixed', inset: 0, zIndex: 9999,
-              background: 'rgba(0,0,0,0.92)',
+              position: 'fixed', inset: 0, zIndex: 99999,
+              background: 'rgba(0,0,0,0.88)',
+              backdropFilter: 'blur(6px)',
               display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center', gap: 16,
             }}
@@ -1176,7 +1177,8 @@ export default function Community() {
                 닫기
               </button>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         </div>
