@@ -31,6 +31,7 @@ const EMPTY_FORM = {
   id:'', name:'', category:'realestate', description:'',
   phone:'', website:'', kakao:'', address:'', city:'',
   is_featured:false, is_active:true, tags:'', google_place_id:'',
+  latitude: null as number | null, longitude: null as number | null,
 }
 
 // ── 체크리스트 타입 (DB 기반)
@@ -424,6 +425,7 @@ function BusinessTab() {
       is_featured:b.is_featured, is_active:b.is_active,
       tags:b.tags?.join(', ')||'',
       google_place_id:b.google_place_id||'',
+      latitude: (b as any).latitude ?? null, longitude: (b as any).longitude ?? null,
     })
     setEditTarget(b); setShowForm(true)
   }
@@ -431,9 +433,22 @@ function BusinessTab() {
   async function save() {
     if (!form.name) { showToast('업체명은 필수예요'); return }
     setSaving(true)
+    // 좌표 자동 획득 (address 있고 좌표 없을 때)
+    let lat = form.latitude
+    let lng = form.longitude
+    if (form.address && (lat == null || lng == null)) {
+      try {
+        const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(form.address)}&key=${GOOGLE_KEY}`)
+        const json = await res.json()
+        if (json.results?.[0]?.geometry?.location) {
+          lat = json.results[0].geometry.location.lat
+          lng = json.results[0].geometry.location.lng
+        }
+      } catch {}
+    }
     // city가 없으면 address에서 address 추출해서 채우기
     const cityVal = form.city || form.address.split(',').find(p => /[A-Z]{2,3}/.test(p.trim()) === false && p.trim().length > 2)?.trim() || ''
-    const payload = { ...form, city: cityVal, tags: form.tags.split(',').map(t=>t.trim()).filter(Boolean), rating:0, reviews_count:0 }
+    const payload = { ...form, city: cityVal, tags: form.tags.split(',').map(t=>t.trim()).filter(Boolean), rating:0, reviews_count:0, latitude: lat, longitude: lng }
     if (editTarget) {
       const result = await updateBusiness(editTarget.id, payload)
       if (result) showToast('✅ 수정 완료')
