@@ -137,13 +137,17 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         today.setHours(0, 0, 0, 0)
         const todayStr = today.toISOString()
 
-        const { count } = await supabase
-          .from('community_posts')
-          .select('*', { count: 'exact', head: true })
-          .gte('created_at', todayStr)
-        if (count !== null) setTodayPostCount(count)
+        const refetch = async () => {
+          const { count } = await supabase
+            .from('community_posts')
+            .select('*', { count: 'exact', head: true })
+            .gte('created_at', todayStr)
+          if (count !== null) setTodayPostCount(count)
+        }
 
-        // Realtime 구독 — 새 글 INSERT/DELETE 시 카운트 업데이트
+        await refetch()
+
+        // Realtime 구독 — INSERT는 +1, DELETE는 재쿼리
         channel = supabase
           .channel('today-posts')
           .on('postgres_changes', {
@@ -160,11 +164,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             event: 'DELETE',
             schema: 'public',
             table: 'community_posts',
-          }, (payload: any) => {
-            const createdAt = new Date(payload.old.created_at)
-            if (createdAt >= today) {
-              setTodayPostCount(prev => Math.max(0, prev - 1))
-            }
+          }, () => {
+            refetch()
           })
           .subscribe()
       } catch {}
