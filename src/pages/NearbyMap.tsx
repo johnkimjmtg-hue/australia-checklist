@@ -41,11 +41,11 @@ function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): 
 const MY_LOCATION_SVG = encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 100 100">' +
   '<ellipse cx="50" cy="90" rx="15" ry="5" fill="rgba(0,0,0,0.2)"/>' +
-  '<path d="M 50 20 C 42 20, 38 25, 38 32 L 38 60 C 38 65, 42 68, 45 68 L 45 85 C 45 88, 55 88, 55 85 L 55 68 C 58 68, 62 65, 62 60 L 62 32 C 62 25, 58 20, 50 20 Z" fill="#FFD600" stroke="#333" stroke-width="2.5"/>' +
+  '<path d="M 50 20 C 42 20, 38 25, 38 32 L 38 60 C 38 65, 42 68, 45 68 L 45 85 C 45 88, 55 88, 55 85 L 55 68 C 58 68, 62 65, 62 60 L 62 32 C 62 25, 58 20, 50 20 Z" fill="#FFD600" stroke="#333" stroke-width="3.5"/>' +
   '<circle cx="50" cy="15" r="8" fill="#FFD600" stroke="#333" stroke-width="3.5"/>' +
-  '<line x1="38" y1="35" x2="28" y2="52" stroke="#333" stroke-width="8" stroke-linecap="round"/>' +
+  '<line x1="38" y1="35" x2="28" y2="52" stroke="#333" stroke-width="8.5" stroke-linecap="round"/>' +
   '<line x1="38" y1="35" x2="28" y2="52" stroke="#FFD600" stroke-width="5" stroke-linecap="round"/>' +
-  '<line x1="62" y1="35" x2="72" y2="52" stroke="#333" stroke-width="8" stroke-linecap="round"/>' +
+  '<line x1="62" y1="35" x2="72" y2="52" stroke="#333" stroke-width="8.5" stroke-linecap="round"/>' +
   '<line x1="62" y1="35" x2="72" y2="52" stroke="#FFD600" stroke-width="5" stroke-linecap="round"/>' +
   '</svg>'
 )
