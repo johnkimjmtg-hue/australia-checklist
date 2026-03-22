@@ -234,58 +234,60 @@ export default function NearbyMap({ onBack }: Props) {
         .svc-btn:active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff !important; transform: scale(0.97); }
       `}</style>
 
-      {/* 카테고리 슬라이딩 메뉴 */}
-      <div className="cat-scroll" style={{ padding:'10px 10px 8px', background:'#e8e8e8', display:'flex', gap:6, paddingBottom:8 }}>
-        {sortedCategories.map(cat => {
-          const isActive = category === cat.id
-          const count = catCounts[cat.id] || 0
-          return (
-            <button key={cat.id} onClick={() => setCategory(cat.id)}
-              className="svc-btn"
-              style={{
-                height:36, borderRadius:8, border:'none',
-                background:'#e8e8e8', cursor:'pointer',
-                flexShrink:0, padding:'0 14px',
-                fontSize:12, fontWeight: isActive ? 700 : 500,
-                color: isActive ? getCatColor(cat.id) : '#64748B',
-                boxShadow: isActive
-                  ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-                  : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-                whiteSpace:'nowrap',
-              }}>
-              {cat.label}
-              <span style={{ marginLeft:4, fontSize:10, color: isActive ? getCatColor(cat.id) : '#94A3B8' }}>
-                {count}
-              </span>
-            </button>
-          )
-        })}
-      </div>
+      {/* 카테고리 슬라이딩 + 거리 필터 — sticky 고정 */}
+      <div style={{ position:'sticky', top:0, zIndex:24, background:'#e8e8e8' }}>
+        <div className="cat-scroll" style={{ padding:'10px 10px 6px', display:'flex', gap:6 }}>
+          {sortedCategories.map(cat => {
+            const isActive = category === cat.id
+            const count = catCounts[cat.id] || 0
+            return (
+              <button key={cat.id} onClick={() => setCategory(cat.id)}
+                className="svc-btn"
+                style={{
+                  height:36, borderRadius:8, border:'none',
+                  background:'#e8e8e8', cursor:'pointer',
+                  flexShrink:0, padding:'0 14px',
+                  fontSize:12, fontWeight: isActive ? 700 : 500,
+                  color: isActive ? getCatColor(cat.id) : '#64748B',
+                  boxShadow: isActive
+                    ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                    : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                  whiteSpace:'nowrap',
+                }}>
+                {cat.label}
+                <span style={{ marginLeft:4, fontSize:10, color: isActive ? getCatColor(cat.id) : '#94A3B8' }}>
+                  {count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
 
-      {/* 거리 필터 */}
-      <div style={{ padding:'0 10px 8px', display:'flex', gap:6 }}>
-        {RADIUS_OPTIONS.map(opt => {
-          const isActive = radius === opt.value
-          const disabled = opt.value !== null && !myPos
-          return (
-            <button
-              key={String(opt.value)}
-              onClick={() => { if (!disabled) setRadius(opt.value) }}
-              style={{
-                flex:1, height:28, borderRadius:8, border:'none',
-                background:'#e8e8e8', cursor: disabled ? 'default' : 'pointer',
-                fontSize:10, fontWeight: isActive ? 700 : 500,
-                color: disabled ? '#C0C8D4' : isActive ? '#1B6EF3' : '#64748B',
-                boxShadow: isActive
-                  ? 'inset 2px 2px 5px #c5c5c5, inset -2px -2px 5px #ffffff'
-                  : '2px 2px 5px #c5c5c5, -2px -2px 5px #ffffff',
-                WebkitTapHighlightColor:'transparent',
-              }}
-            >
-              {opt.label}
-            </button>
-          )
-        })}
+        {/* 거리 필터 */}
+        <div style={{ padding:'0 10px 8px', display:'flex', gap:6 }}>
+          {RADIUS_OPTIONS.map(opt => {
+            const isActive = radius === opt.value
+            const disabled = opt.value !== null && !myPos
+            return (
+              <button
+                key={String(opt.value)}
+                onClick={() => { if (!disabled) setRadius(opt.value) }}
+                style={{
+                  flex:1, height:28, borderRadius:8, border:'none',
+                  background:'#e8e8e8', cursor: disabled ? 'default' : 'pointer',
+                  fontSize:10, fontWeight: isActive ? 700 : 500,
+                  color: disabled ? '#C0C8D4' : isActive ? '#1B6EF3' : '#64748B',
+                  boxShadow: isActive
+                    ? 'inset 2px 2px 5px #c5c5c5, inset -2px -2px 5px #ffffff'
+                    : '2px 2px 5px #c5c5c5, -2px -2px 5px #ffffff',
+                  WebkitTapHighlightColor:'transparent',
+                }}
+              >
+                {opt.label}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* 지도 */}
