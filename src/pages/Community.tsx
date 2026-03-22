@@ -657,11 +657,7 @@ export default function Community() {
               <Icon icon="mdi:kangaroo" width={22} height={22} color="#fff" />
             </div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 채팅방</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981' }} />
-                <div style={{ fontSize: 11, color: '#10B981', fontWeight: 600 }}>{onlineCount}명 접속 중</div>
-              </div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 단톡방</div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1042,86 +1038,95 @@ export default function Community() {
           </div>
         )}
 
-        <div style={{
-          display: 'flex', alignItems: 'flex-end', gap: 8,
-          background: '#fff', borderRadius: 24, padding: '5px 10px',
-          border: '1px solid #C8C8C8',
-        }}>
-          {/* 이미지 미리보기 */}
-          {imgPreview && (
-            <div style={{ position:'relative', marginBottom:6, display:'inline-block' }}>
-              <img src={imgPreview} alt="" style={{ maxHeight:80, maxWidth:160, borderRadius:8, border:'1px solid #C8C8C8', objectFit:'cover' }} />
-              <button onClick={() => { setImgFile(null); setImgPreview(null) }} style={{
-                position:'absolute', top:-6, right:-6, width:18, height:18,
-                borderRadius:'50%', background:'#64748B', border:'none', cursor:'pointer',
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display:'none' }}
+          onChange={e => {
+            const f = e.target.files?.[0]
+            if (!f) return
+            setImgFile(f)
+            setImgPreview(URL.createObjectURL(f))
+            e.target.value = ''
+          }}
+        />
+
+        <div style={{ display:'flex', alignItems:'flex-end', gap:8 }}>
+          {/* + 버튼 (입력창 밖 왼쪽) */}
+          <button onClick={() => fileInputRef.current?.click()} style={{
+            width:36, height:36, borderRadius:'50%', flexShrink:0,
+            background:'#e8e8e8', border:'none', cursor:'pointer',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            boxShadow:'2px 2px 5px #c5c5c5, -2px -2px 5px #ffffff',
+            WebkitTapHighlightColor:'transparent',
+            marginBottom:2,
+          }}>
+            <Icon icon="ph:plus" width={20} height={20} color={imgFile ? BLUE : '#64748B'} />
+          </button>
+
+          {/* 입력창 */}
+          <div style={{
+            flex:1, background:'#fff', borderRadius:20, padding:'8px 12px',
+            border:'1px solid #C8C8C8', display:'flex', flexDirection:'column', gap:6,
+          }}>
+            {/* 이미지 미리보기 — 위쪽 */}
+            {imgPreview && (
+              <div style={{ position:'relative', display:'inline-block', alignSelf:'flex-start' }}>
+                <img src={imgPreview} alt="" style={{ maxHeight:100, maxWidth:180, borderRadius:8, border:'1px solid #C8C8C8', objectFit:'cover', display:'block' }} />
+                <button onClick={() => { setImgFile(null); setImgPreview(null) }} style={{
+                  position:'absolute', top:-6, right:-6, width:18, height:18,
+                  borderRadius:'50%', background:'#64748B', border:'none', cursor:'pointer',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                }}>
+                  <Icon icon="ph:x" width={10} height={10} color="#fff" />
+                </button>
+              </div>
+            )}
+
+            {/* 텍스트 입력 + 이모지 + 전송 */}
+            <div style={{ display:'flex', alignItems:'flex-end', gap:6 }}>
+              <button onClick={() => setShowEmoji(v => !v)} style={{
+                background:'none', border:'none', cursor:'pointer',
+                padding:0, fontSize:20, opacity: showEmoji ? 1 : 0.5,
+                transition:'opacity 0.15s', flexShrink:0, lineHeight:1, marginBottom:2,
+              }}>🙂</button>
+
+              <textarea
+                ref={textareaRef}
+                value={newText}
+                onChange={e => {
+                  setNewText(e.target.value)
+                  e.target.style.height = 'auto'
+                  e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                    e.preventDefault()
+                    handlePost()
+                  }
+                }}
+                placeholder="메시지 입력..."
+                rows={1}
+                className="chat-textarea"
+                style={{ fontSize:14, color:'#1E293B', lineHeight:1.6, minHeight:24, maxHeight:120 }}
+              />
+
+              <button onClick={handlePost} disabled={uploading} style={{
+                width:30, height:30, borderRadius:'50%', flexShrink:0,
+                background: (newText.trim() || imgFile) && !uploading ? BLUE : '#CBD5E1', border:'none',
+                cursor: (newText.trim() || imgFile) && !uploading ? 'pointer' : 'default',
                 display:'flex', alignItems:'center', justifyContent:'center',
+                transition:'background 0.2s',
               }}>
-                <Icon icon="ph:x" width={10} height={10} color="#fff" />
+                {uploading
+                  ? <Icon icon="ph:spinner" width={16} height={16} color="#fff" style={{ animation:'spin 1s linear infinite' }} />
+                  : <Icon icon="ph:paper-plane-right-fill" width={16} height={16} color="#fff" />
+                }
               </button>
             </div>
-          )}
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display:'none' }}
-            onChange={e => {
-              const f = e.target.files?.[0]
-              if (!f) return
-              setImgFile(f)
-              setImgPreview(URL.createObjectURL(f))
-              e.target.value = ''
-            }}
-          />
-
-          <button onClick={() => setShowEmoji(v => !v)} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            padding: 0, fontSize: 20, opacity: showEmoji ? 1 : 0.5,
-            transition: 'opacity 0.15s', flexShrink: 0, lineHeight: 1,
-            marginBottom: 2,
-          }}>🙂</button>
-
-          <textarea
-            ref={textareaRef}
-            value={newText}
-            onChange={e => {
-              setNewText(e.target.value)
-              e.target.style.height = 'auto'
-              e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-                e.preventDefault()
-                handlePost()
-              }
-            }}
-            placeholder="메시지 입력..."
-            rows={1}
-            className="chat-textarea"
-            style={{ fontSize: 14, color: '#1E293B', lineHeight: 1.6, minHeight: 24, maxHeight: 120 }}
-          />
-
-          <button onClick={() => fileInputRef.current?.click()} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            padding: 0, flexShrink: 0, lineHeight: 1, marginBottom: 2,
-            opacity: imgFile ? 1 : 0.5,
-          }}>
-            <Icon icon="ph:image" width={22} height={22} color={imgFile ? BLUE : '#94A3B8'} />
-          </button>
-
-          <button onClick={handlePost} disabled={uploading} style={{
-            width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
-            background: (newText.trim() || imgFile) && !uploading ? BLUE : '#CBD5E1', border: 'none',
-            cursor: (newText.trim() || imgFile) && !uploading ? 'pointer' : 'default',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'background 0.2s',
-          }}>
-            {uploading
-              ? <Icon icon="ph:spinner" width={16} height={16} color="#fff" style={{ animation:'spin 1s linear infinite' }} />
-              : <Icon icon="ph:paper-plane-right-fill" width={16} height={16} color="#fff" />
-            }
-          </button>
+          </div>
+        </div>
         {/* 닉네임 변경 팝업 */}
         {showNameChange && myName && (
           <NameChangePopup
@@ -1150,21 +1155,31 @@ export default function Community() {
               style={{ maxWidth: '90vw', maxHeight: '75vh', borderRadius: 12, objectFit: 'contain' }}
             />
             <div style={{ display: 'flex', gap: 12 }} onClick={e => e.stopPropagation()}>
-              <a
-                href={fullscreenImg}
-                download="image.jpg"
-                target="_blank"
-                rel="noreferrer"
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await fetch(fullscreenImg!)
+                    const blob = await res.blob()
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = 'image.jpg'
+                    a.click()
+                    URL.revokeObjectURL(url)
+                  } catch {
+                    window.open(fullscreenImg!, '_blank')
+                  }
+                  setFullscreenImg(null)
+                }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 6,
-                  background: BLUE, color: '#fff', borderRadius: 10,
-                  padding: '10px 20px', textDecoration: 'none',
-                  fontSize: 13, fontWeight: 700,
+                  background: BLUE, color: '#fff', border: 'none', borderRadius: 10,
+                  padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
                 }}
               >
                 <Icon icon="ph:download-simple" width={16} height={16} color="#fff" />
                 다운로드
-              </a>
+              </button>
               <button
                 onClick={() => setFullscreenImg(null)}
                 style={{
