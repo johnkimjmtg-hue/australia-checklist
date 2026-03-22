@@ -985,6 +985,12 @@ function ItemsTab({ cats, items, setItems }: {
 
   async function uploadItemImage(id: string, file: File) {
     setSaving(true)
+    // 기존 이미지 Storage에서 삭제
+    const existing = items.find(i => i.id === id)
+    if (existing?.image_url) {
+      const oldPath = existing.image_url.split('/storage/v1/object/public/shopping-images/')[1]
+      if (oldPath) await supabase.storage.from('shopping-images').remove([decodeURIComponent(oldPath)])
+    }
     const ext = file.name.split('.').pop()
     const path = `checklist/${id}_${Date.now()}.${ext}`
     const { error: upErr } = await supabase.storage.from('shopping-images').upload(path, file, { upsert: true })
@@ -997,6 +1003,11 @@ function ItemsTab({ cats, items, setItems }: {
   }
 
   async function deleteItemImage(id: string) {
+    const existing = items.find(i => i.id === id)
+    if (existing?.image_url) {
+      const oldPath = existing.image_url.split('/storage/v1/object/public/shopping-images/')[1]
+      if (oldPath) await supabase.storage.from('shopping-images').remove([decodeURIComponent(oldPath)])
+    }
     await supabase.from('checklist_items').update({ image_url: null }).eq('id', id)
     setItems(items.map(i => i.id===id ? {...i, image_url: null} : i))
     showToast('이미지 삭제됨')
@@ -2218,6 +2229,11 @@ function ShoppingTab() {
     let imageUrl = form.image_url
 
     if (imgFile) {
+      // 기존 이미지 Storage에서 삭제
+      if (editing?.image_url) {
+        const oldPath = editing.image_url.split('/storage/v1/object/public/shopping-images/')[1]
+        if (oldPath) await supabase.storage.from('shopping-images').remove([decodeURIComponent(oldPath)])
+      }
       const ext  = imgFile.name.split('.').pop()
       const path = `products/${Date.now()}.${ext}`
       const { error } = await supabase.storage.from('shopping-images').upload(path, imgFile, { upsert: true })
