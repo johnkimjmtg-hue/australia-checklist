@@ -1052,17 +1052,15 @@ export default function Community() {
           }}
         />
 
-        <div style={{ display:'flex', alignItems:'flex-end', gap:8 }}>
-          {/* + 버튼 (입력창 밖 왼쪽) */}
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          {/* + 버튼 — 심플 테두리 */}
           <button onClick={() => fileInputRef.current?.click()} style={{
-            width:36, height:36, borderRadius:'50%', flexShrink:0,
-            background:'#e8e8e8', border:'none', cursor:'pointer',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            boxShadow:'2px 2px 5px #c5c5c5, -2px -2px 5px #ffffff',
+            width:32, height:32, borderRadius:'50%', flexShrink:0,
+            background:'none', border:`1.5px solid ${imgFile ? BLUE : '#C8C8C8'}`,
+            cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
             WebkitTapHighlightColor:'transparent',
-            marginBottom:2,
           }}>
-            <Icon icon="ph:plus" width={20} height={20} color={imgFile ? BLUE : '#64748B'} />
+            <Icon icon="ph:plus" width={18} height={18} color={imgFile ? BLUE : '#94A3B8'} />
           </button>
 
           {/* 입력창 */}

@@ -820,6 +820,9 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {/* 1행 */}
             <button className="calc-btn" onClick={onStart} style={{ height: 72 }}>1<br/>버킷리스트</button>
+            <button className="calc-btn" onClick={onServices} style={{ height: 72 }}>2<br/>업체리스트</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=nearby')} style={{ height: 72 }}>3<br/>내주변</button>
+            {/* 2행 */}
             <button className="calc-btn" onClick={() => {
               try {
                 const list = JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]')
@@ -827,12 +830,9 @@ export default function LandingPage({ state, onStart, onServices }: Props) {
               } catch {
                 navigate('/app?tab=shopping')
               }
-            }} style={{ height: 72 }}>2<br/>쇼핑리스트</button>
-            <button className="calc-btn" onClick={() => navigate('/app?tab=bingo')} style={{ height: 72 }}>3<br/>카페빙고게임</button>
-            {/* 2행 */}
-            <button className="calc-btn" onClick={() => navigate('/app?tab=community')} style={{ height: 72 }}>4<br/>채팅방</button>
-            <button className="calc-btn" onClick={onServices} style={{ height: 72 }}>5<br/>업체리스트</button>
-            <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>6<br/>준비중</button>
+            }} style={{ height: 72 }}>4<br/>쇼핑리스트</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=bingo')} style={{ height: 72 }}>5<br/>카페빙고게임</button>
+            <button className="calc-btn" onClick={() => navigate('/app?tab=community')} style={{ height: 72 }}>6<br/>나도한마디</button>
             {/* 3행 */}
             <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>7<br/>준비중</button>
             <button className="calc-btn" style={{ height: 72, color: '#94A3B8' }}>8<br/>준비중</button>
