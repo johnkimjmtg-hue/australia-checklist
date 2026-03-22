@@ -70,6 +70,7 @@ export default function NearbyMap({ onBack }: Props) {
   const mapRef      = useRef<HTMLDivElement>(null)
   const mapObj      = useRef<any>(null)
   const markersRef  = useRef<any[]>([])
+  const infoRef     = useRef<any>(null)
   const myMarkerRef = useRef<any>(null)
 
   const [category, setCategory] = useState<string>('cafe')
@@ -79,6 +80,18 @@ export default function NearbyMap({ onBack }: Props) {
   const [locError, setLocError] = useState('')
   const [selBiz, setSelBiz]     = useState<Business | null>(null)
   const [myPos, setMyPos]       = useState<{ lat: number; lng: number } | null>(null)
+
+  // InfoWindow 버튼 클릭 → 바텀시트 연결
+  useEffect(() => {
+    (window as any).__nearbySelectBiz = (bizId: string) => {
+      const found = allBiz.find(b => b.id === bizId)
+      if (found) {
+        setSelBiz(found)
+        if (infoRef.current) infoRef.current.close()
+      }
+    }
+    return () => { delete (window as any).__nearbySelectBiz }
+  }, [allBiz])
 
   // DB 최초 1회 로드
   useEffect(() => {
@@ -143,6 +156,8 @@ export default function NearbyMap({ onBack }: Props) {
         styles: [{ featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }],
       })
 
+      infoRef.current = new google.maps.InfoWindow()
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           pos => {
@@ -204,8 +219,20 @@ export default function NearbyMap({ onBack }: Props) {
       })
 
       marker.addListener('click', () => {
-        setSelBiz(biz)
         mapObj.current.panTo({ lat, lng })
+        if (infoRef.current) {
+          infoRef.current.close()
+          infoRef.current.setContent(`
+            <div style="font-family:-apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;padding:4px 2px;min-width:140px">
+              <div style="font-size:13px;font-weight:800;color:#0F172A;margin-bottom:8px">${biz.name}</div>
+              <button
+                onclick="window.__nearbySelectBiz('${biz.id}')"
+                style="width:100%;padding:7px 0;background:#1B6EF3;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit"
+              >자세히 보기 →</button>
+            </div>
+          `)
+          infoRef.current.open({ map: mapObj.current, anchor: marker })
+        }
       })
 
       markersRef.current.push(marker)
