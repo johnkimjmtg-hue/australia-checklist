@@ -22,7 +22,6 @@ import Shopping from './Shopping'
 import MyShoppingView from './MyShoppingView'
 import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
-import NearbyMap from './NearbyMap'
 
 const CAT_ICON_MAP: Record<string,string> = {
   hospital:'ph:first-aid-kit',food:'ph:fork-knife',shopping:'ph:shopping-bag',
@@ -43,7 +42,7 @@ const PRICE_LABEL: Record<string, string> = { '$': '저렴', '$$': '보통', '$$
 
 type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker'
-type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'bingo' | 'community' | 'nearby'
+type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'bingo' | 'community'
 
 export default function ChecklistPage({ state, setState, onLanding }: Props & { onLanding?: () => void }) {
   const [searchParams] = useSearchParams()
@@ -395,7 +394,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             { id:'bingo',      icon:'ph:coffee',        label:'카페빙고게임' },
             { id:'community',  icon:'ph:chats-circle',  label:'채팅방' },
             { id:'services',   icon:'ph:buildings',     label:'업체리스트' },
-            { id:'nearby',     icon:'ph:map-pin',       label:'내주변' },
           ] as { id: MainTab; icon: string; label: string }[]).map(tab => {
             const isShopping = tab.id === 'shopping'
             const hasMyList  = isShopping && myListCount > 0
@@ -457,7 +455,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 className={`neu-tab${isActive ? ' active' : ''}`}
                 style={{ flex:1, minWidth:0, height:52 }}>
                 <Icon icon={tabIcon} width={16} height={16} color={tabColor} />
-                <span style={{ fontSize:10, fontWeight: isActive || (isShopping && hasMyList) ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
+                <span style={{ fontSize:10, fontWeight: isActive ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
                   {tabLabel}
                 </span>
               </button>
@@ -487,8 +485,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         />
       ) : mainTab === 'bingo' ? (
         <BingoPage embedded={true} onCityChange={setBingoCity} onBack={() => window.location.href = '/'} />
-      ) : mainTab === 'nearby' ? (
-        <NearbyMap onBack={() => setMainTab('bucketlist')} />
       ) : mainTab === 'community' ? (
         <Community />
       ) : (mainTab === 'bucketlist' && isIssued && trip) ? (
