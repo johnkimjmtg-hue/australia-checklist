@@ -8,6 +8,48 @@ import {
 import { supabase } from '../lib/supabase'
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'hojugaja2024'
+const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+
+// 이미지 압축 (Canvas → WebP)
+async function compressImage(file: File | Blob, maxPx = 800): Promise<Blob> {
+  return new Promise(resolve => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      let w = img.width, h = img.height
+      if (w > maxPx || h > maxPx) {
+        if (w > h) { h = Math.round(h * maxPx / w); w = maxPx }
+        else { w = Math.round(w * maxPx / h); h = maxPx }
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = w; canvas.height = h
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
+      canvas.toBlob(blob => resolve(blob!), 'image/webp', 0.80)
+      URL.revokeObjectURL(url)
+    }
+    img.src = url
+  })
+}
+
+// Cloudinary 업로드
+async function uploadToCloudinary(file: File | Blob, folder = 'shopping'): Promise<string> {
+  const compressed = await compressImage(file)
+  const fd = new FormData()
+  fd.append('file', compressed, 'image.webp')
+  fd.append('upload_preset', UPLOAD_PRESET)
+  fd.append('folder', folder)
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd })
+  const data = await res.json()
+  if (!data.secure_url) throw new Error('Cloudinary 업로드 실패')
+  return data.secure_url
+}
+
+// Cloudinary URL에서 public_id 추출 후 삭제 (unsigned preset은 삭제 불가 — DB만 정리)
+function getCloudinaryPublicId(url: string): string | null {
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/)
+  return match ? match[1] : null
+}
 
 // ── 탭 타입
 type MainTab = 'business' | 'categories' | 'items' | 'requests' | 'suggestions' | 'community' | 'shopping' | 'bingo' | 'google'
@@ -2250,17 +2292,12 @@ function ShoppingTab() {
     let imageUrl = form.image_url
 
     if (imgFile) {
-      // 기존 이미지 Storage에서 삭제
-      if (editing?.image_url) {
-        const oldPath = editing.image_url.split('/storage/v1/object/public/shopping-images/')[1]
-        if (oldPath) await supabase.storage.from('shopping-images').remove([decodeURIComponent(oldPath)])
-      }
-      const ext  = imgFile.name.split('.').pop()
-      const path = `products/${Date.now()}.${ext}`
-      const { error } = await supabase.storage.from('shopping-images').upload(path, imgFile, { upsert: true })
-      if (!error) {
-        const { data } = supabase.storage.from('shopping-images').getPublicUrl(path)
-        imageUrl = data.publicUrl
+      try {
+        imageUrl = await uploadToCloudinary(imgFile, 'shopping')
+      } catch {
+        alert('이미지 업로드 실패')
+        setSaving(false)
+        return
       }
     }
 
@@ -2813,6 +2850,8 @@ function GoogleMappingTab() {
       )}
 
       {/* ── 좌표 자동 입력 섹션 */}
+      <ShoppingImageMigrationSection ff={ff} />
+
       <GeocodingSection ff={ff} />
 
       {/* ── 별점 업데이트 섹션 */}
@@ -2821,6 +2860,99 @@ function GoogleMappingTab() {
   )
 }
 
+
+
+function ShoppingImageMigrationSection({ ff }: { ff: string }) {
+  const [running, setRunning] = useState(false)
+  const [results, setResults] = useState<{ name: string; status: string }[]>([])
+  const [total, setTotal] = useState<number | null>(null)
+  const [done, setDone] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleRun = async () => {
+    if (!confirm('Supabase Storage 상품 이미지를 Cloudinary로 이전할까요?')) return
+    setRunning(true); setResults([]); setError(null); setDone(0)
+    try {
+      const { data: products, error: fetchErr } = await supabase
+        .from('shopping_products')
+        .select('id, name, image_url')
+        .not('image_url', 'is', null)
+        .ilike('image_url', '%supabase%')
+      if (fetchErr) throw new Error(fetchErr.message)
+      setTotal(products.length)
+      const BATCH = 5
+      for (let i = 0; i < products.length; i += BATCH) {
+        const batch = products.slice(i, i + BATCH)
+        await Promise.all(batch.map(async (p: any) => {
+          try {
+            const res = await fetch(p.image_url)
+            if (!res.ok) throw new Error('fetch 실패')
+            const blob = await res.blob()
+            const newUrl = await uploadToCloudinary(blob, 'shopping')
+            await supabase.from('shopping_products').update({ image_url: newUrl }).eq('id', p.id)
+            setResults(prev => [...prev, { name: p.name, status: '✅ 완료' }])
+          } catch (e: any) {
+            setResults(prev => [...prev, { name: p.name, status: '❌ 실패: ' + String(e?.message ?? e) }])
+          }
+          setDone(prev => prev + 1)
+        }))
+        if (i + BATCH < products.length) await new Promise(r => setTimeout(r, 300))
+      }
+    } catch (e: any) {
+      setError(String(e?.message ?? e))
+    }
+    setRunning(false)
+  }
+
+  const succeeded = results.filter(r => r.status.startsWith('✅')).length
+  const failed    = results.filter(r => !r.status.startsWith('✅')).length
+
+  return (
+    <div style={{ marginBottom:24, fontFamily: ff }}>
+      <div style={{ background:'#EFF6FF', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
+        <div style={{ fontWeight:800, color:'#1B6EF3', marginBottom:4 }}>🖼 쇼핑 이미지 Cloudinary 이전</div>
+        Supabase Storage 상품 이미지를 Cloudinary로 이전합니다.<br />
+        이전 후 DB의 image_url이 Cloudinary URL로 자동 업데이트됩니다.
+      </div>
+      <button onClick={handleRun} disabled={running} style={{
+        width:'100%', height:48, borderRadius:12, border:'none',
+        background: running ? '#94A3B8' : '#1B6EF3',
+        color:'#fff', fontSize:15, fontWeight:700,
+        cursor: running ? 'default' : 'pointer', marginBottom:16,
+        display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+      }}>
+        {running ? `🖼 이전 중... ${done}${total !== null ? '/' + total : ''}개` : '🖼 Cloudinary 이전 시작'}
+      </button>
+      {error && <div style={{ background:'#FEE2E2', borderRadius:10, padding:'12px 14px', marginBottom:16, fontSize:13, color:'#DC2626' }}>❌ {error}</div>}
+      {results.length > 0 && (
+        <>
+          <div style={{ display:'flex', gap:8, marginBottom:12 }}>
+            <div style={{ flex:1, background:'#DCFCE7', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#16A34A' }}>{succeeded}</div>
+              <div style={{ fontSize:11, color:'#16A34A', fontWeight:600 }}>완료</div>
+            </div>
+            <div style={{ flex:1, background:'#FEE2E2', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#DC2626' }}>{failed}</div>
+              <div style={{ fontSize:11, color:'#DC2626', fontWeight:600 }}>실패</div>
+            </div>
+            <div style={{ flex:1, background:'#F1F5F9', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#475569' }}>{results.length}</div>
+              <div style={{ fontSize:11, color:'#475569', fontWeight:600 }}>처리됨</div>
+            </div>
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:6, maxHeight:300, overflowY:'auto' }}>
+            {results.map((r, i) => (
+              <div key={i} style={{ background:'#fff', borderRadius:10, padding:'10px 14px', border:'1px solid ' + (r.status.startsWith('✅') ? '#DCFCE7' : '#FEE2E2'), display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div style={{ fontSize:13, fontWeight:700, color:'#0F172A' }}>{r.name}</div>
+                <div style={{ fontSize:12, fontWeight:700 }}>{r.status}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
 
 function GeocodingSection({ ff }: { ff: string }) {
   const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY
