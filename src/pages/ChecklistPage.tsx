@@ -143,7 +143,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           .gte('created_at', todayStr)
         if (count !== null) setTodayPostCount(count)
 
-        // Realtime 구독 — 새 글 INSERT 시 카운트 +1
+        // Realtime 구독 — 새 글 INSERT/DELETE 시 카운트 업데이트
         channel = supabase
           .channel('today-posts')
           .on('postgres_changes', {
@@ -154,6 +154,16 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             const createdAt = new Date(payload.new.created_at)
             if (createdAt >= today) {
               setTodayPostCount(prev => prev + 1)
+            }
+          })
+          .on('postgres_changes', {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'community_posts',
+          }, (payload: any) => {
+            const createdAt = new Date(payload.old.created_at)
+            if (createdAt >= today) {
+              setTodayPostCount(prev => Math.max(0, prev - 1))
             }
           })
           .subscribe()
