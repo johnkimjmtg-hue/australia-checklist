@@ -118,6 +118,8 @@ export default function NearbyMap({ onBack }: Props) {
       mapObj.current = new google.maps.Map(mapRef.current, {
         center: { lat: -33.8688, lng: 151.2093 },
         zoom: 13,
+        minZoom: 10,
+        maxZoom: 13,
         disableDefaultUI: true,
         zoomControl: true,
         styles: [{ featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }],
