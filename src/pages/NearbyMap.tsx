@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { getBusinesses } from '../lib/businessService'
 import type { Business } from '../lib/businessService'
+import BusinessCard from '../components/BusinessCard'
 
 const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
 type MapTab = 'all' | 'cafe' | 'restaurant' | 'tour'
-type RadiusOption = 5 | 20 | 30 | null  // null = 전체
+type RadiusOption = 5 | 20 | 30 | null
 
 const MAP_TABS: { id: MapTab; label: string; icon: string; categories: string[] }[] = [
   { id: 'all',        label: '전체',   icon: 'ph:squares-four', categories: [] },
@@ -27,7 +28,6 @@ const TAB_COLOR: Record<MapTab, string> = {
   all: '#1B6EF3', cafe: '#A0522D', restaurant: '#E25822', tour: '#2E8B57',
 }
 
-// Haversine 거리 계산 (km)
 function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371
   const dLat = (lat2 - lat1) * Math.PI / 180
@@ -76,19 +76,16 @@ export default function NearbyMap({ onBack }: Props) {
     })
   }, [])
 
-  // 지도 초기화
   useEffect(() => {
     if (loading) return
     initMap()
   }, [loading])
 
-  // 탭/거리/위치 변경 시 마커 갱신 (DB 호출 없음 — 프론트 필터)
   useEffect(() => {
     if (!mapObj.current) return
     updateMarkers()
   }, [tab, radius, myPos, allBiz])
 
-  // 필터 적용된 업체 목록
   function getFiltered(): Business[] {
     const tabInfo = MAP_TABS.find(t => t.id === tab)!
     let list = tab === 'all' ? allBiz : allBiz.filter(b => tabInfo.categories.includes(b.category))
@@ -190,7 +187,9 @@ export default function NearbyMap({ onBack }: Props) {
   const filtered = getFiltered()
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 80px)', fontFamily: ff, background:'#e8e8e8' }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 80px)', fontFamily: ff, background:'#e8e8e8', position:'relative' }}>
+
+      <style>{`@keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }`}</style>
 
       {/* 카테고리 탭 */}
       <div style={{ padding:'10px 10px 6px', background:'#e8e8e8', display:'flex', gap:8 }}>
@@ -278,78 +277,59 @@ export default function NearbyMap({ onBack }: Props) {
         {/* 내 위치로 이동 버튼 */}
         {myPos && (
           <button onClick={() => mapObj.current?.panTo(myPos)} style={{
-            position:'absolute', bottom: selBiz ? 220 : 16, right:12,
+            position:'absolute', bottom:16, right:12,
             width:40, height:40, borderRadius:20,
             background:'#fff', border:'none', cursor:'pointer',
             display:'flex', alignItems:'center', justifyContent:'center',
             boxShadow:'0 2px 8px rgba(0,0,0,0.15)',
             WebkitTapHighlightColor:'transparent',
-            transition:'bottom 0.3s',
           }}>
             <Icon icon="ph:crosshair" width={20} height={20} color="#1B6EF3" />
           </button>
         )}
       </div>
 
-      {/* 선택된 업체 카드 */}
+      {/* 업체 바텀시트 — BusinessCard 사용 */}
       {selBiz && (
-        <div style={{
-          position:'absolute', bottom:0, left:0, right:0,
-          background:'#fff', borderRadius:'20px 20px 0 0',
-          padding:'20px 16px 32px',
-          boxShadow:'0 -4px 20px rgba(0,0,0,0.12)',
-          animation:'slideUp 0.25s ease',
-          zIndex:10,
-        }}>
-          <style>{`@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }`}</style>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12 }}>
-            <div>
-              <div style={{ fontSize:16, fontWeight:800, color:'#0F172A', marginBottom:4 }}>{selBiz.name}</div>
-              <div style={{ fontSize:12, color:'#64748B', fontWeight:600 }}>
-                📍 {selBiz.city}
-                {myPos && (
-                  <span style={{ marginLeft:8, color:'#94A3B8' }}>
-                    {getDistanceKm(myPos.lat, myPos.lng, (selBiz as any).latitude, (selBiz as any).longitude).toFixed(1)}km
-                  </span>
-                )}
-                {selBiz.is_featured && <span style={{ marginLeft:8, color:'#1B6EF3', fontWeight:700 }}>⭐ 추천</span>}
+        <>
+          {/* 딤 배경 */}
+          <div
+            onClick={() => setSelBiz(null)}
+            style={{
+              position:'fixed', inset:0,
+              background:'rgba(0,0,0,0.35)',
+              zIndex:500,
+            }}
+          />
+          {/* 바텀시트 */}
+          <div style={{
+            position:'fixed', bottom:0,
+            left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:480,
+            background:'#e8e8e8',
+            borderRadius:'20px 20px 0 0',
+            zIndex:501,
+            animation:'slideUpSheet 0.25s ease',
+            maxHeight:'75vh',
+            overflowY:'auto',
+            paddingBottom:32,
+          }}>
+            {/* 핸들 바 */}
+            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'12px auto 16px' }} />
+
+            {/* 거리 표시 */}
+            {myPos && (
+              <div style={{ textAlign:'center', fontSize:12, color:'#94A3B8', fontWeight:600, marginBottom:10 }}>
+                📍 내 위치에서 {getDistanceKm(myPos.lat, myPos.lng, (selBiz as any).latitude, (selBiz as any).longitude).toFixed(1)}km
               </div>
+            )}
+
+            {/* BusinessCard */}
+            <div style={{ padding:'0 12px' }}>
+              <BusinessCard business={selBiz} />
             </div>
-            <button onClick={() => setSelBiz(null)} style={{
-              background:'none', border:'none', cursor:'pointer', fontSize:18, color:'#94A3B8', padding:4,
-            }}>✕</button>
           </div>
-
-          {selBiz.description && (
-            <div style={{ fontSize:12, color:'#475569', lineHeight:1.7, marginBottom:14,
-              display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden',
-            }}>{selBiz.description}</div>
-          )}
-
-          <div style={{ display:'flex', gap:8 }}>
-            {selBiz.phone && (
-              <a href={`tel:${selBiz.phone}`} style={{
-                flex:1, height:40, borderRadius:10,
-                background:'#1B6EF3', color:'#fff',
-                display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-                textDecoration:'none', fontSize:13, fontWeight:700,
-              }}>
-                <Icon icon="ph:phone" width={15} height={15} color="#fff" />
-                전화하기
-              </a>
-            )}
-            {selBiz.kakao && (
-              <a href={`https://open.kakao.com/o/${selBiz.kakao}`} target="_blank" rel="noreferrer" style={{
-                flex:1, height:40, borderRadius:10,
-                background:'#FEE500', color:'#3C1E1E',
-                display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-                textDecoration:'none', fontSize:13, fontWeight:700,
-              }}>
-                💬 카카오
-              </a>
-            )}
-          </div>
-        </div>
+        </>
       )}
     </div>
   )
