@@ -75,6 +75,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   const [bizCount, setBizCount] = useState(0)
   const [shopCount, setShopCount] = useState(0)
+  const [todayPostCount, setTodayPostCount] = useState(0)
   const [myList, setMyList] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] }
   })
@@ -125,6 +126,22 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       } catch {}
     }
     fetchShopCount()
+  }, [])
+
+  useEffect(() => {
+    async function fetchTodayPosts() {
+      try {
+        const { supabase } = await import('../lib/supabase')
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const { count } = await supabase
+          .from('community_posts')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', today.toISOString())
+        if (count !== null) setTodayPostCount(count)
+      } catch {}
+    }
+    fetchTodayPosts()
   }, [])
 
   useEffect(() => {
@@ -455,11 +472,20 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             return (
               <button key={tab.id} onClick={handleClick}
                 className={`neu-tab${isActive ? ' active' : ''}`}
-                style={{ flex:1, minWidth:0, height:52 }}>
+                style={{ flex:1, minWidth:0, height:52, position:'relative' }}>
                 <Icon icon={tabIcon} width={16} height={16} color={tabColor} />
-                <span style={{ fontSize:10, fontWeight: isActive || (isShopping && hasMyList) ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
+                <span style={{ fontSize:10, fontWeight: isActive ? 700 : 500, color: tabColor, whiteSpace:'nowrap' }}>
                   {tabLabel}
                 </span>
+                {tab.id === 'community' && todayPostCount > 0 && (
+                  <span style={{
+                    position:'absolute', top:4, right:4,
+                    background:'#EF4444', color:'#fff',
+                    fontSize:8, fontWeight:800, borderRadius:10,
+                    padding:'1px 4px', lineHeight:'14px',
+                    minWidth:14, textAlign:'center',
+                  }}>{todayPostCount}</span>
+                )}
               </button>
             )
           })}
