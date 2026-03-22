@@ -13,10 +13,48 @@ interface Message {
   reply_to_id?: string | null
   reply_to_text?: string | null
   reply_to_name?: string | null
+  image_url?: string | null
 }
 
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 const BLUE = '#1B6EF3'
+const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+
+// 이미지 압축 (Canvas → WebP, 최대 800px, 약 200KB 이하)
+async function compressImage(file: File): Promise<Blob> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      const MAX = 800
+      let w = img.width, h = img.height
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX }
+        else { w = Math.round(w * MAX / h); h = MAX }
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = w; canvas.height = h
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
+      canvas.toBlob(blob => resolve(blob!), 'image/webp', 0.75)
+      URL.revokeObjectURL(url)
+    }
+    img.src = url
+  })
+}
+
+// Cloudinary 업로드
+async function uploadToCloudinary(file: File): Promise<string> {
+  const compressed = await compressImage(file)
+  const fd = new FormData()
+  fd.append('file', compressed, 'image.webp')
+  fd.append('upload_preset', UPLOAD_PRESET)
+  fd.append('folder', 'community')
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd })
+  const data = await res.json()
+  if (!data.secure_url) throw new Error('업로드 실패')
+  return data.secure_url
+}
 
 function timeAgo(ts: string): string {
   const diff = Date.now() - new Date(ts).getTime()
@@ -299,6 +337,10 @@ export default function Community() {
   const [messages, setMessages] = useState<Message[]>([])
   const [liked, setLiked] = useState<Set<string>>(getLiked)
   const [newText, setNewText] = useState('')
+  const [imgFile, setImgFile] = useState<File | null>(null)
+  const [imgPreview, setImgPreview] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [fullscreenImg, setFullscreenImg] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [showEmoji, setShowEmoji] = useState(false)
   const [likedAnim, setLikedAnim] = useState<string | null>(null)
@@ -310,6 +352,7 @@ export default function Community() {
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -358,6 +401,7 @@ export default function Community() {
       reply_to_id: p.reply_to_id ?? null,
       reply_to_text: p.reply_to_text ?? null,
       reply_to_name: p.reply_to_name ?? null,
+      image_url: p.image_url ?? null,
     })))
     setLoading(false)
   }, [])
@@ -489,20 +533,30 @@ export default function Community() {
 
   const handlePost = async () => {
     const text = newText.trim()
-    if (!text || !myName) return
+    if (!text && !imgFile) return
+    if (!myName) return
+    setUploading(true)
     setNewText('')
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
+    if (textareaRef.current) textareaRef.current.style.height = 'auto'
+
+    let imageUrl: string | null = null
+    if (imgFile) {
+      try { imageUrl = await uploadToCloudinary(imgFile) } catch {}
+      setImgFile(null)
+      setImgPreview(null)
     }
+
     await supabase.from('community_posts').insert({
-      text,
+      text: text || '',
       author_id: MY_ID,
       author_name: myName,
       reply_to_id: replyTo?.id ?? null,
       reply_to_text: replyTo?.text ?? null,
       reply_to_name: replyTo?.author_name ?? null,
+      image_url: imageUrl,
     })
     setReplyTo(null)
+    setUploading(false)
     await fetchMessages()
     scrollToBottom()
   }
@@ -603,7 +657,11 @@ export default function Community() {
               <Icon icon="mdi:kangaroo" width={22} height={22} color="#fff" />
             </div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 단톡방</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 채팅방</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981' }} />
+                <div style={{ fontSize: 11, color: '#10B981', fontWeight: 600 }}>{onlineCount}명 접속 중</div>
+              </div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -830,6 +888,21 @@ export default function Community() {
                           </div>
                         )}
                         {msg.text}
+                        {/* 이미지 */}
+                        {msg.image_url && (
+                          <div style={{ marginTop: msg.text ? 8 : 0 }}>
+                            <img
+                              src={msg.image_url}
+                              alt=""
+                              onClick={() => setFullscreenImg(msg.image_url!)}
+                              style={{
+                                maxWidth: 200, maxHeight: 200, borderRadius: 8,
+                                objectFit: 'cover', cursor: 'pointer', display: 'block',
+                                border: '1px solid rgba(0,0,0,0.08)',
+                              }}
+                            />
+                          </div>
+                        )}
                         {/* 답글 뱃지 — 원글에 답글이 있을 때 표시 */}
                         {!msg.reply_to_id && repliesMap[msg.id]?.length > 0 && (
                           <div
@@ -974,12 +1047,48 @@ export default function Community() {
           background: '#fff', borderRadius: 24, padding: '5px 10px',
           border: '1px solid #C8C8C8',
         }}>
+          {/* 이미지 미리보기 */}
+          {imgPreview && (
+            <div style={{ position:'relative', marginBottom:6, display:'inline-block' }}>
+              <img src={imgPreview} alt="" style={{ maxHeight:80, maxWidth:160, borderRadius:8, border:'1px solid #C8C8C8', objectFit:'cover' }} />
+              <button onClick={() => { setImgFile(null); setImgPreview(null) }} style={{
+                position:'absolute', top:-6, right:-6, width:18, height:18,
+                borderRadius:'50%', background:'#64748B', border:'none', cursor:'pointer',
+                display:'flex', alignItems:'center', justifyContent:'center',
+              }}>
+                <Icon icon="ph:x" width={10} height={10} color="#fff" />
+              </button>
+            </div>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display:'none' }}
+            onChange={e => {
+              const f = e.target.files?.[0]
+              if (!f) return
+              setImgFile(f)
+              setImgPreview(URL.createObjectURL(f))
+              e.target.value = ''
+            }}
+          />
+
           <button onClick={() => setShowEmoji(v => !v)} style={{
             background: 'none', border: 'none', cursor: 'pointer',
             padding: 0, fontSize: 20, opacity: showEmoji ? 1 : 0.5,
             transition: 'opacity 0.15s', flexShrink: 0, lineHeight: 1,
             marginBottom: 2,
           }}>🙂</button>
+
+          <button onClick={() => fileInputRef.current?.click()} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: 0, flexShrink: 0, lineHeight: 1, marginBottom: 2,
+            opacity: imgFile ? 1 : 0.5,
+          }}>
+            <Icon icon="ph:image" width={22} height={22} color={imgFile ? BLUE : '#94A3B8'} />
+          </button>
 
           <textarea
             ref={textareaRef}
@@ -1001,14 +1110,17 @@ export default function Community() {
             style={{ fontSize: 14, color: '#1E293B', lineHeight: 1.6, minHeight: 24, maxHeight: 120 }}
           />
 
-          <button onClick={handlePost} style={{
+          <button onClick={handlePost} disabled={uploading} style={{
             width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
-            background: newText.trim() ? BLUE : '#CBD5E1', border: 'none',
-            cursor: newText.trim() ? 'pointer' : 'default',
+            background: (newText.trim() || imgFile) && !uploading ? BLUE : '#CBD5E1', border: 'none',
+            cursor: (newText.trim() || imgFile) && !uploading ? 'pointer' : 'default',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'background 0.2s',
           }}>
-            <Icon icon="ph:paper-plane-right-fill" width={16} height={16} color="#fff" />
+            {uploading
+              ? <Icon icon="ph:spinner" width={16} height={16} color="#fff" style={{ animation:'spin 1s linear infinite' }} />
+              : <Icon icon="ph:paper-plane-right-fill" width={16} height={16} color="#fff" />
+            }
           </button>
         {/* 닉네임 변경 팝업 */}
         {showNameChange && myName && (
@@ -1017,6 +1129,54 @@ export default function Community() {
             onClose={() => setShowNameChange(false)}
             onSet={(name) => { handleSetName(name); setShowNameChange(false) }}
           />
+        )}
+
+        {/* 풀스크린 이미지 뷰어 */}
+        {fullscreenImg && (
+          <div
+            onClick={() => setFullscreenImg(null)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(0,0,0,0.92)',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center', gap: 16,
+            }}
+          >
+            <img
+              src={fullscreenImg}
+              alt=""
+              onClick={e => e.stopPropagation()}
+              style={{ maxWidth: '90vw', maxHeight: '75vh', borderRadius: 12, objectFit: 'contain' }}
+            />
+            <div style={{ display: 'flex', gap: 12 }} onClick={e => e.stopPropagation()}>
+              <a
+                href={fullscreenImg}
+                download="image.jpg"
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  background: BLUE, color: '#fff', borderRadius: 10,
+                  padding: '10px 20px', textDecoration: 'none',
+                  fontSize: 13, fontWeight: 700,
+                }}
+              >
+                <Icon icon="ph:download-simple" width={16} height={16} color="#fff" />
+                다운로드
+              </a>
+              <button
+                onClick={() => setFullscreenImg(null)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  background: 'rgba(255,255,255,0.15)', color: '#fff', border: 'none',
+                  borderRadius: 10, padding: '10px 20px',
+                  fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                }}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
         )}
 
         </div>
