@@ -31,7 +31,6 @@ const EMPTY_FORM = {
   id:'', name:'', category:'realestate', description:'',
   phone:'', website:'', kakao:'', address:'', city:'',
   is_featured:false, is_active:true, tags:'', google_place_id:'',
-  latitude: null as number | null, longitude: null as number | null,
 }
 
 // ── 체크리스트 타입 (DB 기반)
@@ -425,7 +424,6 @@ function BusinessTab() {
       is_featured:b.is_featured, is_active:b.is_active,
       tags:b.tags?.join(', ')||'',
       google_place_id:b.google_place_id||'',
-      latitude: (b as any).latitude ?? null, longitude: (b as any).longitude ?? null,
     })
     setEditTarget(b); setShowForm(true)
   }
@@ -433,22 +431,9 @@ function BusinessTab() {
   async function save() {
     if (!form.name) { showToast('업체명은 필수예요'); return }
     setSaving(true)
-    // 좌표 자동 획득 (address 있고 좌표 없을 때)
-    let lat = form.latitude
-    let lng = form.longitude
-    if (form.address && (lat == null || lng == null)) {
-      try {
-        const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(form.address)}&key=${GOOGLE_KEY}`)
-        const json = await res.json()
-        if (json.results?.[0]?.geometry?.location) {
-          lat = json.results[0].geometry.location.lat
-          lng = json.results[0].geometry.location.lng
-        }
-      } catch {}
-    }
     // city가 없으면 address에서 address 추출해서 채우기
     const cityVal = form.city || form.address.split(',').find(p => /[A-Z]{2,3}/.test(p.trim()) === false && p.trim().length > 2)?.trim() || ''
-    const payload = { ...form, city: cityVal, tags: form.tags.split(',').map(t=>t.trim()).filter(Boolean), rating:0, reviews_count:0, latitude: lat, longitude: lng }
+    const payload = { ...form, city: cityVal, tags: form.tags.split(',').map(t=>t.trim()).filter(Boolean), rating:0, reviews_count:0 }
     if (editTarget) {
       const result = await updateBusiness(editTarget.id, payload)
       if (result) showToast('✅ 수정 완료')
@@ -2806,8 +2791,137 @@ function GoogleMappingTab() {
         </div>
       )}
 
+      {/* ── 좌표 자동 입력 섹션 */}
+      <GeocodingSection ff={ff} />
+
       {/* ── 별점 업데이트 섹션 */}
       <RatingUpdateSection ff={ff} />
+    </div>
+  )
+}
+
+
+function GeocodingSection({ ff }: { ff: string }) {
+  const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY
+  const [running, setRunning]   = useState(false)
+  const [results, setResults]   = useState<{ name: string; status: string; lat?: number; lng?: number }[]>([])
+  const [total, setTotal]       = useState<number | null>(null)
+  const [done, setDone]         = useState(0)
+  const [error, setError]       = useState<string | null>(null)
+
+  const handleRun = async () => {
+    if (!confirm('latitude가 없는 업체를 Google Geocoding API로 좌표 입력할까요?\n주소가 불확실한 업체는 건너뜁니다.')) return
+    setRunning(true)
+    setResults([])
+    setError(null)
+    setDone(0)
+
+    try {
+      const { data: bizList, error: fetchErr } = await supabase
+        .from('businesses')
+        .select('id, name, address, city')
+        .is('latitude', null)
+        .not('address', 'is', null)
+        .neq('address', '')
+
+      if (fetchErr) throw new Error(fetchErr.message)
+      setTotal(bizList.length)
+
+      const BATCH = 20
+      for (let i = 0; i < bizList.length; i += BATCH) {
+        const batch = bizList.slice(i, i + BATCH)
+        await Promise.all(batch.map(async (biz: any) => {
+          try {
+            const query = encodeURIComponent(`${biz.address}, ${biz.city}, Australia`)
+            const res = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${GOOGLE_KEY}`
+            )
+            const json = await res.json()
+            if (json.results?.[0]?.geometry?.location) {
+              const { lat, lng } = json.results[0].geometry.location
+              await supabase.from('businesses').update({ latitude: lat, longitude: lng }).eq('id', biz.id)
+              setResults(prev => [...prev, { name: biz.name, status: '✅ 완료', lat, lng }])
+            } else {
+              setResults(prev => [...prev, { name: biz.name, status: '⚠️ 주소 못찾음' }])
+            }
+          } catch {
+            setResults(prev => [...prev, { name: biz.name, status: '❌ 오류' }])
+          }
+          setDone(prev => prev + 1)
+        }))
+        // 배치 간 딜레이 (API 제한 방지)
+        if (i + BATCH < bizList.length) await new Promise(r => setTimeout(r, 500))
+      }
+    } catch (e: any) {
+      setError(String(e?.message ?? e))
+    }
+    setRunning(false)
+  }
+
+  const succeeded = results.filter(r => r.status.startsWith('✅')).length
+  const failed    = results.filter(r => !r.status.startsWith('✅')).length
+
+  return (
+    <div style={{ marginTop:24, fontFamily: ff }}>
+      <div style={{ background:'#ECFDF5', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
+        <div style={{ fontWeight:800, color:'#059669', marginBottom:4 }}>📍 좌표 자동 입력</div>
+        latitude/longitude가 없는 업체를 Google Geocoding API로 좌표를 자동 입력합니다.<br />
+        주소가 불확실한 업체는 건너뛰며, 20개씩 배치 처리됩니다.
+      </div>
+
+      <button
+        onClick={handleRun}
+        disabled={running}
+        style={{
+          width:'100%', height:48, borderRadius:12, border:'none',
+          background: running ? '#94A3B8' : '#059669',
+          color:'#fff', fontSize:15, fontWeight:700,
+          cursor: running ? 'default' : 'pointer',
+          marginBottom:16,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+        }}
+      >
+        {running
+          ? `📍 처리 중... ${done}${total !== null ? `/${total}` : ''}개`
+          : '📍 좌표 자동 입력 시작'}
+      </button>
+
+      {error && (
+        <div style={{ background:'#FEE2E2', borderRadius:10, padding:'12px 14px', marginBottom:16, fontSize:13, color:'#DC2626' }}>
+          ❌ 오류: {error}
+        </div>
+      )}
+
+      {results.length > 0 && (
+        <>
+          <div style={{ display:'flex', gap:8, marginBottom:12 }}>
+            <div style={{ flex:1, background:'#DCFCE7', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#16A34A' }}>{succeeded}</div>
+              <div style={{ fontSize:11, color:'#16A34A', fontWeight:600 }}>완료</div>
+            </div>
+            <div style={{ flex:1, background:'#FEE2E2', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#DC2626' }}>{failed}</div>
+              <div style={{ fontSize:11, color:'#DC2626', fontWeight:600 }}>실패/건너뜀</div>
+            </div>
+            <div style={{ flex:1, background:'#F1F5F9', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#475569' }}>{results.length}</div>
+              <div style={{ fontSize:11, color:'#475569', fontWeight:600 }}>처리됨</div>
+            </div>
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:6, maxHeight:300, overflowY:'auto' }}>
+            {results.map((r, i) => (
+              <div key={i} style={{
+                background:'#fff', borderRadius:10, padding:'10px 14px',
+                border:`1px solid ${r.status.startsWith('✅') ? '#DCFCE7' : '#FEE2E2'}`,
+                display:'flex', alignItems:'center', justifyContent:'space-between',
+              }}>
+                <div style={{ fontSize:13, fontWeight:700, color:'#0F172A' }}>{r.name}</div>
+                <div style={{ fontSize:12, fontWeight:700, flexShrink:0 }}>{r.status}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }
