@@ -1,21 +1,14 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import { getBusinesses } from '../lib/businessService'
 import type { Business } from '../lib/businessService'
+import { CATEGORIES } from '../data/businesses'
 import BusinessCard from '../components/BusinessCard'
 
 const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
-type MapTab = 'all' | 'cafe' | 'restaurant' | 'tour'
 type RadiusOption = 5 | 20 | 30 | null
-
-const MAP_TABS: { id: MapTab; label: string; icon: string; categories: string[] }[] = [
-  { id: 'all',        label: '전체',   icon: 'ph:squares-four', categories: [] },
-  { id: 'cafe',       label: '카페',   icon: 'ph:coffee',       categories: ['cafe'] },
-  { id: 'restaurant', label: '식당',   icon: 'ph:fork-knife',   categories: ['restaurant', 'food'] },
-  { id: 'tour',       label: '관광지', icon: 'ph:map-pin',      categories: ['tour', 'attraction', 'places'] },
-]
 
 const RADIUS_OPTIONS: { label: string; value: RadiusOption }[] = [
   { label: '5km',  value: 5 },
@@ -24,8 +17,15 @@ const RADIUS_OPTIONS: { label: string; value: RadiusOption }[] = [
   { label: '전체', value: null },
 ]
 
-const TAB_COLOR: Record<MapTab, string> = {
-  all: '#1B6EF3', cafe: '#A0522D', restaurant: '#E25822', tour: '#2E8B57',
+// 카테고리별 마커 색상
+const CAT_COLORS: Record<string, string> = {
+  cafe: '#A0522D', restaurant: '#E25822', travel: '#2E8B57',
+  hotel: '#7C3AED', gp: '#DC2626', dental: '#0891B2',
+  realestate: '#1B6EF3', beauty: '#EC4899', mart: '#16A34A',
+  culture: '#D97706', default: '#64748B',
+}
+function getCatColor(catId: string): string {
+  return CAT_COLORS[catId] ?? CAT_COLORS.default
 }
 
 function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -72,20 +72,37 @@ export default function NearbyMap({ onBack }: Props) {
   const markersRef  = useRef<any[]>([])
   const myMarkerRef = useRef<any>(null)
 
-  const [tab, setTab]       = useState<MapTab>('all')
-  const [radius, setRadius] = useState<RadiusOption>(5)
-  const [allBiz, setAllBiz] = useState<Business[]>([])
+  const [category, setCategory] = useState<string>('all')
+  const [radius, setRadius]     = useState<RadiusOption>(5)
+  const [allBiz, setAllBiz]     = useState<Business[]>([])
   const [loading, setLoading]   = useState(true)
   const [locError, setLocError] = useState('')
   const [selBiz, setSelBiz]     = useState<Business | null>(null)
   const [myPos, setMyPos]       = useState<{ lat: number; lng: number } | null>(null)
 
+  // DB 최초 1회 로드
   useEffect(() => {
     getBusinesses().then(data => {
       setAllBiz(data.filter(b => (b as any).latitude && (b as any).longitude))
       setLoading(false)
     })
   }, [])
+
+  // 카테고리별 업체 수 (Services.tsx 동일 로직)
+  const catCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    allBiz.forEach(b => {
+      counts[b.category] = (counts[b.category] || 0) + 1
+    })
+    return counts
+  }, [allBiz])
+
+  // 업체 많은 순 정렬, 0개 카테고리 제외 (Services.tsx 동일 로직)
+  const sortedCategories = useMemo(() => {
+    return CATEGORIES
+      .filter(c => c.id !== 'all' && (catCounts[c.id] || 0) > 0)
+      .sort((a, b) => (catCounts[b.id] || 0) - (catCounts[a.id] || 0))
+  }, [catCounts])
 
   useEffect(() => {
     if (loading) return
@@ -95,11 +112,12 @@ export default function NearbyMap({ onBack }: Props) {
   useEffect(() => {
     if (!mapObj.current) return
     updateMarkers()
-  }, [tab, radius, myPos, allBiz])
+  }, [category, radius, myPos, allBiz])
 
   function getFiltered(): Business[] {
-    const tabInfo = MAP_TABS.find(t => t.id === tab)!
-    let list = tab === 'all' ? allBiz : allBiz.filter(b => tabInfo.categories.includes(b.category))
+    let list = category === 'all'
+      ? allBiz
+      : allBiz.filter(b => b.category === category)
     if (radius !== null && myPos) {
       list = list.filter(b => {
         const dist = getDistanceKm(myPos.lat, myPos.lng, (b as any).latitude, (b as any).longitude)
@@ -163,8 +181,8 @@ export default function NearbyMap({ onBack }: Props) {
     markersRef.current.forEach(m => m.setMap(null))
     markersRef.current = []
 
-    const color = TAB_COLOR[tab]
     const list = getFiltered()
+    const color = category === 'all' ? '#1B6EF3' : getCatColor(category)
 
     list.forEach(biz => {
       const lat = (biz as any).latitude
@@ -199,25 +217,34 @@ export default function NearbyMap({ onBack }: Props) {
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 80px)', fontFamily: ff, background:'#e8e8e8', position:'relative' }}>
 
-      <style>{`@keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }`}</style>
+      <style>{`
+        @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
+        .cat-scroll { overflow-x:auto; scrollbar-width:none; }
+        .cat-scroll::-webkit-scrollbar { display:none; }
+      `}</style>
 
-      {/* 카테고리 탭 */}
-      <div style={{ padding:'10px 10px 6px', background:'#e8e8e8', display:'flex', gap:8 }}>
-        {MAP_TABS.map(t => {
-          const isActive = tab === t.id
+      {/* 카테고리 슬라이딩 메뉴 */}
+      <div className="cat-scroll" style={{ padding:'10px 10px 8px', background:'#e8e8e8', display:'flex', gap:6 }}>
+        {sortedCategories.map(cat => {
+          const isActive = category === cat.id
+          const count = catCounts[cat.id] || 0
           return (
-            <button key={t.id} onClick={() => setTab(t.id)} style={{
-              flex:1, height:40, borderRadius:10, border:'none',
-              background:'#e8e8e8', cursor:'pointer',
-              display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2,
-              boxShadow: isActive
-                ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-                : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-              WebkitTapHighlightColor:'transparent',
-            }}>
-              <Icon icon={t.icon} width={14} height={14} color={isActive ? TAB_COLOR[t.id] : '#64748B'} />
-              <span style={{ fontSize:9, fontWeight: isActive ? 700 : 500, color: isActive ? TAB_COLOR[t.id] : '#64748B' }}>
-                {t.label}
+            <button key={cat.id} onClick={() => setCategory(cat.id)}
+              style={{
+                height:36, borderRadius:8, border:'none',
+                background:'#e8e8e8', cursor:'pointer',
+                flexShrink:0, padding:'0 12px',
+                fontSize:12, fontWeight: isActive ? 700 : 500,
+                color: isActive ? getCatColor(cat.id) : '#64748B',
+                boxShadow: isActive
+                  ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
+                  : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                whiteSpace:'nowrap',
+                WebkitTapHighlightColor:'transparent',
+              }}>
+              {cat.emoji} {cat.label}
+              <span style={{ marginLeft:4, fontSize:10, color: isActive ? getCatColor(cat.id) : '#94A3B8' }}>
+                {count}
               </span>
             </button>
           )
