@@ -1128,7 +1128,6 @@ export default function Community() {
           </div>
         </div>
         </div>
-      </div>
         {/* 닉네임 변경 팝업 */}
         {showNameChange && myName && (
           <NameChangePopup
@@ -1197,9 +1196,7 @@ export default function Community() {
           </div>,
           document.body
         )}
-
-        </div>
       </div>
-    </div>
+
   )
 }
