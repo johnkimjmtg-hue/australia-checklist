@@ -125,12 +125,19 @@ export default function NearbyMap({ onBack }: Props) {
               position: { lat: myLat, lng: myLng },
               map: mapObj.current,
               icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 10,
-                fillColor: '#1B6EF3',
-                fillOpacity: 1,
-                strokeColor: '#fff',
-                strokeWeight: 3,
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">
+                    <ellipse cx="18" cy="40" rx="8" ry="3" fill="rgba(0,0,0,0.15)"/>
+                    <circle cx="18" cy="8" r="6" fill="#1B6EF3" stroke="#fff" stroke-width="2"/>
+                    <path d="M8 28 Q8 18 18 18 Q28 18 28 28 L26 36 Q22 38 18 38 Q14 38 10 36 Z" fill="#1B6EF3" stroke="#fff" stroke-width="1.5"/>
+                    <line x1="8" y1="22" x2="4" y2="30" stroke="#1B6EF3" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="28" y1="22" x2="32" y2="30" stroke="#1B6EF3" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="14" y1="36" x2="12" y2="44" stroke="#1B6EF3" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="22" y1="36" x2="24" y2="44" stroke="#1B6EF3" stroke-width="3" stroke-linecap="round"/>
+                  </svg>
+                `),
+                scaledSize: new google.maps.Size(36, 44),
+                anchor: new google.maps.Point(18, 44),
               },
               title: '내 위치',
               zIndex: 999,
