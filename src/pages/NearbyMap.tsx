@@ -219,30 +219,41 @@ export default function NearbyMap({ onBack }: Props) {
 
       <style>{`
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
-        .cat-scroll { overflow-x:auto; scrollbar-width:none; }
-        .cat-scroll::-webkit-scrollbar { display:none; }
+        .cat-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:#C8C8C8 #e8e8e8; }
+        @media (max-width:768px) {
+          .cat-scroll::-webkit-scrollbar { height:4px; }
+          .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
+          .cat-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
+        }
+        @media (min-width:769px) {
+          .cat-scroll::-webkit-scrollbar { height:4px; }
+          .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
+          .cat-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
+        }
+        .svc-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .svc-btn:active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff !important; transform: scale(0.97); }
       `}</style>
 
       {/* 카테고리 슬라이딩 메뉴 */}
-      <div className="cat-scroll" style={{ padding:'10px 10px 8px', background:'#e8e8e8', display:'flex', gap:6 }}>
+      <div className="cat-scroll" style={{ padding:'10px 10px 8px', background:'#e8e8e8', display:'flex', gap:6, paddingBottom:8 }}>
         {sortedCategories.map(cat => {
           const isActive = category === cat.id
           const count = catCounts[cat.id] || 0
           return (
             <button key={cat.id} onClick={() => setCategory(cat.id)}
+              className="svc-btn"
               style={{
                 height:36, borderRadius:8, border:'none',
                 background:'#e8e8e8', cursor:'pointer',
-                flexShrink:0, padding:'0 12px',
+                flexShrink:0, padding:'0 14px',
                 fontSize:12, fontWeight: isActive ? 700 : 500,
                 color: isActive ? getCatColor(cat.id) : '#64748B',
                 boxShadow: isActive
                   ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
                   : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
                 whiteSpace:'nowrap',
-                WebkitTapHighlightColor:'transparent',
               }}>
-              {cat.emoji} {cat.label}
+              {cat.label}
               <span style={{ marginLeft:4, fontSize:10, color: isActive ? getCatColor(cat.id) : '#94A3B8' }}>
                 {count}
               </span>
