@@ -98,7 +98,15 @@ export default function BusinessCard({ business }: Props) {
 
           {/* 업체명 + 펼쳐보기 아이콘 + 북마크 */}
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
-            <div style={{ fontSize:17, fontWeight:800, color:'#0F172A', flex:1, paddingRight:8 }}>{name}</div>
+            <div style={{ flex:1, paddingRight:8 }}>
+              <div style={{ fontSize:17, fontWeight:800, color:'#0F172A' }}>{name}</div>
+              {business.is_korean && (
+                <div style={{ display:'inline-flex', alignItems:'center', gap:3, marginTop:3, background:'#FFF7ED', border:'1px solid #FED7AA', borderRadius:6, padding:'2px 8px' }}>
+                  <span style={{ fontSize:12 }}>🇰🇷</span>
+                  <span style={{ fontSize:11, fontWeight:700, color:'#EA580C' }}>한인업체</span>
+                </div>
+              )}
+            </div>
             <div style={{ display:'flex', alignItems:'center', gap:2, flexShrink:0 }}>
               <button
                 onClick={() => { setExpanded(v => !v) }}

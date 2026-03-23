@@ -39,6 +39,7 @@ export const CATEGORIES = [
   { id: 'construction', label: '건설·시공',      emoji: '🏗'  },
   { id: 'shopping',   label: '쇼핑',           emoji: '🛍'  },
   { id: 'culture',    label: '문화시설',       emoji: '🎨'  },
+  { id: 'attraction', label: '명소·관광지',    emoji: '🗺'  },
   { id: 'transport',  label: '교통',           emoji: '🚌'  },
   { id: 'etc',        label: '기타',           emoji: '📌'  },
 ]

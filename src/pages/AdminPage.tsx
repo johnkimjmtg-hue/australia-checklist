@@ -499,6 +499,11 @@ function BusinessTab() {
     showToast(cur ? '추천 해제' : '⭐ 추천 설정'); await load()
   }
 
+  async function handleKoreanToggle(id: string, cur: boolean) {
+    await supabase.from('businesses').update({ is_korean: !cur }).eq('id', id)
+    showToast(!cur ? '🇰🇷 한인업체 설정' : '한인업체 해제'); await load()
+  }
+
   return (
     <>
       {toast && <Toast msg={toast} />}
@@ -615,6 +620,7 @@ function BusinessTab() {
                     <div>
                       <span style={{ fontSize:15, fontWeight:900, color:'#0F172A' }}>{b.name}</span>
                       {b.is_featured && <span style={{ marginLeft:6, fontSize:10, background:'#1E4D83', color:'#fff', borderRadius:10, padding:'2px 8px', fontWeight:800 }}>추천</span>}
+                      {b.is_korean && <span style={{ marginLeft:6, fontSize:10, background:'#FFF7ED', color:'#EA580C', borderRadius:10, padding:'2px 8px', fontWeight:800, border:'1px solid #FED7AA' }}>🇰🇷 한인</span>}
                       {!b.is_active  && <span style={{ marginLeft:6, fontSize:10, background:'#e8420a', color:'#fff', borderRadius:10, padding:'2px 8px', fontWeight:800 }}>비활성</span>}
                     </div>
                     <span style={{ fontSize:11, color:'#8AAAC8' }}>{CATEGORIES.find(c=>c.id===b.category)?.emoji} {CATEGORIES.find(c=>c.id===b.category)?.label}</span>
@@ -622,6 +628,11 @@ function BusinessTab() {
                   <div style={{ fontSize:11, color:'#7a8fb5', marginBottom:12 }}>📍 {b.city} · ⭐ {b.rating} ({b.reviews_count})</div>
                   <div style={{ display:'flex', gap:8 }}>
                     <button onClick={() => openEdit(b)} style={{ ...btnGhost, flex:1, padding:'7px' }}>✏️ 수정</button>
+                    <button onClick={() => handleKoreanToggle(b.id, !!b.is_korean)} style={{
+                      flex:1, padding:'7px', border:'none', borderRadius:8, cursor:'pointer', fontWeight:800, fontSize:12,
+                      background: b.is_korean ? 'rgba(234,88,12,0.1)' : 'rgba(200,218,248,0.3)',
+                      color: b.is_korean ? '#EA580C' : '#64748B',
+                    }}>{b.is_korean ? '🇰🇷 한인해제' : '🇰🇷 한인설정'}</button>
                     <button onClick={() => handleToggle(b.id, b.is_featured)} style={{
                       flex:1, padding:'7px', border:'none', borderRadius:8, cursor:'pointer', fontWeight:800, fontSize:12,
                       background: b.is_featured ? 'rgba(255,220,50,0.2)' : 'rgba(200,218,248,0.3)',
@@ -2839,6 +2850,8 @@ function GoogleMappingTab() {
       )}
 
       {/* ── 좌표 자동 입력 섹션 */}
+      <GooglePlacesCollectSection ff={ff} />
+
       <ShoppingImageMigrationSection ff={ff} />
       <ChecklistImageMigrationSection ff={ff} />
 
@@ -2851,6 +2864,228 @@ function GoogleMappingTab() {
 }
 
 
+
+
+function GooglePlacesCollectSection({ ff }: { ff: string }) {
+  const [apiKey, setApiKey] = useState('')
+  const [running, setRunning] = useState(false)
+  const [results, setResults] = useState<{ name: string; status: string }[]>([])
+  const [total, setTotal] = useState(0)
+  const [done, setDone] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedAreas, setSelectedAreas] = useState<string[]>(['CBD'])
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(['cafe', 'restaurant'])
+
+  const AREAS = [
+    { id: 'CBD',          label: 'CBD',           lat: -33.8688, lng: 151.2093 },
+    { id: 'Bondi',        label: 'Bondi',          lat: -33.8914, lng: 151.2767 },
+    { id: 'Manly',        label: 'Manly',          lat: -33.7969, lng: 151.2851 },
+    { id: 'Chatswood',    label: 'Chatswood',      lat: -33.7980, lng: 151.1794 },
+    { id: 'Parramatta',   label: 'Parramatta',     lat: -33.8150, lng: 151.0011 },
+    { id: 'Strathfield',  label: 'Strathfield',    lat: -33.8749, lng: 151.0826 },
+    { id: 'Eastwood',     label: 'Eastwood',       lat: -33.7906, lng: 151.0814 },
+    { id: 'Burwood',      label: 'Burwood',        lat: -33.8774, lng: 151.1030 },
+    { id: 'Campsie',      label: 'Campsie',        lat: -33.9105, lng: 151.1032 },
+    { id: 'BlueMountains',label: 'Blue Mountains', lat: -33.7138, lng: 150.3119 },
+    { id: 'PortStephens', label: 'Port Stephens',  lat: -32.7165, lng: 152.1544 },
+  ]
+
+  const TYPES = [
+    { id: 'cafe',              label: '카페·베이커리', category: 'cafe' },
+    { id: 'restaurant',        label: '식당',          category: 'restaurant' },
+    { id: 'tourist_attraction',label: '명소·관광지',   category: 'attraction' },
+  ]
+
+  const toggleArea = (id: string) => setSelectedAreas(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id])
+  const toggleType = (id: string) => setSelectedTypes(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id])
+
+  const handleRun = async () => {
+    if (!apiKey.trim()) { alert('API 키를 입력해주세요'); return }
+    if (selectedAreas.length === 0) { alert('지역을 선택해주세요'); return }
+    if (selectedTypes.length === 0) { alert('카테고리를 선택해주세요'); return }
+    if (!confirm(`${selectedAreas.length}개 지역 × ${selectedTypes.length}개 카테고리 수집을 시작할까요?`)) return
+
+    setRunning(true); setResults([]); setError(null); setDone(0); setTotal(0)
+
+    let totalCount = 0
+    const areas = AREAS.filter(a => selectedAreas.includes(a.id))
+    const types = TYPES.filter(t => selectedTypes.includes(t.id))
+
+    for (const area of areas) {
+      for (const type of types) {
+        try {
+          let pageToken: string | null = null
+          let pageCount = 0
+
+          do {
+            const params = new URLSearchParams({
+              location: `${area.lat},${area.lng}`,
+              radius: '2000',
+              type: type.id,
+              key: apiKey,
+              language: 'ko',
+            })
+            if (pageToken) params.set('pagetoken', pageToken)
+
+            const res = await fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?${params}`)
+            const data = await res.json()
+
+            if (data.status === 'REQUEST_DENIED') throw new Error('API 키 오류: ' + data.error_message)
+
+            const places = data.results ?? []
+            totalCount += places.length
+            setTotal(t => t + places.length)
+
+            for (const place of places) {
+              try {
+                const existing = await supabase
+                  .from('businesses')
+                  .select('id')
+                  .eq('google_place_id', place.place_id)
+                  .single()
+
+                if (existing.data) {
+                  setResults(prev => [...prev, { name: place.name, status: '⏭ 중복 스킵' }])
+                  setDone(prev => prev + 1)
+                  continue
+                }
+
+                await supabase.from('businesses').insert({
+                  name: place.name,
+                  category: type.category,
+                  description: '',
+                  address: place.vicinity ?? '',
+                  city: area.label,
+                  rating: 0,
+                  reviews_count: 0,
+                  is_featured: false,
+                  is_active: true,
+                  is_korean: false,
+                  source: 'google',
+                  tags: [],
+                  google_place_id: place.place_id,
+                  google_rating: place.rating ?? null,
+                  google_review_count: place.user_ratings_total ?? null,
+                  latitude: place.geometry?.location?.lat ?? null,
+                  longitude: place.geometry?.location?.lng ?? null,
+                })
+                setResults(prev => [...prev, { name: place.name, status: '✅ 추가' }])
+              } catch {
+                setResults(prev => [...prev, { name: place.name, status: '❌ 실패' }])
+              }
+              setDone(prev => prev + 1)
+            }
+
+            pageToken = data.next_page_token ?? null
+            if (pageToken) await new Promise(r => setTimeout(r, 2000))
+            pageCount++
+          } while (pageToken && pageCount < 3)
+
+        } catch (e: any) {
+          setError(String(e?.message ?? e))
+          setRunning(false)
+          return
+        }
+      }
+    }
+    setRunning(false)
+  }
+
+  const succeeded = results.filter(r => r.status.startsWith('✅')).length
+  const skipped   = results.filter(r => r.status.startsWith('⏭')).length
+  const failed    = results.filter(r => r.status.startsWith('❌')).length
+
+  return (
+    <div style={{ marginBottom:24, fontFamily: ff }}>
+      <div style={{ background:'#F0FDF4', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
+        <div style={{ fontWeight:800, color:'#16A34A', marginBottom:4 }}>🗺 Google Places 업체 수집</div>
+        선택한 지역/카테고리의 업체를 Google Places API로 수집합니다.<br />
+        별도 API 키를 입력하세요 (Google Cloud 새 프로젝트 $200 무료 크레딧).
+      </div>
+
+      {/* API 키 입력 */}
+      <div style={{ marginBottom:12 }}>
+        <div style={{ fontSize:11, fontWeight:700, color:'#64748B', marginBottom:4 }}>Google Places API 키</div>
+        <input
+          type="password"
+          value={apiKey}
+          onChange={e => setApiKey(e.target.value)}
+          placeholder="AIza..."
+          style={{ width:'100%', padding:'10px 12px', borderRadius:10, border:'1px solid #E2E8F0', fontSize:13, boxSizing:'border-box' as const }}
+        />
+      </div>
+
+      {/* 지역 선택 */}
+      <div style={{ marginBottom:12 }}>
+        <div style={{ fontSize:11, fontWeight:700, color:'#64748B', marginBottom:6 }}>지역 선택</div>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+          {AREAS.map(a => (
+            <button key={a.id} onClick={() => toggleArea(a.id)} style={{
+              padding:'5px 12px', borderRadius:20, fontSize:12, fontWeight:700, cursor:'pointer',
+              background: selectedAreas.includes(a.id) ? '#1B6EF3' : '#F1F5F9',
+              color: selectedAreas.includes(a.id) ? '#fff' : '#64748B',
+              border: 'none',
+            }}>{a.label}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* 카테고리 선택 */}
+      <div style={{ marginBottom:16 }}>
+        <div style={{ fontSize:11, fontWeight:700, color:'#64748B', marginBottom:6 }}>카테고리 선택</div>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+          {TYPES.map(t => (
+            <button key={t.id} onClick={() => toggleType(t.id)} style={{
+              padding:'5px 12px', borderRadius:20, fontSize:12, fontWeight:700, cursor:'pointer',
+              background: selectedTypes.includes(t.id) ? '#1B6EF3' : '#F1F5F9',
+              color: selectedTypes.includes(t.id) ? '#fff' : '#64748B',
+              border: 'none',
+            }}>{t.label}</button>
+          ))}
+        </div>
+      </div>
+
+      <button onClick={handleRun} disabled={running} style={{
+        width:'100%', height:48, borderRadius:12, border:'none',
+        background: running ? '#94A3B8' : '#16A34A',
+        color:'#fff', fontSize:15, fontWeight:700,
+        cursor: running ? 'default' : 'pointer', marginBottom:16,
+        display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+      }}>
+        {running ? `🗺 수집 중... ${done}/${total}개` : '🗺 수집 시작'}
+      </button>
+
+      {error && <div style={{ background:'#FEE2E2', borderRadius:10, padding:'12px 14px', marginBottom:16, fontSize:13, color:'#DC2626' }}>❌ {error}</div>}
+
+      {results.length > 0 && (
+        <>
+          <div style={{ display:'flex', gap:8, marginBottom:12 }}>
+            <div style={{ flex:1, background:'#DCFCE7', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#16A34A' }}>{succeeded}</div>
+              <div style={{ fontSize:11, color:'#16A34A', fontWeight:600 }}>추가</div>
+            </div>
+            <div style={{ flex:1, background:'#FEF9C3', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#CA8A04' }}>{skipped}</div>
+              <div style={{ fontSize:11, color:'#CA8A04', fontWeight:600 }}>중복스킵</div>
+            </div>
+            <div style={{ flex:1, background:'#FEE2E2', borderRadius:10, padding:'10px', textAlign:'center' }}>
+              <div style={{ fontSize:20, fontWeight:800, color:'#DC2626' }}>{failed}</div>
+              <div style={{ fontSize:11, color:'#DC2626', fontWeight:600 }}>실패</div>
+            </div>
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:4, maxHeight:300, overflowY:'auto' }}>
+            {results.slice(-50).map((r, i) => (
+              <div key={i} style={{ background:'#fff', borderRadius:8, padding:'8px 12px', border:'1px solid #E2E8F0', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div style={{ fontSize:12, fontWeight:600, color:'#0F172A' }}>{r.name}</div>
+                <div style={{ fontSize:11, fontWeight:700 }}>{r.status}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
 
 function ShoppingImageMigrationSection({ ff }: { ff: string }) {
   const [running, setRunning] = useState(false)

@@ -14,10 +14,14 @@ export type Business = {
   reviews_count: number
   is_featured: boolean
   is_active: boolean
+  is_korean?: boolean
+  source?: string
   tags: string[]
   google_place_id?: string
   google_rating?: number
   google_review_count?: number
+  latitude?: number
+  longitude?: number
   created_at?: string
   updated_at?: string
 }
