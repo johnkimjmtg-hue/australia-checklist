@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
-import { CheckItem, ITEM_ICONS } from '../data/checklist'
+import { CheckItem } from '../data/checklist'
 import { supabase } from '../lib/supabase'
 
 type Category = { id: string; label: string; emoji: string; sort_order: number }
@@ -814,7 +814,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                         }}>
                           {db?.image_url
                             ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
-                            : <Icon icon={db?.icon ?? ITEM_ICONS[item.id] ?? CAT_ICON_MAP[(item as any).categoryId] ?? 'ph:star'} width={28} height={28} color={checked ? '#78716C' : '#CBD5E1'} />
+                            : <Icon icon={db?.icon ?? CAT_ICON_MAP[(item as any).categoryId] ?? 'ph:star'} width={28} height={28} color={checked ? '#78716C' : '#CBD5E1'} />
                           }
                         </div>
                       )
