@@ -558,6 +558,15 @@ function BusinessTab() {
                     style={{ height:40, padding:'0 12px', borderRadius:8, border:'1px solid #E2E8F0', background:'#FFF7ED', color:'#D97706', fontSize:12, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}
                   >⭐ 별점 초기화</button>
                 )}
+                {editTarget && (
+                  <button
+                    onClick={async () => {
+                      await supabase.from('businesses').update({ latitude: null, longitude: null }).eq('id', editTarget.id)
+                      showToast('좌표 초기화 완료')
+                    }}
+                    style={{ height:40, padding:'0 12px', borderRadius:8, border:'1px solid #E2E8F0', background:'#F0FDF4', color:'#16A34A', fontSize:12, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}
+                  >📍 좌표 초기화</button>
+                )}
               </div>
             </Field>
             <div style={{ display:'flex', gap:20, marginTop:8 }}>
@@ -2876,77 +2885,80 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
   const [total, setTotal] = useState(0)
   const [done, setDone] = useState(0)
   const [error, setError] = useState<string | null>(null)
-  const [postcodes, setPostcodes] = useState<string[]>(['2000'])
-  const [postcodeInput, setPostcodeInput] = useState('')
+  const [selectedAreas, setSelectedAreas] = useState<string[]>(['CBD'])
   const [selectedTypes, setSelectedTypes] = useState<string[]>(['cafe', 'restaurant'])
-  const [radius, setRadius] = useState(1500)
 
-  const TYPES = [
-    { id: 'cafe',               label: '카페·베이커리', googleType: 'cafe',               category: 'cafe' },
-    { id: 'restaurant',         label: '식당',          googleType: 'restaurant',          category: 'restaurant' },
-    { id: 'tourist_attraction', label: '명소·관광지',   googleType: 'tourist_attraction',  category: 'attraction' },
+  const AREAS = [
+    { id: 'CBD',          label: 'CBD',           lat: -33.8688, lng: 151.2093 },
+    { id: 'Bondi',        label: 'Bondi',          lat: -33.8914, lng: 151.2767 },
+    { id: 'Manly',        label: 'Manly',          lat: -33.7969, lng: 151.2851 },
+    { id: 'Chatswood',    label: 'Chatswood',      lat: -33.7980, lng: 151.1794 },
+    { id: 'Parramatta',   label: 'Parramatta',     lat: -33.8150, lng: 151.0011 },
+    { id: 'Strathfield',  label: 'Strathfield',    lat: -33.8749, lng: 151.0826 },
+    { id: 'Eastwood',     label: 'Eastwood',       lat: -33.7906, lng: 151.0814 },
+    { id: 'Burwood',      label: 'Burwood',        lat: -33.8774, lng: 151.1030 },
+    { id: 'Campsie',      label: 'Campsie',        lat: -33.9105, lng: 151.1032 },
+    { id: 'BlueMountains',label: 'Blue Mountains', lat: -33.7138, lng: 150.3119 },
+    { id: 'PortStephens', label: 'Port Stephens',  lat: -32.7165, lng: 152.1544 },
   ]
 
-  const addPostcode = () => {
-    const pc = postcodeInput.trim()
-    if (!pc) return
-    if (postcodes.includes(pc)) { setPostcodeInput(''); return }
-    setPostcodes(prev => [...prev, pc])
-    setPostcodeInput('')
-  }
+  const TYPES = [
+    { id: 'cafe',               label: '카페·베이커리', category: 'cafe',       googleType: 'cafe' },
+    { id: 'restaurant',         label: '식당',          category: 'restaurant', googleType: 'restaurant' },
+    { id: 'tourist_attraction', label: '명소·관광지',   category: 'attraction', googleType: 'tourist_attraction' },
+  ]
 
-  const removePostcode = (pc: string) => setPostcodes(prev => prev.filter(p => p !== pc))
+  const toggleArea = (id: string) => setSelectedAreas(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id])
   const toggleType = (id: string) => setSelectedTypes(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id])
 
-  const geocodePostcode = (service: any, postcode: string): Promise<{ lat: number; lng: number; label: string } | null> => {
-    return new Promise(resolve => {
-      const geocoder = new (window as any).google.maps.Geocoder()
-      geocoder.geocode({ address: `${postcode}, NSW, Australia` }, (results: any[], status: string) => {
-        if (status !== 'OK' || !results[0]) { resolve(null); return }
-        const loc = results[0].geometry.location
-        const label = results[0].formatted_address.split(',')[0]
-        resolve({ lat: loc.lat(), lng: loc.lng(), label })
-      })
-    })
-  }
-
   const searchNearby = (service: any, location: any, type: string): Promise<any[]> => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       service.nearbySearch({
-        location, radius, type, language: 'ko',
-      }, (results: any[], status: string) => {
-        resolve(status === 'OK' ? results ?? [] : [])
+        location,
+        radius: 2000,
+        type,
+        language: 'ko',
+      }, (results: any[], status: string, pagination: any) => {
+        if (status !== 'OK' && status !== 'ZERO_RESULTS') {
+          resolve([])
+          return
+        }
+        const places = results ?? []
+        if (pagination?.hasNextPage) {
+          setTimeout(() => {
+            pagination.nextPage()
+          }, 2000)
+          // nextPage 결과는 콜백으로 다시 오지만 여기선 첫 페이지만 처리
+        }
+        resolve(places)
       })
     })
   }
 
   const handleRun = async () => {
-    if (postcodes.length === 0) { alert('포스트코드를 입력해주세요'); return }
+    if (selectedAreas.length === 0) { alert('지역을 선택해주세요'); return }
     if (selectedTypes.length === 0) { alert('카테고리를 선택해주세요'); return }
-    if (!confirm(`${postcodes.length}개 포스트코드 × ${selectedTypes.length}개 카테고리 수집을 시작할까요?`)) return
+    if (!confirm(`${selectedAreas.length}개 지역 × ${selectedTypes.length}개 카테고리 수집을 시작할까요?`)) return
 
     setRunning(true); setResults([]); setError(null); setDone(0); setTotal(0)
 
     try {
       await loadGoogleMaps()
       const googleMaps = (window as any).google?.maps
-      if (!googleMaps) throw new Error('Google Maps 로드 실패')
+      if (!googleMaps) throw new Error('Google Maps가 로드되지 않았습니다')
 
       const mapDiv = mapRef.current!
       const map = new googleMaps.Map(mapDiv, { center: { lat: -33.8688, lng: 151.2093 }, zoom: 13 })
       const service = new googleMaps.places.PlacesService(map)
+
+      const areas = AREAS.filter(a => selectedAreas.includes(a.id))
       const types = TYPES.filter(t => selectedTypes.includes(t.id))
 
-      for (const pc of postcodes) {
-        const geo = await geocodePostcode(service, pc)
-        if (!geo) {
-          setResults(prev => [...prev, { name: `${pc} (포스트코드)`, status: '❌ 주소 변환 실패' }])
-          continue
-        }
-        const location = new googleMaps.LatLng(geo.lat, geo.lng)
-
+      for (const area of areas) {
         for (const type of types) {
+          const location = new googleMaps.LatLng(area.lat, area.lng)
           const places = await searchNearby(service, location, type.googleType)
+
           setTotal(prev => prev + places.length)
 
           for (const place of places) {
@@ -2968,7 +2980,7 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
                 category: type.category,
                 description: '',
                 address: place.vicinity ?? '',
-                city: geo.label,
+                city: area.label,
                 rating: 0,
                 reviews_count: 0,
                 is_featured: false,
@@ -2982,7 +2994,7 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
                 latitude: place.geometry?.location?.lat() ?? null,
                 longitude: place.geometry?.location?.lng() ?? null,
               })
-              setResults(prev => [...prev, { name: place.name, status: `✅ ${pc} 추가` }])
+              setResults(prev => [...prev, { name: place.name, status: '✅ 추가' }])
             } catch {
               setResults(prev => [...prev, { name: place.name, status: '❌ 실패' }])
             }
@@ -3003,55 +3015,26 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
 
   return (
     <div style={{ marginBottom:24, fontFamily: ff }}>
+      {/* 숨겨진 지도 div (PlacesService 필요) */}
       <div ref={mapRef} style={{ width:1, height:1, position:'absolute', opacity:0, pointerEvents:'none' }} />
 
       <div style={{ background:'#F0FDF4', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
         <div style={{ fontWeight:800, color:'#16A34A', marginBottom:4 }}>🗺 Google Places 업체 수집</div>
-        포스트코드로 원하는 지역을 직접 입력해서 수집합니다.
+        Maps JavaScript API로 브라우저에서 직접 수집합니다.<br />
+        기존 Google Maps 키를 사용하며 별도 API 키 불필요합니다.
       </div>
 
-      {/* 포스트코드 입력 */}
+      {/* 지역 선택 */}
       <div style={{ marginBottom:12 }}>
-        <div style={{ fontSize:11, fontWeight:700, color:'#64748B', marginBottom:6 }}>포스트코드 입력 (NSW 기준)</div>
-        <div style={{ display:'flex', gap:8, marginBottom:8 }}>
-          <input
-            value={postcodeInput}
-            onChange={e => setPostcodeInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && addPostcode()}
-            placeholder="예: 2000, 2026, 2042..."
-            style={{ flex:1, padding:'9px 12px', borderRadius:10, border:'1px solid #E2E8F0', fontSize:13 }}
-          />
-          <button onClick={addPostcode} style={{
-            padding:'9px 16px', borderRadius:10, border:'none',
-            background:'#1B6EF3', color:'#fff', fontWeight:700, fontSize:13, cursor:'pointer',
-          }}>추가</button>
-        </div>
+        <div style={{ fontSize:11, fontWeight:700, color:'#64748B', marginBottom:6 }}>지역 선택</div>
         <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
-          {postcodes.map(pc => (
-            <div key={pc} style={{
-              display:'flex', alignItems:'center', gap:4,
-              background:'#EFF6FF', border:'1px solid #BFDBFE', borderRadius:20, padding:'4px 10px',
-            }}>
-              <span style={{ fontSize:12, fontWeight:700, color:'#1B6EF3' }}>{pc}</span>
-              <button onClick={() => removePostcode(pc)} style={{
-                background:'none', border:'none', cursor:'pointer', padding:0, lineHeight:1,
-                color:'#94A3B8', fontSize:14, fontWeight:700,
-              }}>×</button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 검색 반경 */}
-      <div style={{ marginBottom:12 }}>
-        <div style={{ fontSize:11, fontWeight:700, color:'#64748B', marginBottom:6 }}>검색 반경</div>
-        <div style={{ display:'flex', gap:6 }}>
-          {[500, 1000, 1500, 2000, 3000].map(r => (
-            <button key={r} onClick={() => setRadius(r)} style={{
-              padding:'5px 12px', borderRadius:20, fontSize:12, fontWeight:700, cursor:'pointer', border:'none',
-              background: radius === r ? '#1B6EF3' : '#F1F5F9',
-              color: radius === r ? '#fff' : '#64748B',
-            }}>{r >= 1000 ? `${r/1000}km` : `${r}m`}</button>
+          {AREAS.map(a => (
+            <button key={a.id} onClick={() => toggleArea(a.id)} style={{
+              padding:'5px 12px', borderRadius:20, fontSize:12, fontWeight:700, cursor:'pointer',
+              background: selectedAreas.includes(a.id) ? '#1B6EF3' : '#F1F5F9',
+              color: selectedAreas.includes(a.id) ? '#fff' : '#64748B',
+              border: 'none',
+            }}>{a.label}</button>
           ))}
         </div>
       </div>
@@ -3062,9 +3045,10 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
         <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
           {TYPES.map(t => (
             <button key={t.id} onClick={() => toggleType(t.id)} style={{
-              padding:'5px 12px', borderRadius:20, fontSize:12, fontWeight:700, cursor:'pointer', border:'none',
+              padding:'5px 12px', borderRadius:20, fontSize:12, fontWeight:700, cursor:'pointer',
               background: selectedTypes.includes(t.id) ? '#1B6EF3' : '#F1F5F9',
               color: selectedTypes.includes(t.id) ? '#fff' : '#64748B',
+              border: 'none',
             }}>{t.label}</button>
           ))}
         </div>
@@ -3111,6 +3095,8 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
     </div>
   )
 }
+
+
 
 function GeocodingSection({ ff }: { ff: string }) {
   const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY
