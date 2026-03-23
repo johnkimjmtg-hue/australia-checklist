@@ -2867,7 +2867,7 @@ function GoogleMappingTab() {
 
 
 function GooglePlacesCollectSection({ ff }: { ff: string }) {
-  const [apiKey, setApiKey] = useState('')
+  const mapRef = useRef<HTMLDivElement>(null)
   const [running, setRunning] = useState(false)
   const [results, setResults] = useState<{ name: string; status: string }[]>([])
   const [total, setTotal] = useState(0)
@@ -2891,102 +2891,107 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
   ]
 
   const TYPES = [
-    { id: 'cafe',              label: '카페·베이커리', category: 'cafe' },
-    { id: 'restaurant',        label: '식당',          category: 'restaurant' },
-    { id: 'tourist_attraction',label: '명소·관광지',   category: 'attraction' },
+    { id: 'cafe',               label: '카페·베이커리', category: 'cafe',       googleType: 'cafe' },
+    { id: 'restaurant',         label: '식당',          category: 'restaurant', googleType: 'restaurant' },
+    { id: 'tourist_attraction', label: '명소·관광지',   category: 'attraction', googleType: 'tourist_attraction' },
   ]
 
   const toggleArea = (id: string) => setSelectedAreas(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id])
   const toggleType = (id: string) => setSelectedTypes(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id])
 
+  const searchNearby = (service: any, location: any, type: string): Promise<any[]> => {
+    return new Promise((resolve) => {
+      service.nearbySearch({
+        location,
+        radius: 2000,
+        type,
+        language: 'ko',
+      }, (results: any[], status: string, pagination: any) => {
+        if (status !== 'OK' && status !== 'ZERO_RESULTS') {
+          resolve([])
+          return
+        }
+        const places = results ?? []
+        if (pagination?.hasNextPage) {
+          setTimeout(() => {
+            pagination.nextPage()
+          }, 2000)
+          // nextPage 결과는 콜백으로 다시 오지만 여기선 첫 페이지만 처리
+        }
+        resolve(places)
+      })
+    })
+  }
+
   const handleRun = async () => {
-    if (!apiKey.trim()) { alert('API 키를 입력해주세요'); return }
     if (selectedAreas.length === 0) { alert('지역을 선택해주세요'); return }
     if (selectedTypes.length === 0) { alert('카테고리를 선택해주세요'); return }
     if (!confirm(`${selectedAreas.length}개 지역 × ${selectedTypes.length}개 카테고리 수집을 시작할까요?`)) return
 
     setRunning(true); setResults([]); setError(null); setDone(0); setTotal(0)
 
-    let totalCount = 0
-    const areas = AREAS.filter(a => selectedAreas.includes(a.id))
-    const types = TYPES.filter(t => selectedTypes.includes(t.id))
+    try {
+      const googleMaps = (window as any).google?.maps
+      if (!googleMaps) throw new Error('Google Maps가 로드되지 않았습니다')
 
-    for (const area of areas) {
-      for (const type of types) {
-        try {
-          let pageToken: string | null = null
-          let pageCount = 0
+      const mapDiv = mapRef.current!
+      const map = new googleMaps.Map(mapDiv, { center: { lat: -33.8688, lng: 151.2093 }, zoom: 13 })
+      const service = new googleMaps.places.PlacesService(map)
 
-          do {
-            const params = new URLSearchParams({
-              location: `${area.lat},${area.lng}`,
-              radius: '2000',
-              type: type.id,
-              key: apiKey,
-              language: 'ko',
-            })
-            if (pageToken) params.set('pagetoken', pageToken)
+      const areas = AREAS.filter(a => selectedAreas.includes(a.id))
+      const types = TYPES.filter(t => selectedTypes.includes(t.id))
 
-            const res = await fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?${params}`)
-            const data = await res.json()
+      for (const area of areas) {
+        for (const type of types) {
+          const location = new googleMaps.LatLng(area.lat, area.lng)
+          const places = await searchNearby(service, location, type.googleType)
 
-            if (data.status === 'REQUEST_DENIED') throw new Error('API 키 오류: ' + data.error_message)
+          setTotal(prev => prev + places.length)
 
-            const places = data.results ?? []
-            totalCount += places.length
-            setTotal(t => t + places.length)
+          for (const place of places) {
+            try {
+              const { data: existing } = await supabase
+                .from('businesses')
+                .select('id')
+                .eq('google_place_id', place.place_id)
+                .maybeSingle()
 
-            for (const place of places) {
-              try {
-                const existing = await supabase
-                  .from('businesses')
-                  .select('id')
-                  .eq('google_place_id', place.place_id)
-                  .single()
-
-                if (existing.data) {
-                  setResults(prev => [...prev, { name: place.name, status: '⏭ 중복 스킵' }])
-                  setDone(prev => prev + 1)
-                  continue
-                }
-
-                await supabase.from('businesses').insert({
-                  name: place.name,
-                  category: type.category,
-                  description: '',
-                  address: place.vicinity ?? '',
-                  city: area.label,
-                  rating: 0,
-                  reviews_count: 0,
-                  is_featured: false,
-                  is_active: true,
-                  is_korean: false,
-                  source: 'google',
-                  tags: [],
-                  google_place_id: place.place_id,
-                  google_rating: place.rating ?? null,
-                  google_review_count: place.user_ratings_total ?? null,
-                  latitude: place.geometry?.location?.lat ?? null,
-                  longitude: place.geometry?.location?.lng ?? null,
-                })
-                setResults(prev => [...prev, { name: place.name, status: '✅ 추가' }])
-              } catch {
-                setResults(prev => [...prev, { name: place.name, status: '❌ 실패' }])
+              if (existing) {
+                setResults(prev => [...prev, { name: place.name, status: '⏭ 중복 스킵' }])
+                setDone(prev => prev + 1)
+                continue
               }
-              setDone(prev => prev + 1)
+
+              await supabase.from('businesses').insert({
+                name: place.name,
+                category: type.category,
+                description: '',
+                address: place.vicinity ?? '',
+                city: area.label,
+                rating: 0,
+                reviews_count: 0,
+                is_featured: false,
+                is_active: true,
+                is_korean: false,
+                source: 'google',
+                tags: [],
+                google_place_id: place.place_id,
+                google_rating: place.rating ?? null,
+                google_review_count: place.user_ratings_total ?? null,
+                latitude: place.geometry?.location?.lat() ?? null,
+                longitude: place.geometry?.location?.lng() ?? null,
+              })
+              setResults(prev => [...prev, { name: place.name, status: '✅ 추가' }])
+            } catch {
+              setResults(prev => [...prev, { name: place.name, status: '❌ 실패' }])
             }
-
-            pageToken = data.next_page_token ?? null
-            if (pageToken) await new Promise(r => setTimeout(r, 2000))
-            pageCount++
-          } while (pageToken && pageCount < 3)
-
-        } catch (e: any) {
-          setError(String(e?.message ?? e))
-          setRunning(false)
-          return
+            setDone(prev => prev + 1)
+          }
+          await new Promise(r => setTimeout(r, 500))
         }
       }
+    } catch (e: any) {
+      setError(String(e?.message ?? e))
     }
     setRunning(false)
   }
@@ -2997,22 +3002,13 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
 
   return (
     <div style={{ marginBottom:24, fontFamily: ff }}>
+      {/* 숨겨진 지도 div (PlacesService 필요) */}
+      <div ref={mapRef} style={{ width:1, height:1, position:'absolute', opacity:0, pointerEvents:'none' }} />
+
       <div style={{ background:'#F0FDF4', borderRadius:12, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#1E293B', lineHeight:1.7 }}>
         <div style={{ fontWeight:800, color:'#16A34A', marginBottom:4 }}>🗺 Google Places 업체 수집</div>
-        선택한 지역/카테고리의 업체를 Google Places API로 수집합니다.<br />
-        별도 API 키를 입력하세요 (Google Cloud 새 프로젝트 $200 무료 크레딧).
-      </div>
-
-      {/* API 키 입력 */}
-      <div style={{ marginBottom:12 }}>
-        <div style={{ fontSize:11, fontWeight:700, color:'#64748B', marginBottom:4 }}>Google Places API 키</div>
-        <input
-          type="password"
-          value={apiKey}
-          onChange={e => setApiKey(e.target.value)}
-          placeholder="AIza..."
-          style={{ width:'100%', padding:'10px 12px', borderRadius:10, border:'1px solid #E2E8F0', fontSize:13, boxSizing:'border-box' as const }}
-        />
+        Maps JavaScript API로 브라우저에서 직접 수집합니다.<br />
+        기존 Google Maps 키를 사용하며 별도 API 키 불필요합니다.
       </div>
 
       {/* 지역 선택 */}
