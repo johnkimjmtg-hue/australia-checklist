@@ -451,7 +451,8 @@ function BusinessTab() {
 
   async function load() {
     setLoading(true)
-    setBusinesses(await getBusinesses())
+    const { data } = await supabase.from('businesses').select('*').order('name')
+    setBusinesses(data || [])
     setLoading(false)
   }
 
