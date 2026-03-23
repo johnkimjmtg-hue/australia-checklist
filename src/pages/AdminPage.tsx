@@ -152,13 +152,17 @@ function loadGoogleMaps(): Promise<void> {
   if (_mapsPromise) return _mapsPromise
   _mapsPromise = new Promise((resolve, reject) => {
     if ((window as any).google?.maps?.places) { resolve(); return }
+    const existing = document.querySelector('script[src*="maps.googleapis.com"]')
+    if (existing) {
+      const check = setInterval(() => {
+        if ((window as any).google?.maps?.places) { clearInterval(check); resolve() }
+      }, 100)
+      return
+    }
     const s = document.createElement('script')
     s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_KEY}&libraries=places&v=weekly`
-    s.onload = () => {
-      // 약간 딜레이 줘서 places 객체 완전히 초기화되도록
-      setTimeout(() => resolve(), 100)
-    }
-    s.onerror = () => reject(new Error('Google Maps load failed'))
+    s.onload = () => setTimeout(() => resolve(), 300)
+    s.onerror = () => reject(new Error('Google Maps 로드 실패'))
     document.head.appendChild(s)
   })
   return _mapsPromise
@@ -2931,6 +2935,7 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
     setRunning(true); setResults([]); setError(null); setDone(0); setTotal(0)
 
     try {
+      await loadGoogleMaps()
       const googleMaps = (window as any).google?.maps
       if (!googleMaps) throw new Error('Google Maps가 로드되지 않았습니다')
 
