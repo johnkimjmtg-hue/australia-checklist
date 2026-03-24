@@ -230,7 +230,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         </>
       ) : (
         // ── 버킷리스트 선택 화면 (paddingBottom으로 하단 고정 영역 확보)
-        <div style={{ paddingBottom: 130, background: '#EEF4FF', minHeight: '100dvh' }}>
+        <div style={{ paddingBottom: 130, background: '#F5F9FF', minHeight: '100dvh' }}>
 
           {/* ── 헤더 (스크롤 시 올라감) ── */}
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
@@ -259,7 +259,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
           {/* ── 서브헤더 + 카테고리 (sticky 고정) ── */}
           {!showSearch && (
-            <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgCard, borderBottom:`1px solid ${colors.border}` }}>
+            <div style={{ position:'sticky', top:0, zIndex:30, background:'#F5F9FF', borderBottom:`1px solid ${colors.border}` }}>
               {/* 멘트 + 일정설정 + 일정보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
                 <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? colors.primary : colors.gray600 }}>
@@ -423,7 +423,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {/* ── 하단 고정 영역 ── */}
       <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, zIndex:40 }}>
         {mainTab==='bucketlist'&&!isIssued&&(
-          <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2], borderTop:`1.5px solid ${colors.border}` }}>
+          <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2], borderTop:`1.5px solid ${colors.border}`, background:'#F5F9FF' }}>
             <button onClick={handleIssue} style={{
               flex:4, height:44, background:colors.primary, color:'#fff',
               border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
