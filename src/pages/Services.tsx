@@ -67,8 +67,15 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       data = await getBusinesses(cat === 'all' ? undefined : cat, currentPage, PAGE_SIZE)
     }
 
+    // 추천업체 가나다순 → 일반업체 가나다순 정렬
+    const sortMixed = (list: Business[]) => {
+      const featured = sortByName(list.filter(b => b.is_featured))
+      const normal   = sortByName(list.filter(b => !b.is_featured))
+      return [...featured, ...normal]
+    }
+
     if (reset) {
-      setBusinesses(data)
+      setBusinesses(sortMixed(data))
       setLoading(false)
       // 총 개수 가져오기 (카테고리 탭 표시용)
       if (!q.trim()) {
@@ -77,7 +84,12 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         searchBusinessesCount(q.trim()).then(c => setTotalCount(c))
       }
     } else {
-      setBusinesses(prev => [...prev, ...data])
+      setBusinesses(prev => {
+        const newData = [...prev, ...data]
+        const featured = sortByName(newData.filter(b => b.is_featured))
+        const normal   = sortByName(newData.filter(b => !b.is_featured))
+        return [...featured, ...normal]
+      })
       setLoadingMore(false)
       if (!reset) setPage(p => p + 1)
     }
@@ -131,7 +143,12 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             let data: Business[]
             if (q) data = await searchBusinesses(q, nextPage, PAGE_SIZE)
             else data = await getBusinesses(cat === 'all' ? undefined : cat, nextPage, PAGE_SIZE)
-            setBusinesses(prev => [...prev, ...data])
+            setBusinesses(prev => {
+                const newData = [...prev, ...data]
+                const featured = sortByName(newData.filter(b => b.is_featured))
+                const normal   = sortByName(newData.filter(b => !b.is_featured))
+                return [...featured, ...normal]
+              })
             setLoadingMore(false)
             setHasMore(data.length === PAGE_SIZE)
           })
