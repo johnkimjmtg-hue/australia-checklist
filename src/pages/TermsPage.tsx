@@ -18,7 +18,8 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
 
   return (
     <div style={{
-      minHeight: '100dvh',
+      position: 'fixed',
+      inset: 0,
       background: colors.bgPage,
       fontFamily: font.family,
       display: 'flex',
@@ -29,10 +30,9 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
       <div style={{
         width: '100%',
         maxWidth: 480,
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        flex: 1,
-        minHeight: '100dvh',
         background: colors.bgPage,
         boxSizing: 'border-box',
       }}>
@@ -43,9 +43,7 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
         display: 'flex',
         borderBottom: `1px solid ${colors.border}`,
         background: colors.bgCard,
-        position: 'sticky',
-        top: 56,
-        zIndex: 40,
+        flexShrink: 0,
       }}>
         {(['terms', 'privacy'] as Tab[]).map(t => (
           <button
@@ -71,11 +69,12 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
         ))}
       </div>
 
-      {/* 본문 */}
+      {/* 본문 - 스크롤 영역 */}
       <div style={{
         flex: 1,
-        padding: `${spacing[5]}px ${spacing[4]}px ${spacing[10]}px`,
         overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
+        padding: `${spacing[5]}px ${spacing[4]}px ${spacing[10]}px`,
       }}>
         {tab === 'terms' ? <TermsContent /> : <PrivacyContent />}
       </div>
