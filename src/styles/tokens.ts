@@ -30,7 +30,7 @@ export const colors = {
   dangerLight:  '#FEE2E2',
 
   // Background
-  bgPage:  '#F5F9FF',  // 전체 배경 → 아주 연한 파랑
+  bgPage:  '#F8FAFC',  // 전체 배경 → 아주 연한 회색
   bgCard:  '#FFFFFF',  // 카드 배경 (그림자로 구분)
   bgInput: '#EEF4FF',  // 인풋 배경 → 연한 파랑 (primary 계열)
 
