@@ -220,7 +220,15 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>버킷리스트</span>
               <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>
-                {Object.keys(state.selected).length}개 선택
+                {Object.values(achieved).filter(Boolean).length}/{(() => {
+                  const allRows: number[] = []
+                  Object.keys(state.selected).forEach(id => {
+                    const days = state.schedules[id] ?? []
+                    if (days.length === 0) allRows.push(0)
+                    else days.forEach(() => allRows.push(0))
+                  })
+                  return allRows.length
+                })()} 완료
               </span>
             </div>
           </div>

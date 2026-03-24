@@ -539,16 +539,16 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         )}
       </div>
 
-      {/* ══ 하단 버튼 — 탭바 위 (paddingBottom 68px 확보) ══ */}
+      {/* ══ 하단 버튼 — 탭바 위 ══ */}
       <div style={{
-        position:'fixed', bottom:68,
+        position:'fixed', bottom:62,
         left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430,
         padding:`${spacing[2]}px ${spacing[3]}px`,
         background:colors.bgPage,
         zIndex:20, boxSizing:'border-box',
         display:'flex', gap:spacing[2],
-        borderTop:`1px solid ${colors.border}`,
+        borderTop:`1.5px solid ${colors.border}`,
       }}>
         <button onClick={onEdit} style={{
           flex:1, height:44, borderRadius:radius.sm,
