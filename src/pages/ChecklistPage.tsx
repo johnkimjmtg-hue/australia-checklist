@@ -371,9 +371,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     style={{
                       display:'flex', alignItems:'center', gap:spacing[3],
                       padding:`${spacing[3]}px ${spacing[3]}px`,
-                      background: checked ? colors.primaryLight : colors.bgCard,
+                      background: colors.bgCard,
                       borderRadius:radius.md,
-                      border: checked ? `1.5px solid ${colors.primary}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray200}`,
+                      border: checked ? `1.5px solid ${colors.primary}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                       cursor:'pointer', transition:'all 0.15s',
                     }}
                     onClick={async()=>{
@@ -444,8 +444,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               버킷리스트 발행하기
             </button>
             <button onClick={()=>setModal('confirmReset')} style={{
-              flex:1, height:44, background:colors.gray100, color:colors.textSecondary,
-              border:'none', borderRadius:radius.sm, fontSize:font.size.sm, fontWeight:font.weight.medium,
+              flex:1, height:44, background:colors.bgCard, color:colors.gray600,
+              border:`1px solid ${colors.gray400}`, borderRadius:radius.sm, fontSize:font.size.sm, fontWeight:font.weight.bold,
               cursor:'pointer', fontFamily:ff,
             }}>초기화</button>
           </div>
@@ -457,8 +457,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             return (
               <button key={tab.id} className="nav-btn" onClick={()=>handleTabClick(tab.id)}
                 style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, height:50, background:'none', border:'none', cursor:'pointer', position:'relative', fontFamily:ff }}>
-                <Icon icon={tab.icon} width={20} height={20} color={isActive?colors.primary:colors.textTertiary} />
-                <span style={{ fontSize:9, fontWeight:isActive?font.weight.bold:font.weight.regular, color:isActive?colors.primary:colors.textTertiary }}>{tab.label}</span>
+                <Icon icon={tab.icon} width={20} height={20} color={isActive?colors.primary:colors.gray500} />
+                <span style={{ fontSize:9, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.gray500 }}>{tab.label}</span>
                 {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:colors.primary, position:'absolute', bottom:2 }} />}
                 {showBadge&&<span style={{ position:'absolute', top:6, right:'calc(50% - 14px)', background:'#EF4444', color:'#fff', fontSize:8, fontWeight:font.weight.bold, borderRadius:radius.full, padding:'1px 4px', minWidth:14, textAlign:'center' }}>{todayPostCount}</span>}
               </button>
