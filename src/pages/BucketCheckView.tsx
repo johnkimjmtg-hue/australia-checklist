@@ -110,12 +110,12 @@ function CoinStack({ count, total }: { count:number; total:number }) {
 }
 
 function CircleProgress({ pct }: { pct:number }) {
-  const R = 44, C = 2*Math.PI*R
+  const R = 48, C = 2*Math.PI*R
   return (
-    <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
-      <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
-        <circle cx={50} cy={50} r={R} fill="none" stroke={colors.gray200} strokeWidth={10}/>
-        <circle cx={50} cy={50} r={R} fill="none" stroke="#FFCD00" strokeWidth={10}
+    <div style={{ position:'relative', width:116, height:116, flexShrink:0 }}>
+      <svg width={116} height={116} viewBox="0 0 116 116" style={{ transform:'rotate(-90deg)' }}>
+        <circle cx={58} cy={58} r={R} fill="none" stroke={colors.gray200} strokeWidth={14}/>
+        <circle cx={58} cy={58} r={R} fill="none" stroke="#FFCD00" strokeWidth={14}
           strokeDasharray={C} strokeDashoffset={C-(pct/100)*C} strokeLinecap="round"
           style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)' }}
         />
@@ -443,7 +443,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         }}>
           <CircleProgress pct={pct} />
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[1], lineHeight:1.2 }}>나의 버킷리스트</div>
+            <div style={{ fontSize:font.size['2xl'], fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[1], lineHeight:1.2 }}>나의 버킷리스트</div>
             <div style={{ fontSize:font.size.sm, color:colors.textSecondary, fontWeight:font.weight.medium, marginBottom:spacing[2] }}>
               {trip.startDate.slice(5).replace('-','/')} ~ {trip.endDate.slice(5).replace('-','/')}
             </div>
@@ -451,7 +451,14 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
               <span style={{ fontSize:font.size['3xl'], fontWeight:font.weight.bold, color:colors.textPrimary, lineHeight:1 }}>{achievedCount}</span>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.medium, color:colors.textSecondary }}>/{total}건 완료</span>
             </div>
-            <div style={{ fontSize:font.size.sm, color:colors.textTertiary, lineHeight:1.5 }}>나만의 버킷리스트 꼭 완료하세요.</div>
+            <div style={{ fontSize:font.size.sm, color:colors.textTertiary, lineHeight:1.5 }}>{
+              pct === 0 ? '첫 번째 항목을 완료해봐요! 🙌' :
+              pct < 25  ? '좋은 시작이에요! 계속 해봐요 💪' :
+              pct < 50  ? '절반을 향해 달려가고 있어요! 🏃' :
+              pct < 75  ? '절반을 넘었어요! 조금만 더! ⚡' :
+              pct < 100 ? '거의 다 왔어요! 마지막 스퍼트! 🔥' :
+                          '모든 항목을 완료했어요! 축하합니다 🎉'
+            }</div>
           </div>
           <CoinStack count={achievedCount} total={total} />
         </div>
@@ -537,15 +544,15 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           <Icon icon="ph:pencil-simple" width={16} height={16} color={colors.textSecondary} />
           리스트 수정하기
         </button>
-        <button onClick={onLanding} style={{
+        <button onClick={() => {}} style={{
           flex:1, height:44, borderRadius:radius.sm,
           border:'none', background:colors.primary,
           color:'#fff', fontSize:font.size.md, fontWeight:font.weight.bold,
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
           WebkitTapHighlightColor:'transparent', fontFamily:font.family,
         }}>
-          <Icon icon="ph:check-circle" width={16} height={16} color="#fff" />
-          저장하고 나가기
+          <Icon icon="ph:floppy-disk" width={16} height={16} color="#fff" />
+          저장하기
         </button>
         <button onClick={() => setShowMoreMenu(true)} style={{
           width:44, height:44, borderRadius:radius.sm, flexShrink:0,
