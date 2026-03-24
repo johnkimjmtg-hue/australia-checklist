@@ -30,18 +30,6 @@ const C = {
 }
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
-// ── 도시 목록 ──
-const CITIES = [
-  { value: 'Sydney',     label: '🦘 시드니' },
-  { value: 'Melbourne',  label: '☕ 멜번' },
-  { value: 'Brisbane',   label: '🌞 브리즈번' },
-  { value: 'Perth',      label: '🌊 퍼스' },
-  { value: 'Adelaide',   label: '🍷 애들레이드' },
-  { value: 'Gold Coast', label: '🏄 골드코스트' },
-  { value: 'Cairns',     label: '🐠 케언즈' },
-  { value: 'Other',      label: '기타' },
-]
-
 type Mode = 'select' | 'login' | 'signup'
 type Step = 'auth'
 
@@ -101,22 +89,7 @@ export default function OnboardingPage({ onComplete }: Props) {
     })
   }
 
-  // ── 여행 정보 저장 ──
-  async function handleTripSave() {
-    if (!returnDate) { setError('귀국 예정일을 선택해주세요'); return }
-    if (!city)       { setError('거주 도시를 선택해주세요'); return }
-    setTripLoading(true); setError('')
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setError('로그인 정보가 없어요'); setTripLoading(false); return }
-    await supabase.from('profiles').upsert({
-      id: user.id,
-      return_date: returnDate,
-      city,
-      updated_at: new Date().toISOString(),
-    })
-    setTripLoading(false)
-    onComplete()
-  }
+
 
   // ── 소셜 로그인 콜백 감지 ──
   useEffect(() => {
@@ -131,10 +104,7 @@ export default function OnboardingPage({ onComplete }: Props) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // ── D-Day 미리보기 ──
-  const dDay = returnDate
-    ? Math.ceil((new Date(returnDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-    : null
+
 
   return (
     <div style={{
@@ -157,9 +127,6 @@ export default function OnboardingPage({ onComplete }: Props) {
         .ob-btn-primary { background:${C.primary}; color:#fff; }
         .ob-btn-ghost { background:transparent; color:${C.primary}; border:1.5px solid ${C.primary}; }
         .ob-btn-google { background:${C.google}; color:${C.googleText}; border:1px solid ${C.border}; }
-        .city-btn { flex:1; min-width:calc(50% - 4px); height:44px; border:1px solid ${C.border}; border-radius:10px; background:#fff; color:${C.textSub}; font-size:14px; font-family:${ff}; cursor:pointer; transition:all 0.12s; -webkit-tap-highlight-color:transparent; }
-        .city-btn.active { border:1.5px solid ${C.primary}; background:${C.primaryLight}; color:${C.primary}; font-weight:700; }
-        .city-btn:active { transform:scale(0.97); }
       `}</style>
 
       {/* 로고 */}
