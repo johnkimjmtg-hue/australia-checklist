@@ -103,7 +103,7 @@ export default function NearbyMap({ onBack }: Props) {
 
   // DB 최초 1회 로드
   useEffect(() => {
-    getBusinesses().then(data => {
+    getBusinesses(undefined, 0, 2000).then(data => {
       setAllBiz(data.filter(b => (b as any).latitude && (b as any).longitude))
       setLoading(false)
     })
@@ -161,6 +161,7 @@ export default function NearbyMap({ onBack }: Props) {
         maxZoom: 13,
         disableDefaultUI: true,
         zoomControl: true,
+        zoomControlOptions: { position: (window as any).google.maps.ControlPosition.RIGHT_CENTER },
         styles: [{ featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }],
       })
 
@@ -317,9 +318,9 @@ export default function NearbyMap({ onBack }: Props) {
                 className="map-btn"
                 style={{
                   flex:1, height:28, borderRadius:radius.sm,
-                  background: isActive ? colors.primaryLight : colors.bgCard,
-                  color: disabled ? colors.gray300 : isActive ? colors.primary : colors.textSecondary,
-                  border: isActive ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                  background: isActive ? colors.primary : colors.bgCard,
+                  color: disabled ? colors.gray300 : isActive ? '#fff' : colors.gray600,
+                  border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                   cursor: disabled ? 'default' : 'pointer',
                   fontSize:font.size.xs, fontWeight:font.weight.bold,
                   fontFamily:ff,
@@ -348,7 +349,7 @@ export default function NearbyMap({ onBack }: Props) {
         {locError && (
           <div style={{
             position:'absolute', top:12, left:12, right:80,
-            background:colors.dangerLight, borderRadius:radius.md, padding:`${spacing[2]}px ${spacing[3]}px`,
+            background:colors.dangerLight, borderRadius:8, padding:`${spacing[2]}px ${spacing[3]}px`,
             fontSize:font.size.sm, color:colors.danger, fontWeight:font.weight.bold,
             border:`1px solid ${colors.danger}`,
           }}>⚠️ {locError}</div>
@@ -357,7 +358,7 @@ export default function NearbyMap({ onBack }: Props) {
         {/* 업체 수 배지 */}
         <div style={{
           position:'absolute', top:12, right:12,
-          background:colors.bgCard, borderRadius:radius.sm, padding:"4px 12px",
+          background:colors.bgCard, borderRadius:8, padding:"4px 12px",
           fontSize:font.size.xs, color:colors.textSecondary, fontWeight:font.weight.bold,
           border:`1px solid ${colors.border}`,
         }}>
