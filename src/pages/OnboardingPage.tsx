@@ -11,9 +11,11 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { colors, font, radius, spacing, T } from '../styles/tokens'
 import { Button, Input } from '../components/ui'
+import TermsPage from './TermsPage'
 
 type Mode = 'select' | 'login' | 'signup'
 type Step = 'auth'
+type TermsTab = 'terms' | 'privacy'
 
 type Props = {
   onComplete: () => void
@@ -27,6 +29,7 @@ export default function OnboardingPage({ onComplete }: Props) {
   const [name, setName]         = useState('')
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState('')
+  const [termsTab, setTermsTab] = useState<TermsTab | null>(null)
 
   // ── 이메일 로그인 ──
   async function handleLogin() {
@@ -265,14 +268,58 @@ export default function OnboardingPage({ onComplete }: Props) {
         </div>
       )}
 
-      {/* 하단 */}
+      {/* 하단 약관 안내 */}
       <div style={{
         position: 'fixed', bottom: spacing[6],
-        ...T.xs,
+        left: 0, right: 0,
         textAlign: 'center',
+        padding: `0 ${spacing[5]}px`,
+        pointerEvents: 'none',
       }}>
-        가입하면 이용약관 및 개인정보처리방침에 동의하는 것으로 간주해요
+        <div style={{
+          ...T.xs,
+          color: colors.textTertiary,
+          lineHeight: 1.7,
+          pointerEvents: 'auto',
+        }}>
+          계속 진행하면{' '}
+          <button
+            onClick={() => setTermsTab('terms')}
+            style={{
+              background: 'none', border: 'none', padding: 0,
+              color: colors.primary, fontSize: font.size.xs,
+              fontWeight: font.weight.bold, cursor: 'pointer',
+              fontFamily: font.family, textDecoration: 'underline',
+              textUnderlineOffset: 2,
+            }}
+          >이용약관</button>
+          {' '}및{' '}
+          <button
+            onClick={() => setTermsTab('privacy')}
+            style={{
+              background: 'none', border: 'none', padding: 0,
+              color: colors.primary, fontSize: font.size.xs,
+              fontWeight: font.weight.bold, cursor: 'pointer',
+              fontFamily: font.family, textDecoration: 'underline',
+              textUnderlineOffset: 2,
+            }}
+          >개인정보처리방침</button>
+          에 동의하게 됩니다.
+        </div>
       </div>
+
+      {/* 약관 페이지 */}
+      {termsTab && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: colors.bgPage,
+        }}>
+          <TermsPage
+            initialTab={termsTab}
+            onBack={() => setTermsTab(null)}
+          />
+        </div>
+      )}
     </div>
   )
 }
