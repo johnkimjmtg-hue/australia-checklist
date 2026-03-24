@@ -4,8 +4,6 @@ import { Business } from '../lib/businessService'
 import { isBookmarked, toggleBookmark } from '../lib/businessBookmarks'
 import BusinessShareModal from './BusinessShareModal'
 
-import koreanFlag from '../assets/korean_flag.jpg'
-
 type Props = { business: Business }
 
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
@@ -100,15 +98,8 @@ export default function BusinessCard({ business }: Props) {
 
           {/* 업체명 + 펼쳐보기 아이콘 + 북마크 */}
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
-            <div style={{ flex:1, paddingRight:8, display:'flex', alignItems:'center', gap:6 }}>
-              {business.is_korean && (
-                <img src={koreanFlag} alt="한인업체"
-                  style={{ width:20, height:20, borderRadius:'50%', objectFit:'cover', flexShrink:0, border:'1px solid #e2e8f0' }} />
-              )}
-              <div style={{
-                fontSize:17, fontWeight:800, color:'#0F172A',
-                ...(!expanded ? { whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' } : {}),
-              }}>{name}</div>
+            <div style={{ flex:1, paddingRight:8 }}>
+              <div style={{ fontSize:17, fontWeight:800, color:'#0F172A' }}>{name}</div>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:2, flexShrink:0 }}>
               <button
@@ -150,10 +141,16 @@ export default function BusinessCard({ business }: Props) {
             </div>
           )}
 
-          {/* 설명 — 펼친 상태에서만 표시 */}
-          {description && expanded && (
+          {/* 설명 — 접힌 상태: 2줄 제한 */}
+          {description && (
             <div style={{
               fontSize:13, color:'#334155', lineHeight:1.6, marginBottom:10,
+              ...(expanded ? {} : {
+                display:'-webkit-box',
+                WebkitLineClamp: 1,
+                WebkitBoxOrient: 'vertical' as any,
+                overflow:'hidden',
+              }),
             }}>{description}</div>
           )}
 
