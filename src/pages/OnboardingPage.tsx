@@ -9,26 +9,8 @@
 // ─────────────────────────────────────────────
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-
-// ── 디자인 토큰 (tokens.ts 적용 전 인라인 정의) ──
-const C = {
-  primary:     '#1B6EF3',
-  primaryDark: '#1458CC',
-  primaryLight:'#EEF4FF',
-  bgPage:      '#F8FAFC',
-  bgCard:      '#FFFFFF',
-  bgInput:     '#F1F5F9',
-  border:      '#E2E8F0',
-  textPrimary: '#0F172A',
-  textSub:     '#64748B',
-  textHint:    '#94A3B8',
-  danger:      '#DC2626',
-  dangerLight: '#FEE2E2',
-  success:     '#16A34A',
-  google:      '#FFFFFF',
-  googleText:  '#3C4043',
-}
-const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+import { colors, font, radius, spacing, T } from '../styles/tokens'
+import { Button, Input } from '../components/ui'
 
 type Mode = 'select' | 'login' | 'signup'
 type Step = 'auth'
@@ -45,8 +27,6 @@ export default function OnboardingPage({ onComplete }: Props) {
   const [name, setName]         = useState('')
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState('')
-
-  // 여행 정보
 
   // ── 이메일 로그인 ──
   async function handleLogin() {
@@ -89,13 +69,10 @@ export default function OnboardingPage({ onComplete }: Props) {
     })
   }
 
-
-
   // ── 소셜 로그인 콜백 감지 ──
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        // URL 파라미터 정리
         const url = new URL(window.location.href)
         url.searchParams.delete('onboarding')
         window.history.replaceState({}, '', url.toString())
@@ -104,46 +81,58 @@ export default function OnboardingPage({ onComplete }: Props) {
     return () => subscription.unsubscribe()
   }, [])
 
-
-
   return (
     <div style={{
       minHeight: '100dvh',
-      background: C.bgPage,
-      fontFamily: ff,
+      background: colors.bgPage,
+      fontFamily: font.family,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '24px 20px',
+      padding: `${spacing[6]}px ${spacing[5]}px`,
       boxSizing: 'border-box',
     }}>
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
-        .ob-input { width:100%; height:48px; background:${C.bgInput}; border:1px solid ${C.border}; border-radius:10px; padding:0 14px; font-size:15px; color:${C.textPrimary}; font-family:${ff}; outline:none; box-sizing:border-box; transition:border 0.15s; }
-        .ob-input:focus { border:1.5px solid ${C.primary}; background:#fff; }
-        .ob-btn { width:100%; height:52px; border:none; border-radius:12px; font-size:16px; font-weight:700; font-family:${ff}; cursor:pointer; transition:all 0.12s; -webkit-tap-highlight-color:transparent; }
-        .ob-btn:active { transform:scale(0.97); opacity:0.85; }
-        .ob-btn-primary { background:${C.primary}; color:#fff; }
-        .ob-btn-ghost { background:transparent; color:${C.primary}; border:1.5px solid ${C.primary}; }
-        .ob-btn-google { background:${C.google}; color:${C.googleText}; border:1px solid ${C.border}; }
       `}</style>
 
       {/* 로고 */}
-      <div style={{ textAlign: 'center', marginBottom: 36, animation: 'fadeUp 0.4s ease' }}>
-        <div style={{ fontSize: 32, marginBottom: 8 }}>🦘</div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: C.textPrimary, letterSpacing: 1 }}>호주가자</div>
-        <div style={{ fontSize: 13, color: C.textHint, marginTop: 4 }}>호주 생활 정보 앱</div>
+      <div style={{ textAlign: 'center', marginBottom: spacing[8], animation: 'fadeUp 0.4s ease' }}>
+        <div style={{ fontSize: 32, marginBottom: spacing[2] }}>🦘</div>
+        <div style={{ ...T.h1, letterSpacing: 1 }}>호주가자</div>
+        <div style={{ ...T.xs, marginTop: spacing[1] }}>호주 생활 정보 앱</div>
       </div>
 
-      {/* ── STEP 1: 인증 ── */}
+      {/* ── STEP: 인증 ── */}
       {step === 'auth' && (
         <div style={{ width: '100%', maxWidth: 360, animation: 'fadeUp 0.4s ease 0.1s both' }}>
 
           {/* 선택 화면 */}
           {mode === 'select' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <button className="ob-btn ob-btn-google" onClick={handleGoogle} style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing[3] }}>
+              {/* 구글 로그인 버튼 */}
+              <button
+                onClick={handleGoogle}
+                style={{
+                  width: '100%',
+                  height: 52,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: spacing[2],
+                  background: colors.bgCard,
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: radius.md,
+                  fontSize: font.size.md,
+                  fontWeight: font.weight.bold,
+                  fontFamily: font.family,
+                  color: '#3C4043',
+                  cursor: 'pointer',
+                  transition: 'all 0.12s',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
                 <svg width="18" height="18" viewBox="0 0 48 48">
                   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                   <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -152,20 +141,31 @@ export default function OnboardingPage({ onComplete }: Props) {
                 </svg>
                 Google로 시작하기
               </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '4px 0' }}>
-                <div style={{ flex: 1, height: 1, background: C.border }} />
-                <span style={{ fontSize: 12, color: C.textHint }}>또는</span>
-                <div style={{ flex: 1, height: 1, background: C.border }} />
+
+              {/* 구분선 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: spacing[3], margin: `${spacing[1]}px 0` }}>
+                <div style={{ flex: 1, height: 1, background: colors.border }} />
+                <span style={{ ...T.xs }}>또는</span>
+                <div style={{ flex: 1, height: 1, background: colors.border }} />
               </div>
-              <button className="ob-btn ob-btn-primary" onClick={() => setMode('signup')}>
+
+              <Button variant="primary" size="lg" fullWidth onClick={() => setMode('signup')}>
                 이메일로 회원가입
-              </button>
-              <button className="ob-btn ob-btn-ghost" onClick={() => setMode('login')}>
+              </Button>
+              <Button variant="ghost" size="lg" fullWidth onClick={() => setMode('login')}>
                 이미 계정이 있어요
-              </button>
+              </Button>
               <button
                 onClick={onComplete}
-                style={{ background:'none', border:'none', color:C.textHint, fontSize:13, cursor:'pointer', padding:'4px 0', fontFamily:ff, textAlign:'center' as const }}>
+                style={{
+                  background: 'none', border: 'none',
+                  color: colors.textTertiary,
+                  fontSize: font.size.sm,
+                  cursor: 'pointer',
+                  padding: `${spacing[1]}px 0`,
+                  fontFamily: font.family,
+                  textAlign: 'center' as const,
+                }}>
                 나중에 할게요
               </button>
             </div>
@@ -173,17 +173,42 @@ export default function OnboardingPage({ onComplete }: Props) {
 
           {/* 로그인 */}
           {mode === 'login' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ fontSize: 18, fontWeight: 700, color: C.textPrimary, marginBottom: 4 }}>로그인</div>
-              <input className="ob-input" type="email" placeholder="이메일" value={email} onChange={e => setEmail(e.target.value)} />
-              <input className="ob-input" type="password" placeholder="비밀번호" value={password} onChange={e => setPassword(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleLogin()} />
-              {error && <div style={{ fontSize: 13, color: C.danger, background: C.dangerLight, borderRadius: 8, padding: '8px 12px' }}>{error}</div>}
-              <button className="ob-btn ob-btn-primary" onClick={handleLogin} disabled={loading}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing[3] }}>
+              <div style={{ ...T.h2, marginBottom: spacing[1] }}>로그인</div>
+              <Input
+                type="email"
+                placeholder="이메일"
+                value={email}
+                onChange={setEmail}
+              />
+              <Input
+                type="password"
+                placeholder="비밀번호"
+                value={password}
+                onChange={setPassword}
+              />
+              {error && (
+                <div style={{
+                  ...T.sm,
+                  color: colors.danger,
+                  background: colors.dangerLight,
+                  borderRadius: radius.sm,
+                  padding: `${spacing[2]}px ${spacing[3]}px`,
+                }}>{error}</div>
+              )}
+              <Button variant="primary" size="lg" fullWidth onClick={handleLogin} disabled={loading}>
                 {loading ? '로그인 중...' : '로그인'}
-              </button>
-              <button onClick={() => { setMode('select'); setError('') }}
-                style={{ background: 'none', border: 'none', color: C.textHint, fontSize: 13, cursor: 'pointer', padding: '4px 0', fontFamily: ff }}>
+              </Button>
+              <button
+                onClick={() => { setMode('select'); setError('') }}
+                style={{
+                  background: 'none', border: 'none',
+                  color: colors.textTertiary,
+                  fontSize: font.size.sm,
+                  cursor: 'pointer',
+                  padding: `${spacing[1]}px 0`,
+                  fontFamily: font.family,
+                }}>
                 ← 돌아가기
               </button>
             </div>
@@ -191,18 +216,48 @@ export default function OnboardingPage({ onComplete }: Props) {
 
           {/* 회원가입 */}
           {mode === 'signup' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ fontSize: 18, fontWeight: 700, color: C.textPrimary, marginBottom: 4 }}>회원가입</div>
-              <input className="ob-input" type="text" placeholder="이름 (닉네임)" value={name} onChange={e => setName(e.target.value)} />
-              <input className="ob-input" type="email" placeholder="이메일" value={email} onChange={e => setEmail(e.target.value)} />
-              <input className="ob-input" type="password" placeholder="비밀번호 (6자 이상)" value={password} onChange={e => setPassword(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSignup()} />
-              {error && <div style={{ fontSize: 13, color: C.danger, background: C.dangerLight, borderRadius: 8, padding: '8px 12px' }}>{error}</div>}
-              <button className="ob-btn ob-btn-primary" onClick={handleSignup} disabled={loading}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing[3] }}>
+              <div style={{ ...T.h2, marginBottom: spacing[1] }}>회원가입</div>
+              <Input
+                type="text"
+                placeholder="이름 (닉네임)"
+                value={name}
+                onChange={setName}
+              />
+              <Input
+                type="email"
+                placeholder="이메일"
+                value={email}
+                onChange={setEmail}
+              />
+              <Input
+                type="password"
+                placeholder="비밀번호 (6자 이상)"
+                value={password}
+                onChange={setPassword}
+              />
+              {error && (
+                <div style={{
+                  ...T.sm,
+                  color: colors.danger,
+                  background: colors.dangerLight,
+                  borderRadius: radius.sm,
+                  padding: `${spacing[2]}px ${spacing[3]}px`,
+                }}>{error}</div>
+              )}
+              <Button variant="primary" size="lg" fullWidth onClick={handleSignup} disabled={loading}>
                 {loading ? '가입 중...' : '가입하고 시작하기'}
-              </button>
-              <button onClick={() => { setMode('select'); setError('') }}
-                style={{ background: 'none', border: 'none', color: C.textHint, fontSize: 13, cursor: 'pointer', padding: '4px 0', fontFamily: ff }}>
+              </Button>
+              <button
+                onClick={() => { setMode('select'); setError('') }}
+                style={{
+                  background: 'none', border: 'none',
+                  color: colors.textTertiary,
+                  fontSize: font.size.sm,
+                  cursor: 'pointer',
+                  padding: `${spacing[1]}px 0`,
+                  fontFamily: font.family,
+                }}>
                 ← 돌아가기
               </button>
             </div>
@@ -210,8 +265,12 @@ export default function OnboardingPage({ onComplete }: Props) {
         </div>
       )}
 
-            {/* 하단 */}
-      <div style={{ position: 'fixed', bottom: 24, fontSize: 11, color: C.textHint, textAlign: 'center' }}>
+      {/* 하단 */}
+      <div style={{
+        position: 'fixed', bottom: spacing[6],
+        ...T.xs,
+        textAlign: 'center',
+      }}>
         가입하면 이용약관 및 개인정보처리방침에 동의하는 것으로 간주해요
       </div>
     </div>
