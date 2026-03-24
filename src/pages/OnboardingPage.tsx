@@ -12,6 +12,7 @@ import { supabase } from '../lib/supabase'
 import { colors, font, radius, spacing, T } from '../styles/tokens'
 import { Button, Input } from '../components/ui'
 import TermsPage from './TermsPage'
+import logoImg from '../assets/logo.png'
 
 type Mode = 'select' | 'login' | 'signup'
 type Step = 'auth'
@@ -114,7 +115,7 @@ export default function OnboardingPage({ onComplete }: Props) {
           {/* 로고 */}
           <div style={{ textAlign: 'center', marginBottom: spacing[8], animation: 'fadeUp 0.4s ease' }}>
             <img
-              src="/src/assets/logo.png"
+              src={logoImg}
               alt="호주가자"
               style={{ width: 100, height: 100, objectFit: 'contain', marginBottom: spacing[2] }}
             />
