@@ -288,7 +288,7 @@ export default function NearbyMap({ onBack }: Props) {
               <button key={cat.id} onClick={() => setCategory(cat.id)}
                 className="map-btn"
                 style={{
-                  height:32, borderRadius:radius.full,
+                  height:36, borderRadius:20,
                   background: isActive ? colors.primary : colors.bgCard,
                   color: isActive ? '#fff' : colors.gray600,
                   border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
@@ -316,7 +316,7 @@ export default function NearbyMap({ onBack }: Props) {
                 onClick={() => { if (!disabled) setRadius(opt.value) }}
                 className="map-btn"
                 style={{
-                  flex:1, height:28, borderRadius:radius.full,
+                  flex:1, height:28, borderRadius:20,
                   background: isActive ? colors.primaryLight : colors.bgCard,
                   color: disabled ? colors.gray300 : isActive ? colors.primary : colors.textSecondary,
                   border: isActive ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
@@ -348,7 +348,7 @@ export default function NearbyMap({ onBack }: Props) {
         {locError && (
           <div style={{
             position:'absolute', top:12, left:12, right:80,
-            background:colors.dangerLight, borderRadius:radius.md, padding:`${spacing[2]}px ${spacing[3]}px`,
+            background:colors.dangerLight, borderRadius:10, padding:`${spacing[2]}px ${spacing[3]}px`,
             fontSize:font.size.sm, color:colors.danger, fontWeight:font.weight.bold,
             border:`1px solid ${colors.danger}`,
           }}>⚠️ {locError}</div>
@@ -357,7 +357,7 @@ export default function NearbyMap({ onBack }: Props) {
         {/* 업체 수 배지 */}
         <div style={{
           position:'absolute', top:12, right:12,
-          background:colors.bgCard, borderRadius:radius.full, padding:`4px ${spacing[3]}px`,
+          background:colors.bgCard, borderRadius:20, padding:"4px 12px",
           fontSize:font.size.xs, color:colors.textSecondary, fontWeight:font.weight.bold,
           border:`1px solid ${colors.border}`,
         }}>
@@ -368,7 +368,7 @@ export default function NearbyMap({ onBack }: Props) {
         {myPos && (
           <button onClick={() => mapObj.current?.panTo(myPos)} className="map-btn" style={{
             position:'absolute', bottom:16, right:12,
-            width:40, height:40, borderRadius:radius.full,
+            width:40, height:40, borderRadius:20,
             background:colors.bgCard, border:`1px solid ${colors.border}`, cursor:'pointer',
             display:'flex', alignItems:'center', justifyContent:'center',
           }}>
@@ -389,7 +389,7 @@ export default function NearbyMap({ onBack }: Props) {
             left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:390,
             background:colors.bgCard,
-            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
+            borderRadius:'20px 20px 0 0',
             zIndex:501,
             animation:'slideUpSheet 0.25s ease',
             maxHeight:'75vh',
