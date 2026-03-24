@@ -389,7 +389,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     </div>
                     {/* 텍스트 */}
                     <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:checked?colors.primary:colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                      <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color:checked?colors.primary:colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
                         {item.label}
                       </div>
                       <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'wrap' }}>
