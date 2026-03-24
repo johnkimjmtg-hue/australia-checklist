@@ -4,7 +4,6 @@
 // ─────────────────────────────────────────────
 import { useState } from 'react'
 import { colors, font, radius, spacing, T } from '../styles/tokens'
-import { AppHeader } from '../components/ui'
 
 type Tab = 'terms' | 'privacy'
 
@@ -36,8 +35,26 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
         boxSizing: 'border-box',
         overflow: 'hidden',
       }}>
-      <div style={{ flexShrink: 0 }}>
-        <AppHeader title="약관 및 정책" onBack={onBack} />
+      {/* 헤더 */}
+      <div style={{
+        flexShrink: 0,
+        height: 56,
+        background: colors.bgCard,
+        borderBottom: `1px solid ${colors.border}`,
+        padding: `0 ${spacing[4]}px`,
+        display: 'flex', alignItems: 'center', gap: spacing[2],
+      }}>
+        <button onClick={onBack} style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          padding: spacing[1], margin: `-${spacing[1]}px`,
+          display: 'flex', alignItems: 'center',
+          WebkitTapHighlightColor: 'transparent',
+        }}>
+          <svg width={20} height={20} viewBox="0 0 20 20" fill="none">
+            <path d="M12.5 15L7.5 10L12.5 5" stroke={colors.textPrimary} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+        <div style={{ ...T.h4 }}>약관 및 정책</div>
       </div>
 
       {/* 탭 */}
