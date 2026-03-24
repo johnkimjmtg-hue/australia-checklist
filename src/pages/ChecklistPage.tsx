@@ -215,6 +215,15 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <Community />
       ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
         <>
+          {/* 헤더 */}
+          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
+              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>버킷리스트</span>
+              <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>
+                {Object.keys(state.selected).length}개 선택
+              </span>
+            </div>
+          </div>
           <BucketCheckView state={state} trip={trip} setState={setState} items={ITEMS} dbItems={dbItems} onAchievedChange={setAchieved}
             onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{}; try{localStorage.removeItem('bucket-achieved')}catch{}; setAchieved({}) }}
             onDelete={doReset}

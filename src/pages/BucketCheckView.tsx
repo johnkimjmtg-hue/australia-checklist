@@ -496,7 +496,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       </div>
 
       {/* ══ 리스트 ══ */}
-      <div style={{ padding:`${spacing[2]}px 0 160px`, display:'flex', flexDirection:'column', gap:spacing[4] }}>
+      <div style={{ padding:`${spacing[2]}px 0 180px`, display:'flex', flexDirection:'column', gap:spacing[4] }}>
         {sortedDays.map(dayIdx => {
           const dayItems = (byDay.get(dayIdx) ?? []).filter(item => filterRow(item.id, dayIdx))
           if (!dayItems.length) return null
