@@ -18,7 +18,7 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
   return (
     <div style={{
       minHeight: '100dvh',
-      background: colors.bgPage,
+      background: '#FFFFFF',
       fontFamily: font.family,
       display: 'flex',
       justifyContent: 'center',
@@ -30,7 +30,7 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
         minHeight: '100dvh',
         display: 'flex',
         flexDirection: 'column',
-        background: colors.bgPage,
+        background: '#FFFFFF',
         boxSizing: 'border-box',
       }}>
       {/* 헤더 */}
