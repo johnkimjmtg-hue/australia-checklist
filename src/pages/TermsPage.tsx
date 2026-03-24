@@ -34,8 +34,11 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
         flexDirection: 'column',
         background: colors.bgPage,
         boxSizing: 'border-box',
+        overflow: 'hidden',
       }}>
-      <AppHeader title="약관 및 정책" onBack={onBack} />
+      <div style={{ flexShrink: 0 }}>
+        <AppHeader title="약관 및 정책" onBack={onBack} />
+      </div>
 
       {/* 탭 */}
       <div style={{
