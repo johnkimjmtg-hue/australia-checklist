@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import { CATEGORIES } from '../data/businesses'
 import { Business, getBusinesses, getBusinessesCount, searchBusinesses, searchBusinessesCount } from '../lib/businessService'
@@ -100,17 +100,25 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
 
   // 카테고리 카운트 (한번만)
   useEffect(() => {
+    // 전체 count
     getBusinessesCount().then(total => {
-      setCatCounts({ all: total })
+      setCatCounts(prev => ({ ...prev, all: total }))
     })
-    // 초기 10개용 featured 로드
-    getBusinesses(undefined, 0, 50).then(data => {
-      const featured = data.filter(b => b.is_featured)
-      const normal   = data.filter(b => !b.is_featured)
-      const shuffledF = [...featured].sort(() => Math.random() - 0.5)
-      const shuffledN = [...normal].sort(() => Math.random() - 0.5)
-      if (shuffledF.length >= 10) setInitialTen(shuffledF.slice(0, 10))
-      else setInitialTen([...shuffledF, ...shuffledN].slice(0, 10))
+    // 카테고리별 count 병렬 로드
+    const cats = CATEGORIES.filter(c => c.id !== 'all')
+    Promise.all(
+      cats.map(c => getBusinessesCount(c.id).then(n => ({ id: c.id, n })))
+    ).then(results => {
+      const counts: Record<string, number> = {}
+      results.forEach(r => { counts[r.id] = r.n })
+      setCatCounts(prev => ({ ...prev, ...counts }))
+    })
+    // 초기 10개 — 추천 가나다/ABC순, 부족하면 일반 가나다/ABC순으로 채움
+    getBusinesses(undefined, 0, 200).then(data => {
+      const featured = sortByName(data.filter(b => b.is_featured))
+      const normal   = sortByName(data.filter(b => !b.is_featured))
+      if (featured.length >= 10) setInitialTen(featured.slice(0, 10))
+      else setInitialTen([...featured, ...normal].slice(0, 10))
     })
   }, [])
 
