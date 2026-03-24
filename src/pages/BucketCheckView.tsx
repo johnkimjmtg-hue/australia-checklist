@@ -438,11 +438,11 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   }
 
   return (
-    <div ref={pageRef} style={{ minHeight:'100vh', background:'#e8e8e8', fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif', maxWidth:480, margin:'0 auto', position:'relative' }}>
+    <div ref={pageRef} style={{ minHeight:'100dvh', background:colors.bgPage, fontFamily:font.family, maxWidth:430, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         @keyframes confettiFall {
           0%   { transform:translateY(0) rotate(0deg); opacity:1; }
           100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
@@ -456,8 +456,8 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       <Confetti trigger={confettiTrigger} />
 
-      {/* ══ 진행 카드 ══ */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'16px 16px 0' }}>
+      {/* ══ 진행 카드 (유지) ══ */}
+      <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgPage, padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
         <div style={{
           background:'#c8d4b8',
           borderRadius:12,
@@ -481,19 +481,16 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       </div>
 
       {/* ══ 필터 ══ */}
-      <div style={{ padding:'14px 16px 0',display:'flex',alignItems:'center',gap:8 }}>
-        <span style={{ fontSize:12,color:'#94A3B8',fontWeight:600,flexShrink:0 }}>필터</span>
+      <div style={{ padding:`${spacing[3]}px ${spacing[3]}px 0`, display:'flex', alignItems:'center', gap:spacing[2] }}>
+        <span style={{ fontSize:font.size.xs, color:colors.textTertiary, fontWeight:font.weight.medium, flexShrink:0 }}>필터</span>
         {FILTERS.map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)} style={{
-            height:30, padding:'0 14px', borderRadius:6,
-            border:'none',
-            background:'#e8e8e8',
-            color: filter===f.key ? '#1B6EF3' : '#94A3B8',
-            fontSize:13, fontWeight: filter===f.key ? 700 : 500, cursor:'pointer',
-            boxShadow: filter===f.key
-              ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-              : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-            WebkitTapHighlightColor:'transparent',
+            height:30, padding:`0 ${spacing[3]}px`, borderRadius:radius.full,
+            border: filter===f.key ? `1.5px solid ${colors.primary}` : `1px solid ${colors.border}`,
+            background: filter===f.key ? colors.primaryLight : colors.bgCard,
+            color: filter===f.key ? colors.primary : colors.textSecondary,
+            fontSize:font.size.sm, fontWeight: filter===f.key ? font.weight.bold : font.weight.regular,
+            cursor:'pointer', WebkitTapHighlightColor:'transparent', fontFamily:font.family,
           }}>{f.label}</button>
         ))}
       </div>
