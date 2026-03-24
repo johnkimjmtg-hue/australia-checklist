@@ -348,7 +348,7 @@ function PrivacyContent() {
           <><strong>삭제</strong>: 개인정보의 삭제를 요청할 수 있습니다.</>,
           <><strong>처리 정지</strong>: 개인정보 처리의 정지를 요청할 수 있습니다.</>,
         ]} />
-        <P>위 권리 행사는 서비스 내 설정 또는 <strong>support@hojugaja.com</strong>으로 요청하실 수 있으며, 접수 후 10일 이내에 처리합니다.</P>
+        <P>위 권리 행사는 서비스 내 설정 또는 <strong>johnkim.jmtg@gmail.com</strong>으로 요청하실 수 있으며, 접수 후 10일 이내에 처리합니다.</P>
       </Section>
 
       <Section title="제8조 (쿠키 및 유사 기술)">
@@ -371,7 +371,7 @@ function PrivacyContent() {
         <P>개인정보 처리에 관한 업무를 총괄하고 이용자의 개인정보 관련 불만 처리 및 피해 구제를 위해 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.</P>
         <UL items={[
           '개인정보 보호책임자: 호주가자 운영팀',
-          '문의 이메일: support@hojugaja.com',
+          '문의 이메일: johnkim.jmtg@gmail.com',
           '처리 시간: 평일 09:00 ~ 18:00 (AEST 기준)',
         ]} />
       </Section>
@@ -380,7 +380,7 @@ function PrivacyContent() {
         <Table
           headers={['버전', '시행일', '주요 변경 내용']}
           rows={[
-            ['v1.0', '2025.01.01', '최초 제정'],
+            ['v1.0', '2026.03.24', '최초 제정'],
           ]}
         />
       </Section>
