@@ -230,7 +230,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         </>
       ) : (
         // ── 버킷리스트 선택 화면 (paddingBottom으로 하단 고정 영역 확보)
-        <div style={{ paddingBottom: 130 }}>
+        <div style={{ paddingBottom: 130, background: '#EEF4FF', minHeight: '100dvh' }}>
 
           {/* ── 헤더 (스크롤 시 올라감) ── */}
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
@@ -331,7 +331,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           )}
 
           {/* ── 리스트 ── */}
-          <div style={{ background:colors.bgCard, padding:`${spacing[3]}px ${spacing[3]}px` }}>
+          <div style={{ background:'transparent', padding:`${spacing[3]}px ${spacing[3]}px` }}>
             {!showSearch && (
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[2] }}>
                 <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary }}>
@@ -484,10 +484,11 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <>
           <div onClick={()=>setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600 }} />
           <div style={{
-            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:430, background:colors.bgCard,
-            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, zIndex:601,
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
+            borderRadius:radius.xl, zIndex:601,
             animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
             <div style={{ width:'100%', height:200, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', background:colors.primaryLight }}>
@@ -523,20 +524,21 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {detailItem&&(
         <div onClick={()=>setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', fontFamily:ff }}>
           <div onClick={e=>e.stopPropagation()} style={{
-            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:430, background:colors.bgCard,
-            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, maxHeight:'85vh', overflowY:'auto',
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
+            borderRadius:radius.xl, maxHeight:'85vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
             {detailItem.image_url&&<div style={{ width:'100%', height:220, overflow:'hidden', marginTop:spacing[2] }}><img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /></div>}
             <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[10]}px` }}>
               <div style={{ ...T.h2, lineHeight:1.4, marginBottom:spacing[3] }}>{detailItem.label}</div>
-              {detailItem.description&&<div style={{ fontSize:font.size.md, color:colors.textSecondary, lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
+              {detailItem.description&&<div style={{ fontSize:font.size.md, color:'#475569', lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
               {detailItem.tips&&(
                 <div style={{ background:colors.primaryLight, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4] }}>
                   <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary, marginBottom:spacing[1] }}>💡 현지인 팁</div>
-                  <div style={{ fontSize:font.size.sm, color:colors.textSecondary, lineHeight:1.6 }}>{detailItem.tips}</div>
+                  <div style={{ fontSize:font.size.sm, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
                 </div>
               )}
               {detailItem.address&&(
