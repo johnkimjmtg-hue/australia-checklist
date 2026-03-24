@@ -23,7 +23,19 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
       fontFamily: font.family,
       display: 'flex',
       flexDirection: 'column',
+      alignItems: 'center',
     }}>
+      {/* 모바일 기준 래퍼 */}
+      <div style={{
+        width: '100%',
+        maxWidth: 480,
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        minHeight: '100dvh',
+        background: colors.bgPage,
+        boxSizing: 'border-box',
+      }}>
       <AppHeader title="약관 및 정책" onBack={onBack} />
 
       {/* 탭 */}
@@ -66,6 +78,7 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
         overflowY: 'auto',
       }}>
         {tab === 'terms' ? <TermsContent /> : <PrivacyContent />}
+      </div>
       </div>
     </div>
   )
