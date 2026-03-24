@@ -148,18 +148,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const handleOpenTripPicker = () => { setPickerStep('start'); setStartDate(trip?.startDate??''); setEndDate(trip?.endDate??''); setModal('tripPicker') }
   const handleResetTrip = () => { setStartDate(''); setEndDate(''); clearTrip(); setTrip(null); setModal('none') }
 
-  const [showFireworks, setShowFireworks] = useState(false)
-  const playFireworksSound = () => {
-    try {
-      const ctx = new (window.AudioContext||(window as any).webkitAudioContext)()
-      const boom = (time:number,freq:number,vol:number) => { const buf=ctx.createBuffer(1,ctx.sampleRate*0.5,ctx.sampleRate); const data=buf.getChannelData(0); for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*0.08)); const src=ctx.createBufferSource(); src.buffer=buf; const gain=ctx.createGain(); const filter=ctx.createBiquadFilter(); filter.type='lowpass'; filter.frequency.setValueAtTime(freq,time); filter.frequency.exponentialRampToValueAtTime(80,time+0.4); gain.gain.setValueAtTime(vol,time); gain.gain.exponentialRampToValueAtTime(0.001,time+0.5); src.connect(filter); filter.connect(gain); gain.connect(ctx.destination); src.start(time) }
-      const now=ctx.currentTime; boom(now,300,0.8); boom(now+0.35,200,0.6); boom(now+0.65,150,0.4)
-    } catch {}
-  }
 
   const handleDateSelect = (val:string) => {
     if(pickerStep==='start'){ setStartDate(val); setPickerStep('end') }
-    else { const t={startDate,endDate:val}; saveTrip(t); setTrip(t); setModal('none'); playFireworksSound(); setShowFireworks(true); setTimeout(()=>setShowFireworks(false),2800) }
+    else { const t={startDate,endDate:val}; saveTrip(t); setTrip(t); setModal('none') }
   }
 
   const handleIssue = () => {
@@ -199,7 +191,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.6} }
-        @keyframes fwBurst { 0%{transform:translate(-50%,-50%) scale(0) rotate(var(--r));opacity:1} 80%{opacity:0.8} 100%{transform:translate(var(--tx),var(--ty)) scale(1) rotate(var(--r));opacity:0} }
         .list-item:active { background: ${colors.gray50} !important; }
         .cat-btn { transition:all 0.12s; -webkit-tap-highlight-color:transparent; }
         .nav-btn  { -webkit-tap-highlight-color:transparent; }
@@ -466,9 +457,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           })}
         </div>
       </div>
-
-      {/* ── 폭죽 ── */}
-      {showFireworks&&<Fireworks />}
 
       {/* ── ScheduleSheet ── */}
       {sheetItem&&trip&&(
@@ -773,17 +761,3 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }: { step
 }
 
 /* ── 폭죽 ── */
-function Fireworks() {
-  const fwColors=['#FFCD00','#1B6EF3','#FF4B4B','#4ECDC4','#FF9F43','#A29BFE','#55EFC4','#FD79A8','#fff']
-  const cx=50; const cy=50
-  const particles=Array.from({length:72},(_,i)=>{ const angle=(i/72)*360; const dist=80+Math.random()*120; const rad=(angle*Math.PI)/180; return { tx:Math.cos(rad)*dist, ty:Math.sin(rad)*dist, color:fwColors[Math.floor(Math.random()*fwColors.length)], delay:Math.random()*0.3, dur:0.8+Math.random()*0.6, size:4+Math.random()*6, isRect:i%3!==0, angle } })
-  return (
-    <div style={{ position:'fixed', inset:0, zIndex:999, pointerEvents:'none', overflow:'hidden' }}>
-      {particles.map((p,i)=>(
-        <div key={i} style={{ position:'absolute', left:`${cx}%`, top:`${cy}%`, width:p.isRect?p.size*0.5:p.size, height:p.isRect?p.size*2:p.size, borderRadius:p.isRect?2:'50%', background:p.color,
-          // @ts-ignore
-          '--tx':`${p.tx}px`,'--ty':`${p.ty}px`,'--r':`${p.angle}deg`, animation:`fwBurst ${p.dur}s ease-out ${p.delay}s both` }} />
-      ))}
-    </div>
-  )
-}
