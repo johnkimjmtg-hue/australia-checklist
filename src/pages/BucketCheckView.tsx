@@ -96,13 +96,13 @@ function CoinStack({ count, total }: { count:number; total:number }) {
             width: 28, height: 14, borderRadius: '50%',
             background: isGold
               ? 'radial-gradient(ellipse at 35% 35%, #FFE566, #FFCD00 60%, #C8960C)'
-              : '#C8C8C8',
+              : colors.gray200,
             transition: `all 0.3s ease ${i * 0.06}s`,
             animation: isGold ? `coinPop 0.3s ease ${i * 0.06}s both` : 'none',
           }}/>
         )
       })}
-      <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600, marginTop:4 }}>
+      <div style={{ fontSize:font.size.xs, color:colors.textTertiary, fontWeight:font.weight.medium, marginTop:4 }}>
         {count}/{total}
       </div>
     </div>
@@ -112,16 +112,16 @@ function CoinStack({ count, total }: { count:number; total:number }) {
 function CircleProgress({ pct }: { pct:number }) {
   const R = 44, C = 2*Math.PI*R
   return (
-    <div style={{ position:'relative',width:100,height:100,flexShrink:0 }}>
+    <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
       <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
-        <circle cx={50} cy={50} r={R} fill="none" stroke="#a8b498" strokeWidth={10}/>
+        <circle cx={50} cy={50} r={R} fill="none" stroke={colors.gray200} strokeWidth={10}/>
         <circle cx={50} cy={50} r={R} fill="none" stroke="#FFCD00" strokeWidth={10}
           strokeDasharray={C} strokeDashoffset={C-(pct/100)*C} strokeLinecap="round"
           style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)' }}
         />
       </svg>
-      <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center' }}>
-        <span style={{ fontSize:15,fontWeight:800,color:'#2d3e1f' }}>{pct}%</span>
+      <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <span style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:colors.textPrimary }}>{pct}%</span>
       </div>
     </div>
   )
@@ -432,25 +432,26 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       <Confetti trigger={confettiTrigger} />
 
-      {/* ══ 진행 카드 (유지) ══ */}
+      {/* ══ 진행 카드 ══ */}
       <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgPage, padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
         <div style={{
-          background:'#c8d4b8',
-          borderRadius:12,
-          boxShadow:'inset 3px 3px 8px #a8b498, inset -2px -2px 6px #e8f4d8',
-          padding:'20px', display:'flex', alignItems:'center', gap:20,
+          background:colors.bgCard,
+          borderRadius:radius.lg,
+          border:`1px solid ${colors.border}`,
+          boxShadow:shadow.card,
+          padding:`${spacing[4]}px`, display:'flex', alignItems:'center', gap:spacing[4],
         }}>
           <CircleProgress pct={pct} />
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:20,fontWeight:800,color:'#2d3e1f',marginBottom:4,lineHeight:1.2 }}>호주 버킷리스트</div>
-            <div style={{ fontSize:12,color:'#4a5e32',fontWeight:600,marginBottom:6 }}>
+            <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[1], lineHeight:1.2 }}>호주 버킷리스트</div>
+            <div style={{ fontSize:font.size.xs, color:colors.textTertiary, fontWeight:font.weight.medium, marginBottom:spacing[2] }}>
               {trip.startDate.slice(5).replace('-','/')} ~ {trip.endDate.slice(5).replace('-','/')}
             </div>
-            <div style={{ display:'flex',alignItems:'baseline',gap:4,marginBottom:4 }}>
-              <span style={{ fontSize:28,fontWeight:800,color:'#2d3e1f',lineHeight:1 }}>{achievedCount}</span>
-              <span style={{ fontSize:17,fontWeight:600,color:'#4a5e32' }}>/{total}건 완료</span>
+            <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:spacing[1] }}>
+              <span style={{ fontSize:font.size['2xl'], fontWeight:font.weight.bold, color:colors.textPrimary, lineHeight:1 }}>{achievedCount}</span>
+              <span style={{ fontSize:font.size.lg, fontWeight:font.weight.medium, color:colors.textSecondary }}>/{total}건 완료</span>
             </div>
-            <div style={{ fontSize:13,color:'#4a5e32',lineHeight:1.5 }}>나만의 버킷리스트 꼭 완료하세요.</div>
+            <div style={{ fontSize:font.size.xs, color:colors.textTertiary, lineHeight:1.5 }}>나만의 버킷리스트 꼭 완료하세요.</div>
           </div>
           <CoinStack count={achievedCount} total={total} />
         </div>
