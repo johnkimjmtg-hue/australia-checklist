@@ -121,7 +121,7 @@ function CircleProgress({ pct }: { pct:number }) {
         />
       </svg>
       <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <span style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary }}>{pct}%</span>
+        <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>{pct}%</span>
       </div>
     </div>
   )
@@ -437,8 +437,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         <div style={{
           background:colors.bgCard,
           borderRadius:radius.lg,
-          border:`1px solid ${colors.border}`,
-          boxShadow:shadow.card,
+          border:`1.5px solid ${colors.gray300}`,
           padding:`${spacing[4]}px`, display:'flex', alignItems:'center', gap:spacing[4],
         }}>
           <CircleProgress pct={pct} />
