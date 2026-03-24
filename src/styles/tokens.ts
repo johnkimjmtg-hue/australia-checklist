@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────
 // 호주가자 Design Tokens  (src/styles/tokens.ts)
-// Flexischools-inspired: clean white, blue accent, no neumorphism
+// GlobeGlider-inspired: pure white base, blue accent input, no neumorphism
 // ─────────────────────────────────────────────
 
 export const colors = {
@@ -30,9 +30,9 @@ export const colors = {
   dangerLight:  '#FEE2E2',
 
   // Background
-  bgPage:  '#F8FAFC',  // 전체 배경 (기존 #e8e8e8 교체)
-  bgCard:  '#FFFFFF',  // 카드 배경
-  bgInput: '#F1F5F9',  // 인풋 배경
+  bgPage:  '#FFFFFF',  // 전체 배경 → 순백
+  bgCard:  '#FFFFFF',  // 카드 배경 (그림자로 구분)
+  bgInput: '#EEF4FF',  // 인풋 배경 → 연한 파랑 (primary 계열)
 
   // Text
   textPrimary:   '#0F172A',
@@ -88,8 +88,8 @@ export const spacing = {
 } as const
 
 export const shadow = {
-  // 뉴모피즘 완전 제거 → 얇은 테두리 + 미묘한 그림자
-  card:  '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+  // 배경이 흰색이므로 카드 구분을 위해 그림자 살짝 강화
+  card:  '0 2px 8px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05)',
   modal: '0 8px 32px rgba(0,0,0,0.12)',
   none:  'none',
 } as const
@@ -111,7 +111,7 @@ export const T = {
   xs:      { fontSize: font.size.xs,     fontWeight: font.weight.regular, color: colors.textTertiary  },
   caption: { fontSize: font.size.xs,     fontWeight: font.weight.medium,  color: colors.textSecondary },
 
-  // 카드
+  // 카드 — border 제거, 그림자로만 구분 (흰 배경 위에서 더 깔끔)
   card: {
     background:   colors.bgCard,
     borderRadius: radius.lg,
@@ -120,13 +120,13 @@ export const T = {
     boxShadow:    shadow.card,
   } as React.CSSProperties,
 
-  // 인풋
+  // 인풋 — 연한 파랑 배경, 테두리 없음 (GlobeGlider 스타일)
   input: {
     width:        '100%',
     height:       48,
     background:   colors.bgInput,
-    border:       `1px solid ${colors.border}`,
-    borderRadius: radius.sm,
+    border:       '1.5px solid transparent',
+    borderRadius: radius.md,
     padding:      `0 ${spacing[3]}px`,
     fontSize:     font.size.md,
     color:        colors.textPrimary,
