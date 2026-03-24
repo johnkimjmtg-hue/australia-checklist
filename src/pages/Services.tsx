@@ -203,8 +203,10 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       <style>{`
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .svc-btn  { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-        .cat-scroll { overflow-x:auto; scrollbar-width:none; }
-        .cat-scroll::-webkit-scrollbar { display:none; }
+        .cat-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:${colors.gray300} ${colors.bgPage}; }
+        .cat-scroll::-webkit-scrollbar { height:4px; }
+        .cat-scroll::-webkit-scrollbar-track { background:${colors.bgPage}; border-radius:2px; }
+        .cat-scroll::-webkit-scrollbar-thumb { background:${colors.gray300}; border-radius:2px; }
       `}</style>
 
       {/* ── 스티키 헤더 ── */}
