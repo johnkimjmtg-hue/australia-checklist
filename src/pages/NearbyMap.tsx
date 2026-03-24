@@ -5,8 +5,10 @@ import type { Business } from '../lib/businessService'
 import { CATEGORIES } from '../data/businesses'
 import BusinessCard from '../components/BusinessCard'
 
+import { colors, font, radius, spacing } from '../styles/tokens'
+
 const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY
-const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+const ff = font.family
 
 type RadiusOption = 5 | 20 | 30 | null
 
@@ -259,56 +261,52 @@ export default function NearbyMap({ onBack }: Props) {
   const filtered = getFiltered()
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 80px)', fontFamily: ff, background:'#e8e8e8', position:'relative' }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'calc(100dvh - 80px)', fontFamily:ff, background:colors.bgPage, position:'relative' }}>
 
       <style>{`
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
-        .cat-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:#C8C8C8 #e8e8e8; }
-        @media (max-width:768px) {
-          .cat-scroll::-webkit-scrollbar { height:4px; }
-          .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
-          .cat-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
-        }
-        @media (min-width:769px) {
-          .cat-scroll::-webkit-scrollbar { height:4px; }
-          .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
-          .cat-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
-        }
-        .svc-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-        .svc-btn:active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff !important; transform: scale(0.97); }
+        .cat-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:${colors.gray300} ${colors.bgPage}; }
+        .cat-scroll::-webkit-scrollbar { height:4px; }
+        .cat-scroll::-webkit-scrollbar-track { background:${colors.bgPage}; border-radius:2px; }
+        .cat-scroll::-webkit-scrollbar-thumb { background:${colors.gray300}; border-radius:2px; }
+        .map-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
       `}</style>
 
-      {/* 카테고리 슬라이딩 + 거리 필터 — sticky 고정 */}
-      <div style={{ position:'sticky', top:0, zIndex:24, background:'#e8e8e8' }}>
-        <div className="cat-scroll" style={{ padding:'10px 10px 6px', display:'flex', gap:6 }}>
+      {/* 스티키 필터 — 카테고리 + 거리 */}
+      <div style={{
+        position:'sticky', top:0, zIndex:24,
+        background:colors.bgPage,
+        borderBottom:`1px solid ${colors.border}`,
+        padding:`${spacing[2]}px ${spacing[3]}px`,
+      }}>
+        {/* 카테고리 슬라이더 */}
+        <div className="cat-scroll" style={{ display:'flex', gap:spacing[2], paddingBottom:4, marginBottom:spacing[2] }}>
           {sortedCategories.map(cat => {
             const isActive = category === cat.id
             const count = catCounts[cat.id] || 0
             return (
               <button key={cat.id} onClick={() => setCategory(cat.id)}
-                className="svc-btn"
+                className="map-btn"
                 style={{
-                  height:36, borderRadius:8, border:'none',
-                  background:'#e8e8e8', cursor:'pointer',
-                  flexShrink:0, padding:'0 14px',
-                  fontSize:12, fontWeight: isActive ? 700 : 500,
-                  color: isActive ? getCatColor(cat.id) : '#64748B',
-                  boxShadow: isActive
-                    ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-                    : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-                  whiteSpace:'nowrap',
+                  height:32, borderRadius:radius.sm,
+                  background: isActive ? colors.primary : colors.bgCard,
+                  color: isActive ? '#fff' : colors.gray600,
+                  border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                  cursor:'pointer', flexShrink:0,
+                  padding:`0 ${spacing[3]}px`,
+                  fontSize:font.size.sm, fontWeight:font.weight.bold,
+                  display:'flex', alignItems:'center', gap:4,
+                  whiteSpace:'nowrap', fontFamily:ff,
                 }}>
                 {cat.label}
-                <span style={{ marginLeft:4, fontSize:10, color: isActive ? getCatColor(cat.id) : '#94A3B8' }}>
-                  {count}
-                </span>
+                <span style={{ fontSize:font.size.xs, opacity:0.75 }}>({count})</span>
               </button>
             )
           })}
         </div>
 
         {/* 거리 필터 */}
-        <div style={{ padding:'0 10px 8px', display:'flex', gap:6 }}>
+        <div style={{ display:'flex', gap:spacing[2] }}>
           {RADIUS_OPTIONS.map(opt => {
             const isActive = radius === opt.value
             const disabled = opt.value !== null && !myPos
@@ -316,15 +314,15 @@ export default function NearbyMap({ onBack }: Props) {
               <button
                 key={String(opt.value)}
                 onClick={() => { if (!disabled) setRadius(opt.value) }}
+                className="map-btn"
                 style={{
-                  flex:1, height:28, borderRadius:8, border:'none',
-                  background:'#e8e8e8', cursor: disabled ? 'default' : 'pointer',
-                  fontSize:10, fontWeight: isActive ? 700 : 500,
-                  color: disabled ? '#C0C8D4' : isActive ? '#1B6EF3' : '#64748B',
-                  boxShadow: isActive
-                    ? 'inset 2px 2px 5px #c5c5c5, inset -2px -2px 5px #ffffff'
-                    : '2px 2px 5px #c5c5c5, -2px -2px 5px #ffffff',
-                  WebkitTapHighlightColor:'transparent',
+                  flex:1, height:28, borderRadius:radius.sm,
+                  background: isActive ? colors.primaryLight : colors.bgCard,
+                  color: disabled ? colors.gray300 : isActive ? colors.primary : colors.textSecondary,
+                  border: isActive ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                  cursor: disabled ? 'default' : 'pointer',
+                  fontSize:font.size.xs, fontWeight:font.weight.bold,
+                  fontFamily:ff,
                 }}
               >
                 {opt.label}
@@ -341,40 +339,40 @@ export default function NearbyMap({ onBack }: Props) {
         {loading && (
           <div style={{
             position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center',
-            background:'rgba(232,232,232,0.8)',
+            background:`rgba(248,250,252,0.85)`,
           }}>
-            <div style={{ fontSize:13, color:'#64748B', fontWeight:700 }}>지도 불러오는 중...</div>
+            <div style={{ fontSize:font.size.sm, color:colors.textTertiary, fontWeight:font.weight.bold }}>지도 불러오는 중...</div>
           </div>
         )}
 
         {locError && (
           <div style={{
-            position:'absolute', top:12, left:12, right:72,
-            background:'#fff', borderRadius:10, padding:'10px 14px',
-            fontSize:12, color:'#E25822', fontWeight:600,
-            boxShadow:'0 2px 8px rgba(0,0,0,0.12)',
+            position:'absolute', top:12, left:12, right:80,
+            background:colors.dangerLight, borderRadius:radius.sm, padding:`${spacing[2]}px ${spacing[3]}px`,
+            fontSize:font.size.sm, color:colors.danger, fontWeight:font.weight.bold,
+            border:`1px solid ${colors.danger}`,
           }}>⚠️ {locError}</div>
         )}
 
+        {/* 업체 수 배지 */}
         <div style={{
           position:'absolute', top:12, right:12,
-          background:'#fff', borderRadius:20, padding:'4px 12px',
-          fontSize:11, color:'#64748B', fontWeight:700,
-          boxShadow:'0 2px 8px rgba(0,0,0,0.12)',
+          background:colors.bgCard, borderRadius:radius.full, padding:`4px ${spacing[3]}px`,
+          fontSize:font.size.xs, color:colors.textSecondary, fontWeight:font.weight.bold,
+          border:`1px solid ${colors.border}`,
         }}>
           {filtered.length}개
         </div>
 
+        {/* 내 위치로 이동 버튼 */}
         {myPos && (
-          <button onClick={() => mapObj.current?.panTo(myPos)} style={{
+          <button onClick={() => mapObj.current?.panTo(myPos)} className="map-btn" style={{
             position:'absolute', bottom:16, right:12,
-            width:40, height:40, borderRadius:20,
-            background:'#fff', border:'none', cursor:'pointer',
+            width:40, height:40, borderRadius:radius.full,
+            background:colors.bgCard, border:`1px solid ${colors.border}`, cursor:'pointer',
             display:'flex', alignItems:'center', justifyContent:'center',
-            boxShadow:'0 2px 8px rgba(0,0,0,0.15)',
-            WebkitTapHighlightColor:'transparent',
           }}>
-            <Icon icon="ph:crosshair" width={20} height={20} color="#1B6EF3" />
+            <Icon icon="ph:crosshair" width={20} height={20} color={colors.primary} />
           </button>
         )}
       </div>
@@ -390,8 +388,8 @@ export default function NearbyMap({ onBack }: Props) {
             position:'fixed', bottom:0,
             left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:390,
-            background:'#e8e8e8',
-            borderRadius:'20px 20px 0 0',
+            background:colors.bgCard,
+            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
             zIndex:501,
             animation:'slideUpSheet 0.25s ease',
             maxHeight:'75vh',
@@ -399,13 +397,13 @@ export default function NearbyMap({ onBack }: Props) {
             boxSizing:'border-box',
             paddingBottom:32,
           }}>
-            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'12px auto 16px' }} />
+            <div style={{ width:40, height:4, borderRadius:2, background:colors.gray300, margin:'12px auto 16px' }} />
             {myPos && (
-              <div style={{ textAlign:'center', fontSize:12, color:'#94A3B8', fontWeight:600, marginBottom:10 }}>
+              <div style={{ textAlign:'center', fontSize:font.size.sm, color:colors.textTertiary, fontWeight:font.weight.bold, marginBottom:spacing[2] }}>
                 📍 내 위치에서 {getDistanceKm(myPos.lat, myPos.lng, (selBiz as any).latitude, (selBiz as any).longitude).toFixed(1)}km
               </div>
             )}
-            <div style={{ padding:'0 12px' }}>
+            <div style={{ padding:`0 ${spacing[3]}px` }}>
               <BusinessCard business={selBiz} />
             </div>
           </div>

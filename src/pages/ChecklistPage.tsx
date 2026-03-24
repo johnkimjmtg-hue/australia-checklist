@@ -218,7 +218,14 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : mainTab==='myshoppinglist' ? (
         <MyShoppingView myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
       ) : mainTab==='nearby' ? (
-        <NearbyMap onBack={()=>setMainTab('bucketlist')} />
+        <>
+          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
+              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>내 주변</span>
+            </div>
+          </div>
+          <NearbyMap onBack={()=>setMainTab('bucketlist')} />
+        </>
       ) : mainTab==='community' ? (
         <Community />
       ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
