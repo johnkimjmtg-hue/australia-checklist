@@ -281,8 +281,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   <button onClick={()=>setModal(modal==='calendar'?'none':'calendar')} style={{
                     height:30, padding:`0 ${spacing[2]}px`, borderRadius:radius.sm,
                     border:`1.5px solid ${modal==='calendar' ? colors.primary : colors.gray300}`,
-                    background: modal==='calendar' ? colors.primaryLight : colors.bgCard,
-                    color: modal==='calendar' ? colors.primary : colors.gray600,
+                    background: modal==='calendar' ? colors.primary : colors.bgCard,
+                    color: modal==='calendar' ? '#fff' : colors.gray600,
                     fontSize:font.size.xs, fontWeight:font.weight.bold,
                     cursor:'pointer', display:'flex', alignItems:'center', gap:3, fontFamily:ff,
                   }}>
@@ -323,14 +323,16 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   })()}
                 </div>
               </div>
-              {/* 캘린더 뷰 */}
-              {modal==='calendar' && trip && (
-                <CalendarModal state={state} trip={trip} allItems={allItems} onClose={()=>setModal('none')} />
-              )}
             </div>
           )}
 
-          {/* ── 리스트 ── */}
+          {/* ── 캘린더 뷰 (리스트 본문 대체) ── */}
+          {modal==='calendar' && trip && !showSearch && (
+            <CalendarModal state={state} trip={trip} allItems={allItems} onClose={()=>setModal('none')} />
+          )}
+
+          {/* ── 리스트 (캘린더 모드일 때 숨김) ── */}
+          {modal !== 'calendar' && (
           <div style={{ background:'transparent', padding:`${spacing[3]}px ${spacing[3]}px` }}>
             {!showSearch && (
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[2] }}>
@@ -391,9 +393,16 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                         {item.label}
                       </div>
                       <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'wrap' }}>
-                        {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium }}>📍 {region.label}</span>}
-                        {checked && dayCount>0 && <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.primary, color:'#fff', borderRadius:radius.full, padding:`1px ${spacing[2]}px` }}>{dayCount}일차</span>}
-                        {checked && dayCount===0 && <span style={{ fontSize:font.size.xs, color:colors.warning, fontWeight:font.weight.bold }}>일정 미지정</span>}
+                        {checked && dayCount===0 && (
+                          <span
+                            onClick={e=>{ e.stopPropagation(); if(trip) setSheetItem(item as CheckItem) }}
+                            style={{ fontSize:font.size.xs, color:colors.warning, fontWeight:font.weight.bold, cursor:'pointer', textDecoration:'underline', textUnderlineOffset:2 }}
+                          >일정 미지정</span>
+                        )}
+                        {checked && dayCount>0 && (state.schedules[item.id]??[]).map(dayIdx=>(
+                          <span key={dayIdx} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.primary, color:'#fff', borderRadius:radius.full, padding:`1px ${spacing[2]}px` }}>{dayIdx+1}일차</span>
+                        ))}
+                        {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium, marginLeft:'auto' }}>📍 {region.label}</span>}
                       </div>
                     </div>
                     {/* 체크박스 */}
@@ -417,6 +426,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               })}
             </div>
           </div>
+          )}
         </div>
       )}
 
@@ -577,35 +587,97 @@ function CalendarModal({ state, trip, allItems, onClose }: { state:AppState; tri
   const dayCount = days.map((_,idx)=> allItems.filter(item=>state.selected[item.id]&&(state.schedules[item.id]??[]).includes(idx)).length)
   function dayColor(count:number):string { if(count<=0) return colors.bgCard; if(count===1) return '#D1FAE5'; if(count===2) return '#FEF08A'; if(count===3) return '#FED7AA'; return '#FCA5A5' }
   const dayItems = activeDayIdx!==null ? allItems.filter(item=>state.selected[item.id]&&(state.schedules[item.id]??[]).includes(activeDayIdx)) : []
+
+  // 달력 그리드: 7열, 시작 요일 맞춤
+  const startDow = new Date(trip.startDate).getDay() // 0=일
+  const totalCells = Math.ceil((days.length + startDow) / 7) * 7
+  const cells: (number|null)[] = []
+  for(let i=0;i<startDow;i++) cells.push(null)
+  for(let i=0;i<days.length;i++) cells.push(i)
+  while(cells.length<totalCells) cells.push(null)
+  const DOW_LABELS = ['일','월','화','수','목','금','토']
+
   return (
-    <div style={{ background:colors.bgCard, borderTop:`1px solid ${colors.border}`, padding:`${spacing[3]}px ${spacing[4]}px ${spacing[4]}px`, fontFamily:font.family }}>
+    <div style={{ background:'#F5F9FF', padding:`${spacing[3]}px ${spacing[3]}px ${spacing[4]}px`, fontFamily:font.family }}>
+      {/* 헤더 */}
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[3] }}>
-        <span style={{ ...T.h4 }}>📅 일정 현황</span>
-        <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:colors.textTertiary, fontSize:16, padding:0, fontFamily:font.family }}>✕</button>
+        <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.textPrimary }}>📅 일정 현황</span>
+        <div style={{ display:'flex', alignItems:'center', gap:spacing[3] }}>
+          {/* 범례 */}
+          <div style={{ display:'flex', gap:spacing[2] }}>
+            {[['없음','#fff'],['1개','#D1FAE5'],['2개','#FEF08A'],['3개','#FED7AA'],['4+','#FCA5A5']].map(([label,color])=>(
+              <div key={label} style={{ display:'flex', alignItems:'center', gap:3 }}>
+                <div style={{ width:8, height:8, borderRadius:2, background:color, border:`1px solid ${colors.gray200}` }}/>
+                <span style={{ fontSize:9, color:colors.textTertiary }}>{label}</span>
+              </div>
+            ))}
+          </div>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:colors.textTertiary, fontSize:16, padding:0, lineHeight:1 }}>✕</button>
+        </div>
       </div>
-      <div style={{ display:'flex', gap:spacing[2], overflowX:'auto', paddingBottom:spacing[2], scrollbarWidth:'none' }}>
-        {days.map((d,idx)=>{
-          const isActive=activeDayIdx===idx; const bg=dayColor(dayCount[idx])
+
+      {/* 요일 헤더 */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', marginBottom:4 }}>
+        {DOW_LABELS.map((d,i)=>(
+          <div key={d} style={{ textAlign:'center', fontSize:9, fontWeight:font.weight.bold, padding:'3px 0',
+            color: i===0?'#E05050':i===6?'#4477CC':colors.textTertiary }}>
+            {d}
+          </div>
+        ))}
+      </div>
+
+      {/* 달력 그리드 */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:3 }}>
+        {cells.map((dayIdx, ci) => {
+          if(dayIdx===null) return <div key={ci} />
+          const d = days[dayIdx]
+          const isActive = activeDayIdx===dayIdx
+          const bg = isActive ? colors.primary : dayColor(dayCount[dayIdx])
+          const dateNum = new Date(d).getDate()
+          const colIdx = ci % 7
           return (
-            <button key={idx} onClick={()=>setActiveDayIdx(isActive?null:idx)} style={{ minWidth:56, height:52, borderRadius:radius.sm, flexShrink:0, border:isActive?`1.5px solid ${colors.primary}`:`1px solid ${colors.border}`, cursor:'pointer', background:isActive?colors.primaryLight:bg, color:isActive?colors.primary:colors.textSecondary, fontSize:font.size.sm, fontWeight:isActive?font.weight.bold:font.weight.regular, fontFamily:font.family, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2, position:'relative' }}>
-              <div style={{ fontSize:font.size.xs }}>{idx+1}일차</div>
-              <div style={{ fontSize:9, opacity:0.8 }}>{fmtMD(d)}</div>
-              {dayCount[idx]>0&&<span style={{ position:'absolute', top:3, right:4, fontSize:9, fontWeight:font.weight.bold, color:colors.textSecondary }}>{dayCount[idx]}</span>}
+            <button key={ci} onClick={()=>setActiveDayIdx(isActive?null:dayIdx)} style={{
+              aspectRatio:'1', borderRadius:radius.sm,
+              border: isActive ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray200}`,
+              background: bg,
+              color: isActive ? '#fff' : colors.textPrimary,
+              cursor:'pointer', fontFamily:font.family,
+              display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:1,
+              padding:'2px 0', position:'relative',
+              WebkitTapHighlightColor:'transparent',
+            }}>
+              <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold,
+                color: isActive?'#fff': colIdx===0?'#E05050':colIdx===6?'#4477CC':colors.textPrimary }}>
+                {dateNum}
+              </div>
+              <div style={{ fontSize:8, opacity:0.7, color:isActive?'#fff':colors.textTertiary }}>
+                {dayIdx+1}일
+              </div>
+              {dayCount[dayIdx]>0&&!isActive&&(
+                <span style={{ position:'absolute', top:2, right:3, fontSize:8, fontWeight:font.weight.bold, color:colors.textSecondary }}>{dayCount[dayIdx]}</span>
+              )}
             </button>
           )
         })}
       </div>
+
+      {/* 선택된 날짜 항목 */}
       <div style={{ marginTop:spacing[3], minHeight:40 }}>
         {activeDayIdx===null ? (
-          <p style={{ ...T.sm, textAlign:'center', padding:`${spacing[3]}px 0` }}>날짜를 눌러 일정을 확인하세요</p>
+          <p style={{ ...T.sm, textAlign:'center', padding:`${spacing[2]}px 0`, color:colors.textTertiary }}>날짜를 눌러 일정을 확인하세요</p>
         ) : dayItems.length===0 ? (
-          <p style={{ ...T.sm, textAlign:'center', padding:`${spacing[3]}px 0` }}>이 날 할당된 항목이 없어요</p>
+          <p style={{ ...T.sm, textAlign:'center', padding:`${spacing[2]}px 0`, color:colors.textTertiary }}>이 날 할당된 항목이 없어요</p>
         ) : (
-          <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:spacing[1] }}>
+            <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:4 }}>
+              {activeDayIdx+1}일차 · {fmtMD(days[activeDayIdx])} ({dayItems.length}개)
+            </div>
             {dayItems.map(item=>(
-              <div key={item.id} style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, background:colors.primaryLight, borderRadius:radius.sm, fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.medium }}>
-                <Icon icon="ph:check-circle-fill" width={14} height={14} color={colors.primary} />
-                {item.label.includes(',')?item.label.split(',')[0].trim():item.label}
+              <div key={item.id} style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, background:colors.bgCard, borderRadius:radius.sm, border:`1px solid ${colors.border}` }}>
+                <Icon icon="ph:check-circle-fill" width={13} height={13} color={colors.primary} />
+                <span style={{ fontSize:font.size.sm, color:colors.textPrimary, fontWeight:font.weight.medium }}>
+                  {item.label.includes(',')?item.label.split(',')[0].trim():item.label}
+                </span>
               </div>
             ))}
           </div>
