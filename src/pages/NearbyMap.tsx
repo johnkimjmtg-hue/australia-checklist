@@ -269,7 +269,7 @@ export default function NearbyMap({ onBack }: Props) {
         .cat-scroll::-webkit-scrollbar { height:4px; }
         .cat-scroll::-webkit-scrollbar-track { background:${colors.bgPage}; border-radius:2px; }
         .cat-scroll::-webkit-scrollbar-thumb { background:${colors.gray300}; border-radius:2px; }
-        .map-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .map-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; border-radius: 20px !important; }
       `}</style>
 
       {/* 스티키 필터 — 카테고리 + 거리 */}
