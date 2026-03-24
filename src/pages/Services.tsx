@@ -199,7 +199,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const isFiltered  = isSearch || isCatFilter
 
   return (
-    <div style={{ minHeight:'100dvh', background:colors.bgPage, fontFamily:ff, paddingBottom:40 }}>
+    <div style={{ minHeight:'100dvh', background:colors.bgPage, fontFamily:ff, paddingBottom:130 }}>
       <style>{`
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .svc-btn  { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
@@ -209,10 +209,10 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         .cat-scroll::-webkit-scrollbar-thumb { background:${colors.gray300}; border-radius:2px; }
       `}</style>
 
-      {/* ── 스티키 헤더 ── */}
+      {/* ── 스티키 헤더 (탭+검색+카테고리) — 연한 회색 배경 ── */}
       <div style={{
         position:'sticky', top:0, zIndex:10,
-        background:colors.bgCard,
+        background:colors.bgPage,
         borderBottom:`1px solid ${colors.border}`,
         padding:`${spacing[3]}px ${spacing[4]}px ${spacing[3]}px`,
       }}>
@@ -281,7 +281,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                   height:34, borderRadius:radius.sm,
                   background: isActive ? colors.primary : colors.bgCard,
                   color: isActive ? '#fff' : colors.gray600,
-                  fontSize:font.size.xs, fontWeight:font.weight.bold,
+                  fontSize:font.size.sm, fontWeight:font.weight.bold,
                   cursor:'pointer', flexShrink:0, minWidth:72,
                   border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                   display:'flex', alignItems:'center', justifyContent:'center',

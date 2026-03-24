@@ -204,7 +204,15 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
       {/* ── 다른 탭들 ── */}
       {mainTab==='services' ? (
-        <Services onSelectBusiness={()=>{}} onBack={()=>setMainTab('bucketlist')} />
+        <>
+          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
+              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>업체리스트</span>
+              <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>{bizCount > 0 ? `${bizCount}개 업체` : ''}</span>
+            </div>
+          </div>
+          <Services onSelectBusiness={()=>{}} onBack={()=>setMainTab('bucketlist')} />
+        </>
       ) : mainTab==='shopping' ? (
         <Shopping myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onGoToMyList={()=>setMainTab('myshoppinglist')} />
       ) : mainTab==='myshoppinglist' ? (
