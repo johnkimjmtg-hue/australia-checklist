@@ -119,7 +119,8 @@ export default function OnboardingPage({ onComplete }: Props) {
               alt="호주가자"
               style={{ width: 100, height: 100, objectFit: 'contain', marginBottom: spacing[2] }}
             />
-            <div style={{ ...T.xs, marginTop: spacing[1] }}>호주 생활 정보 앱</div>
+            <div style={{ ...T.h1, letterSpacing: 1 }}>호주가자</div>
+            <div style={{ ...T.xs, marginTop: spacing[1] }}>호주 여행 정보 앱</div>
           </div>
 
           {/* ── STEP: 인증 ── */}
