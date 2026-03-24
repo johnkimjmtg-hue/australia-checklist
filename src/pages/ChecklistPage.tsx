@@ -458,7 +458,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               <button key={tab.id} className="nav-btn" onClick={()=>handleTabClick(tab.id)}
                 style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, height:50, background:'none', border:'none', cursor:'pointer', position:'relative', fontFamily:ff }}>
                 <Icon icon={tab.icon} width={20} height={20} color={isActive?colors.primary:colors.gray500} />
-                <span style={{ fontSize:9, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.gray500 }}>{tab.label}</span>
+                <span style={{ fontSize:10, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.gray500 }}>{tab.label}</span>
                 {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:colors.primary, position:'absolute', bottom:2 }} />}
                 {showBadge&&<span style={{ position:'absolute', top:6, right:'calc(50% - 14px)', background:'#EF4444', color:'#fff', fontSize:8, fontWeight:font.weight.bold, borderRadius:radius.full, padding:'1px 4px', minWidth:14, textAlign:'center' }}>{todayPostCount}</span>}
               </button>
