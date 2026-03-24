@@ -190,13 +190,14 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const activeTabId: MainTab = mainTab==='myshoppinglist'?'shopping':mainTab
 
   return (
-    <div style={{ minHeight:'100dvh', background:colors.bgPage, fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative', display:'flex', flexDirection:'column' }}>
+    <div style={{ minHeight:'100dvh', background:colors.bgPage, fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
         @keyframes scaleIn { from{opacity:0;transform:translate(-50%,-50%) scale(.94)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
         @keyframes shake   { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
         @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.6} }
         @keyframes fwBurst { 0%{transform:translate(-50%,-50%) scale(0) rotate(var(--r));opacity:1} 80%{opacity:0.8} 100%{transform:translate(var(--tx),var(--ty)) scale(1) rotate(var(--r));opacity:0} }
         .list-item:active { background: ${colors.gray50} !important; }
@@ -204,263 +205,227 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         .nav-btn  { -webkit-tap-highlight-color:transparent; }
       `}</style>
 
-      {/* ── 메인 컨텐츠 ── */}
-      <div style={{ flex:1, overflowY:'auto', paddingBottom: mainTab==='bucketlist'&&!isIssued ? 124 : 64 }}>
+      {/* ── 다른 탭들 ── */}
+      {mainTab==='services' ? (
+        <Services onSelectBusiness={()=>{}} onBack={()=>setMainTab('bucketlist')} />
+      ) : mainTab==='shopping' ? (
+        <Shopping myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onGoToMyList={()=>setMainTab('myshoppinglist')} />
+      ) : mainTab==='myshoppinglist' ? (
+        <MyShoppingView myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
+      ) : mainTab==='nearby' ? (
+        <NearbyMap onBack={()=>setMainTab('bucketlist')} />
+      ) : mainTab==='community' ? (
+        <Community />
+      ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
+        <>
+          <BucketCheckView state={state} trip={trip} setState={setState} items={ITEMS} dbItems={dbItems} onAchievedChange={setAchieved}
+            onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{}; try{localStorage.removeItem('bucket-achieved')}catch{}; setAchieved({}) }}
+            onDelete={doReset}
+            onShare={()=>{ const at=state.meta.lastIssuedAt??issuedAt; setIssuedAt(at); setShowReceipt(true) }}
+            onLanding={()=>onLanding?.()} />
+          {showReceipt&&trip&&(
+            <ReceiptModal state={state} trip={trip} issuedAt={issuedAt} achieved={achieved} dbItems={dbItems}
+              onClose={()=>setShowReceipt(false)} onReset={()=>{ setShowReceipt(false); doReset() }} />
+          )}
+        </>
+      ) : (
+        // ── 버킷리스트 선택 화면 (paddingBottom으로 하단 고정 영역 확보)
+        <div style={{ paddingBottom: 130 }}>
 
-        {mainTab==='services' ? (
-          <Services onSelectBusiness={()=>{}} onBack={()=>setMainTab('bucketlist')} />
-        ) : mainTab==='shopping' ? (
-          <Shopping myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onGoToMyList={()=>setMainTab('myshoppinglist')} />
-        ) : mainTab==='myshoppinglist' ? (
-          <MyShoppingView myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
-        ) : mainTab==='nearby' ? (
-          <NearbyMap onBack={()=>setMainTab('bucketlist')} />
-        ) : mainTab==='community' ? (
-          <Community />
-        ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
-          <>
-            <BucketCheckView state={state} trip={trip} setState={setState} items={ITEMS} dbItems={dbItems} onAchievedChange={setAchieved}
-              onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{}; try{localStorage.removeItem('bucket-achieved')}catch{}; setAchieved({}) }}
-              onDelete={doReset}
-              onShare={()=>{ const at=state.meta.lastIssuedAt??issuedAt; setIssuedAt(at); setShowReceipt(true) }}
-              onLanding={()=>onLanding?.()} />
-            {showReceipt&&trip&&(
-              <ReceiptModal state={state} trip={trip} issuedAt={issuedAt} achieved={achieved} dbItems={dbItems}
-                onClose={()=>setShowReceipt(false)} onReset={()=>{ setShowReceipt(false); doReset() }} />
-            )}
-          </>
-        ) : (
-          <>
-            {/* ── 헤더 (스크롤 시 올라감) ── */}
-            <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
-              {/* 타이틀 + 돋보기 */}
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-                <span onClick={handleLogoTap} style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary, cursor:'pointer', userSelect:'none', letterSpacing:-0.3 }}>버킷리스트</span>
-                <button onClick={()=>{ setShowSearch(v=>!v); if(showSearch) setSearchQuery('') }} style={{
-                  width:36, height:36, borderRadius:radius.full,
-                  border:`1.5px solid ${showSearch ? colors.primary : colors.border}`,
-                  background: showSearch ? colors.primaryLight : colors.bgCard,
-                  display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer',
-                }}>
-                  <Icon icon={showSearch ? 'ph:x' : 'ph:magnifying-glass'} width={17} height={17} color={showSearch ? colors.primary : colors.textSecondary} />
-                </button>
-              </div>
-              {/* 검색창 */}
-              {showSearch && (
-                <div style={{ padding:`0 ${spacing[4]}px ${spacing[3]}px` }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, height:42, border:`1.5px solid ${colors.primary}` }}>
-                    <Icon icon="ph:magnifying-glass" width={15} height={15} color={colors.primary} />
-                    <input autoFocus value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="버킷리스트 검색"
-                      style={{ flex:1, border:'none', outline:'none', fontSize:font.size.md, color:colors.textPrimary, background:'transparent', fontFamily:ff }} />
-                    {searchQuery && (
-                      <button onClick={()=>setSearchQuery('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex' }}>
-                        <Icon icon="ph:x" width={13} height={13} color={colors.textTertiary} />
-                      </button>
-                    )}
-                  </div>
+          {/* ── 헤더 (스크롤 시 올라감) ── */}
+          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
+              <span onClick={handleLogoTap} style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary, cursor:'pointer', userSelect:'none' }}>버킷리스트</span>
+              <button onClick={()=>{ setShowSearch(v=>!v); if(showSearch) setSearchQuery('') }} style={{
+                width:36, height:36, borderRadius:radius.full,
+                border:`1.5px solid ${showSearch ? colors.primary : colors.border}`,
+                background: showSearch ? colors.primaryLight : colors.bgCard,
+                display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer',
+              }}>
+                <Icon icon={showSearch ? 'ph:x' : 'ph:magnifying-glass'} width={17} height={17} color={showSearch ? colors.primary : colors.textSecondary} />
+              </button>
+            </div>
+            {showSearch && (
+              <div style={{ padding:`0 ${spacing[4]}px ${spacing[3]}px` }}>
+                <div style={{ display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, height:42, border:`1.5px solid ${colors.primary}` }}>
+                  <Icon icon="ph:magnifying-glass" width={15} height={15} color={colors.primary} />
+                  <input autoFocus value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="버킷리스트 검색"
+                    style={{ flex:1, border:'none', outline:'none', fontSize:font.size.md, color:colors.textPrimary, background:'transparent', fontFamily:ff }} />
+                  {searchQuery && <button onClick={()=>setSearchQuery('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex' }}><Icon icon="ph:x" width={13} height={13} color={colors.textTertiary} /></button>}
                 </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── 서브헤더 + 카테고리 (sticky 고정) ── */}
+          {!showSearch && (
+            <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgCard, borderBottom:`1px solid ${colors.border}` }}>
+              {/* 멘트 + 일정설정 + 일정보기 */}
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
+                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? colors.primary : colors.gray600 }}>
+                  {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
+                </span>
+                <div style={{ display:'flex', gap:spacing[2] }}>
+                  <button onClick={handleOpenTripPicker} style={{
+                    height:30, padding:`0 ${spacing[2]}px`, borderRadius:radius.sm,
+                    border: tripLabel ? `1.5px solid ${colors.success}` : `1.5px solid ${colors.primary}`,
+                    background: tripLabel ? colors.successLight : colors.primaryLight,
+                    color: tripLabel ? colors.success : colors.primary,
+                    fontSize:font.size.xs, fontWeight:font.weight.bold,
+                    cursor:'pointer', display:'flex', alignItems:'center', gap:3, fontFamily:ff,
+                    animation: !tripLabel ? 'pulse 1.4s ease-in-out infinite' : 'none',
+                  }}>
+                    <Icon icon="ph:airplane-takeoff" width={12} height={12} />
+                    {tripLabel ?? '일정 설정'}
+                  </button>
+                  <button onClick={()=>setModal(modal==='calendar'?'none':'calendar')} style={{
+                    height:30, padding:`0 ${spacing[2]}px`, borderRadius:radius.sm,
+                    border:`1.5px solid ${modal==='calendar' ? colors.primary : colors.gray300}`,
+                    background: modal==='calendar' ? colors.primaryLight : colors.bgCard,
+                    color: modal==='calendar' ? colors.primary : colors.gray600,
+                    fontSize:font.size.xs, fontWeight:font.weight.bold,
+                    cursor:'pointer', display:'flex', alignItems:'center', gap:3, fontFamily:ff,
+                  }}>
+                    <Icon icon="ph:calendar-check" width={12} height={12} />
+                    일정보기
+                  </button>
+                </div>
+              </div>
+              {/* 카테고리 그리드 */}
+              <div style={{ padding:`0 ${spacing[3]}px ${spacing[3]}px` }}>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:spacing[1] }}>
+                  {(() => {
+                    const nonCustom = CATEGORIES.filter(c=>c.id!=='custom')
+                    const custom    = CATEGORIES.find(c=>c.id==='custom')
+                    const allCats   = custom ? [...nonCustom,custom] : nonCustom
+                    return allCats.map(cat => {
+                      const isActive = activeCategory===cat.id
+                      const catDone  = allItems.filter(i=>i.categoryId===cat.id&&state.selected[i.id]).length
+                      return (
+                        <button key={cat.id} className="cat-btn"
+                          onClick={()=>{ setState(setCategory(state,cat.id)); setShowSearch(false) }}
+                          style={{
+                            height:36, borderRadius:radius.sm, position:'relative',
+                            border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                            background: isActive ? colors.primary : colors.bgCard,
+                            cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:ff,
+                            WebkitTapHighlightColor:'transparent',
+                          }}>
+                          <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:isActive ? '#fff' : colors.gray700, lineHeight:1.2, textAlign:'center', padding:'0 2px', wordBreak:'keep-all' }}>
+                            {cat.label}
+                          </span>
+                          {catDone>0 && (
+                            <span style={{ position:'absolute', top:-5, right:-5, background:'#EF4444', color:'#fff', borderRadius:radius.full, fontSize:8, fontWeight:font.weight.bold, minWidth:16, height:16, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 3px' }}>{catDone}</span>
+                          )}
+                        </button>
+                      )
+                    })
+                  })()}
+                </div>
+              </div>
+              {/* 캘린더 뷰 */}
+              {modal==='calendar' && trip && (
+                <CalendarModal state={state} trip={trip} allItems={allItems} onClose={()=>setModal('none')} />
               )}
             </div>
+          )}
 
-            {/* ── 서브헤더 + 카테고리 (sticky 고정) ── */}
+          {/* ── 리스트 ── */}
+          <div style={{ background:colors.bgCard, padding:`${spacing[3]}px ${spacing[3]}px` }}>
             {!showSearch && (
-              <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgCard, borderBottom:`1px solid ${colors.border}` }}>
-                {/* 멘트 + 일정설정 + 일정보기 */}
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
-                  <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? colors.primary : colors.gray600 }}>
-                    {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
-                  </span>
-                  <div style={{ display:'flex', gap:spacing[2] }}>
-                    <button onClick={handleOpenTripPicker} style={{
-                      height:30, padding:`0 ${spacing[2]}px`, borderRadius:radius.sm,
-                      border: tripLabel ? `1.5px solid ${colors.success}` : `1.5px solid ${colors.primary}`,
-                      background: tripLabel ? colors.successLight : colors.primaryLight,
-                      color: tripLabel ? colors.success : colors.primary,
-                      fontSize:font.size.xs, fontWeight:font.weight.bold,
-                      cursor:'pointer', display:'flex', alignItems:'center', gap:3, fontFamily:ff,
-                      animation: !tripLabel ? 'pulse 1.4s ease-in-out infinite' : 'none',
-                    }}>
-                      <Icon icon="ph:airplane-takeoff" width={12} height={12} />
-                      {tripLabel ?? '일정 설정'}
-                    </button>
-                    <button onClick={()=>setModal(modal==='calendar'?'none':'calendar')} style={{
-                      height:30, padding:`0 ${spacing[2]}px`, borderRadius:radius.sm,
-                      border:`1.5px solid ${modal==='calendar' ? colors.primary : colors.gray300}`,
-                      background: modal==='calendar' ? colors.primaryLight : colors.bgCard,
-                      color: modal==='calendar' ? colors.primary : colors.gray600,
-                      fontSize:font.size.xs, fontWeight:font.weight.bold,
-                      cursor:'pointer', display:'flex', alignItems:'center', gap:3, fontFamily:ff,
-                    }}>
-                      <Icon icon="ph:calendar-check" width={12} height={12} />
-                      일정보기
-                    </button>
-                  </div>
-                </div>
-
-                {/* 카테고리 그리드 */}
-                <div style={{ padding:`0 ${spacing[3]}px ${spacing[3]}px` }}>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:spacing[1] }}>
-                    {(() => {
-                      const nonCustom = CATEGORIES.filter(c=>c.id!=='custom')
-                      const custom    = CATEGORIES.find(c=>c.id==='custom')
-                      const allCats   = custom ? [...nonCustom,custom] : nonCustom
-                      return allCats.map(cat => {
-                        const isActive = activeCategory===cat.id
-                        const catDone  = allItems.filter(i=>i.categoryId===cat.id&&state.selected[i.id]).length
-                        return (
-                          <button key={cat.id} className="cat-btn"
-                            onClick={()=>{ setState(setCategory(state,cat.id)); setShowSearch(false) }}
-                            style={{
-                              height:36, borderRadius:radius.sm, position:'relative',
-                              border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
-                              background: isActive ? colors.primary : colors.bgCard,
-                              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:ff,
-                              WebkitTapHighlightColor:'transparent',
-                            }}>
-                            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:isActive ? '#fff' : colors.gray700, lineHeight:1.2, textAlign:'center', padding:'0 2px', wordBreak:'keep-all' }}>
-                              {cat.label}
-                            </span>
-                            {catDone>0 && (
-                              <span style={{ position:'absolute', top:-5, right:-5, background:'#EF4444', color:'#fff', borderRadius:radius.full, fontSize:8, fontWeight:font.weight.bold, minWidth:16, height:16, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 3px' }}>{catDone}</span>
-                            )}
-                          </button>
-                        )
-                      })
-                    })()}
-                  </div>
-                </div>
-
-                {/* 캘린더 뷰 (인라인) */}
-                {modal==='calendar' && trip && (
-                  <CalendarModal state={state} trip={trip} allItems={allItems} onClose={()=>setModal('none')} />
-                )}
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[2] }}>
+                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary }}>
+                  {CATEGORIES.find(c=>c.id===activeCategory)?.label}
+                </span>
+                <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>
+                  {catItems.filter(i=>state.selected[i.id]).length}/{catItems.length}
+                </span>
               </div>
             )}
-
-            {/* ── 리스트 ── */}
-            <div style={{ background:colors.bgCard, padding:`${spacing[3]}px ${spacing[3]}px` }}>
-              {/* 섹션 헤더 */}
-              {!showSearch && (
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[2] }}>
-                  <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary }}>
-                    {CATEGORIES.find(c=>c.id===activeCategory)?.label}
-                  </span>
-                  <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>
-                    {catItems.filter(i=>state.selected[i.id]).length}/{catItems.length}
-                  </span>
+            {activeCategory==='custom'&&!showSearch&&(
+              <div style={{ display:'flex', gap:spacing[2], marginBottom:spacing[3], alignItems:'center' }}>
+                <div style={{ flex:1, display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, border:`1px solid ${colors.border}`, height:44 }}>
+                  <Icon icon="ph:plus-circle" width={16} height={16} color={colors.primary} />
+                  <input ref={inputRef} value={customLabel} onChange={e=>setCustomLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleAddCustom()} placeholder="직접 추가"
+                    style={{ flex:1, border:'none', outline:'none', fontSize:font.size.md, color:colors.textPrimary, background:'transparent', fontFamily:ff }} />
                 </div>
-              )}
-
-              {/* 직접 추가 */}
-              {activeCategory==='custom'&&!showSearch&&(
-                <div style={{ display:'flex', gap:spacing[2], marginBottom:spacing[3], alignItems:'center' }}>
-                  <div style={{ flex:1, display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, border:`1px solid ${colors.border}`, height:44 }}>
-                    <Icon icon="ph:plus-circle" width={16} height={16} color={colors.primary} />
-                    <input ref={inputRef} value={customLabel} onChange={e=>setCustomLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleAddCustom()} placeholder="직접 추가"
-                      style={{ flex:1, border:'none', outline:'none', fontSize:font.size.md, color:colors.textPrimary, background:'transparent', fontFamily:ff }} />
-                  </div>
-                  <button onClick={handleAddCustom} style={{ height:44, padding:`0 ${spacing[4]}px`, background:colors.primary, color:'#fff', border:'none', borderRadius:radius.sm, fontWeight:font.weight.bold, fontSize:font.size.sm, cursor:'pointer', fontFamily:ff }}>추가</button>
-                </div>
-              )}
-
-              {/* 아이템 카드 리스트 */}
-              <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
-                {searchResults!==null&&searchResults.length===0&&(
-                  <div style={{ textAlign:'center', padding:'40px 0', ...T.sm }}>검색 결과가 없어요</div>
-                )}
-                {(searchResults??catItems).map(item => {
-                  const checked  = !!state.selected[item.id]
-                  const dayCount = (state.schedules[item.id]??[]).length
-                  const db       = dbItems.find(d=>d.id===item.id)
-                  const regionKey = db?.address ? Object.keys(STATE_MAP).find(k=>db.address!.toUpperCase().includes(k)) : null
-                  const region    = regionKey ? STATE_MAP[regionKey] : null
-                  const cat       = CATEGORIES.find(c=>c.id===item.categoryId)
-                  const isHighlight = highlightItem===item.id
-
-                  return (
-                    <div key={item.id} id={`item-${item.id}`} className="list-item"
-                      style={{
-                        display:'flex', alignItems:'center', gap:spacing[3],
-                        padding:`${spacing[3]}px ${spacing[3]}px`,
-                        background: checked ? '#EEF4FF' : colors.bgCard,
-                        borderRadius:radius.md,
-                        border: checked ? `2px solid ${colors.primary}` : isHighlight ? `2px solid ${colors.primary}` : `1.5px solid ${colors.gray200}`,
-                        cursor:'pointer', transition:'all 0.15s',
-                      }}
-                      onClick={async()=>{
-                        if(!db) return
-                        if((db.related_product_ids?.length??0)>0){ const {data}=await supabase.from('shopping_products').select('*').eq('id',db.related_product_ids![0]).single(); if(data) setSelProduct(data); return }
-                        setDetailItem(db)
-                        if((db.related_business_ids?.length??0)>0){ const {data}=await supabase.from('businesses').select('*').in('id',db.related_business_ids!); setDetailBizCards(data??[]) } else setDetailBizCards([])
-                      }}
-                    >
-                      {/* 왼쪽: 동그란 이미지 */}
-                      <div style={{
-                        width:44, height:44, borderRadius:'50%', flexShrink:0,
-                        background: colors.primaryLight,
-                        border:`1px solid ${colors.border}`,
-                        overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center',
-                      }}>
-                        {db?.image_url
-                          ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                          : <span style={{ fontSize:20 }}>{cat?.emoji ?? '📌'}</span>
-                        }
-                      </div>
-
-                      {/* 가운데: 텍스트 */}
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:checked?colors.primary:colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
-                          {item.label}
-                        </div>
-                        <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'wrap' }}>
-                          {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium }}>📍 {region.label}</span>}
-                          {checked && dayCount>0 && (
-                            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.primary, color:'#fff', borderRadius:radius.full, padding:`1px ${spacing[2]}px` }}>
-                              {dayCount}일차
-                            </span>
-                          )}
-                          {checked && dayCount===0 && (
-                            <span style={{ fontSize:font.size.xs, color:colors.warning, fontWeight:font.weight.bold }}>일정 미지정</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* 오른쪽: 체크박스 */}
-                      <button onClick={e=>{
-                        e.stopPropagation()
-                        if(!trip){ setModal('noTrip'); return }
-                        const nextChecked = !checked
-                        setState(toggleItem(state,item.id))
-                        if(nextChecked) setTimeout(()=>setSheetItem(item as CheckItem),50)
-                      }} style={{
-                        width:24, height:24, borderRadius:6, flexShrink:0,
-                        border: checked ? 'none' : `1.5px solid ${colors.border}`,
-                        background: checked ? colors.primary : colors.bgCard,
-                        display:'flex', alignItems:'center', justifyContent:'center',
-                        cursor:'pointer', padding:0, transition:'all 0.15s',
-                      }}>
-                        {checked&&(
-                          <svg width="12" height="9" viewBox="0 0 11 8" fill="none">
-                            <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-                  )
-                })}
+                <button onClick={handleAddCustom} style={{ height:44, padding:`0 ${spacing[4]}px`, background:colors.primary, color:'#fff', border:'none', borderRadius:radius.sm, fontWeight:font.weight.bold, fontSize:font.size.sm, cursor:'pointer', fontFamily:ff }}>추가</button>
               </div>
+            )}
+            {searchResults!==null&&searchResults.length===0&&(
+              <div style={{ textAlign:'center', padding:'40px 0', ...T.sm }}>검색 결과가 없어요</div>
+            )}
+            <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
+              {(searchResults??catItems).map(item => {
+                const checked  = !!state.selected[item.id]
+                const dayCount = (state.schedules[item.id]??[]).length
+                const db       = dbItems.find(d=>d.id===item.id)
+                const regionKey = db?.address ? Object.keys(STATE_MAP).find(k=>db.address!.toUpperCase().includes(k)) : null
+                const region    = regionKey ? STATE_MAP[regionKey] : null
+                const cat       = CATEGORIES.find(c=>c.id===item.categoryId)
+                const isHighlight = highlightItem===item.id
+                return (
+                  <div key={item.id} id={`item-${item.id}`} className="list-item"
+                    style={{
+                      display:'flex', alignItems:'center', gap:spacing[3],
+                      padding:`${spacing[3]}px ${spacing[3]}px`,
+                      background: checked ? colors.primaryLight : colors.bgCard,
+                      borderRadius:radius.md,
+                      border: checked ? `1.5px solid ${colors.primary}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray200}`,
+                      cursor:'pointer', transition:'all 0.15s',
+                    }}
+                    onClick={async()=>{
+                      if(!db) return
+                      if((db.related_product_ids?.length??0)>0){ const {data}=await supabase.from('shopping_products').select('*').eq('id',db.related_product_ids![0]).single(); if(data) setSelProduct(data); return }
+                      setDetailItem(db)
+                      if((db.related_business_ids?.length??0)>0){ const {data}=await supabase.from('businesses').select('*').in('id',db.related_business_ids!); setDetailBizCards(data??[]) } else setDetailBizCards([])
+                    }}
+                  >
+                    {/* 동그란 이미지 */}
+                    <div style={{ width:44, height:44, borderRadius:'50%', flexShrink:0, background:colors.primaryLight, border:`1px solid ${colors.border}`, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      {db?.image_url ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{ fontSize:20 }}>{cat?.emoji ?? '📌'}</span>}
+                    </div>
+                    {/* 텍스트 */}
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:checked?colors.primary:colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                        {item.label}
+                      </div>
+                      <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'wrap' }}>
+                        {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium }}>📍 {region.label}</span>}
+                        {checked && dayCount>0 && <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.primary, color:'#fff', borderRadius:radius.full, padding:`1px ${spacing[2]}px` }}>{dayCount}일차</span>}
+                        {checked && dayCount===0 && <span style={{ fontSize:font.size.xs, color:colors.warning, fontWeight:font.weight.bold }}>일정 미지정</span>}
+                      </div>
+                    </div>
+                    {/* 체크박스 */}
+                    <button onClick={e=>{
+                      e.stopPropagation()
+                      if(!trip){ setModal('noTrip'); return }
+                      const nextChecked=!checked
+                      setState(toggleItem(state,item.id))
+                      if(nextChecked) setTimeout(()=>setSheetItem(item as CheckItem),50)
+                    }} style={{
+                      width:24, height:24, borderRadius:6, flexShrink:0,
+                      border: checked ? 'none' : `1.5px solid ${colors.gray300}`,
+                      background: checked ? colors.primary : colors.bgCard,
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      cursor:'pointer', padding:0, transition:'all 0.15s',
+                    }}>
+                      {checked&&<svg width="12" height="9" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </button>
+                  </div>
+                )
+              })}
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
 
       {/* ── 하단 고정 영역 ── */}
       <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, zIndex:40 }}>
-        {/* 발행하기 버튼 — 위에 보더 */}
         {mainTab==='bucketlist'&&!isIssued&&(
           <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2], borderTop:`1.5px solid ${colors.border}` }}>
             <button onClick={handleIssue} style={{
-              flex:4, height:40, background:colors.primary, color:'#fff',
+              flex:4, height:44, background:colors.primary, color:'#fff',
               border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
               cursor:'pointer', fontFamily:ff, animation:shakeBtn?'shake 0.5s ease':'none',
               display:'flex', alignItems:'center', justifyContent:'center', gap:6,
@@ -469,14 +434,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               버킷리스트 발행하기
             </button>
             <button onClick={()=>setModal('confirmReset')} style={{
-              flex:1, height:40, background:colors.gray100, color:colors.textSecondary,
+              flex:1, height:44, background:colors.gray100, color:colors.textSecondary,
               border:'none', borderRadius:radius.sm, fontSize:font.size.sm, fontWeight:font.weight.medium,
               cursor:'pointer', fontFamily:ff,
             }}>초기화</button>
           </div>
         )}
-
-        {/* 하단 탭바 */}
         <div style={{ display:'flex', padding:`${spacing[1]}px 0 ${spacing[2]}px`, borderTop:`1.5px solid ${colors.border}` }}>
           {TABS.map(tab=>{
             const isActive = activeTabId===tab.id
@@ -497,6 +460,14 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {/* ── 폭죽 ── */}
       {showFireworks&&<Fireworks />}
 
+      {/* ── ScheduleSheet ── */}
+      {sheetItem&&trip&&(
+        <ScheduleSheet itemLabel={sheetItem.label} trip={trip}
+          currentDays={state.schedules[sheetItem.id]??[]}
+          onSelect={days=>{ setState(setSchedule(state,sheetItem.id,days)) }}
+          onClose={()=>setSheetItem(null)} />
+      )}
+
       {/* ── Trip date picker ── */}
       {modal==='tripPicker'&&(
         <TripPickerModal step={pickerStep} startDate={startDate} onSelect={handleDateSelect} onReset={handleResetTrip} onClose={()=>setModal('none')} />
@@ -508,38 +479,41 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {modal==='noDate'&&<AlertModal title="출발일과 도착일을 모두 선택해주세요" confirmLabel="확인" onConfirm={()=>setModal('none')} onCancel={()=>setModal('none')} hideCancel />}
       {modal==='noSchedule'&&<AlertModal title="날짜 미지정 항목이 있어요" message="체크된 모든 항목에 날짜를 지정해야 발행할 수 있어요." confirmLabel="확인" onConfirm={()=>setModal('none')} onCancel={()=>setModal('none')} hideCancel />}
 
-      {/* ── ScheduleSheet ── */}
-      {sheetItem&&trip&&(
-        <ScheduleSheet itemLabel={sheetItem.label} trip={trip}
-          currentDays={state.schedules[sheetItem.id]??[]}
-          onSelect={days=>{ setState(setSchedule(state,sheetItem.id,days)) }}
-          onClose={()=>setSheetItem(null)} />
-      )}
-
-      {showReceipt&&trip&&(
-        <ReceiptModal state={state} trip={trip} issuedAt={issuedAt} achieved={achieved} dbItems={dbItems}
-          onClose={()=>setShowReceipt(false)} onReset={()=>setModal('confirmReset')} />
-      )}
-
       {/* ── 쇼핑 상품 팝업 ── */}
       {selProduct&&(
         <>
           <div onClick={()=>setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600 }} />
-          <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, zIndex:601, animation:'slideUp 0.25s ease', maxHeight:'85vh', overflowY:'auto' }}>
+          <div style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, background:colors.bgCard,
+            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, zIndex:601,
+            animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
+          }}>
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
-            <div style={{ width:'100%', height:200, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', background:colors.gray100 }}>
-              {selProduct.image_url ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <Icon icon="ph:shopping-bag" width={48} height={48} color={colors.gray300} />}
+            <div style={{ width:'100%', height:200, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', background:colors.primaryLight }}>
+              {selProduct.image_url ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <Icon icon="ph:shopping-bag" width={56} height={56} color={colors.primary} />}
             </div>
             <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[10]}px` }}>
               <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap', marginBottom:spacing[3], alignItems:'center' }}>
                 {(selProduct.tags??[]).map((tag:string)=>(
-                  <span key={tag} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:TAG_COLOR[tag]?.bg??colors.gray100, color:TAG_COLOR[tag]?.color??colors.textSecondary }}>{tag}</span>
+                  <span key={tag} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:TAG_COLOR[tag]?.bg??colors.primaryLight, color:TAG_COLOR[tag]?.color??colors.primary }}>{tag}</span>
                 ))}
+                {selProduct.price_range&&<span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:colors.primaryLight, color:PRICE_COLOR[selProduct.price_range]??colors.primary, border:`1px solid ${colors.border}`, marginLeft:'auto' }}>{selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}</span>}
               </div>
               <div style={{ ...T.h2, marginBottom:spacing[1] }}>{selProduct.name}</div>
               {selProduct.brand&&<div style={{ ...T.sm, marginBottom:spacing[3] }}>{selProduct.brand}</div>}
-              {selProduct.description&&<div style={{ ...T.body, lineHeight:1.7, marginBottom:spacing[4] }}>{selProduct.description}</div>}
-              <button onClick={()=>setSelProduct(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:'none', background:colors.gray100, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>닫기</button>
+              {selProduct.description&&<div style={{ fontSize:font.size.sm, color:colors.textSecondary, lineHeight:1.7, marginBottom:spacing[4] }}>{selProduct.description}</div>}
+              {(selProduct.where_to_buy??[]).length>0&&(
+                <div style={{ marginBottom:spacing[4] }}>
+                  <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>어디서 살 수 있어요?</div>
+                  <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap' }}>
+                    {selProduct.where_to_buy.map((store:string)=>(
+                      <span key={store} style={{ fontSize:font.size.sm, padding:`4px ${spacing[2]}px`, borderRadius:radius.sm, background:colors.primaryLight, color:colors.primary, border:`1px solid ${colors.border}` }}>🏪 {store}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button onClick={()=>setSelProduct(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${colors.border}`, background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>닫기</button>
             </div>
           </div>
         </>
@@ -548,20 +522,25 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {/* ── 버킷리스트 상세 팝업 ── */}
       {detailItem&&(
         <div onClick={()=>setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', fontFamily:ff }}>
-          <div onClick={e=>e.stopPropagation()} style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, maxHeight:'85vh', overflowY:'auto', animation:'slideUp 0.25s ease' }}>
+          <div onClick={e=>e.stopPropagation()} style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, background:colors.bgCard,
+            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, maxHeight:'85vh', overflowY:'auto',
+            animation:'slideUpSheet 0.25s ease',
+          }}>
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
-            {detailItem.image_url&&<div style={{ width:'100%', height:200, overflow:'hidden', marginTop:spacing[2] }}><img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /></div>}
+            {detailItem.image_url&&<div style={{ width:'100%', height:220, overflow:'hidden', marginTop:spacing[2] }}><img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /></div>}
             <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[10]}px` }}>
               <div style={{ ...T.h2, lineHeight:1.4, marginBottom:spacing[3] }}>{detailItem.label}</div>
-              {detailItem.description&&<div style={{ ...T.body, lineHeight:1.7, marginBottom:spacing[4], color:colors.textSecondary }}>{detailItem.description}</div>}
+              {detailItem.description&&<div style={{ fontSize:font.size.md, color:colors.textSecondary, lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
               {detailItem.tips&&(
-                <div style={{ background:colors.warningLight, border:`1px solid ${colors.warning}`, borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.warning, marginBottom:spacing[1] }}>💡 현지인 팁</div>
-                  <div style={{ ...T.sm, lineHeight:1.6 }}>{detailItem.tips}</div>
+                <div style={{ background:colors.primaryLight, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4] }}>
+                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary, marginBottom:spacing[1] }}>💡 현지인 팁</div>
+                  <div style={{ fontSize:font.size.sm, color:colors.textSecondary, lineHeight:1.6 }}>{detailItem.tips}</div>
                 </div>
               )}
               {detailItem.address&&(
-                <button onClick={()=>window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')} style={{ display:'flex', alignItems:'center', gap:spacing[2], width:'100%', background:colors.bgCard, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4], cursor:'pointer', textAlign:'left' }}>
+                <button onClick={()=>window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')} style={{ display:'flex', alignItems:'center', gap:spacing[2], width:'100%', background:colors.primaryLight, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4], cursor:'pointer', textAlign:'left' }}>
                   <Icon icon="ph:map-pin" width={16} height={16} color={colors.primary} />
                   <div>
                     <div style={{ fontSize:font.size.xs, color:colors.textTertiary }}>여기서 할 수 있어요</div>
@@ -572,19 +551,23 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               )}
               {detailBizCards.length>0&&(
                 <div style={{ marginBottom:spacing[4] }}>
-                  <div style={{ ...T.caption, marginBottom:spacing[2] }}>🏢 관련 업체</div>
+                  <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>🏢 관련 업체</div>
                   <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>{detailBizCards.map(biz=><BusinessCard key={biz.id} business={biz} />)}</div>
                 </div>
               )}
-              <button onClick={()=>setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:'none', background:colors.gray100, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>닫기</button>
+              <button onClick={()=>setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${colors.border}`, background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>닫기</button>
             </div>
           </div>
         </div>
       )}
+
+      {showReceipt&&trip&&(
+        <ReceiptModal state={state} trip={trip} issuedAt={issuedAt} achieved={achieved} dbItems={dbItems}
+          onClose={()=>setShowReceipt(false)} onReset={()=>setModal('confirmReset')} />
+      )}
     </div>
   )
 }
-
 /* ── 캘린더 뷰 (인라인) ── */
 function CalendarModal({ state, trip, allItems, onClose }: { state:AppState; trip:TripInfo; allItems:any[]; onClose:()=>void }) {
   const days = getTripDays(trip)
@@ -635,12 +618,18 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
   return (
     <>
       <div onClick={onCancel} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600, animation:'fadeIn 0.2s ease' }} />
-      <div style={{ position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', background:colors.bgCard, borderRadius:radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`, zIndex:601, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center', animation:'scaleIn 0.22s ease', fontFamily:font.family }}>
-        <p style={{ ...T.h4, marginBottom:message?spacing[2]:spacing[5], lineHeight:1.5 }}>{title}</p>
-        {message&&<p style={{ ...T.sm, marginBottom:spacing[5], lineHeight:1.6 }}>{message}</p>}
+      <div style={{
+        position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+        background:colors.bgCard, borderRadius:radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,
+        zIndex:601, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+        animation:'scaleIn 0.22s ease', fontFamily:font.family,
+        boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
+      }}>
+        <p style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:message?spacing[2]:spacing[5], lineHeight:1.5 }}>{title}</p>
+        {message&&<p style={{ fontSize:font.size.sm, color:colors.textSecondary, marginBottom:spacing[5], lineHeight:1.6 }}>{message}</p>}
         <div style={{ display:'flex', gap:spacing[2] }}>
           {confirmFirst&&<button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:radius.sm, background:colors.primaryLight, color:confirmColor??colors.primary, fontWeight:font.weight.bold, fontSize:font.size.md, cursor:'pointer', fontFamily:font.family }}>{confirmLabel}</button>}
-          {!hideCancel&&<button onClick={onCancel} style={{ flex:1, height:48, border:'none', borderRadius:radius.sm, background:colors.gray100, color:colors.textSecondary, fontWeight:font.weight.medium, fontSize:font.size.sm, cursor:'pointer', fontFamily:font.family }}>취소</button>}
+          {!hideCancel&&<button onClick={onCancel} style={{ flex:1, height:48, border:`1px solid ${colors.border}`, borderRadius:radius.sm, background:colors.bgCard, color:colors.textSecondary, fontWeight:font.weight.medium, fontSize:font.size.sm, cursor:'pointer', fontFamily:font.family }}>취소</button>}
           {!confirmFirst&&<button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:radius.sm, background:confirmColor===colors.danger?colors.dangerLight:colors.primaryLight, color:confirmColor??colors.primary, fontWeight:font.weight.bold, fontSize:font.size.md, cursor:'pointer', fontFamily:font.family }}>{confirmLabel}</button>}
         </div>
       </div>
