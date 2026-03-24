@@ -160,8 +160,7 @@ export default function NearbyMap({ onBack }: Props) {
         minZoom: 10,
         maxZoom: 13,
         disableDefaultUI: true,
-        zoomControl: true,
-        zoomControlOptions: { position: (window as any).google.maps.ControlPosition.RIGHT_CENTER },
+        zoomControl: false,
         styles: [{ featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }],
       })
 
@@ -317,9 +316,9 @@ export default function NearbyMap({ onBack }: Props) {
                 onClick={() => { if (!disabled) setRadius(opt.value) }}
                 className="map-btn"
                 style={{
-                  flex:1, height:28, borderRadius:radius.sm,
-                  background: isActive ? colors.primary : colors.bgCard,
-                  color: disabled ? colors.gray300 : isActive ? '#fff' : colors.gray600,
+                  flex:1, height:28, borderRadius:20,
+                  background: isActive ? colors.primaryLight : colors.bgCard,
+                  color: disabled ? colors.gray300 : colors.gray600,
                   border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                   cursor: disabled ? 'default' : 'pointer',
                   fontSize:font.size.xs, fontWeight:font.weight.bold,
@@ -365,15 +364,38 @@ export default function NearbyMap({ onBack }: Props) {
           {filtered.length}개
         </div>
 
+        {/* 커스텀 줌 버튼 — 오른쪽 아래 12% 위치 */}
+        <div style={{
+          position:'absolute', right:12, bottom:'12%',
+          display:'flex', flexDirection:'column', gap:4,
+        }}>
+          <button onClick={() => mapObj.current?.setZoom((mapObj.current?.getZoom() ?? 13) + 1)}
+            style={{
+              width:36, height:36, borderRadius:8,
+              background:colors.bgCard, border:`1px solid ${colors.border}`,
+              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+              fontSize:20, color:colors.textSecondary, fontWeight:400,
+              WebkitTapHighlightColor:'transparent',
+            }}>+</button>
+          <button onClick={() => mapObj.current?.setZoom((mapObj.current?.getZoom() ?? 13) - 1)}
+            style={{
+              width:36, height:36, borderRadius:8,
+              background:colors.bgCard, border:`1px solid ${colors.border}`,
+              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+              fontSize:20, color:colors.textSecondary, fontWeight:400,
+              WebkitTapHighlightColor:'transparent',
+            }}>−</button>
+        </div>
+
         {/* 내 위치로 이동 버튼 */}
         {myPos && (
           <button onClick={() => mapObj.current?.panTo(myPos)} className="map-btn" style={{
-            position:'absolute', bottom:16, right:12,
-            width:40, height:40, borderRadius:radius.sm,
+            position:'absolute', bottom:'5%', right:12,
+            width:36, height:36, borderRadius:8,
             background:colors.bgCard, border:`1px solid ${colors.border}`, cursor:'pointer',
             display:'flex', alignItems:'center', justifyContent:'center',
           }}>
-            <Icon icon="ph:crosshair" width={20} height={20} color={colors.primary} />
+            <Icon icon="ph:crosshair" width={18} height={18} color={colors.primary} />
           </button>
         )}
       </div>
