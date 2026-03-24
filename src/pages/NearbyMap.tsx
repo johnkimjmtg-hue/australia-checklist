@@ -269,7 +269,7 @@ export default function NearbyMap({ onBack }: Props) {
         .cat-scroll::-webkit-scrollbar { height:4px; }
         .cat-scroll::-webkit-scrollbar-track { background:${colors.bgPage}; border-radius:2px; }
         .cat-scroll::-webkit-scrollbar-thumb { background:${colors.gray300}; border-radius:2px; }
-        .map-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; border-radius: 20px !important; }
+        .map-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; border-radius: 8px !important; }
       `}</style>
 
       {/* 스티키 필터 — 카테고리 + 거리 */}
@@ -288,7 +288,7 @@ export default function NearbyMap({ onBack }: Props) {
               <button key={cat.id} onClick={() => setCategory(cat.id)}
                 className="map-btn"
                 style={{
-                  height:36, borderRadius:radius.xl,
+                  height:36, borderRadius:radius.sm,
                   background: isActive ? colors.primary : colors.bgCard,
                   color: isActive ? '#fff' : colors.gray600,
                   border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
@@ -316,7 +316,7 @@ export default function NearbyMap({ onBack }: Props) {
                 onClick={() => { if (!disabled) setRadius(opt.value) }}
                 className="map-btn"
                 style={{
-                  flex:1, height:28, borderRadius:radius.xl,
+                  flex:1, height:28, borderRadius:radius.sm,
                   background: isActive ? colors.primaryLight : colors.bgCard,
                   color: disabled ? colors.gray300 : isActive ? colors.primary : colors.textSecondary,
                   border: isActive ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
@@ -357,7 +357,7 @@ export default function NearbyMap({ onBack }: Props) {
         {/* 업체 수 배지 */}
         <div style={{
           position:'absolute', top:12, right:12,
-          background:colors.bgCard, borderRadius:radius.xl, padding:"4px 12px",
+          background:colors.bgCard, borderRadius:radius.sm, padding:"4px 12px",
           fontSize:font.size.xs, color:colors.textSecondary, fontWeight:font.weight.bold,
           border:`1px solid ${colors.border}`,
         }}>
@@ -368,7 +368,7 @@ export default function NearbyMap({ onBack }: Props) {
         {myPos && (
           <button onClick={() => mapObj.current?.panTo(myPos)} className="map-btn" style={{
             position:'absolute', bottom:16, right:12,
-            width:40, height:40, borderRadius:radius.xl,
+            width:40, height:40, borderRadius:radius.sm,
             background:colors.bgCard, border:`1px solid ${colors.border}`, cursor:'pointer',
             display:'flex', alignItems:'center', justifyContent:'center',
           }}>
