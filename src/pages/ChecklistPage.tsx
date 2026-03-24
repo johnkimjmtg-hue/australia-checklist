@@ -30,6 +30,12 @@ import NearbyMap from './NearbyMap'
 
 const ff = font.family
 
+const CAT_ICON_MAP: Record<string,string> = {
+  hospital:'ph:first-aid-kit', food:'ph:fork-knife', shopping:'ph:shopping-bag',
+  admin:'ph:files', people:'ph:users', parenting:'ph:baby', places:'ph:map-pin',
+  schedule:'ph:calendar', custom:'ph:star',
+}
+
 const TAG_COLOR: Record<string, { bg: string; color: string }> = {
   '인기':     { bg:'#FEF3C7', color:'#B45309' },
   '강추':     { bg:'#DCFCE7', color:'#15803D' },
@@ -376,7 +382,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   >
                     {/* 동그란 이미지 */}
                     <div style={{ width:44, height:44, borderRadius:'50%', flexShrink:0, background:colors.primaryLight, border:`1px solid ${colors.border}`, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                      {db?.image_url ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{ fontSize:20 }}>{cat?.emoji ?? '📌'}</span>}
+                      {db?.image_url
+                        ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                        : <Icon icon={db?.icon ?? CAT_ICON_MAP[item.categoryId] ?? 'ph:star'} width={22} height={22} color={colors.primary} />
+                      }
                     </div>
                     {/* 텍스트 */}
                     <div style={{ flex:1, minWidth:0 }}>
