@@ -17,23 +17,21 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
 
   return (
     <div style={{
-      position: 'fixed',
-      inset: 0,
+      minHeight: '100dvh',
       background: colors.bgPage,
       fontFamily: font.family,
       display: 'flex',
       justifyContent: 'center',
     }}>
-      {/* 모바일 기준 래퍼 maxWidth 480 */}
+      {/* 모바일 기준 래퍼 maxWidth 480 — OnboardingPage와 동일 */}
       <div style={{
         width: '100%',
         maxWidth: 480,
-        height: '100%',
+        minHeight: '100dvh',
         display: 'flex',
         flexDirection: 'column',
         background: colors.bgPage,
         boxSizing: 'border-box',
-        overflow: 'hidden',
       }}>
       {/* 헤더 */}
       <div style={{
@@ -88,11 +86,8 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
         ))}
       </div>
 
-      {/* 본문 - 스크롤 영역 */}
+      {/* 본문 */}
       <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        WebkitOverflowScrolling: 'touch',
         padding: `${spacing[5]}px ${spacing[4]}px ${spacing[10]}px`,
       }}>
         {tab === 'terms' ? <TermsContent /> : <PrivacyContent />}
