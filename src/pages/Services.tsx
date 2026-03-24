@@ -24,11 +24,6 @@ function sortByName(list: Business[]): Business[] {
   })
 }
 
-// 랜덤 N개 추출
-function pickRandom<T>(list: T[], n: number): T[] {
-  const shuffled = [...list].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, n)
-}
 
 export default function Services({ onSelectBusiness, onBack }: Props) {
   const [serviceTab, setServiceTab]   = useState<ServiceTab>('all')
@@ -40,7 +35,6 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const [hasMore, setHasMore]         = useState(true)
   const [page, setPage]               = useState(0)
   const [totalCount, setTotalCount]   = useState(0)
-  const [featuredRandom, setFeaturedRandom] = useState<Business[]>([])  // 기본 추천 랜덤
   const [bookmarked, setBookmarked]   = useState<Business[]>([])
   const [bookmarkCount, setBookmarkCount] = useState(() => getBookmarks().length)
   const [catCounts, setCatCounts]     = useState<Record<string, number>>({})
@@ -69,6 +63,9 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
 
     // 한인업체 필터
     if (korean) data = data.filter(b => b.is_korean)
+
+    // 전체업종 + 카테고리 미선택 + 미검색 → 추천만 표시
+    if (!korean && !cat && !q.trim()) data = data.filter(b => b.is_featured)
 
     // 추천업체 가나다순 → 일반업체 가나다순 정렬
     const sortMixed = (list: Business[]) => {
@@ -110,12 +107,6 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       results.forEach(r => { counts[r.id] = r.n })
       setCatCounts(counts)
     })
-    // 초기 추천 업체 랜덤 로드
-    getBusinesses(undefined, 0, 200).then(data => {
-      const featured = data.filter(b => b.is_featured)
-      const shuffled = [...featured].sort(() => Math.random() - 0.5)
-      setFeaturedRandom(shuffled.length > 0 ? shuffled : [...data].sort(() => Math.random() - 0.5).slice(0, 10))
-    })
   }, [])
 
   // 카테고리 정렬 — 업체 많은 순, all 제외
@@ -125,18 +116,11 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     setSortedCategories(sorted)
   }, [catCounts])
 
-  // 검색어/카테고리/탭 변경 시 재로드 (카테고리 선택 or 검색 시에만)
+  // 검색어/카테고리/탭 변경 시 재로드
   useEffect(() => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
     const korean = serviceTab === 'korean'
-    if (!category && !search.trim()) {
-      // 미선택 상태 — 추천 랜덤만 표시, 로드 불필요
-      setBusinesses([])
-      
-      return
-    }
     searchTimerRef.current = setTimeout(() => {
-      
       loadData(category, search, true, korean)
     }, search.trim() ? 400 : 0)
   }, [category, search, serviceTab])
@@ -330,45 +314,26 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         {/* 전체업종 / 한인업체 탭 */}
         {(serviceTab === 'all' || serviceTab === 'korean') && (
           <>
-            {/* 카테고리 미선택 + 미검색 → 추천 업체 랜덤 표시 */}
-            {!isFiltered && (
-              <>
-                <SectionLabel icon="ph:star" label="추천 업체" color={colors.textSecondary} />
-                {featuredRandom.length === 0
-                  ? <LoadingState />
-                  : (
-                    <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
-                      {(serviceTab === 'korean'
-                        ? featuredRandom.filter(b => b.is_korean)
-                        : featuredRandom
-                      ).map(b => <BusinessCard key={b.id} business={b} />)}
-                    </div>
-                  )
-                }
-              </>
+            <SectionLabel
+              icon={!isFiltered
+                ? (serviceTab === 'korean' ? 'ph:flag' : 'ph:star')
+                : isSearch ? 'ph:magnifying-glass' : 'ph:list-bullets'}
+              label={!isFiltered
+                ? (serviceTab === 'korean' ? `한인업체 (${totalCount})` : `추천 업체 (${totalCount})`)
+                : isSearch
+                  ? `검색 결과 (${totalCount})`
+                  : `${CATEGORIES.find(c => c.id === category)?.label ?? ''} (${totalCount})`}
+              color={colors.textSecondary}
+            />
+            {loading ? <LoadingState /> : businesses.length === 0 ? <EmptyState /> : (
+              <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
+                {businesses.map(b => <BusinessCard key={b.id} business={b} />)}
+              </div>
             )}
-
-            {/* 카테고리 선택 or 검색 → 페이지네이션 결과 */}
-            {isFiltered && (
-              <>
-                <SectionLabel
-                  icon={isSearch ? 'ph:magnifying-glass' : 'ph:list-bullets'}
-                  label={isSearch
-                    ? `검색 결과 (${totalCount})`
-                    : `${CATEGORIES.find(c => c.id === category)?.label ?? ''} (${totalCount})`}
-                  color={colors.textSecondary}
-                />
-                {loading ? <LoadingState /> : businesses.length === 0 ? <EmptyState /> : (
-                  <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
-                    {businesses.map(b => <BusinessCard key={b.id} business={b} />)}
-                  </div>
-                )}
-                {/* 무한스크롤 트리거 */}
-                <div ref={loaderRef} style={{ height:40, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  {loadingMore && <Icon icon="ph:spinner" width={20} height={20} color={colors.textTertiary} style={{ animation:'spin 1s linear infinite' }} />}
-                </div>
-              </>
-            )}
+            {/* 무한스크롤 트리거 */}
+            <div ref={loaderRef} style={{ height:40, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              {loadingMore && <Icon icon="ph:spinner" width={20} height={20} color={colors.textTertiary} style={{ animation:'spin 1s linear infinite' }} />}
+            </div>
           </>
         )}
       </div>
