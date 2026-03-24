@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { CheckItem, ITEM_ICONS } from '../data/checklist'
 import { supabase } from '../lib/supabase'
+import { colors, font, radius, spacing, T } from '../styles/tokens'
 
 type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null; image_url?: string | null; tips?: string | null; related_product_ids?: string[] | null }
 import { AppState, TripInfo, getTripDays, fmtMD, dow } from '../store/state'
@@ -129,29 +130,27 @@ function CircleProgress({ pct }: { pct:number }) {
 function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>void; onClose:()=>void }) {
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,0.65)',zIndex:700 }}/>
+      <div onClick={onClose} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:700 }}/>
       <div style={{
         position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
-        width:'calc(100% - 40px)',maxWidth:320,
-        background:'#e8e8e8',borderRadius:20,padding:'32px 24px 24px',
-        zIndex:701,textAlign:'center',
+        width:'calc(100% - 48px)',maxWidth:300,
+        background:colors.bgCard,borderRadius:radius.lg,padding:`${spacing[6]}px ${spacing[5]}px`,
+        zIndex:701,textAlign:'center',boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
       }}>
-        <div style={{ fontSize:52,marginBottom:8 }}>🎉</div>
-        <div style={{ fontSize:22,fontWeight:800,color:'#1B6EF3',marginBottom:8 }}>축하합니다!</div>
-        <div style={{ fontSize:15,color:'#64748B',lineHeight:1.6,marginBottom:24 }}>
+        <div style={{ fontSize:48,marginBottom:spacing[2] }}>🎉</div>
+        <div style={{ fontSize:font.size.xl,fontWeight:font.weight.bold,color:colors.primary,marginBottom:spacing[2] }}>축하합니다!</div>
+        <div style={{ fontSize:font.size.md,color:colors.textSecondary,lineHeight:1.6,marginBottom:spacing[5] }}>
           모든 리스트를 완료했습니다.<br/>
-          <span style={{ fontWeight:700,color:'#FFCD00',fontSize:17 }}>{total}개</span>를 모두 달성했어요 🥳
+          <span style={{ fontWeight:font.weight.bold,color:'#FFCD00',fontSize:font.size.lg }}>{total}개</span>를 모두 달성했어요 🥳
         </div>
-        <div style={{ display:'flex',gap:8 }}>
+        <div style={{ display:'flex',gap:spacing[2] }}>
           <button onClick={onClose} style={{
-            flex:1,height:48,borderRadius:8,border:'1px solid #C8C8C8',
-            background:'#e8e8e8',color:'#64748B',fontSize:14,fontWeight:600,cursor:'pointer',
-            boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+            flex:1,height:48,borderRadius:radius.sm,border:`1px solid ${colors.border}`,
+            background:colors.bgCard,color:colors.textSecondary,fontSize:font.size.md,fontWeight:font.weight.medium,cursor:'pointer',
           }}>닫기</button>
           <button onClick={onReset} style={{
-            flex:2,height:48,borderRadius:8,border:'none',
-            background:'#e8e8e8',color:'#1B6EF3',fontSize:14,fontWeight:700,cursor:'pointer',
-            boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+            flex:2,height:48,borderRadius:radius.sm,border:'none',
+            background:colors.primaryLight,color:colors.primary,fontSize:font.size.md,fontWeight:font.weight.bold,cursor:'pointer',
           }}>다시 시작하기</button>
         </div>
       </div>
@@ -162,18 +161,18 @@ function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>v
 function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=>void }) {
   return (
     <>
-      <div onClick={onCancel} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,0.6)',zIndex:600 }}/>
+      <div onClick={onCancel} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:600 }}/>
       <div style={{
         position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
         width:'calc(100% - 48px)',maxWidth:300,
-        background:'#e8e8e8',borderRadius:16,padding:'28px 20px 20px',
-        zIndex:601,textAlign:'center',
+        background:colors.bgCard,borderRadius:radius.lg,padding:`${spacing[6]}px ${spacing[5]}px`,
+        zIndex:601,textAlign:'center',boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
       }}>
-        <p style={{ fontSize:17,fontWeight:700,color:'#1E293B',marginBottom:8 }}>버킷리스트를 삭제할까요?</p>
-        <p style={{ fontSize:14,color:'#64748B',lineHeight:1.6,marginBottom:24 }}>모든 체크 내용과 일정이 삭제됩니다.</p>
-        <div style={{ display:'flex',gap:8 }}>
-          <button onClick={onCancel} style={{ flex:1,height:48,borderRadius:6,border:'1px solid #C8C8C8',background:'#e8e8e8',color:'#64748B',fontSize:15,fontWeight:600,cursor:'pointer',boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>취소</button>
-          <button onClick={onConfirm} style={{ flex:2,height:48,borderRadius:6,border:'none',background:'#e8e8e8',color:'#DC2626',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff' }}>삭제하기</button>
+        <p style={{ fontSize:font.size.lg,fontWeight:font.weight.bold,color:colors.textPrimary,marginBottom:spacing[2] }}>버킷리스트를 삭제할까요?</p>
+        <p style={{ fontSize:font.size.md,color:colors.textSecondary,lineHeight:1.6,marginBottom:spacing[5] }}>모든 체크 내용과 일정이 삭제됩니다.</p>
+        <div style={{ display:'flex',gap:spacing[2] }}>
+          <button onClick={onCancel} style={{ flex:1,height:48,borderRadius:radius.sm,border:`1px solid ${colors.border}`,background:colors.bgCard,color:colors.textSecondary,fontSize:font.size.md,fontWeight:font.weight.medium,cursor:'pointer' }}>취소</button>
+          <button onClick={onConfirm} style={{ flex:2,height:48,borderRadius:radius.sm,border:'none',background:colors.dangerLight,color:colors.danger,fontSize:font.size.md,fontWeight:font.weight.bold,cursor:'pointer' }}>삭제하기</button>
         </div>
       </div>
     </>
@@ -338,13 +337,13 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
     return (
       <div style={{
         display:'flex', alignItems:'stretch',
-        margin:'0 16px', borderRadius:12,
-        background: isAchieved ? '#fff8e4' : '#fff',
-        border:'1px solid #C8C8C8',
-        borderLeft: isAchieved ? '4px solid #16A34A' : '4px solid #CBD5E1',
-        transition:'all 0.3s', overflow:'hidden',
+        margin:`0 ${spacing[3]}px`, borderRadius:radius.md,
+        background: colors.bgCard,
+        border: isAchieved ? `1px solid ${colors.success}` : `1px solid ${colors.gray300}`,
+        borderLeft: isAchieved ? `3px solid ${colors.success}` : `3px solid ${colors.gray200}`,
+        transition:'all 0.2s', overflow:'hidden',
       }}>
-        {/* 왼쪽 - 이미지 꽉 채우기 */}
+        {/* 왼쪽 이미지 */}
         <div onClick={async e => {
           e.stopPropagation()
           if (!db) return
@@ -359,34 +358,33 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             setDetailBizCards(data ?? [])
           } else setDetailBizCards([])
         }} style={{
-          width:80, flexShrink:0, cursor: db ? 'pointer' : 'default',
-          background:'#f0f0f0', overflow:'hidden',
+          width:72, flexShrink:0, cursor: db ? 'pointer' : 'default',
+          background:colors.gray100, overflow:'hidden',
           display:'flex', alignItems:'center', justifyContent:'center',
         }}>
           {db?.image_url
             ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
-            : <Icon icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'} width={28} height={28} color={isAchieved ? '#78716C' : '#CBD5E1'} />
+            : <Icon icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'} width={24} height={24} color={colors.gray400} />
           }
         </div>
 
-        {/* 가운데 - 제목 + 설명 + 뱃지 */}
-        <div style={{ flex:1, display:'flex', flexDirection:'column', gap:3, minWidth:0, justifyContent:'center', padding:'10px 8px 10px 12px' }}>
+        {/* 가운데 텍스트 */}
+        <div style={{ flex:1, display:'flex', flexDirection:'column', gap:3, minWidth:0, justifyContent:'center', padding:`${spacing[2]}px ${spacing[2]}px ${spacing[2]}px ${spacing[3]}px` }}>
           <span style={{
-            fontSize:14, fontWeight: isAchieved ? 700 : 500,
-            color: isAchieved ? '#0F172A' : '#475569',
+            fontSize:font.size.md, fontWeight: isAchieved ? font.weight.bold : font.weight.medium,
+            color: isAchieved ? colors.success : colors.textPrimary,
             lineHeight:1.4,
             display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden',
           }}>{item.label}</span>
           {db?.description && (
             <span style={{
-              fontSize:11, color:'#94A3B8', fontWeight:400, lineHeight:1.5,
+              fontSize:font.size.xs, color:colors.textTertiary, lineHeight:1.5,
               overflow:'hidden', textOverflow:'ellipsis',
               display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical',
             }}>{db.description}</span>
           )}
-
           {hasDetail && (
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:4 }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:2 }}>
               <button
                 onClick={async e => {
                   e.stopPropagation()
@@ -402,47 +400,37 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                     setDetailBizCards(data ?? [])
                   } else setDetailBizCards([])
                 }}
-                style={{
-                  fontSize:11, fontWeight:600, color:'#64748B',
-                  background:'none', border:'none',
-                  cursor:'pointer', padding:0, flexShrink:0,
-                }}>
+                style={{ fontSize:font.size.xs, fontWeight:font.weight.medium, color:colors.primary, background:'none', border:'none', cursor:'pointer', padding:0 }}>
                 자세히 알아보기 ›
               </button>
               {region ? (
-                <span style={{
-                  fontSize:11, fontWeight:600, color:'#64748B',
-                  display:'flex', alignItems:'center', gap:3,
-                }}>
-                  <Icon icon="ph:map-pin-fill" width={11} height={11} color="#EF4444" />
-                  {region.label}
+                <span style={{ fontSize:font.size.xs, fontWeight:font.weight.medium, color:colors.textSecondary, display:'flex', alignItems:'center', gap:2 }}>
+                  <Icon icon="ph:map-pin-fill" width={10} height={10} color="#EF4444" />{region.label}
                 </span>
               ) : <span />}
             </div>
           )}
         </div>
 
-        {/* 오른쪽 - 완료 배지 + 삭제 */}
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, gap:6, padding:'10px 12px 10px 0' }}>
-          {/* 완료 배지 */}
+        {/* 오른쪽 완료 + 삭제 */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, padding:`${spacing[2]}px ${spacing[2]}px ${spacing[2]}px 0` }}>
           <div onClick={() => toggleAchieved(item.id, day)} style={{
             display:'flex', alignItems:'center', gap:3,
-            padding:'4px 8px', borderRadius:6, cursor:'pointer',
-            background: isAchieved ? '#16A34A' : '#f0f0f0',
-            border: `1px solid ${isAchieved ? '#16A34A' : '#16A34A'}`,
+            padding:'4px 8px', borderRadius:radius.sm, cursor:'pointer',
+            background: isAchieved ? colors.success : colors.bgCard,
+            border: `1px solid ${colors.success}`,
             transition:'all 0.2s', whiteSpace:'nowrap',
           }}>
-            <span style={{ fontSize:10, fontWeight:700, color: isAchieved ? '#fff' : '#16A34A' }}>완료</span>
+            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color: isAchieved ? '#fff' : colors.success }}>완료</span>
             <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
-              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#16A34A'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : colors.success} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          {/* 삭제 */}
           <button onClick={() => setDeleteItemId({ id: item.id, day })} style={{
             background:'none', border:'none', cursor:'pointer', padding:2,
             display:'flex', alignItems:'center',
           }}>
-            <Icon icon="ph:trash" width={18} height={18} color="#94A3B8" />
+            <Icon icon="ph:trash" width={16} height={16} color={colors.gray400} />
           </button>
         </div>
       </div>
@@ -511,7 +499,286 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       </div>
 
       {/* ══ 리스트 ══ */}
-      <div style={{ padding:'12px 0 130px',display:'flex',flexDirection:'column',gap:16 }}>
+      <div style={{ padding:`${spacing[2]}px 0 160px`, display:'flex', flexDirection:'column', gap:spacing[4] }}>
+        {sortedDays.map(dayIdx => {
+          const dayItems = (byDay.get(dayIdx) ?? []).filter(item => filterRow(item.id, dayIdx))
+          if (!dayItems.length) return null
+          const date     = tripDays[dayIdx]
+          const dayLabel = date ? `${fmtMD(date)}(${dow(date)})` : ''
+          const dayDone  = dayItems.filter(i => !!achieved[`${i.id}_${dayIdx}`]).length
+          return (
+            <div key={dayIdx}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`0 ${spacing[3]}px ${spacing[2]}px` }}>
+                <div style={{ display:'flex', alignItems:'center', gap:spacing[2] }}>
+                  <span style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:colors.textPrimary }}>{dayIdx+1}일차</span>
+                  <span style={{ fontSize:font.size.sm, color:colors.textSecondary }}>{dayLabel}</span>
+                </div>
+                <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>{dayDone}/{dayItems.length}</span>
+              </div>
+              <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
+                {dayItems.map(item => <CheckRow key={`${item.id}_${dayIdx}`} item={item} day={dayIdx}/>)}
+              </div>
+            </div>
+          )
+        })}
+        {(() => {
+          const items = checkedItems.filter(i => !(state.schedules[i.id]?.length)).filter(i => filterRow(i.id))
+          if (!items.length) return null
+          const doneCount = items.filter(i => !!achieved[i.id]).length
+          return (
+            <div>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`0 ${spacing[3]}px ${spacing[2]}px` }}>
+                <span style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:colors.textTertiary }}>날짜 미지정</span>
+                <span style={{ fontSize:font.size.sm, color:colors.textSecondary, fontWeight:font.weight.medium }}>{doneCount}/{items.length}</span>
+              </div>
+              <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
+                {items.map(item => <CheckRow key={item.id} item={item}/>)}
+              </div>
+            </div>
+          )
+        })()}
+        {sortedDays.length===0 && checkedItems.filter(i => !(state.schedules[i.id]?.length)).length===0 && (
+          <div style={{ textAlign:'center', padding:'60px 20px', color:colors.textTertiary, fontSize:font.size.md }}>아직 담긴 항목이 없어요</div>
+        )}
+      </div>
+
+      {/* ══ 하단 버튼 — 탭바 위 (paddingBottom 68px 확보) ══ */}
+      <div style={{
+        position:'fixed', bottom:68,
+        left:'50%', transform:'translateX(-50%)',
+        width:'100%', maxWidth:430,
+        padding:`${spacing[2]}px ${spacing[3]}px`,
+        background:colors.bgPage,
+        zIndex:20, boxSizing:'border-box',
+        display:'flex', gap:spacing[2],
+        borderTop:`1px solid ${colors.border}`,
+      }}>
+        <button onClick={onEdit} style={{
+          flex:1, height:44, borderRadius:radius.sm,
+          border:`1px solid ${colors.border}`, background:colors.bgCard,
+          color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold,
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+          WebkitTapHighlightColor:'transparent', fontFamily:font.family,
+        }}>
+          <Icon icon="ph:pencil-simple" width={16} height={16} color={colors.textSecondary} />
+          리스트 수정하기
+        </button>
+        <button onClick={onLanding} style={{
+          flex:1, height:44, borderRadius:radius.sm,
+          border:'none', background:colors.primary,
+          color:'#fff', fontSize:font.size.md, fontWeight:font.weight.bold,
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+          WebkitTapHighlightColor:'transparent', fontFamily:font.family,
+        }}>
+          <Icon icon="ph:check-circle" width={16} height={16} color="#fff" />
+          저장하고 나가기
+        </button>
+        <button onClick={() => setShowMoreMenu(true)} style={{
+          width:44, height:44, borderRadius:radius.sm, flexShrink:0,
+          border:`1px solid ${colors.border}`, background:colors.bgCard,
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+          WebkitTapHighlightColor:'transparent',
+        }}>
+          <Icon icon="ph:dots-three-vertical" width={18} height={18} color={colors.textSecondary} />
+        </button>
+      </div>
+
+      {/* ══ 더보기 모달 ══ */}
+      {showMoreMenu && (
+        <div style={{
+          position:'fixed', inset:0, zIndex:100,
+          background:'rgba(0,0,0,0.5)', backdropFilter:'blur(2px)',
+          display:'flex', alignItems:'flex-end', justifyContent:'center',
+        }} onClick={() => setShowMoreMenu(false)}>
+          <div style={{
+            width:'100%', maxWidth:430,
+            background:colors.bgCard, borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
+            padding:`${spacing[4]}px ${spacing[3]}px ${spacing[8]}px`,
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
+            <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textTertiary, marginBottom:spacing[3], letterSpacing:0.5 }}>더보기</div>
+            <button onClick={() => { setShowMoreMenu(false); onShare() }} style={{
+              width:'100%', height:52, borderRadius:radius.md,
+              border:`1px solid ${colors.border}`, background:colors.bgCard,
+              color:colors.primary, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[2],
+              padding:`0 ${spacing[4]}px`, marginBottom:spacing[2], fontFamily:font.family,
+            }}>
+              <Icon icon="ph:share-network" width={18} height={18} color={colors.primary} />공유하기
+            </button>
+            <button onClick={() => { setShowMoreMenu(false); setShowDelete(true) }} style={{
+              width:'100%', height:52, borderRadius:radius.md,
+              border:`1px solid ${colors.dangerLight}`, background:colors.dangerLight,
+              color:colors.danger, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[2],
+              padding:`0 ${spacing[4]}px`, fontFamily:font.family,
+            }}>
+              <Icon icon="ph:trash" width={18} height={18} color={colors.danger} />리스트 삭제하기
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── 아이템 삭제 확인 팝업 */}
+      {deleteItemId && (() => {
+        const item = allItems.find(i => i.id === deleteItemId.id)
+        return (
+          <>
+            <div onClick={() => setDeleteItemId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:700 }} />
+            <div style={{
+              position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+              background:colors.bgCard, borderRadius:radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,
+              zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+              boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
+            }}>
+              <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[2] }}>항목을 삭제할까요?</div>
+              {item && (
+                <div style={{ fontSize:font.size.sm, color:colors.textSecondary, marginBottom:spacing[5], lineHeight:1.5 }}>
+                  <span style={{ fontWeight:font.weight.bold, color:colors.primary }}>{item.label}</span>을<br/>버킷리스트에서 삭제합니다.
+                </div>
+              )}
+              <div style={{ display:'flex', gap:spacing[2] }}>
+                <button onClick={() => setDeleteItemId(null)} style={{
+                  flex:1, height:48, borderRadius:radius.sm, border:`1px solid ${colors.border}`,
+                  background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.medium, cursor:'pointer', fontFamily:font.family,
+                }}>취소</button>
+                <button onClick={() => { deleteItem(deleteItemId.id, deleteItemId.day); setDeleteItemId(null) }} style={{
+                  flex:2, height:48, borderRadius:radius.sm, border:'none',
+                  background:colors.dangerLight, color:colors.danger, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family,
+                }}>삭제하기</button>
+              </div>
+            </div>
+          </>
+        )
+      })()}
+
+      {showDelete && (
+        <DeleteModal onConfirm={() => { setShowDelete(false); onDelete() }} onCancel={() => setShowDelete(false)} />
+      )}
+      {showAllDone && (
+        <AllDoneModal total={total} onReset={() => { setShowAllDone(false); onDelete() }} onClose={() => setShowAllDone(false)} />
+      )}
+
+      {/* ── 쇼핑 상품 팝업 */}
+      {selProduct && (
+        <>
+          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600 }} />
+          <div style={{
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
+            borderRadius:radius.xl, zIndex:601,
+            animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+          }}>
+            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
+            <div style={{ width:'100%', height:200, overflow:'hidden', background:colors.primaryLight, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              {selProduct.image_url
+                ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                : <Icon icon="ph:shopping-bag" width={56} height={56} color={colors.primary} />
+              }
+            </div>
+            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[8]}px` }}>
+              <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap', marginBottom:spacing[3], alignItems:'center' }}>
+                {(selProduct.tags ?? []).map((tag: string) => (
+                  <span key={tag} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:TAG_COLOR[tag]?.bg??colors.primaryLight, color:TAG_COLOR[tag]?.color??colors.primary }}>{tag}</span>
+                ))}
+                {selProduct.price_range && (
+                  <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:colors.primaryLight, color:PRICE_COLOR[selProduct.price_range]??colors.primary, border:`1px solid ${colors.border}`, marginLeft:'auto' }}>{selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}</span>
+                )}
+              </div>
+              <div style={{ ...T.h2, marginBottom:spacing[1] }}>{selProduct.name}</div>
+              {selProduct.brand && <div style={{ ...T.sm, marginBottom:spacing[3] }}>{selProduct.brand}</div>}
+              {selProduct.description && <div style={{ fontSize:font.size.sm, color:colors.textSecondary, lineHeight:1.7, marginBottom:spacing[4] }}>{selProduct.description}</div>}
+              {(selProduct.where_to_buy ?? []).length > 0 && (
+                <div style={{ marginBottom:spacing[4] }}>
+                  <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>어디서 살 수 있어요?</div>
+                  <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap' }}>
+                    {selProduct.where_to_buy.map((store: string) => (
+                      <span key={store} style={{ fontSize:font.size.sm, padding:`4px ${spacing[2]}px`, borderRadius:radius.sm, background:colors.primaryLight, color:colors.primary, border:`1px solid ${colors.border}` }}>🏪 {store}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button onClick={() => setSelProduct(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${colors.border}`, background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family }}>닫기</button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── 버킷리스트 상세 팝업 */}
+      {detailItem && (
+        <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', fontFamily:font.family }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
+            borderRadius:radius.xl, maxHeight:'85vh', overflowY:'auto',
+            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+          }}>
+            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
+            {detailItem.image_url && (
+              <div style={{ width:'100%', height:220, overflow:'hidden', marginTop:spacing[2] }}>
+                <img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+              </div>
+            )}
+            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[8]}px` }}>
+              <div style={{ ...T.h2, lineHeight:1.4, marginBottom:spacing[3] }}>{detailItem.label}</div>
+              {detailItem.description && <div style={{ fontSize:font.size.md, color:'#475569', lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
+              {detailItem.tips && (
+                <div style={{ background:colors.primaryLight, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:spacing[3], marginBottom:spacing[4] }}>
+                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary, marginBottom:spacing[1] }}>💡 현지인 팁</div>
+                  <div style={{ fontSize:font.size.sm, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
+                </div>
+              )}
+              {detailItem.address && (
+                <button onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')} style={{ display:'flex', alignItems:'center', gap:spacing[2], width:'100%', background:colors.primaryLight, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:spacing[3], marginBottom:spacing[4], cursor:'pointer', textAlign:'left' }}>
+                  <Icon icon="ph:map-pin" width={16} height={16} color={colors.primary} />
+                  <div>
+                    <div style={{ fontSize:font.size.xs, color:colors.textTertiary }}>여기서 할 수 있어요</div>
+                    <div style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold, textDecoration:'underline' }}>{detailItem.address}</div>
+                  </div>
+                  <Icon icon="ph:arrow-square-out" width={13} height={13} color={colors.textTertiary} style={{ marginLeft:'auto' }} />
+                </button>
+              )}
+              {detailBizCards.length > 0 && (
+                <div style={{ marginBottom:spacing[4] }}>
+                  <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>🏢 관련 업체</div>
+                  <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
+                    {detailBizCards.map(biz => <BusinessCard key={biz.id} business={biz} />)}
+                  </div>
+                </div>
+              )}
+              <button onClick={() => setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${colors.border}`, background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family }}>닫기</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 관련업체 팝업 */}
+      {detailBizId && (
+        <div style={{ position:'fixed', inset:0, zIndex:800 }}>
+          <div onClick={() => { setDetailBizId(null); setDetailBiz(null) }} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
+          <div style={{
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398, zIndex:801,
+            maxHeight:'85vh', overflowY:'auto', borderRadius:radius.xl,
+            background:colors.bgCard, padding:`${spacing[3]}px ${spacing[3]}px ${spacing[6]}px`,
+            boxSizing:'border-box', animation:'slideUpSheet 0.3s cubic-bezier(0.32,0.72,0,1)',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+          }}>
+            <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:spacing[2] }}>
+              <button onClick={() => { setDetailBizId(null); setDetailBiz(null) }}
+                style={{ background:'none', border:'none', fontSize:18, cursor:'pointer', color:colors.textTertiary }}>✕</button>
+            </div>
+            {detailBiz
+              ? <BusinessCard business={detailBiz} />
+              : <div style={{ textAlign:'center', padding:spacing[6], color:colors.textTertiary, fontSize:font.size.md }}>불러오는 중...</div>
+            }
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
         {sortedDays.map(dayIdx => {
           const dayItems = (byDay.get(dayIdx) ?? []).filter(item => filterRow(item.id, dayIdx))
           if (!dayItems.length) return null
