@@ -334,103 +334,79 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
     const regionKey = db?.address ? Object.keys(stateMap).find(k => db.address!.toUpperCase().includes(k)) : null
     const region = regionKey ? stateMap[regionKey] : null
     const hasDetail = !!(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0 || db?.tips)
+
+    const openDetail = async (e: React.MouseEvent) => {
+      e.stopPropagation()
+      if (!db) return
+      if ((db.related_product_ids?.length ?? 0) > 0) {
+        const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
+        if (data) setSelProduct(data)
+        return
+      }
+      setDetailItem(db)
+      if ((db.related_business_ids?.length ?? 0) > 0) {
+        const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
+        setDetailBizCards(data ?? [])
+      } else setDetailBizCards([])
+    }
+
     return (
-      <div style={{
-        display:'flex', alignItems:'stretch',
-        margin:`0 ${spacing[3]}px`, borderRadius:radius.md,
-        background: colors.bgCard,
-        border: isAchieved ? `1px solid ${colors.success}` : `1px solid ${colors.gray300}`,
-        borderLeft: isAchieved ? `3px solid ${colors.success}` : `3px solid ${colors.gray200}`,
-        transition:'all 0.2s', overflow:'hidden',
-      }}>
-        {/* 왼쪽 이미지 */}
-        <div onClick={async e => {
-          e.stopPropagation()
-          if (!db) return
-          if ((db.related_product_ids?.length ?? 0) > 0) {
-            const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
-            if (data) setSelProduct(data)
-            return
-          }
-          setDetailItem(db)
-          if ((db.related_business_ids?.length ?? 0) > 0) {
-            const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
-            setDetailBizCards(data ?? [])
-          } else setDetailBizCards([])
-        }} style={{
-          width:72, flexShrink:0, cursor: db ? 'pointer' : 'default',
-          background:colors.gray100, overflow:'hidden',
-          display:'flex', alignItems:'center', justifyContent:'center',
-        }}>
+      <div
+        onClick={openDetail}
+        style={{
+          display:'flex', alignItems:'center', gap:spacing[3],
+          padding:`${spacing[3]}px ${spacing[3]}px`,
+          margin:`0 ${spacing[3]}px`,
+          background: colors.bgCard,
+          borderRadius: radius.md,
+          border: isAchieved ? `1px solid ${colors.success}` : `1px solid ${colors.gray300}`,
+          cursor: db ? 'pointer' : 'default',
+          transition:'all 0.15s',
+        }}
+      >
+        {/* 동그란 이미지 — 체크리스트와 동일 */}
+        <div style={{ width:44, height:44, borderRadius:'50%', flexShrink:0, background:colors.gray100, border:`1px solid ${colors.border}`, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
           {db?.image_url
-            ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
-            : <Icon icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'} width={24} height={24} color={colors.gray400} />
+            ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+            : <Icon icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'} width={22} height={22} color={colors.gray400} />
           }
         </div>
 
-        {/* 가운데 텍스트 */}
-        <div style={{ flex:1, display:'flex', flexDirection:'column', gap:3, minWidth:0, justifyContent:'center', padding:`${spacing[2]}px ${spacing[2]}px ${spacing[2]}px ${spacing[3]}px` }}>
-          <span style={{
-            fontSize:font.size.md, fontWeight: isAchieved ? font.weight.bold : font.weight.medium,
-            color: isAchieved ? colors.success : colors.textPrimary,
-            lineHeight:1.4,
-            display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden',
-          }}>{item.label}</span>
-          {db?.description && (
-            <span style={{
-              fontSize:font.size.xs, color:colors.textTertiary, lineHeight:1.5,
-              overflow:'hidden', textOverflow:'ellipsis',
-              display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical',
-            }}>{db.description}</span>
-          )}
-          {hasDetail && (
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:2 }}>
-              <button
-                onClick={async e => {
-                  e.stopPropagation()
-                  if (!db) return
-                  if ((db.related_product_ids?.length ?? 0) > 0) {
-                    const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
-                    if (data) setSelProduct(data)
-                    return
-                  }
-                  setDetailItem(db)
-                  if ((db.related_business_ids?.length ?? 0) > 0) {
-                    const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
-                    setDetailBizCards(data ?? [])
-                  } else setDetailBizCards([])
-                }}
-                style={{ fontSize:font.size.xs, fontWeight:font.weight.medium, color:colors.primary, background:'none', border:'none', cursor:'pointer', padding:0 }}>
-                자세히 알아보기 ›
-              </button>
-              {region ? (
-                <span style={{ fontSize:font.size.xs, fontWeight:font.weight.medium, color:colors.textSecondary, display:'flex', alignItems:'center', gap:2 }}>
-                  <Icon icon="ph:map-pin-fill" width={10} height={10} color="#EF4444" />{region.label}
-                </span>
-              ) : <span />}
-            </div>
-          )}
+        {/* 텍스트 */}
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color: isAchieved ? colors.success : colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+            {item.label}
+          </div>
+          <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'wrap' }}>
+            {db?.description && (
+              <span style={{ fontSize:font.size.xs, color:colors.textTertiary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', maxWidth:160 }}>{db.description}</span>
+            )}
+            {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium, marginLeft:'auto' }}>📍 {region.label}</span>}
+          </div>
         </div>
 
-        {/* 오른쪽 완료 + 삭제 */}
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, padding:`${spacing[2]}px ${spacing[2]}px ${spacing[2]}px 0` }}>
-          <div onClick={() => toggleAchieved(item.id, day)} style={{
-            display:'flex', alignItems:'center', gap:3,
-            padding:'4px 8px', borderRadius:radius.sm, cursor:'pointer',
-            background: isAchieved ? colors.success : colors.bgCard,
-            border: `1px solid ${colors.success}`,
-            transition:'all 0.2s', whiteSpace:'nowrap',
-          }}>
+        {/* 완료 배지 + 휴지통 */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:spacing[1], flexShrink:0 }}>
+          <div
+            onClick={e => { e.stopPropagation(); toggleAchieved(item.id, day) }}
+            style={{
+              display:'flex', alignItems:'center', gap:3,
+              padding:'4px 8px', borderRadius:radius.sm, cursor:'pointer',
+              background: isAchieved ? colors.success : colors.bgCard,
+              border: `1px solid ${colors.success}`,
+              transition:'all 0.15s', whiteSpace:'nowrap',
+            }}
+          >
             <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color: isAchieved ? '#fff' : colors.success }}>완료</span>
             <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
               <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : colors.success} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <button onClick={() => setDeleteItemId({ id: item.id, day })} style={{
-            background:'none', border:'none', cursor:'pointer', padding:2,
-            display:'flex', alignItems:'center',
-          }}>
-            <Icon icon="ph:trash" width={16} height={16} color={colors.gray400} />
+          <button
+            onClick={e => { e.stopPropagation(); setDeleteItemId({ id: item.id, day }) }}
+            style={{ background:'none', border:'none', cursor:'pointer', padding:2, display:'flex', alignItems:'center' }}
+          >
+            <Icon icon="ph:trash" width={15} height={15} color={colors.gray400} />
           </button>
         </div>
       </div>
