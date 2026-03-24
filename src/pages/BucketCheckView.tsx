@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { CheckItem, ITEM_ICONS } from '../data/checklist'
 import { supabase } from '../lib/supabase'
-import { colors, font, radius, spacing, T } from '../styles/tokens'
+import { colors, font, radius, spacing, shadow, T } from '../styles/tokens'
 
 type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null; image_url?: string | null; tips?: string | null; related_product_ids?: string[] | null }
 import { AppState, TripInfo, getTripDays, fmtMD, dow } from '../store/state'
