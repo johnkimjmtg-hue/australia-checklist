@@ -99,7 +99,9 @@ export default function BusinessCard({ business }: Props) {
           {/* 업체명 + 펼쳐보기 아이콘 + 북마크 */}
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
             <div style={{ flex:1, paddingRight:8 }}>
-              <div style={{ fontSize:17, fontWeight:800, color:'#0F172A' }}>{name}</div>
+              <div style={{ fontSize:17, fontWeight:800, color:'#0F172A',
+                whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
+              }}>{name}</div>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:2, flexShrink:0 }}>
               <button
@@ -154,8 +156,8 @@ export default function BusinessCard({ business }: Props) {
             }}>{description}</div>
           )}
 
-          {/* 해시태그 — 접힌 상태: 3개, 펼친 상태: 전체 */}
-          {(tags && tags.length > 0 || business.is_korean) && (
+          {/* 해시태그 — 펼친 상태에서만 표시 */}
+          {expanded && (tags && tags.length > 0 || business.is_korean) && (
             <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, marginTop:12 }}>
               {business.is_korean && (
                 <span style={{ display:'inline-flex', alignItems:'center', gap:3, background:'#FFF7ED', border:'1px solid #FED7AA', borderRadius:6, padding:'4px 10px' }}>
@@ -163,12 +165,9 @@ export default function BusinessCard({ business }: Props) {
                   <span style={{ fontSize:11, fontWeight:700, color:'#EA580C' }}>한인업체</span>
                 </span>
               )}
-              {tags && (expanded ? tags : tags.slice(0, 3)).map(tag => (
+              {tags && tags.map(tag => (
                 <span key={tag} style={{ background:'#EFF6FF', color:'#1B6EF3', fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:'1px solid #BFDBFE' }}>{tag}</span>
               ))}
-              {tags && !expanded && tags.length > 3 && (
-                <span style={{ fontSize:11, color:'#94A3B8', fontWeight:600, padding:'4px 2px' }}>+{tags.length - 3}</span>
-              )}
             </div>
           )}
 
