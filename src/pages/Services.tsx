@@ -8,7 +8,7 @@ import CategoryFilter from '../components/CategoryFilter'
 import { colors, font, radius, spacing } from '../styles/tokens'
 
 type Props = { onSelectBusiness: (id: string) => void; onBack: () => void }
-type ServiceTab = 'all' | 'bookmarks' | 'emergency'
+type ServiceTab = 'all' | 'korean' | 'bookmarks' | 'emergency'
 
 const ff = font.family
 const PAGE_SIZE = 30
@@ -50,7 +50,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const searchTimerRef = useRef<any>(null)
 
   // 초기 로드 + 카테고리/검색 변경 시 재로드
-  const loadData = useCallback(async (cat: string, q: string, reset = true) => {
+  const loadData = useCallback(async (cat: string, q: string, reset = true, korean = false) => {
     if (reset) {
       setLoading(true)
       setPage(0)
@@ -68,6 +68,9 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       data = await getBusinesses(cat === 'all' ? undefined : cat, currentPage, PAGE_SIZE)
     }
 
+    // 한인업체 필터
+    if (korean) data = data.filter(b => b.is_korean)
+
     // 추천업체 가나다순 → 일반업체 가나다순 정렬
     const sortMixed = (list: Business[]) => {
       const featured = sortByName(list.filter(b => b.is_featured))
@@ -78,7 +81,6 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     if (reset) {
       setBusinesses(sortMixed(data))
       setLoading(false)
-      // 총 개수 가져오기 (카테고리 탭 표시용)
       if (!q.trim()) {
         getBusinessesCount(cat === 'all' ? undefined : cat).then(c => setTotalCount(c))
       } else {
@@ -129,14 +131,14 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     setSortedCategories([allCat, ...sorted])
   }, [catCounts])
 
-  // 검색어/카테고리 변경 시 재로드
+  // 검색어/카테고리/탭 변경 시 재로드
   useEffect(() => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
     searchTimerRef.current = setTimeout(() => {
       setShowAll(false)
-      loadData(category, search, true)
+      loadData(category, search, true, serviceTab === 'korean')
     }, search.trim() ? 400 : 0)
-  }, [category, search])
+  }, [category, search, serviceTab])
 
   // 무한 스크롤 — IntersectionObserver
   useEffect(() => {
@@ -148,10 +150,12 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           setLoadingMore(true)
           const q = search.trim()
           const cat = category
+          const korean = serviceTab === 'korean'
           Promise.resolve().then(async () => {
             let data: Business[]
             if (q) data = await searchBusinesses(q, nextPage, PAGE_SIZE)
             else data = await getBusinesses(cat === 'all' ? undefined : cat, nextPage, PAGE_SIZE)
+            if (korean) data = data.filter(b => b.is_korean)
             setBusinesses(prev => {
                 const newData = [...prev, ...data]
                 const featured = sortByName(newData.filter(b => b.is_featured))
@@ -196,6 +200,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
 
   const isSearch    = !!search.trim()
   const isCatFilter = category !== 'all'
+  const isKorean    = serviceTab === 'korean'
   const isFiltered  = isSearch || isCatFilter
 
   return (
@@ -216,23 +221,23 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         borderBottom:`1px solid ${colors.border}`,
         padding:`${spacing[3]}px ${spacing[4]}px ${spacing[3]}px`,
       }}>
-        {/* 전체/북마크/비상연락처 탭 */}
+        {/* 전체/한인업체/북마크/비상연락처 탭 */}
         <div style={{ display:'flex', gap:spacing[2], marginBottom:spacing[3] }}>
-          {(['all', 'bookmarks', 'emergency'] as ServiceTab[]).map(tab => {
+          {(['all', 'korean', 'bookmarks', 'emergency'] as ServiceTab[]).map(tab => {
             const isActive = serviceTab === tab
-            const iconName = tab === 'all' ? 'ph:list-bullets' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:bell-fill'
-            const label = tab === 'all' ? '전체 업종' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
+            const iconName = tab === 'all' ? 'ph:list-bullets' : tab === 'korean' ? 'ph:flag' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:bell-fill'
+            const label = tab === 'all' ? '전체 업종' : tab === 'korean' ? '한인업체' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
             const activeColor = tab === 'emergency' ? colors.danger : colors.primary
-            const iconColor = isActive ? (tab === 'emergency' ? colors.danger : colors.primary) : tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? colors.danger : colors.textTertiary
+            const iconColor = isActive ? (tab === 'emergency' ? colors.danger : colors.primary) : tab === 'korean' ? '#EA580C' : tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? colors.danger : colors.textTertiary
             return (
-              <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }}
+              <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false); setCategory('all') }}
                 className="svc-btn"
                 style={{
                   height:34, padding:`0 ${spacing[3]}px`, borderRadius:radius.full,
                   cursor:'pointer', fontSize:font.size.sm, fontWeight:font.weight.bold,
-                  background: isActive ? (tab === 'emergency' ? colors.dangerLight : colors.primaryLight) : colors.bgCard,
-                  color: isActive ? activeColor : colors.textSecondary,
-                  border: isActive ? `1.5px solid ${activeColor}` : `1px solid ${colors.border}`,
+                  background: isActive ? (tab === 'emergency' ? colors.dangerLight : tab === 'korean' ? '#FFF7ED' : colors.primaryLight) : colors.bgCard,
+                  color: isActive ? (tab === 'korean' ? '#EA580C' : activeColor) : colors.textSecondary,
+                  border: isActive ? `1.5px solid ${tab === 'korean' ? '#FED7AA' : activeColor}` : `1px solid ${colors.border}`,
                   display:'flex', alignItems:'center', gap:5,
                   whiteSpace:'nowrap', fontFamily:ff,
                 }}>
@@ -282,7 +287,8 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                   background: isActive ? colors.primary : colors.bgCard,
                   color: isActive ? '#fff' : colors.gray600,
                   fontSize:font.size.sm, fontWeight:font.weight.bold,
-                  cursor:'pointer', flexShrink:0, minWidth:72,
+                  cursor:'pointer', flexShrink:0,
+                  padding:`0 ${spacing[3]}px`,
                   border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                   display:'flex', alignItems:'center', justifyContent:'center',
                   whiteSpace:'nowrap', fontFamily:ff,
@@ -310,7 +316,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           ) : (
             <>
               <SectionLabel icon="ph:bookmark-simple-fill" label={`내 북마크 (${bookmarked.length})`} color="#1B6EF3" />
-              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
                 {sortByName(bookmarked).map(b => <BusinessCard key={b.id} business={b} />)}
               </div>
             </>
@@ -321,8 +327,8 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         {/* 비상연락처 탭 */}
         {serviceTab === 'emergency' && <EmergencyTab />}
 
-        {/* 검색/카테고리 결과 + 무한스크롤 */}
-        {serviceTab === 'all' && isFiltered && (
+        {/* 한인업체 + 전체업종 탭 — 검색/카테고리 결과 */}
+        {(serviceTab === 'all' || serviceTab === 'korean') && isFiltered && (
           <>
             <SectionLabel
               icon={isSearch ? 'ph:magnifying-glass' : 'ph:list-bullets'}
@@ -332,7 +338,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               color="#64748B"
             />
             {loading ? <LoadingState /> : businesses.length === 0 ? <EmptyState /> : (
-              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
                 {businesses.map(b => <BusinessCard key={b.id} business={b} />)}
               </div>
             )}
@@ -343,18 +349,18 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           </>
         )}
 
-        {serviceTab === 'all' && !isFiltered && (
+        {(serviceTab === 'all' || serviceTab === 'korean') && !isFiltered && (
           <>
             {/* 처음 10개 */}
             {!showAll && (
               <>
                 <SectionLabel icon="ph:shuffle" label="이런 업체 어때요?" color="#64748B" />
                 {loading ? <LoadingState /> : (
-                  <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                  <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
                     {initialTen.map(b => <BusinessCard key={b.id} business={b} />)}
                   </div>
                 )}
-                <button onClick={() => { setShowAll(true); loadData(category, search, true) }} style={{
+                <button onClick={() => { setShowAll(true); loadData(category, search, true, serviceTab === 'korean') }} style={{
                   width:'100%', marginTop:spacing[3], height:48,
                   background:colors.bgCard, border:`1px solid ${colors.border}`, borderRadius:radius.md,
                   cursor:'pointer', display:'flex', alignItems:'center',
@@ -374,7 +380,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               <>
                 <SectionLabel icon="ph:list-bullets" label={`전체 업체 (${totalCount})`} color="#64748B" />
                 {loading ? <LoadingState /> : businesses.length === 0 ? <EmptyState /> : (
-                  <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                  <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
                     {businesses.map(b => <BusinessCard key={b.id} business={b} />)}
                   </div>
                 )}
