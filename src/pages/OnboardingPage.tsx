@@ -114,9 +114,9 @@ export default function OnboardingPage({ onComplete }: Props) {
           {/* 로고 */}
           <div style={{ textAlign: 'center', marginBottom: spacing[8], animation: 'fadeUp 0.4s ease' }}>
             <img
-              src="/src/assets/logo.svg"
+              src="/src/assets/logo.png"
               alt="호주가자"
-              style={{ width: 120, height: 120, objectFit: 'contain', marginBottom: spacing[2] }}
+              style={{ width: 100, height: 100, objectFit: 'contain', marginBottom: spacing[2] }}
             />
             <div style={{ ...T.xs, marginTop: spacing[1] }}>호주 생활 정보 앱</div>
           </div>
