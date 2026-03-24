@@ -271,17 +271,21 @@ export default function OnboardingPage({ onComplete }: Props) {
         </div>
       </div>
 
-      {/* 약관 페이지 — 전체 교체 */}
+      {/* 약관 페이지 — app-shell 기준 430 */}
       {termsTab && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 100,
           overflowY: 'auto',
           background: colors.bgPage,
+          display: 'flex',
+          justifyContent: 'center',
         }}>
-          <TermsPage
-            initialTab={termsTab}
-            onBack={() => setTermsTab(null)}
-          />
+          <div style={{ width: '100%', maxWidth: 430 }}>
+            <TermsPage
+              initialTab={termsTab}
+              onBack={() => setTermsTab(null)}
+            />
+          </div>
         </div>
       )}
     </>

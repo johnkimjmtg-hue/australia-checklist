@@ -23,10 +23,10 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
       display: 'flex',
       justifyContent: 'center',
     }}>
-      {/* 모바일 기준 래퍼 maxWidth 480 — OnboardingPage와 동일 */}
+      {/* app-shell 기준 maxWidth 430 */}
       <div style={{
         width: '100%',
-        maxWidth: 480,
+        maxWidth: 430,
         minHeight: '100dvh',
         display: 'flex',
         flexDirection: 'column',
