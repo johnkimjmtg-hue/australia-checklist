@@ -40,7 +40,6 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const [hasMore, setHasMore]         = useState(true)
   const [page, setPage]               = useState(0)
   const [totalCount, setTotalCount]   = useState(0)
-  const [showAll, setShowAll]         = useState(false)
   const [featuredRandom, setFeaturedRandom] = useState<Business[]>([])  // 기본 추천 랜덤
   const [bookmarked, setBookmarked]   = useState<Business[]>([])
   const [bookmarkCount, setBookmarkCount] = useState(() => getBookmarks().length)
@@ -133,18 +132,18 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     if (!category && !search.trim()) {
       // 미선택 상태 — 추천 랜덤만 표시, 로드 불필요
       setBusinesses([])
-      setShowAll(false)
+      
       return
     }
     searchTimerRef.current = setTimeout(() => {
-      setShowAll(false)
+      
       loadData(category, search, true, korean)
     }, search.trim() ? 400 : 0)
   }, [category, search, serviceTab])
 
   // 무한 스크롤 — IntersectionObserver
   useEffect(() => {
-    if (!loaderRef.current || !showAll) return
+    if (!loaderRef.current) return
     const observer = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMore && !loadingMore && !loading) {
         setPage(p => {
@@ -159,11 +158,11 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             else data = await getBusinesses(cat ? cat : undefined, nextPage, PAGE_SIZE)
             if (korean) data = data.filter(b => b.is_korean)
             setBusinesses(prev => {
-                const newData = [...prev, ...data]
-                const featured = sortByName(newData.filter(b => b.is_featured))
-                const normal   = sortByName(newData.filter(b => !b.is_featured))
-                return [...featured, ...normal]
-              })
+              const newData = [...prev, ...data]
+              const featured = sortByName(newData.filter(b => b.is_featured))
+              const normal   = sortByName(newData.filter(b => !b.is_featured))
+              return [...featured, ...normal]
+            })
             setLoadingMore(false)
             setHasMore(data.length === PAGE_SIZE)
           })
@@ -173,7 +172,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     }, { threshold: 0.1 })
     observer.observe(loaderRef.current)
     return () => observer.disconnect()
-  }, [showAll, hasMore, loadingMore, loading, search, category])
+  }, [hasMore, loadingMore, loading, search, category, serviceTab])
 
   // 북마크
   useEffect(() => {
@@ -231,7 +230,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             const activeColor = tab === 'emergency' ? colors.danger : colors.primary
             const iconColor = isActive ? (tab === 'emergency' ? colors.danger : colors.primary) : tab === 'korean' ? '#EA580C' : tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? colors.danger : colors.textTertiary
             return (
-              <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false); setCategory(''); setSearch('') }}
+              <button key={tab} onClick={() => { setServiceTab(tab); setCategory(''); setSearch('') }}
                 className="svc-btn"
                 style={{
                   height:34, padding:`0 ${spacing[3]}px`, borderRadius:radius.full,
@@ -260,7 +259,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           <Icon icon="ph:magnifying-glass" width={16} height={16} color={colors.textTertiary} />
           <input
             value={search}
-            onChange={e => { setSearch(e.target.value); setShowAll(false) }}
+            onChange={e => { setSearch(e.target.value) }}
             placeholder="업체명, 키워드 검색..."
             style={{
               flex:1, border:'none', outline:'none',
@@ -268,7 +267,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             }}
           />
           {search && (
-            <button onClick={() => { setSearch(''); setShowAll(false) }}
+            <button onClick={() => { setSearch('') }}
               style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex' }}>
               <Icon icon="ph:x-circle" width={16} height={16} color={colors.textTertiary} />
             </button>
@@ -282,7 +281,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             if (count === 0) return null
             return (
               <button key={cat.id} className="chip-btn svc-btn"
-                onClick={() => { setCategory(isActive ? '' : cat.id); setShowAll(false) }}
+                onClick={() => { setCategory(isActive ? '' : cat.id) }}
                 style={{
                   height:34, borderRadius:radius.sm,
                   background: isActive ? colors.primary : colors.bgCard,
