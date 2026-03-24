@@ -288,7 +288,7 @@ export default function NearbyMap({ onBack }: Props) {
               <button key={cat.id} onClick={() => setCategory(cat.id)}
                 className="map-btn"
                 style={{
-                  height:32, borderRadius:radius.sm,
+                  height:32, borderRadius:radius.full,
                   background: isActive ? colors.primary : colors.bgCard,
                   color: isActive ? '#fff' : colors.gray600,
                   border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
@@ -316,7 +316,7 @@ export default function NearbyMap({ onBack }: Props) {
                 onClick={() => { if (!disabled) setRadius(opt.value) }}
                 className="map-btn"
                 style={{
-                  flex:1, height:28, borderRadius:radius.sm,
+                  flex:1, height:28, borderRadius:radius.full,
                   background: isActive ? colors.primaryLight : colors.bgCard,
                   color: disabled ? colors.gray300 : isActive ? colors.primary : colors.textSecondary,
                   border: isActive ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
@@ -348,7 +348,7 @@ export default function NearbyMap({ onBack }: Props) {
         {locError && (
           <div style={{
             position:'absolute', top:12, left:12, right:80,
-            background:colors.dangerLight, borderRadius:radius.sm, padding:`${spacing[2]}px ${spacing[3]}px`,
+            background:colors.dangerLight, borderRadius:radius.md, padding:`${spacing[2]}px ${spacing[3]}px`,
             fontSize:font.size.sm, color:colors.danger, fontWeight:font.weight.bold,
             border:`1px solid ${colors.danger}`,
           }}>⚠️ {locError}</div>
