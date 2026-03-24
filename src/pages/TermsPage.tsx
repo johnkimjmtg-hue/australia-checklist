@@ -23,10 +23,9 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
       background: colors.bgPage,
       fontFamily: font.family,
       display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
+      justifyContent: 'center',
     }}>
-      {/* 모바일 기준 래퍼 */}
+      {/* 모바일 기준 래퍼 maxWidth 480 */}
       <div style={{
         width: '100%',
         maxWidth: 480,
