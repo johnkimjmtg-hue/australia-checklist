@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 import imgShopping from '../assets/landing/shopping.png'
@@ -63,6 +63,8 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
   const [sortBy, setSortBy]         = useState<SortOption>('default')
   const [search, setSearch]         = useState('')
   const [selProduct, setSelProduct] = useState<Product | null>(null)
+  const [displayCount, setDisplayCount] = useState(30)
+  const loaderRef = useRef<HTMLDivElement>(null)
 
   const addToMyList = (id: string) => {
     if (myList.includes(id)) return
@@ -103,6 +105,22 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
     if (sortBy === 'name')       list = [...list].sort((a, b) => a.name.localeCompare(b.name))
     return list
   }, [products, selCat, sortBy, search])
+
+  // 필터 변경 시 displayCount 리셋
+  useEffect(() => { setDisplayCount(30) }, [selCat, sortBy, search])
+
+  // 무한 스크롤
+  useEffect(() => {
+    if (!loaderRef.current) return
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        setDisplayCount(prev => prev + 30)
+      }
+    }, { threshold: 0.1 })
+    observer.observe(loaderRef.current)
+    return () => observer.disconnect()
+  }, [filtered])
+
 
   if (loading) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'60vh' }}>
@@ -325,7 +343,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
 
         {/* ── 상품 그리드 */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-          {filtered.map((p, i) => (
+          {filtered.slice(0, displayCount).map((p, i) => (
             <div key={p.id} style={{
               background:'#fff', borderRadius:14,
               border:'1px solid #C8C8C8',
@@ -388,6 +406,12 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
               </button>
             </div>
           ))}
+          {/* 무한스크롤 트리거 */}
+          {displayCount < filtered.length && (
+            <div ref={loaderRef} style={{ gridColumn:'1/-1', height:40, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <Icon icon="ph:spinner" width={20} height={20} color="#94A3B8" style={{ animation:'spin 1s linear infinite' }} />
+            </div>
+          )}
         </div>
 
         {filtered.length === 0 && (

@@ -35,20 +35,28 @@ export type Review = {
   created_at?: string
 }
 
-// 리뷰 (숨김 — 내부용)
 export async function getReviews(businessId: string): Promise<Review[]> {
   const { data, error } = await supabase.from('reviews').select('*').eq('business_id', businessId).order('created_at', { ascending: false })
   if (error) { console.error('getReviews error:', error); return [] }
   return data as Review[]
 }
 
-export async function getBusinesses(category?: string): Promise<Business[]> {
+export async function getBusinesses(category?: string, page = 0, pageSize = 30): Promise<Business[]> {
   let query = supabase.from('businesses').select('*').eq('is_active', true)
     .order('is_featured', { ascending: false }).order('rating', { ascending: false })
   if (category && category !== 'all') query = query.eq('category', category)
+  query = query.range(page * pageSize, (page + 1) * pageSize - 1)
   const { data, error } = await query
   if (error) { console.error('getBusinesses error:', error); return [] }
   return data as Business[]
+}
+
+export async function getBusinessesCount(category?: string): Promise<number> {
+  let query = supabase.from('businesses').select('*', { count: 'exact', head: true }).eq('is_active', true)
+  if (category && category !== 'all') query = query.eq('category', category)
+  const { count, error } = await query
+  if (error) { console.error('getBusinessesCount error:', error); return 0 }
+  return count ?? 0
 }
 
 export async function getFeaturedBusinesses(): Promise<Business[]> {
@@ -64,12 +72,20 @@ export async function getBusiness(id: string): Promise<Business | null> {
   return data as Business
 }
 
-export async function searchBusinesses(query: string): Promise<Business[]> {
+export async function searchBusinesses(query: string, page = 0, pageSize = 30): Promise<Business[]> {
   const { data, error } = await supabase.from('businesses').select('*').eq('is_active', true)
     .or(`name.ilike.%${query}%,description.ilike.%${query}%,city.ilike.%${query}%`)
     .order('is_featured', { ascending: false })
+    .range(page * pageSize, (page + 1) * pageSize - 1)
   if (error) { console.error('searchBusinesses error:', error); return [] }
   return data as Business[]
+}
+
+export async function searchBusinessesCount(query: string): Promise<number> {
+  const { count, error } = await supabase.from('businesses').select('*', { count: 'exact', head: true }).eq('is_active', true)
+    .or(`name.ilike.%${query}%,description.ilike.%${query}%,city.ilike.%${query}%`)
+  if (error) { console.error('searchBusinessesCount error:', error); return 0 }
+  return count ?? 0
 }
 
 export async function createBusiness(business: Omit<Business, 'rating' | 'reviews_count' | 'created_at' | 'updated_at'>): Promise<Business | null> {
@@ -95,5 +111,3 @@ export async function addReview(review: Omit<Review, 'id' | 'created_at'>): Prom
   if (error) { console.error('addReview error:', error); return null }
   return data as Review
 }
-
-
