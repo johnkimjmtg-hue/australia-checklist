@@ -100,7 +100,7 @@ export default function BusinessCard({ business }: Props) {
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
             <div style={{ flex:1, paddingRight:8 }}>
               <div style={{ fontSize:17, fontWeight:800, color:'#0F172A',
-                whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
+                ...(!expanded ? { display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical' as any, overflow:'hidden' } : {}),
               }}>{name}</div>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:2, flexShrink:0 }}>
