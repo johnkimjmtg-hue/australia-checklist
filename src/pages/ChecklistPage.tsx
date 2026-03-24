@@ -221,7 +221,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         </>
       ) : (
         // ── 버킷리스트 선택 화면 (paddingBottom으로 하단 고정 영역 확보)
-        <div style={{ paddingBottom: 130, background: '#F5F9FF', minHeight: '100dvh' }}>
+        <div style={{ paddingBottom: 130, background: colors.bgPage, minHeight: '100dvh' }}>
 
           {/* ── 헤더 (스크롤 시 올라감) ── */}
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
@@ -250,7 +250,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
           {/* ── 서브헤더 + 카테고리 (sticky 고정) ── */}
           {!showSearch && (
-            <div style={{ position:'sticky', top:0, zIndex:30, background:'#F5F9FF', borderBottom:`1px solid ${colors.border}` }}>
+            <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgPage, borderBottom:`1px solid ${colors.border}` }}>
               {/* 멘트 + 일정설정 + 일정보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
                 <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? colors.primary : colors.gray600 }}>
@@ -424,7 +424,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {/* ── 하단 고정 영역 ── */}
       <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, zIndex:40 }}>
         {mainTab==='bucketlist'&&!isIssued&&(
-          <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2], borderTop:`1.5px solid ${colors.border}`, background:'#F5F9FF' }}>
+          <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2], borderTop:`1.5px solid ${colors.border}`, background:colors.bgPage }}>
             <button onClick={handleIssue} style={{
               flex:4, height:44, background:colors.primary, color:'#fff',
               border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
@@ -448,8 +448,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             return (
               <button key={tab.id} className="nav-btn" onClick={()=>handleTabClick(tab.id)}
                 style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, height:50, background:'none', border:'none', cursor:'pointer', position:'relative', fontFamily:ff }}>
-                <Icon icon={tab.icon} width={20} height={20} color={isActive?colors.primary:colors.gray500} />
-                <span style={{ fontSize:10, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.gray500 }}>{tab.label}</span>
+                <Icon icon={tab.icon} width={20} height={20} color={isActive?colors.primary:colors.textTertiary} />
+                <span style={{ fontSize:10, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.textTertiary }}>{tab.label}</span>
                 {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:colors.primary, position:'absolute', bottom:2 }} />}
                 {showBadge&&<span style={{ position:'absolute', top:6, right:'calc(50% - 14px)', background:'#EF4444', color:'#fff', fontSize:8, fontWeight:font.weight.bold, borderRadius:radius.full, padding:'1px 4px', minWidth:14, textAlign:'center' }}>{todayPostCount}</span>}
               </button>
@@ -586,7 +586,7 @@ function CalendarModal({ state, trip, allItems, onClose }: { state:AppState; tri
   const DOW_LABELS = ['일','월','화','수','목','금','토']
 
   return (
-    <div style={{ background:'#F5F9FF', padding:`${spacing[3]}px ${spacing[3]}px ${spacing[4]}px`, fontFamily:font.family }}>
+    <div style={{ background:colors.bgPage, padding:`${spacing[3]}px ${spacing[3]}px ${spacing[4]}px`, fontFamily:font.family }}>
       {/* 헤더 */}
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[3] }}>
         <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.textPrimary }}>📅 일정 현황</span>

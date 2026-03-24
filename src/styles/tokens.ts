@@ -30,18 +30,18 @@ export const colors = {
   dangerLight:  '#FEE2E2',
 
   // Background
-  bgPage:  '#FFFFFF',  // 전체 배경 → 순백
+  bgPage:  '#F5F9FF',  // 전체 배경 → 아주 연한 파랑
   bgCard:  '#FFFFFF',  // 카드 배경 (그림자로 구분)
   bgInput: '#EEF4FF',  // 인풋 배경 → 연한 파랑 (primary 계열)
 
   // Text
   textPrimary:   '#0F172A',
-  textSecondary: '#64748B',
-  textTertiary:  '#94A3B8',
+  textSecondary: '#475569',
+  textTertiary:  '#64748B',
   textInverse:   '#FFFFFF',
 
   // Border
-  border:      '#E2E8F0',
+  border:      '#CBD5E1',
   borderFocus: '#1B6EF3',
 } as const
 
