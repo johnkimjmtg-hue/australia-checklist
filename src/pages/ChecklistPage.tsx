@@ -231,29 +231,27 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           </>
         ) : (
           <>
-            {/* ── 버킷리스트 헤더 (sticky) ── */}
-            <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgCard, borderBottom:`1px solid ${colors.border}` }}>
-
+            {/* ── 헤더 (sticky) — 버킷리스트 + 돋보기만 ── */}
+            <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
               {/* 타이틀 + 돋보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-                <span onClick={handleLogoTap} style={{ ...T.h3, cursor:'pointer', userSelect:'none' }}>버킷리스트</span>
+                <span onClick={handleLogoTap} style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary, cursor:'pointer', userSelect:'none', letterSpacing:-0.3 }}>버킷리스트</span>
                 <button onClick={()=>{ setShowSearch(v=>!v); if(showSearch) setSearchQuery('') }} style={{
                   width:36, height:36, borderRadius:radius.full,
-                  border:`1px solid ${showSearch ? colors.primary : colors.border}`,
+                  border:`1.5px solid ${showSearch ? colors.primary : colors.border}`,
                   background: showSearch ? colors.primaryLight : colors.bgCard,
                   display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer',
                 }}>
-                  <Icon icon={showSearch ? 'ph:x' : 'ph:magnifying-glass'} width={16} height={16} color={showSearch ? colors.primary : colors.textSecondary} />
+                  <Icon icon={showSearch ? 'ph:x' : 'ph:magnifying-glass'} width={17} height={17} color={showSearch ? colors.primary : colors.textSecondary} />
                 </button>
               </div>
-
-              {/* 검색창 (열렸을 때) */}
+              {/* 검색창 */}
               {showSearch && (
                 <div style={{ padding:`0 ${spacing[4]}px ${spacing[3]}px` }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgInput, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, height:40, border:`1.5px solid ${colors.primary}` }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, height:42, border:`1.5px solid ${colors.primary}` }}>
                     <Icon icon="ph:magnifying-glass" width={15} height={15} color={colors.primary} />
                     <input autoFocus value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="버킷리스트 검색"
-                      style={{ flex:1, border:'none', outline:'none', fontSize:font.size.sm, color:colors.textPrimary, background:'transparent', fontFamily:ff }} />
+                      style={{ flex:1, border:'none', outline:'none', fontSize:font.size.md, color:colors.textPrimary, background:'transparent', fontFamily:ff }} />
                     {searchQuery && (
                       <button onClick={()=>setSearchQuery('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex' }}>
                         <Icon icon="ph:x" width={13} height={13} color={colors.textTertiary} />
@@ -262,18 +260,20 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                   </div>
                 </div>
               )}
+            </div>
 
-              {/* 서브헤더: 멘트 + 일정설정 + 일정보기 */}
-              {!showSearch && (
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`0 ${spacing[4]}px ${spacing[2]}px` }}>
-                  <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? colors.primary : colors.textSecondary }}>
+            {/* ── 서브헤더 + 카테고리 + 캘린더 (스크롤 됨) ── */}
+            {!showSearch && (
+              <div style={{ background:colors.primaryLight }}>
+                {/* 멘트 + 일정설정 + 일정보기 */}
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
+                  <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? colors.primary : colors.gray600 }}>
                     {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
                   </span>
                   <div style={{ display:'flex', gap:spacing[2] }}>
                     <button onClick={handleOpenTripPicker} style={{
-                      height:30, padding:`0 ${spacing[2]}px`,
-                      borderRadius:radius.sm,
-                      border: tripLabel ? `1px solid ${colors.success}` : `1px solid ${colors.primary}`,
+                      height:30, padding:`0 ${spacing[2]}px`, borderRadius:radius.sm,
+                      border: tripLabel ? `1.5px solid ${colors.success}` : `1.5px solid ${colors.primary}`,
                       background: tripLabel ? colors.successLight : colors.primaryLight,
                       color: tripLabel ? colors.success : colors.primary,
                       fontSize:font.size.xs, fontWeight:font.weight.bold,
@@ -284,11 +284,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       {tripLabel ?? '일정 설정'}
                     </button>
                     <button onClick={()=>setModal(modal==='calendar'?'none':'calendar')} style={{
-                      height:30, padding:`0 ${spacing[2]}px`,
-                      borderRadius:radius.sm,
-                      border:`1px solid ${modal==='calendar' ? colors.primary : colors.border}`,
+                      height:30, padding:`0 ${spacing[2]}px`, borderRadius:radius.sm,
+                      border:`1.5px solid ${modal==='calendar' ? colors.primary : colors.gray300}`,
                       background: modal==='calendar' ? colors.primaryLight : colors.bgCard,
-                      color: modal==='calendar' ? colors.primary : colors.textSecondary,
+                      color: modal==='calendar' ? colors.primary : colors.gray600,
                       fontSize:font.size.xs, fontWeight:font.weight.bold,
                       cursor:'pointer', display:'flex', alignItems:'center', gap:3, fontFamily:ff,
                     }}>
@@ -297,11 +296,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     </button>
                   </div>
                 </div>
-              )}
 
-              {/* 카테고리 그리드 2줄 — 이모지 없이 글자만, 배경 연한파랑 */}
-              {!showSearch && (
-                <div style={{ background:colors.primaryLight, padding:`${spacing[2]}px ${spacing[3]}px ${spacing[3]}px` }}>
+                {/* 카테고리 그리드 */}
+                <div style={{ padding:`0 ${spacing[3]}px ${spacing[3]}px` }}>
                   <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:spacing[1] }}>
                     {(() => {
                       const nonCustom = CATEGORIES.filter(c=>c.id!=='custom')
@@ -315,16 +312,16 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                             onClick={()=>{ setState(setCategory(state,cat.id)); setShowSearch(false) }}
                             style={{
                               height:36, borderRadius:radius.sm, position:'relative',
-                              border: isActive ? `1.5px solid ${colors.primary}` : `1px solid ${colors.border}`,
-                              background: colors.bgCard,
+                              border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                              background: isActive ? colors.primary : colors.bgCard,
                               cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:ff,
                               WebkitTapHighlightColor:'transparent',
                             }}>
-                            <span style={{ fontSize:font.size.xs, fontWeight:isActive?font.weight.bold:font.weight.regular, color:isActive?colors.primary:colors.textSecondary, lineHeight:1.2, textAlign:'center', padding:'0 2px', wordBreak:'keep-all' }}>
+                            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:isActive ? '#fff' : colors.gray700, lineHeight:1.2, textAlign:'center', padding:'0 2px', wordBreak:'keep-all' }}>
                               {cat.label}
                             </span>
                             {catDone>0 && (
-                              <span style={{ position:'absolute', top:-4, right:-4, background:colors.primary, color:'#fff', borderRadius:radius.full, fontSize:8, fontWeight:font.weight.bold, minWidth:15, height:15, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px' }}>{catDone}</span>
+                              <span style={{ position:'absolute', top:-5, right:-5, background:'#EF4444', color:'#fff', borderRadius:radius.full, fontSize:8, fontWeight:font.weight.bold, minWidth:16, height:16, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 3px' }}>{catDone}</span>
                             )}
                           </button>
                         )
@@ -332,13 +329,13 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     })()}
                   </div>
                 </div>
-              )}
 
-              {/* 캘린더 뷰 (인라인) */}
-              {modal==='calendar' && trip && !showSearch && (
-                <CalendarModal state={state} trip={trip} allItems={allItems} onClose={()=>setModal('none')} />
-              )}
-            </div>
+                {/* 캘린더 뷰 (인라인) */}
+                {modal==='calendar' && trip && (
+                  <CalendarModal state={state} trip={trip} allItems={allItems} onClose={()=>setModal('none')} />
+                )}
+              </div>
+            )}
 
             {/* ── 리스트 ── */}
             <div style={{ background:colors.primaryLight, padding:`${spacing[3]}px ${spacing[3]}px` }}>
@@ -385,11 +382,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       style={{
                         display:'flex', alignItems:'center', gap:spacing[3],
                         padding:`${spacing[3]}px ${spacing[3]}px`,
-                        background: checked ? '#F0F7FF' : colors.bgCard,
+                        background: checked ? '#EEF4FF' : colors.bgCard,
                         borderRadius:radius.md,
-                        border: checked ? `1.5px solid ${colors.primary}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.border}`,
+                        border: checked ? `2px solid ${colors.primary}` : isHighlight ? `2px solid ${colors.primary}` : `1.5px solid ${colors.gray200}`,
                         cursor:'pointer', transition:'all 0.15s',
-                        boxShadow: shadow.card,
                       }}
                       onClick={async()=>{
                         if(!db) return
@@ -413,11 +409,11 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
                       {/* 가운데: 텍스트 */}
                       <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontSize:font.size.md, fontWeight:checked?font.weight.bold:font.weight.medium, color:checked?colors.primary:colors.textPrimary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                        <div style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:checked?colors.primary:colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
                           {item.label}
                         </div>
                         <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'wrap' }}>
-                          {region && <span style={{ fontSize:font.size.xs, color:colors.textTertiary }}>📍 {region.label}</span>}
+                          {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium }}>📍 {region.label}</span>}
                           {checked && dayCount>0 && (
                             <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.primary, color:'#fff', borderRadius:radius.full, padding:`1px ${spacing[2]}px` }}>
                               {dayCount}일차
