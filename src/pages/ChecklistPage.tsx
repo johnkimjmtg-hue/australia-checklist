@@ -234,106 +234,119 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             {/* ── 버킷리스트 헤더 (sticky) ── */}
             <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgCard, borderBottom:`1px solid ${colors.border}` }}>
 
-              {/* 타이틀 + 버튼들 */}
+              {/* 타이틀 + 돋보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-                <div style={{ display:'flex', alignItems:'center', gap:spacing[2] }}>
-                  <span onClick={handleLogoTap} style={{ ...T.h3, cursor:'pointer', userSelect:'none' }}>버킷리스트</span>
-                  {done>0 && (
-                    <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.primaryLight, color:colors.primary, borderRadius:radius.full, padding:`2px ${spacing[2]}px` }}>
-                      {done}개 선택
-                    </span>
-                  )}
-                </div>
-                <div style={{ display:'flex', gap:spacing[2], alignItems:'center' }}>
-                  <button onClick={handleOpenTripPicker} style={{
-                    height:32, padding:`0 ${spacing[3]}px`, borderRadius:radius.full,
-                    border: tripLabel ? `1.5px solid ${colors.success}` : `1.5px solid ${colors.primary}`,
-                    background: tripLabel ? colors.successLight : colors.primaryLight,
-                    color: tripLabel ? colors.success : colors.primary,
-                    fontSize:font.size.xs, fontWeight:font.weight.bold,
-                    cursor:'pointer', display:'flex', alignItems:'center', gap:4, fontFamily:ff,
-                    animation: !tripLabel ? 'pulse 1.4s ease-in-out infinite' : 'none',
-                  }}>
-                    <Icon icon="ph:airplane-takeoff" width={13} height={13} />
-                    {tripLabel ?? '일정 설정'}
-                  </button>
-                  {trip && (
-                    <button onClick={()=>setModal('calendar')} style={{
-                      width:32, height:32, borderRadius:radius.full,
-                      border:`1px solid ${colors.border}`, background:colors.bgCard,
-                      display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer',
-                    }}>
-                      <Icon icon="ph:calendar-check" width={16} height={16} color={colors.primary} />
-                    </button>
-                  )}
-                </div>
+                <span onClick={handleLogoTap} style={{ ...T.h3, cursor:'pointer', userSelect:'none' }}>버킷리스트</span>
+                <button onClick={()=>{ setShowSearch(v=>!v); if(showSearch) setSearchQuery('') }} style={{
+                  width:36, height:36, borderRadius:radius.full,
+                  border:`1px solid ${showSearch ? colors.primary : colors.border}`,
+                  background: showSearch ? colors.primaryLight : colors.bgCard,
+                  display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer',
+                }}>
+                  <Icon icon={showSearch ? 'ph:x' : 'ph:magnifying-glass'} width={16} height={16} color={showSearch ? colors.primary : colors.textSecondary} />
+                </button>
               </div>
 
               {/* 검색창 (열렸을 때) */}
               {showSearch && (
-                <div style={{ padding:`0 ${spacing[4]}px ${spacing[2]}px` }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgInput, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, height:40, border:`1px solid ${colors.border}` }}>
-                    <Icon icon="ph:magnifying-glass" width={15} height={15} color={colors.textTertiary} />
+                <div style={{ padding:`0 ${spacing[4]}px ${spacing[3]}px` }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgInput, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, height:40, border:`1.5px solid ${colors.primary}` }}>
+                    <Icon icon="ph:magnifying-glass" width={15} height={15} color={colors.primary} />
                     <input autoFocus value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="버킷리스트 검색"
                       style={{ flex:1, border:'none', outline:'none', fontSize:font.size.sm, color:colors.textPrimary, background:'transparent', fontFamily:ff }} />
-                    <button onClick={()=>{ setShowSearch(false); setSearchQuery('') }} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex' }}>
-                      <Icon icon="ph:x" width={13} height={13} color={colors.textTertiary} />
+                    {searchQuery && (
+                      <button onClick={()=>setSearchQuery('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex' }}>
+                        <Icon icon="ph:x" width={13} height={13} color={colors.textTertiary} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 서브헤더: 멘트 + 일정설정 + 일정보기 */}
+              {!showSearch && (
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`0 ${spacing[4]}px ${spacing[2]}px` }}>
+                  <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? colors.primary : colors.textSecondary }}>
+                    {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
+                  </span>
+                  <div style={{ display:'flex', gap:spacing[2] }}>
+                    <button onClick={handleOpenTripPicker} style={{
+                      height:30, padding:`0 ${spacing[2]}px`,
+                      borderRadius:radius.sm,
+                      border: tripLabel ? `1px solid ${colors.success}` : `1px solid ${colors.primary}`,
+                      background: tripLabel ? colors.successLight : colors.primaryLight,
+                      color: tripLabel ? colors.success : colors.primary,
+                      fontSize:font.size.xs, fontWeight:font.weight.bold,
+                      cursor:'pointer', display:'flex', alignItems:'center', gap:3, fontFamily:ff,
+                      animation: !tripLabel ? 'pulse 1.4s ease-in-out infinite' : 'none',
+                    }}>
+                      <Icon icon="ph:airplane-takeoff" width={12} height={12} />
+                      {tripLabel ?? '일정 설정'}
+                    </button>
+                    <button onClick={()=>setModal(modal==='calendar'?'none':'calendar')} style={{
+                      height:30, padding:`0 ${spacing[2]}px`,
+                      borderRadius:radius.sm,
+                      border:`1px solid ${modal==='calendar' ? colors.primary : colors.border}`,
+                      background: modal==='calendar' ? colors.primaryLight : colors.bgCard,
+                      color: modal==='calendar' ? colors.primary : colors.textSecondary,
+                      fontSize:font.size.xs, fontWeight:font.weight.bold,
+                      cursor:'pointer', display:'flex', alignItems:'center', gap:3, fontFamily:ff,
+                    }}>
+                      <Icon icon="ph:calendar-check" width={12} height={12} />
+                      일정보기
                     </button>
                   </div>
                 </div>
               )}
 
-              {/* 카테고리 그리드 2줄 */}
+              {/* 카테고리 그리드 2줄 — 이모지 없이 글자만, 배경 연한파랑 */}
               {!showSearch && (
-                <div style={{ padding:`0 ${spacing[3]}px ${spacing[3]}px`, display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:spacing[1] }}>
-                  {/* 검색 버튼 */}
-                  <button className="cat-btn" onClick={()=>setShowSearch(true)} style={{
-                    height:52, borderRadius:radius.sm, border:`1px solid ${colors.border}`,
-                    background:colors.bgCard, cursor:'pointer',
-                    display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, fontFamily:ff,
-                  }}>
-                    <Icon icon="ph:magnifying-glass" width={16} height={16} color={colors.textTertiary} />
-                    <span style={{ fontSize:font.size.xs, color:colors.textTertiary, fontWeight:font.weight.medium }}>검색</span>
-                  </button>
-                  {/* 카테고리 칩 */}
-                  {(() => {
-                    const nonCustom = CATEGORIES.filter(c=>c.id!=='custom')
-                    const custom    = CATEGORIES.find(c=>c.id==='custom')
-                    const allCats   = custom ? [...nonCustom,custom] : nonCustom
-                    return allCats.map(cat => {
-                      const isActive = activeCategory===cat.id
-                      const catDone  = allItems.filter(i=>i.categoryId===cat.id&&state.selected[i.id]).length
-                      return (
-                        <button key={cat.id} className="cat-btn"
-                          onClick={()=>{ setState(setCategory(state,cat.id)); setShowSearch(false) }}
-                          style={{
-                            height:52, borderRadius:radius.sm, position:'relative',
-                            border: isActive ? `1.5px solid ${colors.primary}` : `1px solid ${colors.border}`,
-                            background: isActive ? colors.primaryLight : colors.bgCard,
-                            cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2, fontFamily:ff,
-                          }}>
-                          <span style={{ fontSize:16 }}>{cat.emoji}</span>
-                          <span style={{ fontSize:9, fontWeight:isActive?font.weight.bold:font.weight.regular, color:isActive?colors.primary:colors.textSecondary, lineHeight:1.2, textAlign:'center', padding:'0 2px' }}>
-                            {cat.label}
-                          </span>
-                          {catDone>0 && (
-                            <span style={{ position:'absolute', top:-4, right:-4, background:colors.primary, color:'#fff', borderRadius:radius.full, fontSize:8, fontWeight:font.weight.bold, minWidth:15, height:15, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px' }}>{catDone}</span>
-                          )}
-                        </button>
-                      )
-                    })
-                  })()}
+                <div style={{ background:colors.primaryLight, padding:`${spacing[2]}px ${spacing[3]}px ${spacing[3]}px` }}>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:spacing[1] }}>
+                    {(() => {
+                      const nonCustom = CATEGORIES.filter(c=>c.id!=='custom')
+                      const custom    = CATEGORIES.find(c=>c.id==='custom')
+                      const allCats   = custom ? [...nonCustom,custom] : nonCustom
+                      return allCats.map(cat => {
+                        const isActive = activeCategory===cat.id
+                        const catDone  = allItems.filter(i=>i.categoryId===cat.id&&state.selected[i.id]).length
+                        return (
+                          <button key={cat.id} className="cat-btn"
+                            onClick={()=>{ setState(setCategory(state,cat.id)); setShowSearch(false) }}
+                            style={{
+                              height:36, borderRadius:radius.sm, position:'relative',
+                              border: isActive ? `1.5px solid ${colors.primary}` : `1px solid ${colors.border}`,
+                              background: colors.bgCard,
+                              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:ff,
+                              WebkitTapHighlightColor:'transparent',
+                            }}>
+                            <span style={{ fontSize:font.size.xs, fontWeight:isActive?font.weight.bold:font.weight.regular, color:isActive?colors.primary:colors.textSecondary, lineHeight:1.2, textAlign:'center', padding:'0 2px', wordBreak:'keep-all' }}>
+                              {cat.label}
+                            </span>
+                            {catDone>0 && (
+                              <span style={{ position:'absolute', top:-4, right:-4, background:colors.primary, color:'#fff', borderRadius:radius.full, fontSize:8, fontWeight:font.weight.bold, minWidth:15, height:15, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px' }}>{catDone}</span>
+                            )}
+                          </button>
+                        )
+                      })
+                    })()}
+                  </div>
                 </div>
+              )}
+
+              {/* 캘린더 뷰 (인라인) */}
+              {modal==='calendar' && trip && !showSearch && (
+                <CalendarModal state={state} trip={trip} allItems={allItems} onClose={()=>setModal('none')} />
               )}
             </div>
 
             {/* ── 리스트 ── */}
-            <div style={{ background:colors.bgPage }}>
+            <div style={{ background:colors.primaryLight, padding:`${spacing[3]}px ${spacing[3]}px` }}>
               {/* 섹션 헤더 */}
               {!showSearch && (
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
-                  <span style={{ ...T.sm, fontWeight:font.weight.bold }}>
-                    {CATEGORIES.find(c=>c.id===activeCategory)?.emoji} {CATEGORIES.find(c=>c.id===activeCategory)?.label}
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[2] }}>
+                  <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary }}>
+                    {CATEGORIES.find(c=>c.id===activeCategory)?.label}
                   </span>
                   <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>
                     {catItems.filter(i=>state.selected[i.id]).length}/{catItems.length}
@@ -343,7 +356,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
               {/* 직접 추가 */}
               {activeCategory==='custom'&&!showSearch&&(
-                <div style={{ display:'flex', gap:spacing[2], padding:`0 ${spacing[4]}px ${spacing[3]}px`, alignItems:'center' }}>
+                <div style={{ display:'flex', gap:spacing[2], marginBottom:spacing[3], alignItems:'center' }}>
                   <div style={{ flex:1, display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, border:`1px solid ${colors.border}`, height:44 }}>
                     <Icon icon="ph:plus-circle" width={16} height={16} color={colors.primary} />
                     <input ref={inputRef} value={customLabel} onChange={e=>setCustomLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleAddCustom()} placeholder="직접 추가"
@@ -353,8 +366,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 </div>
               )}
 
-              {/* 아이템 리스트 — A타입 */}
-              <div style={{ display:'flex', flexDirection:'column' }}>
+              {/* 아이템 카드 리스트 */}
+              <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
                 {searchResults!==null&&searchResults.length===0&&(
                   <div style={{ textAlign:'center', padding:'40px 0', ...T.sm }}>검색 결과가 없어요</div>
                 )}
@@ -371,11 +384,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     <div key={item.id} id={`item-${item.id}`} className="list-item"
                       style={{
                         display:'flex', alignItems:'center', gap:spacing[3],
-                        padding:`${spacing[3]}px ${spacing[4]}px`,
-                        background: isHighlight ? '#EFF6FF' : checked ? colors.primaryLight : colors.bgCard,
-                        borderLeft: checked ? `3px solid ${colors.primary}` : isHighlight ? `3px solid ${colors.primary}` : `3px solid transparent`,
+                        padding:`${spacing[3]}px ${spacing[3]}px`,
+                        background: checked ? '#F0F7FF' : colors.bgCard,
+                        borderRadius:radius.md,
+                        border: checked ? `1.5px solid ${colors.primary}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.border}`,
                         cursor:'pointer', transition:'all 0.15s',
-                        borderBottom:`1px solid ${colors.border}`,
+                        boxShadow: shadow.card,
                       }}
                       onClick={async()=>{
                         if(!db) return
@@ -384,7 +398,38 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                         if((db.related_business_ids?.length??0)>0){ const {data}=await supabase.from('businesses').select('*').in('id',db.related_business_ids!); setDetailBizCards(data??[]) } else setDetailBizCards([])
                       }}
                     >
-                      {/* 체크박스 */}
+                      {/* 왼쪽: 동그란 이미지 */}
+                      <div style={{
+                        width:44, height:44, borderRadius:'50%', flexShrink:0,
+                        background: colors.primaryLight,
+                        border:`1px solid ${colors.border}`,
+                        overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center',
+                      }}>
+                        {db?.image_url
+                          ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                          : <span style={{ fontSize:20 }}>{cat?.emoji ?? '📌'}</span>
+                        }
+                      </div>
+
+                      {/* 가운데: 텍스트 */}
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:font.size.md, fontWeight:checked?font.weight.bold:font.weight.medium, color:checked?colors.primary:colors.textPrimary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                          {item.label}
+                        </div>
+                        <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'wrap' }}>
+                          {region && <span style={{ fontSize:font.size.xs, color:colors.textTertiary }}>📍 {region.label}</span>}
+                          {checked && dayCount>0 && (
+                            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.primary, color:'#fff', borderRadius:radius.full, padding:`1px ${spacing[2]}px` }}>
+                              {dayCount}일차
+                            </span>
+                          )}
+                          {checked && dayCount===0 && (
+                            <span style={{ fontSize:font.size.xs, color:colors.warning, fontWeight:font.weight.bold }}>일정 미지정</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 오른쪽: 체크박스 */}
                       <button onClick={e=>{
                         e.stopPropagation()
                         if(!trip){ setModal('noTrip'); return }
@@ -392,42 +437,18 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                         setState(toggleItem(state,item.id))
                         if(nextChecked) setTimeout(()=>setSheetItem(item as CheckItem),50)
                       }} style={{
-                        width:22, height:22, borderRadius:6, flexShrink:0,
+                        width:24, height:24, borderRadius:6, flexShrink:0,
                         border: checked ? 'none' : `1.5px solid ${colors.border}`,
                         background: checked ? colors.primary : colors.bgCard,
                         display:'flex', alignItems:'center', justifyContent:'center',
-                        cursor:'pointer', padding:0,
+                        cursor:'pointer', padding:0, transition:'all 0.15s',
                       }}>
                         {checked&&(
-                          <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
+                          <svg width="12" height="9" viewBox="0 0 11 8" fill="none">
                             <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         )}
                       </button>
-
-                      {/* 텍스트 */}
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontSize:font.size.md, fontWeight:checked?font.weight.bold:font.weight.medium, color:checked?colors.primary:colors.textPrimary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
-                          {item.label}
-                        </div>
-                        <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3 }}>
-                          {cat&&searchResults&&(
-                            <span style={{ fontSize:font.size.xs, color:colors.textTertiary }}>{cat.emoji} {cat.label}</span>
-                          )}
-                          {region&&(
-                            <span style={{ fontSize:font.size.xs, color:colors.textTertiary }}>{searchResults&&cat?'·':''} 📍 {region.label}</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* 일정 뱃지 */}
-                      {checked&&dayCount>0&&(
-                        <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.primary, color:'#fff', borderRadius:radius.full, padding:`2px ${spacing[2]}px`, flexShrink:0 }}>
-                          {dayCount}일차
-                        </span>
-                      )}
-
-                      <Icon icon="ph:caret-right" width={14} height={14} color={colors.gray300} />
                     </div>
                   )
                 })}
@@ -479,11 +500,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
       {/* ── 폭죽 ── */}
       {showFireworks&&<Fireworks />}
-
-      {/* ── 캘린더 팝업 ── */}
-      {modal==='calendar'&&trip&&(
-        <CalendarModal state={state} trip={trip} allItems={allItems} onClose={()=>setModal('none')} />
-      )}
 
       {/* ── Trip date picker ── */}
       {modal==='tripPicker'&&(
@@ -573,7 +589,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   )
 }
 
-/* ── 캘린더 팝업 ── */
+/* ── 캘린더 뷰 (인라인) ── */
 function CalendarModal({ state, trip, allItems, onClose }: { state:AppState; trip:TripInfo; allItems:any[]; onClose:()=>void }) {
   const days = getTripDays(trip)
   const [activeDayIdx, setActiveDayIdx] = useState<number|null>(null)
@@ -581,41 +597,40 @@ function CalendarModal({ state, trip, allItems, onClose }: { state:AppState; tri
   function dayColor(count:number):string { if(count<=0) return colors.bgCard; if(count===1) return '#D1FAE5'; if(count===2) return '#FEF08A'; if(count===3) return '#FED7AA'; return '#FCA5A5' }
   const dayItems = activeDayIdx!==null ? allItems.filter(item=>state.selected[item.id]&&(state.schedules[item.id]??[]).includes(activeDayIdx)) : []
   return (
-    <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:500, animation:'fadeIn 0.2s ease' }} />
-      <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, zIndex:501, animation:'slideUp 0.25s ease', padding:`0 ${spacing[4]}px ${spacing[6]}px`, maxHeight:'70vh', overflowY:'auto', fontFamily:font.family }}>
-        <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto ${spacing[3]}px` }} />
-        <div style={{ ...T.h4, marginBottom:spacing[3] }}>📅 일정 현황</div>
-        <div style={{ display:'flex', gap:spacing[2], overflowX:'auto', paddingBottom:spacing[2], scrollbarWidth:'none' }}>
-          {days.map((d,idx)=>{
-            const isActive=activeDayIdx===idx; const bg=dayColor(dayCount[idx])
-            return (
-              <button key={idx} onClick={()=>setActiveDayIdx(isActive?null:idx)} style={{ minWidth:56, height:52, borderRadius:radius.sm, flexShrink:0, border:isActive?`1.5px solid ${colors.primary}`:`1px solid ${colors.border}`, cursor:'pointer', background:isActive?colors.primaryLight:bg, color:isActive?colors.primary:colors.textSecondary, fontSize:font.size.sm, fontWeight:isActive?font.weight.bold:font.weight.regular, position:'relative', fontFamily:font.family, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2 }}>
-                <div style={{ fontSize:font.size.xs }}>{idx+1}일차</div>
-                <div style={{ fontSize:9, opacity:0.8 }}>{fmtMD(d)}</div>
-                {dayCount[idx]>0&&<span style={{ position:'absolute', top:3, right:4, fontSize:9, fontWeight:font.weight.bold, color:colors.textSecondary }}>{dayCount[idx]}</span>}
-              </button>
-            )
-          })}
-        </div>
-        <div style={{ marginTop:spacing[3], minHeight:40 }}>
-          {activeDayIdx===null ? (
-            <p style={{ ...T.sm, textAlign:'center', padding:`${spacing[3]}px 0` }}>날짜를 눌러 일정을 확인하세요</p>
-          ) : dayItems.length===0 ? (
-            <p style={{ ...T.sm, textAlign:'center', padding:`${spacing[3]}px 0` }}>이 날 할당된 항목이 없어요</p>
-          ) : (
-            <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
-              {dayItems.map(item=>(
-                <div key={item.id} style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, background:colors.primaryLight, borderRadius:radius.sm, fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.medium }}>
-                  <Icon icon="ph:check-circle-fill" width={14} height={14} color={colors.primary} />
-                  {item.label.includes(',')?item.label.split(',')[0].trim():item.label}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+    <div style={{ background:colors.bgCard, borderTop:`1px solid ${colors.border}`, padding:`${spacing[3]}px ${spacing[4]}px ${spacing[4]}px`, fontFamily:font.family }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[3] }}>
+        <span style={{ ...T.h4 }}>📅 일정 현황</span>
+        <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:colors.textTertiary, fontSize:16, padding:0, fontFamily:font.family }}>✕</button>
       </div>
-    </>
+      <div style={{ display:'flex', gap:spacing[2], overflowX:'auto', paddingBottom:spacing[2], scrollbarWidth:'none' }}>
+        {days.map((d,idx)=>{
+          const isActive=activeDayIdx===idx; const bg=dayColor(dayCount[idx])
+          return (
+            <button key={idx} onClick={()=>setActiveDayIdx(isActive?null:idx)} style={{ minWidth:56, height:52, borderRadius:radius.sm, flexShrink:0, border:isActive?`1.5px solid ${colors.primary}`:`1px solid ${colors.border}`, cursor:'pointer', background:isActive?colors.primaryLight:bg, color:isActive?colors.primary:colors.textSecondary, fontSize:font.size.sm, fontWeight:isActive?font.weight.bold:font.weight.regular, fontFamily:font.family, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2, position:'relative' }}>
+              <div style={{ fontSize:font.size.xs }}>{idx+1}일차</div>
+              <div style={{ fontSize:9, opacity:0.8 }}>{fmtMD(d)}</div>
+              {dayCount[idx]>0&&<span style={{ position:'absolute', top:3, right:4, fontSize:9, fontWeight:font.weight.bold, color:colors.textSecondary }}>{dayCount[idx]}</span>}
+            </button>
+          )
+        })}
+      </div>
+      <div style={{ marginTop:spacing[3], minHeight:40 }}>
+        {activeDayIdx===null ? (
+          <p style={{ ...T.sm, textAlign:'center', padding:`${spacing[3]}px 0` }}>날짜를 눌러 일정을 확인하세요</p>
+        ) : dayItems.length===0 ? (
+          <p style={{ ...T.sm, textAlign:'center', padding:`${spacing[3]}px 0` }}>이 날 할당된 항목이 없어요</p>
+        ) : (
+          <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
+            {dayItems.map(item=>(
+              <div key={item.id} style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, background:colors.primaryLight, borderRadius:radius.sm, fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.medium }}>
+                <Icon icon="ph:check-circle-fill" width={14} height={14} color={colors.primary} />
+                {item.label.includes(',')?item.label.split(',')[0].trim():item.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
