@@ -354,7 +354,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             {searchResults!==null&&searchResults.length===0&&(
               <div style={{ textAlign:'center', padding:'40px 0', ...T.sm }}>검색 결과가 없어요</div>
             )}
-            <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
+            <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
               {(searchResults??catItems).map(item => {
                 const checked  = !!state.selected[item.id]
                 const dayCount = (state.schedules[item.id]??[]).length
@@ -370,7 +370,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       padding:`${spacing[3]}px ${spacing[3]}px`,
                       background: colors.bgCard,
                       borderRadius:radius.md,
-                      border: checked ? `1.5px solid ${colors.success}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                      border: checked ? `1px solid ${colors.success}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                       cursor:'pointer', transition:'all 0.15s',
                     }}
                     onClick={async()=>{
