@@ -93,7 +93,7 @@ export default function OnboardingPage({ onComplete }: Props) {
       {/* 전체 배경 */}
       <div style={{
         minHeight: '100dvh',
-        background: colors.bgPage,
+        background: '#FFFFFF',
         display: 'flex',
         justifyContent: 'center',
         fontFamily: font.family,
@@ -281,7 +281,7 @@ export default function OnboardingPage({ onComplete }: Props) {
         <div style={{
           position: 'fixed', inset: 0, zIndex: 100,
           overflowY: 'auto',
-          background: colors.bgPage,
+          background: '#FFFFFF',
           display: 'flex',
           justifyContent: 'center',
         }}>
