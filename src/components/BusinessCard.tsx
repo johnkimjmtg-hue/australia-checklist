@@ -100,12 +100,6 @@ export default function BusinessCard({ business }: Props) {
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:4 }}>
             <div style={{ flex:1, paddingRight:8 }}>
               <div style={{ fontSize:17, fontWeight:800, color:'#0F172A' }}>{name}</div>
-              {business.is_korean && (
-                <div style={{ display:'inline-flex', alignItems:'center', gap:3, marginTop:3, background:'#FFF7ED', border:'1px solid #FED7AA', borderRadius:6, padding:'2px 8px' }}>
-                  <span style={{ fontSize:12 }}>🇰🇷</span>
-                  <span style={{ fontSize:11, fontWeight:700, color:'#EA580C' }}>한인업체</span>
-                </div>
-              )}
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:2, flexShrink:0 }}>
               <button
@@ -153,7 +147,7 @@ export default function BusinessCard({ business }: Props) {
               fontSize:13, color:'#334155', lineHeight:1.6, marginBottom:10,
               ...(expanded ? {} : {
                 display:'-webkit-box',
-                WebkitLineClamp: 2,
+                WebkitLineClamp: 1,
                 WebkitBoxOrient: 'vertical' as any,
                 overflow:'hidden',
               }),
@@ -161,12 +155,18 @@ export default function BusinessCard({ business }: Props) {
           )}
 
           {/* 해시태그 — 접힌 상태: 3개, 펼친 상태: 전체 */}
-          {tags && tags.length > 0 && (
+          {(tags && tags.length > 0 || business.is_korean) && (
             <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, marginTop:12 }}>
-              {(expanded ? tags : tags.slice(0, 3)).map(tag => (
+              {business.is_korean && (
+                <span style={{ display:'inline-flex', alignItems:'center', gap:3, background:'#FFF7ED', border:'1px solid #FED7AA', borderRadius:6, padding:'4px 10px' }}>
+                  <span style={{ fontSize:11 }}>🇰🇷</span>
+                  <span style={{ fontSize:11, fontWeight:700, color:'#EA580C' }}>한인업체</span>
+                </span>
+              )}
+              {tags && (expanded ? tags : tags.slice(0, 3)).map(tag => (
                 <span key={tag} style={{ background:'#EFF6FF', color:'#1B6EF3', fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:'1px solid #BFDBFE' }}>{tag}</span>
               ))}
-              {!expanded && tags.length > 3 && (
+              {tags && !expanded && tags.length > 3 && (
                 <span style={{ fontSize:11, color:'#94A3B8', fontWeight:600, padding:'4px 2px' }}>+{tags.length - 3}</span>
               )}
             </div>
