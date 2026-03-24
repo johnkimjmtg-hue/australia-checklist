@@ -44,17 +44,17 @@ const CAT_ICONS: Record<string,string> = {
 
 /* 원형 프로그레스 */
 function CircleProgress({ pct }: { pct: number }) {
-  const R = 38, C = 2 * Math.PI * R
+  const R = 42, C = 2 * Math.PI * R
   const offset = C - (pct / 100) * C
   return (
-    <div style={{ position:'relative', width:86, height:86, flexShrink:0 }}>
-      <svg width={86} height={86} viewBox="0 0 86 86" style={{ transform:'rotate(-90deg)' }}>
-        <circle cx={43} cy={43} r={R} fill="none" stroke="#a8b498" strokeWidth={9}/>
-        <circle cx={43} cy={43} r={R} fill="none" stroke="#FFCD00" strokeWidth={9}
+    <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
+      <svg width={100} height={100} viewBox="0 0 100 100" style={{ transform:'rotate(-90deg)' }}>
+        <circle cx={50} cy={50} r={R} fill="none" stroke="#E2E8F0" strokeWidth={12}/>
+        <circle cx={50} cy={50} r={R} fill="none" stroke="#FFCD00" strokeWidth={12}
           strokeDasharray={C} strokeDashoffset={offset} strokeLinecap="round"/>
       </svg>
       <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center' }}>
-        <span style={{ fontSize:13,fontWeight:800,color:'#2d3e1f' }}>{pct}%</span>
+        <span style={{ fontSize:16,fontWeight:700,color:'#0F172A' }}>{pct}%</span>
       </div>
     </div>
   )
@@ -72,10 +72,9 @@ function CoinStack({ count, total }: { count:number; total:number }) {
           background: i < filled
             ? 'radial-gradient(ellipse at 35% 35%, #FFE566, #FFCD00 60%, #C8960C)'
             : '#E2E8F0',
-          boxShadow: i < filled ? '0 2px 4px rgba(180,130,0,0.3)' : 'none',
         }}/>
       ))}
-      <div style={{ fontSize:9,color:'#94A3B8',fontWeight:600,marginTop:3 }}>{count}/{total}</div>
+      <div style={{ fontSize:10,color:'#64748B',fontWeight:500,marginTop:3 }}>{count}/{total}</div>
     </div>
   )
 }
@@ -121,20 +120,28 @@ export default function BucketSharePaper({ state, trip, achieved, dbItems = [] }
 
       {/* ── 상단 진행 카드 ── */}
       <div style={{
-        background:'#c8d4b8', margin:12, borderRadius:12,
-        boxShadow:'inset 3px 3px 8px #a8b498, inset -2px -2px 6px #e8f4d8',
+        background:'#fff', margin:12, borderRadius:12,
+        border:'1.5px solid #CBD5E1',
         padding:'16px', display:'flex', alignItems:'center', gap:14,
       }}>
         <CircleProgress pct={pct} />
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:16,fontWeight:800,color:'#2d3e1f',marginBottom:3,lineHeight:1.2 }}>호주 버킷리스트</div>
-          <div style={{ fontSize:11,color:'#4a5e32',fontWeight:600,marginBottom:5 }}>
+          <div style={{ fontSize:16,fontWeight:700,color:'#0F172A',marginBottom:3,lineHeight:1.2 }}>나의 버킷리스트</div>
+          <div style={{ fontSize:11,color:'#64748B',fontWeight:500,marginBottom:5 }}>
             {trip.startDate.slice(5).replace('-','/')} ~ {trip.endDate.slice(5).replace('-','/')}
           </div>
           <div style={{ display:'flex',alignItems:'baseline',gap:3 }}>
-            <span style={{ fontSize:28,fontWeight:800,color:'#2d3e1f',lineHeight:1 }}>{achievedCount}</span>
-            <span style={{ fontSize:13,fontWeight:600,color:'#4a5e32' }}>/{total}건 완료</span>
+            <span style={{ fontSize:26,fontWeight:700,color:'#0F172A',lineHeight:1 }}>{achievedCount}</span>
+            <span style={{ fontSize:14,fontWeight:500,color:'#64748B' }}>/{total}건 완료</span>
           </div>
+          <div style={{ fontSize:11,color:'#94A3B8',marginTop:3,lineHeight:1.4 }}>{
+            pct === 0 ? '첫 번째 항목을 완료해봐요! 🙌' :
+            pct < 25  ? '좋은 시작이에요! 계속 해봐요 💪' :
+            pct < 50  ? '절반을 향해 달려가고 있어요! 🏃' :
+            pct < 75  ? '절반을 넘었어요! 조금만 더! ⚡' :
+            pct < 100 ? '거의 다 왔어요! 마지막 스퍼트! 🔥' :
+                        '모든 항목을 완료했어요! 축하합니다 🎉'
+          }</div>
         </div>
         <CoinStack count={achievedCount} total={total} />
       </div>
