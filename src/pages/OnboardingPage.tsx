@@ -7,7 +7,7 @@
 // Step 3 → 여행 정보 입력 (귀국일·도시)
 // 완료 → ChecklistPage로 진입
 // ─────────────────────────────────────────────
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
 // ── 디자인 토큰 (tokens.ts 적용 전 인라인 정의) ──
@@ -43,7 +43,7 @@ const CITIES = [
 ]
 
 type Mode = 'select' | 'login' | 'signup'
-type Step = 'auth' | 'trip'
+type Step = 'auth'
 
 type Props = {
   onComplete: () => void
@@ -59,9 +59,6 @@ export default function OnboardingPage({ onComplete }: Props) {
   const [error, setError]       = useState('')
 
   // 여행 정보
-  const [returnDate, setReturnDate] = useState('')
-  const [city, setCity]             = useState('')
-  const [tripLoading, setTripLoading] = useState(false)
 
   // ── 이메일 로그인 ──
   async function handleLogin() {
@@ -75,7 +72,8 @@ export default function OnboardingPage({ onComplete }: Props) {
       const { data: profile } = await supabase.from('profiles').select('return_date, city').eq('id', user.id).single()
       if (profile?.return_date && profile?.city) { onComplete(); return }
     }
-    setStep('trip'); setLoading(false)
+    onComplete()
+    setLoading(false)
   }
 
   // ── 이메일 회원가입 ──
@@ -90,7 +88,8 @@ export default function OnboardingPage({ onComplete }: Props) {
       options: { data: { full_name: name.trim() } },
     })
     if (err) { setError(err.message); setLoading(false); return }
-    setStep('trip'); setLoading(false)
+    onComplete()
+    setLoading(false)
   }
 
   // ── 구글 로그인 ──
@@ -98,7 +97,7 @@ export default function OnboardingPage({ onComplete }: Props) {
     setLoading(true); setError('')
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + '?onboarding=trip' },
+      options: { redirectTo: window.location.origin },
     })
   }
 
@@ -118,6 +117,19 @@ export default function OnboardingPage({ onComplete }: Props) {
     setTripLoading(false)
     onComplete()
   }
+
+  // ── 소셜 로그인 콜백 감지 ──
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // URL 파라미터 정리
+        const url = new URL(window.location.href)
+        url.searchParams.delete('onboarding')
+        window.history.replaceState({}, '', url.toString())
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   // ── D-Day 미리보기 ──
   const dDay = returnDate
@@ -231,69 +243,7 @@ export default function OnboardingPage({ onComplete }: Props) {
         </div>
       )}
 
-      {/* ── STEP 2: 여행 정보 ── */}
-      {step === 'trip' && (
-        <div style={{ width: '100%', maxWidth: 360, animation: 'fadeUp 0.4s ease' }}>
-          <div style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: 20, fontWeight: 800, color: C.textPrimary }}>여행 정보 입력</div>
-            <div style={{ fontSize: 14, color: C.textSub, marginTop: 6 }}>버킷리스트 D-Day 계산에 사용돼요</div>
-          </div>
-
-          {/* 귀국 예정일 */}
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.textSub, marginBottom: 8 }}>귀국 예정일</div>
-            <input
-              className="ob-input"
-              type="date"
-              value={returnDate}
-              onChange={e => setReturnDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
-              style={{ colorScheme: 'light' }}
-            />
-            {dDay !== null && (
-              <div style={{
-                marginTop: 8, padding: '8px 14px',
-                background: dDay > 30 ? C.primaryLight : '#FEF3C7',
-                borderRadius: 8,
-                fontSize: 13, fontWeight: 700,
-                color: dDay > 30 ? C.primary : '#D97706',
-              }}>
-                {dDay > 0 ? `귀국까지 D-${dDay}` : dDay === 0 ? '오늘 귀국이에요!' : '귀국일이 지났어요'}
-              </div>
-            )}
-          </div>
-
-          {/* 거주 도시 */}
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.textSub, marginBottom: 8 }}>거주 도시</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {CITIES.map(c => (
-                <button
-                  key={c.value}
-                  className={`city-btn${city === c.value ? ' active' : ''}`}
-                  onClick={() => setCity(c.value)}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {error && <div style={{ fontSize: 13, color: C.danger, background: C.dangerLight, borderRadius: 8, padding: '8px 12px', marginBottom: 12 }}>{error}</div>}
-
-          <button className="ob-btn ob-btn-primary" onClick={handleTripSave} disabled={tripLoading}>
-            {tripLoading ? '저장 중...' : '시작하기 →'}
-          </button>
-
-          <button
-            onClick={onComplete}
-            style={{ background: 'none', border: 'none', color: C.textHint, fontSize: 13, cursor: 'pointer', padding: '12px 0 0', fontFamily: ff, width: '100%', textAlign: 'center' }}>
-            나중에 설정할게요
-          </button>
-        </div>
-      )}
-
-      {/* 하단 */}
+            {/* 하단 */}
       <div style={{ position: 'fixed', bottom: 24, fontSize: 11, color: C.textHint, textAlign: 'center' }}>
         가입하면 이용약관 및 개인정보처리방침에 동의하는 것으로 간주해요
       </div>

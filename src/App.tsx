@@ -25,18 +25,7 @@ function MainApp() {
         return
       }
 
-      // 로그인 됨 → profiles 확인
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('return_date, city')
-        .eq('id', session.user.id)
-        .single()
-
-      // 여행 정보 없음 → 온보딩 trip step
-      if (!profile?.return_date || !profile?.city) {
-        setShowOnboarding(true)
-      }
-
+      // 로그인 됨 → 바로 메인
       setAuthChecked(true)
     }
 
@@ -45,17 +34,7 @@ function MainApp() {
     // 소셜 로그인 콜백 감지
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('return_date, city')
-          .eq('id', session.user.id)
-          .single()
-
-        if (!profile?.return_date || !profile?.city) {
-          setShowOnboarding(true)
-        } else {
-          setShowOnboarding(false)
-        }
+        setShowOnboarding(false)
         setAuthChecked(true)
       }
       if (event === 'SIGNED_OUT') {
