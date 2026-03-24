@@ -231,8 +231,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           </>
         ) : (
           <>
-            {/* ── 헤더 (sticky) — 버킷리스트 + 돋보기만 ── */}
-            <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
+            {/* ── 헤더 (스크롤 시 올라감) ── */}
+            <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
               {/* 타이틀 + 돋보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
                 <span onClick={handleLogoTap} style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary, cursor:'pointer', userSelect:'none', letterSpacing:-0.3 }}>버킷리스트</span>
@@ -262,9 +262,9 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               )}
             </div>
 
-            {/* ── 서브헤더 + 카테고리 + 캘린더 (스크롤 됨) ── */}
+            {/* ── 서브헤더 + 카테고리 (sticky 고정) ── */}
             {!showSearch && (
-              <div style={{ background:colors.primaryLight }}>
+              <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgCard, borderBottom:`1px solid ${colors.border}` }}>
                 {/* 멘트 + 일정설정 + 일정보기 */}
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
                   <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? colors.primary : colors.gray600 }}>
@@ -338,7 +338,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             )}
 
             {/* ── 리스트 ── */}
-            <div style={{ background:colors.primaryLight, padding:`${spacing[3]}px ${spacing[3]}px` }}>
+            <div style={{ background:colors.bgCard, padding:`${spacing[3]}px ${spacing[3]}px` }}>
               {/* 섹션 헤더 */}
               {!showSearch && (
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[2] }}>
@@ -455,10 +455,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       </div>
 
       {/* ── 하단 고정 영역 ── */}
-      <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, borderTop:`1px solid ${colors.border}`, zIndex:40 }}>
-        {/* 발행하기 버튼 */}
+      <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, zIndex:40 }}>
+        {/* 발행하기 버튼 — 위에 보더 */}
         {mainTab==='bucketlist'&&!isIssued&&(
-          <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2] }}>
+          <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2], borderTop:`1.5px solid ${colors.border}` }}>
             <button onClick={handleIssue} style={{
               flex:4, height:40, background:colors.primary, color:'#fff',
               border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
@@ -477,7 +477,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         )}
 
         {/* 하단 탭바 */}
-        <div style={{ display:'flex', padding:`${spacing[1]}px 0 ${spacing[2]}px` }}>
+        <div style={{ display:'flex', padding:`${spacing[1]}px 0 ${spacing[2]}px`, borderTop:`1.5px solid ${colors.border}` }}>
           {TABS.map(tab=>{
             const isActive = activeTabId===tab.id
             const showBadge = tab.id==='community'&&todayPostCount>0
