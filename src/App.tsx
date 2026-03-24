@@ -1,34 +1,107 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import { loadState, AppState } from './store/state'
-import LandingPage from './pages/LandingPage'
+import { supabase } from './lib/supabase'
+import OnboardingPage from './pages/OnboardingPage'
 import ChecklistPage from './pages/ChecklistPage'
 import AdminPage from './pages/AdminPage'
 import BingoPage from './pages/BingoPage'
 
-// ── 메인 앱
+// ── 메인 앱 (로그인 체크 포함)
 function MainApp() {
-  const navigate = useNavigate()
   const [state, setState] = useState<AppState>(() => loadState())
+  const [authChecked, setAuthChecked] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+
+      // 로그인 안 됨 → 온보딩
+      if (!session) {
+        setShowOnboarding(true)
+        setAuthChecked(true)
+        return
+      }
+
+      // 로그인 됨 → profiles 확인
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('return_date, city')
+        .eq('id', session.user.id)
+        .single()
+
+      // 여행 정보 없음 → 온보딩 trip step
+      if (!profile?.return_date || !profile?.city) {
+        setShowOnboarding(true)
+      }
+
+      setAuthChecked(true)
+    }
+
+    checkAuth()
+
+    // 소셜 로그인 콜백 감지
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('return_date, city')
+          .eq('id', session.user.id)
+          .single()
+
+        if (!profile?.return_date || !profile?.city) {
+          setShowOnboarding(true)
+        } else {
+          setShowOnboarding(false)
+        }
+        setAuthChecked(true)
+      }
+      if (event === 'SIGNED_OUT') {
+        setShowOnboarding(true)
+        setAuthChecked(true)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // 로딩 중
+  if (!authChecked) {
+    return (
+      <div style={{
+        minHeight: '100dvh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#F8FAFC',
+        fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🦘</div>
+          <div style={{ fontSize: 14, color: '#94A3B8', fontWeight: 600 }}>불러오는 중...</div>
+        </div>
+      </div>
+    )
+  }
+
+  // 온보딩
+  if (showOnboarding) {
+    return (
+      <div className="app-shell">
+        <OnboardingPage onComplete={() => setShowOnboarding(false)} />
+      </div>
+    )
+  }
+
+  // 메인
   return (
     <div className="app-shell">
-      <ChecklistPage state={state} setState={setState} onLanding={() => navigate('/')} />
-    </div>
-  )
-}
-
-// ── 랜딩 페이지
-function LandingWrapper() {
-  const navigate = useNavigate()
-  const [state] = useState<AppState>(() => loadState())
-  return (
-    <div className="app-shell">
-      <LandingPage
+      <ChecklistPage
         state={state}
-        onStart={() => navigate('/app')}
-        onServices={() => navigate('/app?tab=services')}
+        setState={setState}
+        onLanding={() => setShowOnboarding(true)}
       />
     </div>
   )
@@ -59,13 +132,13 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/"         element={<LandingWrapper />} />
-        <Route path="/app"      element={<MainApp />} />
-        <Route path="/admin"    element={<AdminWrapper />} />
+        <Route path="/"                  element={<MainApp />} />
+        <Route path="/app"               element={<MainApp />} />
+        <Route path="/admin"             element={<AdminWrapper />} />
         <Route path="/bingo"             element={<BingoWrapper />} />
         <Route path="/bingo/melbourne"   element={<BingoWrapper city="melbourne" />} />
         <Route path="/bingo/sydney"      element={<BingoWrapper city="sydney" />} />
-        <Route path="*"         element={<LandingWrapper />} />
+        <Route path="*"                  element={<MainApp />} />
       </Routes>
       <Analytics />
     </BrowserRouter>
