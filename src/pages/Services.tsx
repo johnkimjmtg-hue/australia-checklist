@@ -5,11 +5,12 @@ import { Business, getBusinesses, getBusinessesCount, searchBusinesses, searchBu
 import { getBookmarks } from '../lib/businessBookmarks'
 import BusinessCard from '../components/BusinessCard'
 import CategoryFilter from '../components/CategoryFilter'
+import { colors, font, radius, spacing } from '../styles/tokens'
 
 type Props = { onSelectBusiness: (id: string) => void; onBack: () => void }
 type ServiceTab = 'all' | 'bookmarks' | 'emergency'
 
-const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
+const ff = font.family
 const PAGE_SIZE = 30
 
 // 가나다 → ABC 정렬
@@ -190,55 +191,41 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const isFiltered  = isSearch || isCatFilter
 
   return (
-    <div style={{ minHeight:'100vh', background:'#e8e8e8', fontFamily:ff, paddingBottom:40 }}>
+    <div style={{ minHeight:'100dvh', background:colors.bgPage, fontFamily:ff, paddingBottom:40 }}>
       <style>{`
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
-        .svc-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-        .svc-btn:active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff !important; transform: scale(0.97); }
-        .cat-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:#C8C8C8 #e8e8e8; }
-        @media (max-width:768px) {
-          .cat-scroll::-webkit-scrollbar { height:4px; }
-          .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
-          .cat-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
-        }
-        @media (min-width:769px) {
-          .cat-scroll::-webkit-scrollbar { height:4px; }
-          .cat-scroll::-webkit-scrollbar-track { background:#e8e8e8; border-radius:2px; }
-          .cat-scroll::-webkit-scrollbar-thumb { background:#C8C8C8; border-radius:2px; }
-        }
+        .svc-btn  { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .cat-scroll { overflow-x:auto; scrollbar-width:none; }
+        .cat-scroll::-webkit-scrollbar { display:none; }
       `}</style>
 
       {/* ── 스티키 헤더 ── */}
       <div style={{
         position:'sticky', top:0, zIndex:10,
-        background:'rgba(232,232,232,0.97)', backdropFilter:'blur(10px)',
-        padding:'12px 16px 12px',
+        background:colors.bgCard,
+        borderBottom:`1px solid ${colors.border}`,
+        padding:`${spacing[3]}px ${spacing[4]}px ${spacing[3]}px`,
       }}>
         {/* 전체/북마크/비상연락처 탭 */}
-        <div style={{ display:'flex', gap:6, marginBottom:10 }}>
+        <div style={{ display:'flex', gap:spacing[2], marginBottom:spacing[3] }}>
           {(['all', 'bookmarks', 'emergency'] as ServiceTab[]).map(tab => {
             const isActive = serviceTab === tab
             const iconName = tab === 'all' ? 'ph:list-bullets' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:bell-fill'
             const label = tab === 'all' ? '전체 업종' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
-            const activeColor = '#1B6EF3'
-            const inactiveColor = tab === 'emergency' ? '#DC2626' : '#94A3B8'
-            const iconColor = isActive ? '#1B6EF3' : tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? '#DC2626' : '#94A3B8'
-            const color = isActive ? activeColor : inactiveColor
+            const activeColor = tab === 'emergency' ? colors.danger : colors.primary
+            const iconColor = isActive ? (tab === 'emergency' ? colors.danger : colors.primary) : tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? colors.danger : colors.textTertiary
             return (
               <button key={tab} onClick={() => { setServiceTab(tab); setShowAll(false) }}
                 className="svc-btn"
                 style={{
-                height:34, padding:'0 14px', borderRadius:20,
-                cursor:'pointer', fontSize:13, fontWeight:700,
-                background: '#e8e8e8',
-                color,
-                border: 'none',
-                boxShadow: isActive
-                  ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-                  : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-                display:'flex', alignItems:'center', gap:5,
-                whiteSpace:'nowrap',
-              }}>
+                  height:34, padding:`0 ${spacing[3]}px`, borderRadius:radius.full,
+                  cursor:'pointer', fontSize:font.size.sm, fontWeight:font.weight.bold,
+                  background: isActive ? (tab === 'emergency' ? colors.dangerLight : colors.primaryLight) : colors.bgCard,
+                  color: isActive ? activeColor : colors.textSecondary,
+                  border: isActive ? `1.5px solid ${activeColor}` : `1px solid ${colors.border}`,
+                  display:'flex', alignItems:'center', gap:5,
+                  whiteSpace:'nowrap', fontFamily:ff,
+                }}>
                 <Icon icon={iconName} width={13} height={13} color={iconColor} />
                 {label}
               </button>
@@ -249,30 +236,30 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         {/* 검색창 + 카테고리 — 전체 탭만 */}
         {serviceTab === 'all' && (<>
         <div style={{
-          display:'flex', alignItems:'center', gap:8,
-          background:'#fff', borderRadius:12, padding:'0 12px',
-          border:'1.5px solid #D1D9E3', height:42,
-          
-          marginBottom:10,
+          display:'flex', alignItems:'center', gap:spacing[2],
+          background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`,
+          border:`1.5px solid ${colors.border}`, height:42,
+          marginBottom:spacing[3],
         }}>
-          <Icon icon="ph:magnifying-glass" width={16} height={16} color="#94A3B8" />
+          <Icon icon="ph:magnifying-glass" width={16} height={16} color={colors.textTertiary} />
           <input
             value={search}
             onChange={e => { setSearch(e.target.value); setShowAll(false) }}
             placeholder="업체명, 키워드 검색..."
             style={{
               flex:1, border:'none', outline:'none',
-              fontSize:14, color:'#1E293B', background:'transparent', fontFamily:ff,
+              fontSize:font.size.md, color:colors.textPrimary, background:'transparent', fontFamily:ff,
             }}
           />
           {search && (
             <button onClick={() => { setSearch(''); setShowAll(false) }}
               style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex' }}>
-              <Icon icon="ph:x-circle" width={16} height={16} color="#94A3B8" />
+              <Icon icon="ph:x-circle" width={16} height={16} color={colors.textTertiary} />
             </button>
           )}
         </div>
-        <div className="cat-scroll" style={{ display:'flex', gap:6, paddingBottom:4, paddingTop:6 }}>
+        {/* 카테고리 가로 스크롤 유지 */}
+        <div className="cat-scroll" style={{ display:'flex', gap:spacing[2], paddingBottom:4 }}>
           {sortedCategories.map(cat => {
             const isActive = category === cat.id
             const count = catCounts[cat.id] || 0
@@ -281,18 +268,15 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               <button key={cat.id} className="chip-btn svc-btn"
                 onClick={() => { setCategory(cat.id); setShowAll(false) }}
                 style={{
-                  height:36, borderRadius:8,
-                  background: '#e8e8e8',
-                  color: isActive ? '#1B6EF3' : '#64748B',
-                  fontSize:12, fontWeight: isActive ? 700 : 500,
-                  cursor:'pointer', position:'relative',
-                  flexShrink:0, width:88,
-                  border: 'none',
-                  boxShadow: isActive
-                    ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-                    : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                  height:34, borderRadius:radius.sm,
+                  background: isActive ? colors.primary : colors.bgCard,
+                  color: isActive ? '#fff' : colors.gray600,
+                  fontSize:font.size.xs, fontWeight:font.weight.bold,
+                  cursor:'pointer', flexShrink:0, minWidth:72,
+                  border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                   display:'flex', alignItems:'center', justifyContent:'center',
-                  whiteSpace:'nowrap',
+                  whiteSpace:'nowrap', fontFamily:ff,
+                  WebkitTapHighlightColor:'transparent',
                 }}>
                 {cat.label}
               </button>
@@ -303,15 +287,15 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       </div>
 
       {/* ── 콘텐츠 ── */}
-      <div style={{ padding:'16px 16px 0' }}>
+      <div style={{ padding:`${spacing[4]}px ${spacing[4]}px 0` }}>
 
         {/* 북마크 탭 */}
         {serviceTab === 'bookmarks' && (
           bookmarked.length === 0 ? (
             <div style={{ textAlign:'center', padding:'64px 0' }}>
-              <Icon icon="ph:bookmark-simple" width={48} height={48} color="#CBD5E1" />
-              <div style={{ marginTop:14, fontSize:15, fontWeight:700, color:'#64748B' }}>저장된 업체가 없어요</div>
-              <div style={{ marginTop:6, fontSize:13, color:'#94A3B8' }}>업체 카드의 북마크 버튼을 눌러 저장하세요</div>
+              <Icon icon="ph:bookmark-simple" width={48} height={48} color={colors.gray300} />
+              <div style={{ marginTop:spacing[3], fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textSecondary }}>저장된 업체가 없어요</div>
+              <div style={{ marginTop:spacing[1], fontSize:font.size.sm, color:colors.textTertiary }}>업체 카드의 북마크 버튼을 눌러 저장하세요</div>
             </div>
           ) : (
             <>
@@ -361,17 +345,16 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                   </div>
                 )}
                 <button onClick={() => { setShowAll(true); loadData(category, search, true) }} style={{
-                  width:'100%', marginTop:14, height:48,
-                  background:'#e8e8e8', border:'none', borderRadius:12,
+                  width:'100%', marginTop:spacing[3], height:48,
+                  background:colors.bgCard, border:`1px solid ${colors.border}`, borderRadius:radius.md,
                   cursor:'pointer', display:'flex', alignItems:'center',
-                  justifyContent:'center', gap:8,
-                  fontSize:14, fontWeight:700, color:'#1B6EF3',
-                  boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-                  WebkitTapHighlightColor:'transparent',
+                  justifyContent:'center', gap:spacing[2],
+                  fontSize:font.size.md, fontWeight:font.weight.bold, color:colors.primary,
+                  WebkitTapHighlightColor:'transparent', fontFamily:ff,
                 }}>
-                  <Icon icon="ph:list-bullets" width={16} height={16} color="#1B6EF3" />
+                  <Icon icon="ph:list-bullets" width={16} height={16} color={colors.primary} />
                   더 많은 업체 보기 ({totalCount > 10 ? totalCount - 10 : ''})
-                  <Icon icon="ph:caret-down" width={14} height={14} color="#1B6EF3" />
+                  <Icon icon="ph:caret-down" width={14} height={14} color={colors.primary} />
                 </button>
               </>
             )}
@@ -412,24 +395,24 @@ const CAT_ICONS: Record<string, string> = {
 
 function SectionLabel({ icon, label, color }: { icon:string; label:string; color:string }) {
   return (
-    <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:10 }}>
-      <Icon icon={icon} width={15} height={15} color={color} />
-      <span style={{ fontSize:13, fontWeight:800, color, letterSpacing:0.2 }}>{label}</span>
+    <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:spacing[3] }}>
+      <Icon icon={icon} width={14} height={14} color={color} />
+      <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color, letterSpacing:0.2 }}>{label}</span>
     </div>
   )
 }
 
 function LoadingState() {
   return (
-    <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+    <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
       {[0,1,2].map(i => (
         <div key={i} style={{
-          background:'#fff', borderRadius:12, padding:'20px 16px',
-          opacity:0.6,
+          background:colors.bgCard, borderRadius:radius.md, padding:`${spacing[4]}px`,
+          border:`1px solid ${colors.border}`, opacity:0.6,
         }}>
-          <div style={{ height:14, width:'55%', background:'#E2E8F0', borderRadius:6, marginBottom:10 }}/>
-          <div style={{ height:10, width:'35%', background:'#F1F5F9', borderRadius:6, marginBottom:8 }}/>
-          <div style={{ height:10, width:'80%', background:'#F1F5F9', borderRadius:6 }}/>
+          <div style={{ height:14, width:'55%', background:colors.gray100, borderRadius:radius.sm, marginBottom:spacing[2] }}/>
+          <div style={{ height:10, width:'35%', background:colors.gray100, borderRadius:radius.sm, marginBottom:spacing[2] }}/>
+          <div style={{ height:10, width:'80%', background:colors.gray100, borderRadius:radius.sm }}/>
         </div>
       ))}
     </div>
@@ -438,9 +421,9 @@ function LoadingState() {
 
 function EmptyState() {
   return (
-    <div style={{ textAlign:'center', padding:'48px 0', color:'#94A3B8', fontSize:14, fontWeight:600 }}>
-      <Icon icon="ph:magnifying-glass" width={36} height={36} color="#CBD5E1" />
-      <div style={{ marginTop:12 }}>검색 결과가 없어요</div>
+    <div style={{ textAlign:'center', padding:'48px 0', color:colors.textTertiary, fontSize:font.size.md, fontWeight:font.weight.medium }}>
+      <Icon icon="ph:magnifying-glass" width={36} height={36} color={colors.gray300} />
+      <div style={{ marginTop:spacing[3] }}>검색 결과가 없어요</div>
     </div>
   )
 }
@@ -542,39 +525,37 @@ const EMERGENCY_DATA = [
 ]
 
 function EmergencyTab() {
-  const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
   return (
     <div style={{ paddingBottom: 40 }}>
       {/* 안내 배너 */}
       <div style={{
-        background:'linear-gradient(135deg,#DC2626,#B91C1C)',
-        borderRadius:14, padding:'16px', marginBottom:16,
-        display:'flex', alignItems:'center', gap:12,
+        background:`linear-gradient(135deg,${colors.danger},#B91C1C)`,
+        borderRadius:radius.md, padding:`${spacing[4]}px`, marginBottom:spacing[4],
+        display:'flex', alignItems:'center', gap:spacing[3],
       }}>
         <Icon icon="ph:flag" width={36} height={36} color="#fff" />
         <div>
-          <div style={{ fontSize:15, fontWeight:800, color:'#fff', marginBottom:2 }}>호주 긴급 전화번호</div>
-          <div style={{ fontSize:12, color:'rgba(255,255,255,0.85)', lineHeight:1.5 }}>전화번호를 누르면 바로 연결돼요</div>
+          <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:'#fff', marginBottom:2 }}>호주 긴급 전화번호</div>
+          <div style={{ fontSize:font.size.sm, color:'rgba(255,255,255,0.85)', lineHeight:1.5 }}>전화번호를 누르면 바로 연결돼요</div>
         </div>
       </div>
 
       {EMERGENCY_DATA.map((group, gi) => (
-        <div key={gi} style={{ marginBottom:14 }}>
+        <div key={gi} style={{ marginBottom:spacing[3] }}>
           {/* 섹션 헤더 */}
           <div style={{
             display:'flex', alignItems:'center', gap:6,
-            fontSize:13, fontWeight:800, color: group.color,
-            marginBottom:8, paddingLeft:2,
+            fontSize:font.size.sm, fontWeight:font.weight.bold, color:group.color,
+            marginBottom:spacing[2], paddingLeft:2,
           }}>
-            <Icon icon={group.icon} width={15} height={15} color={group.color} />
+            <Icon icon={group.icon} width={14} height={14} color={group.color} />
             {group.section}
           </div>
 
           {/* 카드 */}
           <div style={{
-            background:'#fff', borderRadius:12, overflow:'hidden',
-            border:`1.5px solid ${group.border}`,
-            
+            background:colors.bgCard, borderRadius:radius.md, overflow:'hidden',
+            border:`1px solid ${group.border}`,
           }}>
             {group.items.map((item, ii) => (
               <a
@@ -582,23 +563,22 @@ function EmergencyTab() {
                 href={`tel:${item.number.replace(/\s/g, '')}`}
                 style={{
                   display:'flex', alignItems:'center', justifyContent:'space-between',
-                  padding:'13px 16px',
-                  borderBottom: ii < group.items.length - 1 ? '1px solid #F1F5F9' : 'none',
-                  textDecoration:'none',
-                  background: 'transparent',
+                  padding:`${spacing[3]}px ${spacing[4]}px`,
+                  borderBottom: ii < group.items.length - 1 ? `1px solid ${colors.gray100}` : 'none',
+                  textDecoration:'none', background:'transparent',
                 }}
               >
                 <div>
-                  <div style={{ fontSize:13, fontWeight:700, color:'#1E293B', fontFamily:ff }}>{item.label}</div>
-                  <div style={{ fontSize:11, color:'#94A3B8', marginTop:2, fontFamily:ff }}>{item.desc}</div>
+                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.textPrimary, fontFamily:ff }}>{item.label}</div>
+                  <div style={{ fontSize:font.size.xs, color:colors.textTertiary, marginTop:2, fontFamily:ff }}>{item.desc}</div>
                 </div>
                 <div style={{
                   display:'flex', alignItems:'center', gap:6,
-                  background: group.bg, borderRadius:10,
-                  padding:'8px 12px', flexShrink:0,
+                  background:group.bg, borderRadius:radius.sm,
+                  padding:`${spacing[2]}px ${spacing[3]}px`, flexShrink:0,
                 }}>
                   <Icon icon="ph:phone-call" width={14} height={14} color={group.color} />
-                  <span style={{ fontSize:14, fontWeight:800, color: group.color, fontFamily:ff, letterSpacing:0.3 }}>{item.number}</span>
+                  <span style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:group.color, fontFamily:ff, letterSpacing:0.3 }}>{item.number}</span>
                 </div>
               </a>
             ))}
@@ -607,7 +587,7 @@ function EmergencyTab() {
       ))}
 
       {/* 하단 안내 */}
-      <div style={{ textAlign:'center', padding:'16px 0', color:'#94A3B8', fontSize:12 }}>
+      <div style={{ textAlign:'center', padding:`${spacing[4]}px 0`, color:colors.textTertiary, fontSize:font.size.sm }}>
         긴급 상황 시 망설이지 말고 000에 전화하세요
       </div>
     </div>
