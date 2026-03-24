@@ -370,7 +370,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       padding:`${spacing[3]}px ${spacing[3]}px`,
                       background: colors.bgCard,
                       borderRadius:radius.md,
-                      border: checked ? `1.5px solid ${colors.primary}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                      border: checked ? `1.5px solid ${colors.success}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                       cursor:'pointer', transition:'all 0.15s',
                     }}
                     onClick={async()=>{
@@ -389,7 +389,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     </div>
                     {/* 텍스트 */}
                     <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color:checked?colors.primary:colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                      <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color:checked?colors.success:colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
                         {item.label}
                       </div>
                       <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'wrap' }}>
@@ -400,7 +400,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                           >일정 미지정</span>
                         )}
                         {checked && dayCount>0 && (state.schedules[item.id]??[]).map(dayIdx=>(
-                          <span key={dayIdx} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.primary, color:'#fff', borderRadius:radius.full, padding:`1px ${spacing[2]}px` }}>{dayIdx+1}일차</span>
+                          <span key={dayIdx} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.success, color:'#fff', borderRadius:radius.full, padding:`1px ${spacing[2]}px` }}>{dayIdx+1}일차</span>
                         ))}
                         {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium, marginLeft:'auto' }}>📍 {region.label}</span>}
                       </div>
@@ -415,7 +415,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                     }} style={{
                       width:24, height:24, borderRadius:6, flexShrink:0,
                       border: checked ? 'none' : `1.5px solid ${colors.gray300}`,
-                      background: checked ? colors.primary : colors.bgCard,
+                      background: checked ? colors.success : colors.bgCard,
                       display:'flex', alignItems:'center', justifyContent:'center',
                       cursor:'pointer', padding:0, transition:'all 0.15s',
                     }}>
