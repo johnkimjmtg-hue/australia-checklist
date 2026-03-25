@@ -425,40 +425,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
         .neu-tab:active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff; }
       `}</style>
 
-      {/* ── 헤더 */}
-      {!embedded && <div style={{ background: colors.bgPage, paddingBottom:8, flexShrink:0 }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 12px' }}>
-          <span onClick={() => onBack?.()}
-            style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}>
-            HOJUGAJA
-          </span>
-          <span style={{ fontSize:13, color:'#64748B', fontWeight:600 }}>
-            {city === 'melbourne' ? '멜번' : '시드니'}
-          </span>
-        </div>
-        <div style={{ display:'flex', padding:'0 10px', gap:8, overflowX:'auto', scrollbarWidth:'none' }}>
-          {([
-            { id:'bucketlist', icon:'ph:check-circle', label:'버킷리스트',  action: onBack },
-            { id:'shopping',   icon:'ph:shopping-bag', label:'쇼핑리스트',  action: () => {} },
-            { id:'bingo',      icon:'ph:coffee',       label:'카페빙고게임', action: () => {} },
-            { id:'community',  icon:'ph:chats-circle', label:'채팅방',      action: () => {} },
-            { id:'services',   icon:'ph:buildings',    label:'업체리스트',  action: () => {} },
-          ]).map(tab => {
-            const active = tab.id === 'bingo'
-            return (
-              <button key={tab.id} onClick={tab.action}
-                className={`neu-tab${active ? ' active' : ''}`}
-                style={{ flex:1, minWidth:0, height:52 }}>
-                <Icon icon={tab.icon} width={16} height={16} color={active ? '#1B6EF3' : '#94A3B8'} />
-                <span style={{ fontSize:9, fontWeight: active ? 700 : 500, color: active ? '#1B6EF3' : '#94A3B8', whiteSpace:'nowrap' }}>
-                  {tab.label}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </div>}
-
       {/* ── 도시 탭 (헤더 역할) */}
       <div style={{
         position:'sticky', top:0, zIndex:30,
