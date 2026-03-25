@@ -554,7 +554,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             { id:'melbourne', label:'멜번' },
           ] as { id: 'melbourne'|'sydney'; label: string }[]).map(c => (
             <button key={c.id} onClick={() => { setCity(c.id); onCityChange?.(c.id) }} style={{
-              flex:1, height:48, border:'none', cursor:'pointer',
+              flex:1, height:44, border:'none', cursor:'pointer',
               fontWeight: city===c.id ? font.weight.bold : font.weight.regular,
               fontSize: font.size.md,
               color: city===c.id ? colors.primary : colors.textTertiary,
@@ -571,7 +571,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       </div>
 
       {/* ── 상황판 */}
-      <div style={{ position:'sticky', top:48, zIndex:29, background: colors.bgPage, padding:'12px 16px 0' }}>
+      <div style={{ position:'sticky', top:44, zIndex:29, background: colors.bgPage, padding:'12px 16px 0' }}>
         <div style={{
           background:'#c8d4b8',
           borderRadius:12,
