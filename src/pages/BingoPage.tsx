@@ -610,7 +610,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       </div>
 
       {/* ── 5x5 빙고판 */}
-      <div style={{ flex:1, padding:`8px 12px ${embedded ? '62px' : '120px'}`, overflowY:'auto', minHeight:0 }}>
+      <div style={{ flex:1, padding:`8px 12px ${embedded ? '124px' : '62px'}`, overflowY:'auto', minHeight:0 }}>
         <div style={{
           display:'grid', gridTemplateColumns:'repeat(5, 1fr)',
           gap:6,
@@ -808,8 +808,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       })()}
 
       {/* ── 푸터 */}
-      {!embedded && <div style={{
-        position:'fixed', bottom:0,
+      <div style={{
+        position:'fixed', bottom: embedded ? 62 : 0,
         left:'50%', transform:'translateX(-50%)',
         width:'min(100%, 430px)',
         padding:`${spacing[2]}px ${spacing[3]}px`,
@@ -836,7 +836,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         }}>
           <Icon icon="ph:dots-three-vertical" width={18} height={18} color={colors.textSecondary} />
         </button>
-      </div>}
+      </div>
 
       {/* ── 더보기 바텀시트 */}
       {showMoreMenu && (
