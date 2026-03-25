@@ -318,7 +318,7 @@ export default function NearbyMap({ onBack }: Props) {
                 style={{
                   flex:1, height:28, borderRadius:20,
                   background: isActive ? colors.primaryLight : colors.bgCard,
-                  color: disabled ? colors.gray300 : colors.gray600,
+                  color: disabled ? colors.gray300 : colors.textPrimary,
                   border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                   cursor: disabled ? 'default' : 'pointer',
                   fontSize:font.size.xs, fontWeight:font.weight.bold,
