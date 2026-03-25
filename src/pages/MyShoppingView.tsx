@@ -109,7 +109,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
   }
 
   const toggleChecked = (id: string) => {
-    if (!userId) { setShowLoginPrompt(true); return }
     const wasChecked = !!myChecked[id]
     const next = { ...myChecked, [id]: !myChecked[id] }
     if (!next[id]) delete next[id]
@@ -293,7 +292,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           <Icon icon="ph:shopping-bag" width={18} height={18} color="#FF6B9D" />
           상품 추가하기
         </button>
-        <button onClick={() => setShowSaveConfirm(true)} style={{
+        <button onClick={() => { if (!userId) { setShowLoginPrompt(true) } else { setShowSaveConfirm(true) } }} style={{
           flex:1, height:44, borderRadius: radius.sm, border:'none',
           background: '#FF6B9D', color: '#fff',
           fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
@@ -369,7 +368,16 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 background:colors.bgCard, color:colors.textSecondary,
                 fontSize:font.size.md, fontWeight:font.weight.medium, cursor:'pointer', fontFamily:font.family,
               }}>취소</button>
-              <button onClick={() => { setShowSaveConfirm(false); onLanding() }} style={{
+              <button onClick={async () => {
+                if (userId) {
+                  await supabase.from('user_shopping').upsert(
+                    { user_id: userId, my_list: myList, my_checked: myChecked, updated_at: new Date().toISOString() },
+                    { onConflict: 'user_id' }
+                  )
+                }
+                setShowSaveConfirm(false)
+                onLanding()
+              }} style={{
                 flex:2, height:48, borderRadius:radius.sm, border:'none',
                 background:'#FF6B9D', color:'#fff',
                 fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family,
