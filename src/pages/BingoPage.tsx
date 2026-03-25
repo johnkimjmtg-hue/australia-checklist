@@ -232,6 +232,14 @@ function getStatusMsg(checked: number, bingo: number, city: 'melbourne'|'sydney'
   return { title: `${checked}개 카페 방문!`, sub: isMel ? '멜번 카페 투어가 시작됐어요 ☕' : '시드니 카페 투어가 시작됐어요 ☕' }
 }
 
+// DB 저장 헬퍼
+async function saveBingoDB(userId: string, city: string, checked: Set<number>) {
+  await supabase.from('user_bingo').upsert(
+    { user_id: userId, city, checked_indices: [...checked], updated_at: new Date().toISOString() },
+    { onConflict: 'user_id,city' }
+  )
+}
+
 type Props = { onBack?: () => void; embedded?: boolean; initialCity?: 'melbourne' | 'sydney'; onCityChange?: (city: 'melbourne'|'sydney') => void }
 export type BingoRef = { triggerSave: () => void; triggerShare: () => void; triggerReset: () => void }
 export { Props as BingoProps }
@@ -243,6 +251,8 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   const [melbourneCafes, setMelbourneCafes] = useState<BingoCafe[]>([])
   const [sydneyCafes, setSydneyCafes] = useState<BingoCafe[]>([])
   const [cafesLoading, setCafesLoading] = useState(true)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const [checkedMelbourne, setCheckedMelbourne] = useState<Set<number>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')) }
     catch { return new Set() }
@@ -288,14 +298,49 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
     setPrevBingoCount(bingoCount)
   }, [bingoCount])
 
+  // 로그인 감지 + DB 데이터 로드
+  useEffect(() => {
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setUserId(user.id)
+      // DB에서 빙고 체크 현황 로드
+      const { data } = await supabase
+        .from('user_bingo')
+        .select('city, checked_indices')
+        .eq('user_id', user.id)
+      if (data) {
+        data.forEach(row => {
+          const indices = new Set<number>(row.checked_indices ?? [])
+          if (row.city === 'melbourne') {
+            setCheckedMelbourne(indices)
+            localStorage.setItem('bingo-melbourne', JSON.stringify([...indices]))
+          } else if (row.city === 'sydney') {
+            setCheckedSydney(indices)
+            localStorage.setItem('bingo-sydney', JSON.stringify([...indices]))
+          }
+        })
+      }
+    }
+    init()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUserId(session?.user?.id ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
   // 로컬스토리지 저장
   useEffect(() => {
     localStorage.setItem('bingo-melbourne', JSON.stringify([...checkedMelbourne]))
-  }, [checkedMelbourne])
+    if (userId) saveBingoDB(userId, 'melbourne', checkedMelbourne)
+  }, [checkedMelbourne, userId])
   useEffect(() => {
     localStorage.setItem('bingo-sydney', JSON.stringify([...checkedSydney]))
-  }, [checkedSydney])
+    if (userId) saveBingoDB(userId, 'sydney', checkedSydney)
+  }, [checkedSydney, userId])
   const handleCell = (idx: number) => {
+    if (!userId) { setShowLoginPrompt(true); return }
     if (city === 'melbourne') {
       setCheckedMelbourne(prev => {
         const next = new Set(prev)
@@ -578,8 +623,18 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
               padding:`${spacing[3]}px ${spacing[3]}px ${spacing[8]}px`,
               boxSizing:'border-box',
             }}>
-              {/* 핸들 + 닫기 */}
+              {/* 핸들 */}
               <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[3]}px` }} />
+
+              {/* 카페 이미지 */}
+              {c.image_url && (
+                <div style={{
+                  width:'100%', height:180, borderRadius: radius.md,
+                  overflow:'hidden', marginBottom: spacing[3],
+                }}>
+                  <img src={c.image_url} alt={c.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                </div>
+              )}
 
               {/* 카페 카드 */}
               <div style={{ marginBottom: spacing[3] }}>
@@ -658,6 +713,41 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
           리셋
         </button>
       </div>}
+
+      {/* ── 로그인 유도 팝업 */}
+      {showLoginPrompt && (
+        <>
+          <div onClick={() => setShowLoginPrompt(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:900 }} />
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            background: colors.bgCard, borderRadius: radius.lg,
+            padding:`${spacing[6]}px ${spacing[5]}px`,
+            zIndex:901, width:'calc(100% - 48px)', maxWidth:300,
+            textAlign:'center', fontFamily: font.family,
+            boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
+          }}>
+            <div style={{ fontSize:32, marginBottom: spacing[3] }}>☕</div>
+            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>로그인이 필요해요</div>
+            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight:1.6 }}>
+              카페 방문 기록을 저장하려면<br/>로그인이 필요합니다.
+            </div>
+            <div style={{ display:'flex', gap: spacing[2] }}>
+              <button onClick={() => setShowLoginPrompt(false)} style={{
+                flex:1, height:44, borderRadius: radius.sm,
+                border:`1px solid ${colors.border}`, background: colors.bgCard,
+                color: colors.textSecondary, fontSize: font.size.md,
+                fontWeight: font.weight.medium, cursor:'pointer', fontFamily: font.family,
+              }}>취소</button>
+              <button onClick={() => { setShowLoginPrompt(false); onBack?.() }} style={{
+                flex:2, height:44, borderRadius: radius.sm, border:'none',
+                background: colors.primary, color:'#fff',
+                fontSize: font.size.md, fontWeight: font.weight.bold,
+                cursor:'pointer', fontFamily: font.family,
+              }}>로그인하기</button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ── 저장 확인 팝업 */}
       {showSaveConfirm && (
