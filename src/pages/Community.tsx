@@ -631,7 +631,7 @@ export default function Community() {
       background: colors.bgPage,
       fontFamily: ff,
       minHeight: '100%',
-      paddingBottom: 80,
+      paddingBottom: 140,
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
