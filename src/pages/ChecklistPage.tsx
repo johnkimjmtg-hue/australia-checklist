@@ -357,7 +357,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             </div>
           </div>
           <BucketCheckView state={state} trip={trip} setState={setState} items={ITEMS} dbItems={dbItems} onAchievedChange={setAchieved}
-            onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{}; try{localStorage.removeItem('bucket-achieved')}catch{}; setAchieved({}) }}
+            onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{}; if(userId) saveBucketlistDB(next, trip, achieved) }}
             onDelete={doReset}
             onShare={()=>{ const at=state.meta.lastIssuedAt??issuedAt; setIssuedAt(at); setShowReceipt(true) }}
             onLanding={()=>onLanding?.()} />
