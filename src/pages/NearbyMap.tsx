@@ -365,7 +365,7 @@ export default function NearbyMap({ onBack }: Props) {
         </div>
 
         {/* 커스텀 줌 버튼 — 오른쪽 아래 12% 위치 */}
-        <div style={{ position:'absolute', right:12, bottom:'15%', display:'flex', flexDirection:'column', gap:4 }}>
+        <div style={{ position:'absolute', right:12, bottom:'18%', display:'flex', flexDirection:'column', gap:4 }}>
           <button onClick={() => mapObj.current?.setZoom((mapObj.current?.getZoom() ?? 13) + 1)}
             style={{
               width:36, height:36, borderRadius:8,
@@ -387,7 +387,7 @@ export default function NearbyMap({ onBack }: Props) {
         {/* 내 위치로 이동 버튼 */}
         {myPos && (
           <button onClick={() => mapObj.current?.panTo(myPos)} className="map-btn" style={{
-            position:'absolute', bottom:'8%', right:12,
+            position:'absolute', bottom:'11%', right:12,
             width:36, height:36, borderRadius:8,
             background:colors.bgCard, border:`1px solid ${colors.border}`, cursor:'pointer',
             display:'flex', alignItems:'center', justifyContent:'center',
