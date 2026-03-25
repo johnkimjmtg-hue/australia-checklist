@@ -1047,32 +1047,32 @@ export default function Community() {
                   marginTop: continuous ? 0 : (idx > 0 && !shouldShowDate(idx) ? 4 : 0),
                   borderRadius: 8, transition: 'background 0.4s',
                 }}>
-                  {/* 아바타 + 닉네임 (상대방만, 연속이면 숨김) */}
+                  {/* 아바타 (상대방만, 연속이면 숨김) */}
                   {!isMine && (
-                    <div style={{ width: 44, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 3 }}>
+                    <div style={{ width: 34, flexShrink: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
                       {!continuous && (
-                        <>
-                          <div style={{
-                            fontSize: 10, fontWeight: 700, color: colors.textSecondary,
-                            whiteSpace: 'nowrap', maxWidth: 44,
-                            overflow: 'hidden', textOverflow: 'ellipsis',
-                            textAlign: 'center',
-                          }}>{msg.author_name}</div>
-                          <div style={{
-                            width: 34, height: 34, borderRadius: '50%',
-                            background: msg.author_icon ? colors.gray100 : color,
-                            border: msg.author_icon ? `1px solid ${colors.border}` : 'none',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: msg.author_icon ? 20 : 14,
-                            fontWeight: 800, color: '#fff',
-                            flexShrink: 0,
-                          }}>{msg.author_icon ?? msg.author_name[0]}</div>
-                        </>
+                        <div style={{
+                          width: 34, height: 34, borderRadius: '50%',
+                          background: msg.author_icon ? colors.bgCard : color,
+                          border: msg.author_icon ? `1px solid ${colors.border}` : 'none',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: msg.author_icon ? 20 : 14,
+                          fontWeight: 800, color: '#fff',
+                          flexShrink: 0,
+                        }}>{msg.author_icon ?? msg.author_name[0]}</div>
                       )}
                     </div>
                   )}
 
                   <div style={{ maxWidth: '72%', display: 'flex', flexDirection: 'column', alignItems: isMine ? 'flex-end' : 'flex-start' }}>
+
+                    {/* 이름 — 말풍선 위 왼쪽 (상대방, 연속 아닐 때만) */}
+                    {!isMine && !continuous && (
+                      <div style={{
+                        fontSize: 11, fontWeight: 700, color: colors.textSecondary,
+                        marginBottom: 3, paddingLeft: 2,
+                      }}>{msg.author_name}</div>
+                    )}
 
                     {/* 이미지 — 버블 밖, 텍스트 버블 위에 */}
                     {msg.image_url && (
