@@ -567,16 +567,15 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       {/* ══ 더보기 모달 ══ */}
       {showMoreMenu && (
-        <div style={{
-          position:'fixed', inset:0, zIndex:100,
-          background:'rgba(0,0,0,0.5)', backdropFilter:'blur(2px)',
-          display:'flex', alignItems:'flex-end', justifyContent:'center',
-        }} onClick={() => setShowMoreMenu(false)}>
+        <>
+          <div style={{ position:'fixed', inset:0, zIndex:100, background:'rgba(0,0,0,0.5)' }}
+            onClick={() => setShowMoreMenu(false)} />
           <div style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:400,
             background:colors.bgCard, borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
             padding:`${spacing[4]}px ${spacing[3]}px ${spacing[8]}px`,
-            animation:'slideUpSheet 0.25s ease',
+            zIndex:101, animation:'slideUpSheet 0.25s ease',
           }} onClick={e => e.stopPropagation()}>
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
             <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textTertiary, marginBottom:spacing[3], letterSpacing:0.5 }}>더보기</div>
@@ -599,7 +598,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
               <Icon icon="ph:trash" width={18} height={18} color={colors.danger} />리스트 삭제하기
             </button>
           </div>
-        </div>
+        </>
       )}
 
       {/* ── 아이템 삭제 확인 팝업 */}
