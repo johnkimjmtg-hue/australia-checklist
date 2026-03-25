@@ -631,7 +631,7 @@ export default function Community() {
       background: colors.bgPage,
       fontFamily: ff,
       minHeight: '100%',
-      paddingBottom: 140,
+      paddingBottom: 122,
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -996,7 +996,7 @@ export default function Community() {
         maxWidth: 430,
         background: colors.bgCard,
         borderTop: `1px solid ${colors.border}`,
-        padding: '6px 14px 10px',
+        padding: `${spacing[2]}px ${spacing[3]}px`,
         zIndex: 40, boxSizing: 'border-box',
       }}>
         {/* 답장 미리보기 */}
