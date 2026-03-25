@@ -162,7 +162,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   const handleIssue = () => {
     if(!trip){ setModal('noTrip'); return }
-    if(done===0){ triggerShake(); return }
+    if(done===0){ setModal('noItems'); return }
     const checkedIds=Object.keys(state.selected)
     const unscheduled=checkedIds.filter(id=>!(state.schedules[id]?.length))
     if(unscheduled.length>0){ setModal('noSchedule'); return }
@@ -518,6 +518,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {modal==='confirmReset'&&<AlertModal title="전체 초기화할까요?" message="체크 내용과 여행일정이 모두 삭제됩니다." confirmLabel="삭제" confirmColor={colors.danger} onConfirm={doReset} onCancel={()=>setModal('none')} />}
       {modal==='noTrip'&&<AlertModal title="여행일정을 먼저 설정해주세요" confirmLabel="날짜 입력하기" confirmFirst onConfirm={()=>{ setModal('none'); setTimeout(handleOpenTripPicker,100) }} onCancel={()=>setModal('none')} />}
       {modal==='noDate'&&<AlertModal title="출발일과 도착일을 모두 선택해주세요" confirmLabel="확인" onConfirm={()=>setModal('none')} onCancel={()=>setModal('none')} hideCancel />}
+      {modal==='noItems'&&<AlertModal title="선택된 항목이 없어요" message="버킷리스트 항목을 하나 이상 선택해야 발행할 수 있어요." confirmLabel="확인" onConfirm={()=>setModal('none')} onCancel={()=>setModal('none')} hideCancel />}
       {modal==='noSchedule'&&<AlertModal title="날짜 미지정 항목이 있어요" message="체크된 모든 항목에 날짜를 지정해야 발행할 수 있어요." confirmLabel="확인" onConfirm={()=>setModal('none')} onCancel={()=>setModal('none')} hideCancel />}
 
       {/* ── 쇼핑 상품 팝업 ── */}
