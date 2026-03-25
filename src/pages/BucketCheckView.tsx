@@ -184,6 +184,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [deleteItemId, setDeleteItemId] = useState<{ id: string; day?: number } | null>(null)
@@ -537,45 +538,68 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         <button onClick={onEdit} style={{
           flex:1, height:44, borderRadius:radius.sm,
           border:`1px solid ${colors.border}`, background:colors.bgCard,
-          color:colors.textSecondary, fontSize:font.size.sm, fontWeight:font.weight.bold,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold,
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
           WebkitTapHighlightColor:'transparent', fontFamily:font.family,
         }}>
-          <Icon icon="ph:pencil-simple" width={15} height={15} color={colors.textSecondary} />
-          수정
+          <Icon icon="ph:pencil-simple" width={16} height={16} color={colors.textSecondary} />
+          리스트 수정하기
         </button>
         <button onClick={() => setShowSaveConfirm(true)} style={{
           flex:1, height:44, borderRadius:radius.sm,
           border:'none', background:colors.primary,
-          color:'#fff', fontSize:font.size.sm, fontWeight:font.weight.bold,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          color:'#fff', fontSize:font.size.md, fontWeight:font.weight.bold,
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
           WebkitTapHighlightColor:'transparent', fontFamily:font.family,
         }}>
-          <Icon icon="ph:floppy-disk" width={15} height={15} color="#fff" />
-          저장
+          <Icon icon="ph:floppy-disk" width={16} height={16} color="#fff" />
+          저장하기
         </button>
-        <button onClick={() => { onShare() }} style={{
-          flex:1, height:44, borderRadius:radius.sm,
+        <button onClick={() => setShowMoreMenu(true)} style={{
+          width:44, height:44, borderRadius:radius.sm, flexShrink:0,
           border:`1px solid ${colors.border}`, background:colors.bgCard,
-          color:colors.textSecondary, fontSize:font.size.sm, fontWeight:font.weight.bold,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-          WebkitTapHighlightColor:'transparent', fontFamily:font.family,
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+          WebkitTapHighlightColor:'transparent',
         }}>
-          <Icon icon="ph:share-network" width={15} height={15} color={colors.textSecondary} />
-          공유
-        </button>
-        <button onClick={() => setShowDelete(true)} style={{
-          flex:1, height:44, borderRadius:radius.sm,
-          border:`1px solid ${colors.dangerLight}`, background:colors.dangerLight,
-          color:colors.danger, fontSize:font.size.sm, fontWeight:font.weight.bold,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-          WebkitTapHighlightColor:'transparent', fontFamily:font.family,
-        }}>
-          <Icon icon="ph:trash" width={15} height={15} color={colors.danger} />
-          삭제
+          <Icon icon="ph:dots-three-vertical" width={18} height={18} color={colors.textSecondary} />
         </button>
       </div>
 
+      {/* ══ 더보기 모달 ══ */}
+      {showMoreMenu && (
+        <div style={{
+          position:'fixed', inset:0, zIndex:100,
+          background:'rgba(0,0,0,0.5)', backdropFilter:'blur(2px)',
+          display:'flex', alignItems:'flex-end', justifyContent:'center',
+        }} onClick={() => setShowMoreMenu(false)}>
+          <div style={{
+            width:'100%', maxWidth:430,
+            background:colors.bgCard, borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
+            padding:`${spacing[4]}px ${spacing[3]}px ${spacing[8]}px`,
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
+            <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textTertiary, marginBottom:spacing[3], letterSpacing:0.5 }}>더보기</div>
+            <button onClick={() => { setShowMoreMenu(false); onShare() }} style={{
+              width:'100%', height:52, borderRadius:radius.md,
+              border:`1px solid ${colors.border}`, background:colors.bgCard,
+              color:colors.primary, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[2],
+              padding:`0 ${spacing[4]}px`, marginBottom:spacing[2], fontFamily:font.family,
+            }}>
+              <Icon icon="ph:share-network" width={18} height={18} color={colors.primary} />공유하기
+            </button>
+            <button onClick={() => { setShowMoreMenu(false); setShowDelete(true) }} style={{
+              width:'100%', height:52, borderRadius:radius.md,
+              border:`1px solid ${colors.dangerLight}`, background:colors.dangerLight,
+              color:colors.danger, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[2],
+              padding:`0 ${spacing[4]}px`, fontFamily:font.family,
+            }}>
+              <Icon icon="ph:trash" width={18} height={18} color={colors.danger} />리스트 삭제하기
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── 아이템 삭제 확인 팝업 */}
       {deleteItemId && (() => {
