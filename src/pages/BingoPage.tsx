@@ -15,84 +15,6 @@ interface BingoCafe {
 
 
 
-// ── 멜번 판테온 소제목 (1~25)
-const PANTHEON_TITLE: string[] = [
-  '빛의 여신', '어둠의 군주', '시간의 지배자', '공간의 창조자', '공허의 감시자',
-  '물의 여신', '불의 거인', '대지의 신', '바람의 정령', '생명의 여신',
-  '기억의 사서', '꿈의 무희', '지혜의 현자', '감정의 신', '예술의 무희',
-  '언어의 여신', '조화의 원소', '투쟁의 전사', '커피의 기원', '제작의 기술자',
-  '멜버른의 수호자', '게이샤의 영수', '융합의 혼합', '추출의 달인', '궁극의 창조신',
-]
-// ── 멜번 판테온 멘트 (1~25)
-const PANTHEON_LORE: string[] = [
-  '당신은 혼돈의 공허 속에 첫 번째 빛을 선언했습니다.',
-  '당신은 빛을 더욱 선명하게 할 심연의 어둠을 드리웠습니다.',
-  '당신은 영원히 멈춰 있던 세상에 시간의 바퀴를 돌리기 시작했습니다.',
-  '당신은 만물이 거할 무한한 우주와 행성의 공간을 빚어냈습니다.',
-  '당신은 존재의 경계를 획정하여 "있음"과 "없음"을 구분했습니다.',
-  '당신은 메마른 대지에 생명의 근원인 물을 흘려보냈습니다.',
-  '당신은 대지의 심장에 뜨거운 불과 마그마를 심어 에너지를 주었습니다.',
-  '당신은 솟구친 불로 산맥을 이루고 굳건한 땅을 다졌습니다.',
-  '당신은 정체된 공기에 숨결을 불어넣어 대기를 순환시켰습니다.',
-  '당신은 대지에 푸른 숲을 입히고 숨 쉬는 모든 생명을 깨웠습니다.',
-  '당신은 흐르는 시간 속에서 세상의 모든 "기억"을 기록으로 남겼습니다.',
-  '당신은 이성적인 세상 너머에 환상과 상상의 "꿈"을 펼쳤습니다.',
-  '당신은 세상의 진리를 탐구하는 지식과 지혜를 만물에 부여했습니다.',
-  '당신은 삶을 다채롭게 할 희로애락의 감정을 심장에 불어넣었습니다.',
-  '당신은 세상을 아름답게 수놓을 음악과 춤의 예술을 허락했습니다.',
-  '당신은 생각과 마음을 소리로 전하는 "언어"를 가르쳤습니다.',
-  '당신은 상반된 원소들을 조율하여 완벽한 "균형"을 이루었습니다.',
-  '당신은 성장을 위한 시련과 극복의 원동력인 "투쟁"을 시험했습니다.',
-  '당신은 세상의 모든 미각을 뛰어넘을 성스러운 "커피의 원두"를 점지했습니다.',
-  '당신은 커피를 도구로 다루는 고귀한 "기술"을 인간에게 전수했습니다.',
-  '당신은 커피의 정신이 깃든 도시, "멜버른"의 풍경을 그려냈습니다.',
-  '당신은 멜버른의 카페에 신비로운 향기를 더할 "게이샤"의 숨결을 불어넣었습니다.',
-  '당신은 전 세계의 커피 문화를 하나의 완벽한 "블렌드"로 융합했습니다.',
-  '당신은 한 방울의 완벽한 추출을 위해 기술을 극한으로 닦았습니다.',
-  '당신은 마침내 자신만의 완벽한 멜버른 판테온을 완성했습니다.',
-]
-
-// ── 멜번 판테온 이미지 (체크 시 표시)
-const MEL_IMGS = Array.from({ length: 25 }, (_, i) => `/mel_coffee/${i + 1}.jpg`)
-
-// ── 시드니 이미지 (체크 시 표시)
-const SYD_IMGS = Array.from({ length: 25 }, (_, i) => `/syd_coffee/${i + 1}.jpg`)
-// ── 시드니 소제목 (1~25)
-const SYDNEY_TITLE: string[] = [
-  '육분의와 지도', '요람의 탐험가', '모형 배를 깎는 소년', '지도를 그리는 소년', '깃발 꽂는 소년',
-  '양피지 지도', '쌍검의 청년 탐험가', '보물상자를 발견한 전사', '정글의 원시 전사', '해안을 내려다보는 제왕',
-  '망원경 속의 도시', '숲속의 궁수', '나침반을 든 손', '성을 지키는 기사', '성소의 황금 열쇠',
-  '천문기구를 든 손', '기마 대장', '사막의 곡도 전사', '선상 위 결투', '황금 술잔을 든 손',
-  '룬이 새겨진 단검', '황금 갑옷의 국왕', '빛의 팔라딘', '성검을 쥔 손', '태양의 제왕',
-]
-// ── 시드니 멘트 (1~25)
-const SYDNEY_LORE: string[] = [
-  '미지의 바다를 향한 첫 좌표가 찍혔습니다. 전설적인 항해의 시작입니다.',
-  '운명의 파도가 당신을 시드니의 해안으로 인도했습니다. 당신은 선택받은 아이입니다.',
-  '당신은 거친 바다를 정복하기 위해 자신만의 전설적인 돛을 빚기 시작했습니다.',
-  '아직 누구도 가보지 못한 세상을 상상하며 당신은 첫 번째 지도를 그렸습니다.',
-  '첫 번째 섬에 상륙했습니다! 당신의 깃발이 시드니의 바람에 펄럭이기 시작합니다.',
-  '개척의 기록이 시작되었습니다. 이제 당신의 발자국이 시드니의 지도가 됩니다.',
-  '안개 뚫린 낯선 해변, 당신은 양손에 검을 쥐고 미지의 섬으로 뛰어들었습니다.',
-  '숨겨진 성소에서 잠들어 있던 고대의 지혜와 보물을 손에 넣었습니다.',
-  '당신은 거친 야생의 시련을 뚫고 대자연의 힘을 다스리는 법을 배웠습니다.',
-  '높은 절벽 위에서 광활한 시드니의 바다를 바라보며 영토의 주권을 선포했습니다.',
-  '안개 너머, 마침내 당신이 세울 위대한 도시의 실루엣이 보이기 시작합니다.',
-  '보이지 않는 위협조차 꿰뚫는 날카로운 감각으로 시드니의 내륙을 정복했습니다.',
-  '당신의 의지가 곧 나침반의 방향입니다. 이제 당신은 절대 길을 잃지 않습니다.',
-  '당신은 스스로 시드니의 방패가 되어, 당신이 일군 문명을 지키기로 맹세했습니다.',
-  '닫혀 있던 고대의 문을 열었습니다. 이제 도시의 모든 비밀이 당신 앞에 드러납니다.',
-  '당신은 하늘의 별자리를 읽어 운명의 흐름을 완벽히 통제하게 되었습니다.',
-  '당신을 따르는 수많은 추종자와 함께 시드니의 거친 평원을 가로지릅니다.',
-  '타는 듯한 태양과 모래바람 속에서도 당신의 개척 의지는 꺾이지 않았습니다.',
-  '거친 파도 위에서 위협적인 적들을 제압하고 바다의 진정한 지배자가 되었습니다.',
-  '수많은 시련 끝에 얻은 승리의 만찬, 당신의 명성은 온 대륙에 울려 퍼집니다.',
-  '당신은 무기에 깃든 고대의 마법을 깨워, 인간을 초월한 힘을 얻었습니다.',
-  '모든 섬을 통일한 당신은 마침내 시드니를 호령하는 위대한 국왕이 되었습니다.',
-  '당신의 존재 자체가 시드니의 빛이 되어 모든 어둠과 혼돈을 몰아냅니다.',
-  '마지막 시련을 끝낼 전설의 검을 뽑았습니다. 대륙의 모든 전율이 멈춥니다.',
-  "축하합니다! 25개의 신대륙을 모두 정복한 당신은 이제 '시드니의 제왕'입니다.",
-]
 // ── 빙고 라인 체크 (5x5)
 function getBingoLines(checked: Set<number>): number[][] {
   const lines: number[][] = []
@@ -287,32 +209,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
   const [showSydAllDone, setShowSydAllDone] = useState(false)
-  const [showIntro, setShowIntro] = useState(() => {
-    try {
-      const mel = JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')
-      return Array.isArray(mel) && mel.length === 0
-    } catch { return true }
-  })
-  const [showSydIntro, setShowSydIntro] = useState(() => {
-    try {
-      const syd = JSON.parse(localStorage.getItem('bingo-sydney') ?? '[]')
-      return Array.isArray(syd) && syd.length === 0
-    } catch { return true }
-  })
-  const [orderMelbourne, setOrderMelbourne] = useState<number[]>(() => {
-    try { return JSON.parse(localStorage.getItem('bingo-order-melbourne') ?? '[]') }
-    catch { return [] }
-  })
-  const [orderSydney, setOrderSydney] = useState<number[]>(() => {
-    try { return JSON.parse(localStorage.getItem('bingo-order-sydney') ?? '[]') }
-    catch { return [] }
-  })
-  const checkOrder    = city === 'melbourne' ? orderMelbourne : orderSydney
-  const setCheckOrder = (val: number[]) => {
-    if (city === 'melbourne') setOrderMelbourne(val)
-    else setOrderSydney(val)
-  }
-  const [lastCheckedIdx, setLastCheckedIdx] = useState<number|null>(null)
   const [selectedCafe, setSelectedCafe] = useState<{ cafe: BingoCafe; idx: number } | null>(null)
 
   const completedLines = getCompletedLines(checked)
@@ -326,22 +222,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
     updateWidth()
     window.addEventListener('resize', updateWidth)
     return () => window.removeEventListener('resize', updateWidth)
-  }, [])
-
-  // checkOrder 싱크 보정 — checked에 있는데 order에 없으면 뒤에 추가
-  useEffect(() => {
-    const missing = [...checkedMelbourne].filter(i => !orderMelbourne.includes(i))
-    if (missing.length > 0) setOrderMelbourne(prev => [...prev, ...missing])
-  }, [])
-  useEffect(() => {
-    const missing = [...checkedSydney].filter(i => !orderSydney.includes(i))
-    if (missing.length > 0) setOrderSydney(prev => [...prev, ...missing])
-  }, [])
-
-  // 이미지 preload — 마운트 시 백그라운드에서 미리 다운로드
-  useEffect(() => {
-    MEL_IMGS.forEach(src => { const img = new Image(); img.src = src })
-    SYD_IMGS.forEach(src => { const img = new Image(); img.src = src })
   }, [])
 
   // 전체 완료 감지
@@ -369,23 +249,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   useEffect(() => {
     localStorage.setItem('bingo-sydney', JSON.stringify([...checkedSydney]))
   }, [checkedSydney])
-  useEffect(() => {
-    localStorage.setItem('bingo-order-melbourne', JSON.stringify(orderMelbourne))
-  }, [orderMelbourne])
-  useEffect(() => {
-    localStorage.setItem('bingo-order-sydney', JSON.stringify(orderSydney))
-  }, [orderSydney])
-
   const handleCell = (idx: number) => {
-    const isChecked = checked.has(idx)
-    if (!isChecked) {
-      setLastCheckedIdx(idx)
-      if (city === 'melbourne') setOrderMelbourne(prev => prev.includes(idx) ? prev : [...prev, idx])
-      else setOrderSydney(prev => prev.includes(idx) ? prev : [...prev, idx])
-    } else {
-      if (city === 'melbourne') setOrderMelbourne(prev => prev.filter(i => i !== idx))
-      else setOrderSydney(prev => prev.filter(i => i !== idx))
-    }
     if (city === 'melbourne') {
       setCheckedMelbourne(prev => {
         const next = new Set(prev)
@@ -439,15 +303,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
     triggerShare: () => handleShare(),
     triggerReset: () => setShowReset(true),
   }))
-
-  const handleCloseIntro = () => {
-    localStorage.setItem('bingo-mel-intro-seen', '1')
-    setShowIntro(false)
-  }
-
-  const handleLogoTap = () => {
-    onBack()
-  }
 
   // 빙고 라인에 포함된 셀 인덱스
   const highlightedCells = new Set(completedLines.flat())
@@ -520,7 +375,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       {/* ── 헤더 */}
       {!embedded && <div style={{ background: colors.bgPage, paddingBottom:8, flexShrink:0 }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 12px' }}>
-          <span onClick={handleLogoTap}
+          <span onClick={() => onBack?.()}
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}>
             HOJUGAJA
           </span>
@@ -588,25 +443,11 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
         }}>
           <MiniGrid count={checked.size} />
           <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.textTertiary, letterSpacing:1, marginBottom: spacing[1] }}>
-              {city === 'melbourne' ? '멜번 판테온: 창조의 연대기' : '태양의 항해: 시드니 개척 연대기'}
-            </div>
             <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1], lineHeight:1.3 }}>
               {getStatusMsg(checked.size, bingoCount, city).title}
             </div>
-            {lastCheckedIdx !== null && checkOrder.includes(lastCheckedIdx) && (
-              <div style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.primary, letterSpacing:0.5, marginBottom: spacing[1] }}>
-                {city === 'melbourne'
-                  ? PANTHEON_TITLE[checkOrder.indexOf(lastCheckedIdx)]
-                  : SYDNEY_TITLE[checkOrder.indexOf(lastCheckedIdx)]}
-              </div>
-            )}
             <div style={{ fontSize: font.size.sm, color: colors.textTertiary, fontWeight: font.weight.regular, lineHeight:1.5 }}>
-              {lastCheckedIdx !== null && checkOrder.includes(lastCheckedIdx)
-                ? (city === 'melbourne'
-                    ? PANTHEON_LORE[checkOrder.indexOf(lastCheckedIdx)]
-                    : SYDNEY_LORE[checkOrder.indexOf(lastCheckedIdx)])
-                : getStatusMsg(checked.size, bingoCount, city).sub}
+              {getStatusMsg(checked.size, bingoCount, city).sub}
             </div>
           </div>
           {/* 카운터 */}
@@ -627,8 +468,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
             const isChecked = checked.has(idx)
             const isHighlight = highlightedCells.has(idx)
             const isStamping = stampAnim === idx
-            const orderIdx = checkOrder.indexOf(idx)  // 체크 순서 (0-based), -1이면 미체크
-            const imgNum = orderIdx >= 0 ? orderIdx + 1 : null  // 1~25
             return (
               <div
                 key={c.id}
@@ -654,25 +493,26 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                 {/* 이미지 */}
                 <div style={{
                   width:'100%', flex:1,
-                  background: isChecked
-                    ? 'linear-gradient(135deg, #6F4E37 0%, #a0522d 100%)'
-                    : 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)',
+                  background: colors.gray100,
                   display:'flex', alignItems:'center', justifyContent:'center',
-                  transition:'background 0.3s',
                   overflow:'hidden', position:'relative',
                 }}>
-                  {isChecked && imgNum !== null ? (
-                    <img src={city === 'melbourne' ? MEL_IMGS[imgNum - 1] : SYD_IMGS[imgNum - 1]} alt={`stamp-${imgNum}`}
-                      style={{ width:'100%', height:'100%', objectFit:'cover', transition:'opacity 0.3s' }}
-                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
-                    />
-                  ) : (
-                    <img
-                      src={city === 'melbourne' ? `/mel_coffee/mel_image/${c.sort_order}.jpg` : `/syd_coffee/syd_image/${c.sort_order}.jpg`}
-                      alt={c.name}
-                      style={{ width:'100%', height:'100%', objectFit:'cover' }}
-                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
-                    />
+                  <img
+                    src={city === 'melbourne' ? `/mel_coffee/mel_image/${c.sort_order}.jpg` : `/syd_coffee/syd_image/${c.sort_order}.jpg`}
+                    alt={c.name}
+                    style={{ width:'100%', height:'100%', objectFit:'cover' }}
+                    onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                  {/* 체크 오버레이 */}
+                  {isChecked && (
+                    <div style={{
+                      position:'absolute', inset:0,
+                      background:'rgba(27,110,243,0.55)',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      animation: isStamping ? 'stampIn 0.5s ease both' : 'none',
+                    }}>
+                      <Icon icon="ph:check-bold" width={28} height={28} color="#fff" />
+                    </div>
                   )}
                 </div>
 
@@ -680,31 +520,10 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                 <div style={{
                   width:'100%', padding:'3px 4px',
                   fontSize:9, fontWeight:700, textAlign:'center',
-                  color: isChecked ? '#6F4E37' : '#64748B',
-                  lineHeight:1.2,
-                  background:'#fff',
+                  color: isChecked ? colors.primary : colors.textSecondary,
+                  lineHeight:1.2, background: colors.bgCard,
                   whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
                 }}>{c.name}</div>
-
-                {/* 도장 오버레이 */}
-                {isChecked && (
-                  <div style={{
-                    position:'absolute', inset:0,
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                    pointerEvents:'none',
-                  }}>
-                    <div style={{
-                      width:18, height:18,
-                      border:'2px solid rgba(255,255,255,0.9)',
-                      borderRadius:'50%',
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      background:'rgba(255,255,255,0.15)',
-                      animation: isStamping ? 'stampIn 0.5s ease both' : 'none',
-                    }}>
-                      <Icon icon="ph:check-bold" width={10} height={10} color="rgba(255,255,255,1)" />
-                    </div>
-                  </div>
-                )}
               </div>
             )
           })}
@@ -717,18 +536,10 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       {selectedCafe && (() => {
         const { cafe: c, idx } = selectedCafe
         const isChecked = checked.has(idx)
-        const orderIdx  = checkOrder.indexOf(idx)
-        const imgNum    = orderIdx >= 0 ? orderIdx + 1 : checkOrder.length + 1
-        const stampSrc  = city === 'melbourne' ? MEL_IMGS[imgNum - 1] : SYD_IMGS[imgNum - 1]
-        const lore      = city === 'melbourne' ? PANTHEON_LORE[imgNum - 1] : SYDNEY_LORE[imgNum - 1]
-        const title     = city === 'melbourne' ? PANTHEON_TITLE[imgNum - 1] : SYDNEY_TITLE[imgNum - 1]
 
         const handleToggle = () => {
-          const willCheck = !isChecked
           handleCell(idx)
-          if (willCheck) {
-            setTimeout(() => setSelectedCafe(null), 500)
-          }
+          if (!isChecked) setTimeout(() => setSelectedCafe(null), 400)
         }
 
         return (
@@ -738,78 +549,44 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
               position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
               width:'100%', maxWidth:390,
               maxHeight:'85vh', overflowY:'auto',
-              borderRadius:'20px 20px 0 0',
-              background: colors.bgCard,
-              padding:'12px 12px 32px',
+              borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
+              background: colors.bgPage,
+              padding:`${spacing[3]}px ${spacing[3]}px ${spacing[8]}px`,
               boxSizing:'border-box',
             }}>
-              {/* 닫기 */}
-              <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:8 }}>
-                <button onClick={() => setSelectedCafe(null)}
-                  style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', color:'#94A3B8' }}>✕</button>
+              {/* 핸들 + 닫기 */}
+              <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[3]}px` }} />
+
+              {/* 카페 카드 */}
+              <div style={{ marginBottom: spacing[3] }}>
+                {c.business_id
+                  ? <CafeBusinessInfo businessId={c.business_id} />
+                  : (
+                    <div style={{
+                      background: colors.bgCard, borderRadius: radius.md,
+                      border:`1px solid ${colors.border}`, padding:`${spacing[4]}px`,
+                      textAlign:'center',
+                    }}>
+                      <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1] }}>{c.name}</div>
+                      <div style={{ fontSize: font.size.sm, color: colors.textTertiary }}>업체 정보가 아직 연결되지 않았어요</div>
+                    </div>
+                  )
+                }
               </div>
 
-              {/* 상단: 스탬프 이미지 + 멘트 + 체크 */}
-              {(() => {
-                const themeColor = city === 'melbourne' ? '#6F4E37' : '#6F4E37'
-                const themeBg    = city === 'melbourne' ? 'rgba(111,78,55,0.08)' : 'rgba(111,78,55,0.08)'
-                return (
-                  <div style={{
-                    background:'#fff', borderRadius:16, padding:'16px',
-                    marginBottom:12, border:'1px solid #C8C8C8',
-                  }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:14 }}>
-                      {/* 원형 스탬프 이미지 */}
-                      <div style={{
-                        width:80, height:80, borderRadius:'50%', flexShrink:0,
-                        overflow:'hidden', border:`3px solid ${themeColor}`,
-                        background:'linear-gradient(135deg,#6F4E37,#a0522d)',
-                      }}>
-                        <img
-                          src={stampSrc}
-                          alt={`stamp-${imgNum}`}
-                          style={{ width:'100%', height:'100%', objectFit:'cover' }}
-                          onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
-                        />
-                      </div>
-                      {/* 멘트 */}
-                      <div style={{ flex:1 }}>
-                        {title && <div style={{ fontSize:14, fontWeight:800, color:themeColor, marginBottom:6 }}>{title}</div>}
-                        {lore  && <div style={{ fontSize:12, color:'#475569', lineHeight:1.7 }}>{lore}</div>}
-                      </div>
-                    </div>
-                    {/* 체크박스 */}
-                    <div
-                      onClick={handleToggle}
-                      style={{
-                        display:'flex', alignItems:'center', gap:10,
-                        background: themeBg, borderRadius:10,
-                        padding:'12px 14px', cursor:'pointer',
-                        border:`1.5px solid ${isChecked ? themeColor : '#C8C8C8'}`,
-                      }}
-                    >
-                      <div style={{
-                        width:22, height:22, borderRadius:6, flexShrink:0,
-                        border:`2px solid ${themeColor}`,
-                        background: isChecked ? themeColor : '#fff',
-                        display:'flex', alignItems:'center', justifyContent:'center',
-                        transition:'all 0.2s',
-                      }}>
-                        {isChecked && <Icon icon="ph:check-bold" width={13} height={13} color="#fff" />}
-                      </div>
-                      <span style={{ fontSize:14, fontWeight:700, color: isChecked ? themeColor : '#64748B' }}>
-                        {isChecked ? '이 카페를 정복하셨습니다.' : '이 카페를 정복합니다'}
-                      </span>
-                    </div>
-                  </div>
-                )
-              })()}
-
-              {/* 업체 정보 */}
-              {c.business_id
-                ? <CafeBusinessInfo businessId={c.business_id} />
-                : <div style={{ textAlign:'center', padding:24, color:'#94A3B8', fontSize:14 }}>업체 정보가 아직 연결되지 않았어요</div>
-              }
+              {/* 방문 완료 버튼 */}
+              <button onClick={handleToggle} style={{
+                width:'100%', height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
+                background: isChecked ? colors.dangerLight : colors.primary,
+                color: isChecked ? colors.danger : '#fff',
+                fontSize: font.size.md, fontWeight: font.weight.bold,
+                display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
+                fontFamily: font.family,
+                transition:'all 0.15s',
+              }}>
+                <Icon icon={isChecked ? 'ph:x-circle' : 'ph:check-circle'} width={20} height={20} color={isChecked ? colors.danger : '#fff'} />
+                {isChecked ? '방문 취소하기' : '방문 완료!'}
+              </button>
             </div>
           </div>
         )
@@ -889,109 +666,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       )}
 
       {/* ── 더보기 바텀시트 (미사용, 유지) */}
-
-      {/* ── 인트로 팝업 */}
-      {showIntro && city === 'melbourne' && (
-        <>
-          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:800, animation:'fadeIn 0.3s ease' }}
-            onClick={handleCloseIntro} />
-          <div style={{
-            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-            zIndex:801, width:'calc(100% - 32px)', maxWidth:360,
-            background:'#0F172A', borderRadius:20,
-            overflow:'hidden',
-            boxShadow:'0 24px 48px rgba(0,0,0,0.4)',
-            animation:'scaleIn 0.25s ease',
-          }}>
-            {/* 표지 이미지 */}
-            <img src="/mel_coffee/mel.jpg" alt="멜번 판테온"
-              style={{ width:'100%', aspectRatio:'1', objectFit:'cover', display:'block' }} />
-            {/* 텍스트 */}
-            <div style={{ padding:'20px 20px 24px' }}>
-              <div style={{ fontSize:13, fontWeight:800, color:'#FFB800', letterSpacing:1, marginBottom:8 }}>
-                멜번 판테온: 창조의 연대기
-              </div>
-              <div style={{ fontSize:13, color:'#CBD5E1', lineHeight:1.7, marginBottom:16 }}>
-                태초의 정적을 깨고, 멜번을 완성할 <span style={{ color:'#FFB800', fontWeight:700 }}>'카페의 신'</span>이 바로 당신입니까?
-                25개의 성소(카페)에 봉인된 창조신들이 당신의 방문을 기다리고 있습니다.
-              </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:16 }}>
-                {[
-                  { icon:'ph:map-pin', text:'성소를 찾으세요: 빙고맵에 표시된 25곳의 카페로 향하십시오.' },
-                  { icon:'ph:lock-open', text:'봉인을 푸세요: 커피를 즐긴 후 빙고 칸을 터치해 신들을 깨우십시오.' },
-                  { icon:'ph:crown', text:'세계를 완성하세요: 모든 신을 깨우는 순간, 당신은 멜번을 지배하는 궁극의 바리스타로 등극합니다.' },
-                ].map((item, i) => (
-                  <div key={i} style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
-                    <Icon icon={item.icon} width={14} height={14} color="#FFB800" style={{ marginTop:2, flexShrink:0 }} />
-                    <span style={{ fontSize:11, color:'#94A3B8', lineHeight:1.6 }}>{item.text}</span>
-                  </div>
-                ))}
-              </div>
-              <div style={{ fontSize:12, color:'#64748B', fontStyle:'italic', textAlign:'center', marginBottom:16 }}>
-                "지금 첫 번째 원두의 향기를 따라 여정을 시작하십시오!"
-              </div>
-              <button onClick={handleCloseIntro} style={{
-                width:'100%', height:50, borderRadius:12, border:'none',
-                background:'linear-gradient(135deg, #FFB800, #FF8C00)',
-                color:'#0F172A', fontSize:15, fontWeight:800, cursor:'pointer',
-                boxShadow:'0 4px 16px rgba(255,184,0,0.4)',
-              }}>
-                ☕ 여정을 시작합니다
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ── 시드니 인트로 팝업 */}
-      {showSydIntro && city === 'sydney' && (
-        <>
-          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:800, animation:'fadeIn 0.3s ease' }}
-            onClick={() => setShowSydIntro(false)} />
-          <div style={{
-            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-            zIndex:801, width:'calc(100% - 32px)', maxWidth:360,
-            background:'#0A1628', borderRadius:20,
-            overflow:'hidden',
-            boxShadow:'0 24px 48px rgba(0,0,0,0.4)',
-            animation:'scaleIn 0.25s ease', overflowY:'auto', maxHeight:'90vh',
-          }}>
-            <img src="/syd_coffee/syd.jpg" alt="태양의 항해"
-              style={{ width:'100%', aspectRatio:'16/9', objectFit:'cover', display:'block' }} />
-            <div style={{ padding:'20px 20px 24px' }}>
-              <div style={{ fontSize:13, fontWeight:800, color:'#38BDF8', letterSpacing:1, marginBottom:4 }}>
-                ⛵ 태양의 항해: 25개의 신대륙
-              </div>
-              <div style={{ fontSize:11, color:'#38BDF8', marginBottom:12, fontStyle:'italic' }}>
-                "미지의 바다를 향해 전설의 돛을 올려라!"
-              </div>
-              <div style={{ fontSize:12, color:'#CBD5E1', lineHeight:1.8, marginBottom:10 }}>
-                당신은 태양의 인도를 받는 전설적인 탐험가입니다. 당신의 눈앞에 펼쳐진 시드니는 아직 그 누구도 발을 들이지 못한, 신비로운 25개의 섬으로 이루어진 '미개척의 땅'입니다.
-              </div>
-              <div style={{ fontSize:12, color:'#94A3B8', lineHeight:1.8, marginBottom:10 }}>
-                이 섬들은 거친 파도와 안개 속에 몸을 숨긴 채, 자신들을 정복하고 가치를 알아봐 줄 '위대한 개척자'를 기다리고 있습니다.
-              </div>
-              <div style={{ fontSize:12, color:'#94A3B8', lineHeight:1.8, marginBottom:10 }}>
-                당신의 미션은 명확합니다. 거친 바다를 뚫고 25개의 섬(카페)에 차례로 상륙하여 당신의 표식(깃발)을 꽂는 것입니다. 첫 번째 섬에 상륙하여 커피 향기를 만끽하는 순간, 당신의 위대한 항해는 시작됩니다.
-              </div>
-              <div style={{ fontSize:12, color:'#94A3B8', lineHeight:1.8, marginBottom:10 }}>
-                섬을 하나씩 정복할 때마다 당신의 지도 위에는 새로운 대륙이 그려지고, 당신의 이름은 시드니의 역사에 새겨질 것입니다. 25개의 모든 섬에 깃발이 펄럭이는 날, 시드니의 모든 바다와 땅은 당신의 영토가 되며 당신은 마침내 <span style={{ color:'#38BDF8', fontWeight:700 }}>'시드니의 제왕'</span>의 칭호를 얻게 될 것입니다.
-              </div>
-              <div style={{ fontSize:12, color:'#38BDF8', fontStyle:'italic', textAlign:'center', marginBottom:18 }}>
-                "자, 이제 닻을 올리십시오. 당신만의 새로운 세계가 기다리고 있습니다!"
-              </div>
-              <button onClick={() => setShowSydIntro(false)} style={{
-                width:'100%', height:50, borderRadius:12, border:'none',
-                background:'linear-gradient(135deg, #1B6EF3, #0ea5e9)',
-                color:'#fff', fontSize:15, fontWeight:800, cursor:'pointer',
-                boxShadow:'0 4px 16px rgba(27,110,243,0.4)',
-              }}>
-                ⛵ 항해를 시작합니다
-              </button>
-            </div>
-          </div>
-        </>
-      )}
 
       {/* ── 전체 완료 모달 */}
       {showAllDone && (
