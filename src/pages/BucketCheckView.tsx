@@ -578,24 +578,49 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             padding:`${spacing[4]}px ${spacing[3]}px ${spacing[8]}px`,
           }} onClick={e => e.stopPropagation()}>
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
-            <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textTertiary, marginBottom:spacing[3], letterSpacing:0.5 }}>더보기</div>
+
+            {/* 저장하기 */}
+            <button onClick={() => { setShowMoreMenu(false); setShowSaveConfirm(true) }} style={{
+              width:'100%', height:52, borderRadius:radius.md,
+              border:`1px solid ${colors.border}`, background:colors.bgCard,
+              color:colors.textPrimary, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[3],
+              padding:`0 ${spacing[4]}px`, marginBottom:spacing[2], fontFamily:font.family,
+            }}>
+              <Icon icon="ph:floppy-disk" width={18} height={18} color={colors.textSecondary} />저장하기
+            </button>
+
+            {/* 수정하기 */}
+            <button onClick={() => { setShowMoreMenu(false); onEdit() }} style={{
+              width:'100%', height:52, borderRadius:radius.md,
+              border:`1px solid ${colors.border}`, background:colors.bgCard,
+              color:colors.textPrimary, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[3],
+              padding:`0 ${spacing[4]}px`, marginBottom:spacing[2], fontFamily:font.family,
+            }}>
+              <Icon icon="ph:pencil-simple" width={18} height={18} color={colors.textSecondary} />수정하기
+            </button>
+
+            {/* 공유하기 */}
             <button onClick={() => { setShowMoreMenu(false); onShare() }} style={{
               width:'100%', height:52, borderRadius:radius.md,
               border:`1px solid ${colors.border}`, background:colors.bgCard,
-              color:colors.primary, fontSize:font.size.md, fontWeight:font.weight.bold,
-              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[2],
+              color:colors.textPrimary, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[3],
               padding:`0 ${spacing[4]}px`, marginBottom:spacing[2], fontFamily:font.family,
             }}>
-              <Icon icon="ph:share-network" width={18} height={18} color={colors.primary} />공유하기
+              <Icon icon="ph:share-network" width={18} height={18} color={colors.textSecondary} />공유하기
             </button>
+
+            {/* 삭제하기 */}
             <button onClick={() => { setShowMoreMenu(false); setShowDelete(true) }} style={{
               width:'100%', height:52, borderRadius:radius.md,
               border:`1px solid ${colors.dangerLight}`, background:colors.dangerLight,
               color:colors.danger, fontSize:font.size.md, fontWeight:font.weight.bold,
-              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[2],
+              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[3],
               padding:`0 ${spacing[4]}px`, fontFamily:font.family,
             }}>
-              <Icon icon="ph:trash" width={18} height={18} color={colors.danger} />리스트 삭제하기
+              <Icon icon="ph:trash" width={18} height={18} color={colors.danger} />삭제하기
             </button>
           </div>
         </div>
