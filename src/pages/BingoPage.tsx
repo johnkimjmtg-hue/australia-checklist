@@ -579,7 +579,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       </div>
 
       {/* ── 상황판 */}
-      <div style={{ position:'sticky', top:44, zIndex:29, background: colors.bgPage, padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
+      <div style={{ background: colors.bgPage, padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
         <div style={{
           background: colors.bgCard,
           borderRadius: radius.lg,
