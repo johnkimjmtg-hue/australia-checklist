@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
+import { colors, font, radius, spacing, shadow } from '../styles/tokens'
 
 // ── 공유 상수
 interface Product {
@@ -118,8 +119,8 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
 
   return (
     <div ref={pageRef} style={{
-      background:'#e8e8e8', minHeight:'100vh',
-      fontFamily:'"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
+      background: colors.bgPage, minHeight:'100vh',
+      fontFamily: font.family,
       maxWidth:480, margin:'0 auto', position:'relative',
     }}>
       <style>{`
@@ -144,7 +145,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
       <PetalBurst trigger={petalTrigger} />
 
       {/* ── 진행 카드 */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'16px 16px 0' }}>
+      <div style={{ position:'sticky', top:0, zIndex:30, background: colors.bgPage, padding:`${spacing[4]}px ${spacing[4]}px 0` }}>
         <div style={{
           background:'#e8b8e8',
           borderRadius:12,
@@ -194,25 +195,23 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
             return (
               <div key={p.id} className="my-item" style={{
                 display:'flex', alignItems:'stretch',
-                borderRadius:14,
-                background: checked ? '#fff0f5' : '#fff',
-                border:'1px solid #C8C8C8',
-                borderLeft: checked ? '4px solid #FF6B9D' : '4px solid #CBD5E1',
+                borderRadius: radius.md,
+                background: checked ? '#fff0f5' : colors.bgCard,
+                border:`1px solid ${colors.border}`,
+                borderLeft: checked ? '4px solid #FF6B9D' : `4px solid ${colors.gray200}`,
                 transition:'all 0.3s', overflow:'hidden',
+                boxShadow: shadow.card,
               }}>
-                {/* 이미지 6:4 */}
                 <div onClick={() => setSelProduct(p)} style={{
                   width:110, flexShrink:0,
-                  background: p.image_url ? 'none' : '#f0f0f0',
+                  background: p.image_url ? 'none' : colors.gray100,
                   display:'flex', alignItems:'center', justifyContent:'center',
-                  overflow:'hidden', cursor:'pointer',
-                  position:'relative',
+                  overflow:'hidden', cursor:'pointer', position:'relative',
                 }}>
                   {p.image_url
                     ? <img src={p.image_url} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                    : <Icon icon="ph:shopping-bag" width={32} height={32} color="#CBD5E1" />
+                    : <Icon icon="ph:shopping-bag" width={32} height={32} color={colors.gray300} />
                   }
-                  {/* 돋보기 아이콘 */}
                   <div style={{
                     position:'absolute', top:6, right:6,
                     width:24, height:24, borderRadius:'50%',
@@ -223,58 +222,54 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                   </div>
                 </div>
 
-                {/* 텍스트 */}
-                <div onClick={() => setSelProduct(p)} style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', justifyContent:'center', gap:4, cursor:'pointer', padding:'12px 8px 12px 12px' }}>
+                <div onClick={() => setSelProduct(p)} style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', justifyContent:'center', gap:4, cursor:'pointer', padding:`${spacing[3]}px ${spacing[2]}px ${spacing[3]}px ${spacing[3]}px` }}>
                   <span style={{
-                    fontSize:15, fontWeight: checked ? 700 : 600,
-                    color: checked ? '#94A3B8' : '#0F172A',
+                    fontSize: font.size.md, fontWeight: font.weight.bold,
+                    color: checked ? colors.textTertiary : colors.textPrimary,
                     textDecoration: checked ? 'line-through' : 'none',
                     lineHeight:1.4,
                     overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
                   }}>{p.name}</span>
                   {p.description && (
                     <span style={{
-                      fontSize:11, color:'#94A3B8', lineHeight:1.4,
+                      fontSize: font.size.xs, color: colors.textTertiary, lineHeight:1.4,
                       overflow:'hidden', textOverflow:'ellipsis',
                       display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical',
                     }}>{p.description}</span>
                   )}
-                  <span style={{ fontSize:11, color:'#B0B8C1' }}>{p.brand}</span>
+                  <span style={{ fontSize: font.size.xs, color: colors.gray400 }}>{p.brand}</span>
                   <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                    <span style={{ fontSize:11, fontWeight:800, color: checked ? '#CBD5E1' : PRICE_COLOR[p.price_range] ?? '#475569' }}>
+                    <span style={{ fontSize:11, fontWeight: font.weight.bold, color: checked ? colors.gray300 : PRICE_COLOR[p.price_range] ?? colors.textSecondary }}>
                       {p.price_range} · {PRICE_LABEL[p.price_range]}
                     </span>
                     {p.tags[0] && (
                       <span style={{
-                        fontSize:9, fontWeight:800, padding:'2px 5px', borderRadius:4,
-                        background: TAG_COLOR[p.tags[0]]?.bg ?? '#F1F5F9',
-                        color: TAG_COLOR[p.tags[0]]?.color ?? '#475569',
+                        fontSize:9, fontWeight: font.weight.bold, padding:'2px 5px', borderRadius:4,
+                        background: TAG_COLOR[p.tags[0]]?.bg ?? colors.gray100,
+                        color: TAG_COLOR[p.tags[0]]?.color ?? colors.textSecondary,
                       }}>{p.tags[0]}</span>
                     )}
                   </div>
                 </div>
 
-                {/* 오른쪽 - 구매 배지 + 삭제 */}
-                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, padding:'12px 12px 12px 0' }}>
-                  {/* 구매 배지 */}
+                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, padding:`${spacing[3]}px ${spacing[3]}px ${spacing[3]}px 0` }}>
                   <div onClick={() => toggleChecked(p.id)} style={{
                     display:'flex', alignItems:'center', gap:3,
-                    padding:'4px 8px', borderRadius:6, cursor:'pointer',
-                    background: checked ? '#FF6B9D' : '#f0f0f0',
-                    border: `1px solid ${checked ? '#FF6B9D' : '#FF6B9D'}`,
+                    padding:'4px 8px', borderRadius: radius.sm, cursor:'pointer',
+                    background: checked ? '#FF6B9D' : colors.bgCard,
+                    border: `1px solid #FF6B9D`,
                     transition:'all 0.2s', whiteSpace:'nowrap',
                   }}>
-                    <span style={{ fontSize:10, fontWeight:700, color: checked ? '#fff' : '#FF6B9D' }}>구매</span>
+                    <span style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: checked ? '#fff' : '#FF6B9D' }}>구매</span>
                     <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
                       <path d="M1 4L4 7L10 1" stroke={checked ? '#fff' : '#FF6B9D'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
-                  {/* 삭제 */}
                   <button onClick={() => setDeleteConfirmId(p.id)} style={{
                     background:'none', border:'none', cursor:'pointer', padding:2,
                     display:'flex', alignItems:'center',
                   }}>
-                    <Icon icon="ph:trash" width={18} height={18} color="#94A3B8" />
+                    <Icon icon="ph:trash" width={18} height={18} color={colors.textTertiary} />
                   </button>
                 </div>
               </div>
@@ -290,37 +285,34 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         position:'fixed', bottom:0,
         left:'50%', transform:'translateX(-50%)',
         width: footerWidth ?? '100%',
-        padding:'12px 14px 20px',
-        background:'#e8e8e8', zIndex:20, boxSizing:'border-box',
-        display:'flex', gap:8, borderTop:'1px solid #C8C8C8',
+        padding:`${spacing[3]}px ${spacing[3]}px ${spacing[5]}px`,
+        background: colors.bgCard, zIndex:20, boxSizing:'border-box',
+        display:'flex', gap: spacing[2], borderTop:`1.5px solid ${colors.border}`,
       }}>
         <button onClick={onBack} style={{
-          flex:1, height:44, borderRadius:8, border:'none',
-          background:'#e8e8e8', color:'#FF6B9D',
-          fontSize:14, fontWeight:700, cursor:'pointer',
-          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          flex:1, height:44, borderRadius: radius.sm, border:`1.5px solid #FF6B9D`,
+          background: colors.bgCard, color:'#FF6B9D',
+          fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-          WebkitTapHighlightColor:'transparent',
+          WebkitTapHighlightColor:'transparent', fontFamily: font.family,
         }}>
           <Icon icon="ph:shopping-bag" width={18} height={18} color="#FF6B9D" />
           상품 추가하기
         </button>
         <button onClick={onLanding} style={{
-          flex:1, height:44, borderRadius:8, border:'none',
-          background:'#e8e8e8', color:'#1B6EF3',
-          fontSize:14, fontWeight:700, cursor:'pointer',
-          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+          flex:1, height:44, borderRadius: radius.sm, border:`1.5px solid ${colors.primary}`,
+          background: colors.bgCard, color: colors.primary,
+          fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-          WebkitTapHighlightColor:'transparent',
+          WebkitTapHighlightColor:'transparent', fontFamily: font.family,
         }}>
-          <Icon icon="ph:check-circle" width={18} height={18} color="#1B6EF3" />
+          <Icon icon="ph:check-circle" width={18} height={18} color={colors.primary} />
           저장하고 나가기
         </button>
         <button onClick={() => setShowMoreMenu(true)} style={{
-          width:44, height:44, borderRadius:12, flexShrink:0,
-          border:'none', background:'#e8e8e8',
+          width:44, height:44, borderRadius: radius.sm, flexShrink:0,
+          border:`1.5px solid ${colors.border}`, background: colors.bgCard,
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           WebkitTapHighlightColor:'transparent',
         }}>
           <Icon icon="ph:dots-three-vertical" width={20} height={20} color="#64748B" />
@@ -336,26 +328,26 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         }} onClick={() => setShowMoreMenu(false)}>
           <div style={{
             width:'100%', maxWidth:390,
-            background:'#e8e8e8', borderRadius:'20px 20px 0 0',
+            background: colors.bgCard, borderRadius:'20px 20px 0 0',
             padding:'20px 16px 36px',
           }} onClick={e => e.stopPropagation()}>
             <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'0 auto 20px' }} />
             <div style={{ fontSize:13, fontWeight:800, color:'#94A3B8', marginBottom:14, letterSpacing:0.5 }}>더보기</div>
             <button onClick={() => { setShowMoreMenu(false); setShowReceipt(true) }} style={{
               width:'100%', height:52, borderRadius:12, border:'none',
-              background:'#e8e8e8', color:'#1B6EF3',
+              background: colors.bgCard, color: colors.primary,
               fontSize:15, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
-              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              border:`1.5px solid ${colors.border}`,
             }}>
               <Icon icon="ph:share-network" width={18} height={18} color="#1B6EF3" />공유하기
             </button>
             <button onClick={() => { setShowMoreMenu(false); setShowDeleteAll(true) }} style={{
               width:'100%', height:52, borderRadius:12, border:'none',
-              background:'#e8e8e8', color:'#DC2626',
+              background: colors.bgCard, color: colors.danger,
               fontSize:15, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:10, padding:'0 18px',
-              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+              border:`1.5px solid ${colors.border}`,
             }}>
               <Icon icon="ph:trash" width={18} height={18} color="#DC2626" />리스트 삭제하기
             </button>
@@ -369,7 +361,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           <div onClick={() => setShowDeleteAll(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:700 }} />
           <div style={{
             position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-            background:'#e8e8e8', borderRadius:20, padding:'28px 24px 20px',
+            background: colors.bgCard, borderRadius: radius.xl, padding:'28px 24px 20px',
             zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
             boxShadow:'0 20px 60px rgba(0,0,0,0.25)',
           }}>
@@ -380,8 +372,8 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={() => setShowDeleteAll(false)} style={{
                 flex:1, height:48, borderRadius:10, border:'none',
-                background:'#e8e8e8', color:'#64748B', fontSize:14, fontWeight:600, cursor:'pointer',
-                boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                background: colors.bgCard, color: colors.textSecondary, fontSize: font.size.md, fontWeight: font.weight.medium, cursor:'pointer',
+                border:`1.5px solid ${colors.border}`,
               }}>취소</button>
               <button onClick={() => {
                 onMyListChange([])
@@ -390,8 +382,8 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 onBack()
               }} style={{
                 flex:2, height:48, borderRadius:10, border:'none',
-                background:'#e8e8e8', color:'#DC2626', fontSize:14, fontWeight:700, cursor:'pointer',
-                boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                background: colors.bgCard, color: colors.danger, fontSize:14, fontWeight:700, cursor:'pointer',
+                border:`1.5px solid ${colors.border}`,
               }}>삭제하기</button>
             </div>
           </div>
@@ -406,7 +398,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
             <div onClick={() => setDeleteConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:700 }} />
             <div style={{
               position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-              background:'#e8e8e8', borderRadius:20, padding:'28px 24px 20px',
+              background: colors.bgCard, borderRadius: radius.xl, padding:'28px 24px 20px',
               zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
               boxShadow:'0 20px 60px rgba(0,0,0,0.25)',
             }}>
@@ -417,13 +409,13 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
               <div style={{ display:'flex', gap:8 }}>
                 <button onClick={() => setDeleteConfirmId(null)} style={{
                   flex:1, height:48, borderRadius:10, border:'none',
-                  background:'#e8e8e8', color:'#64748B', fontSize:14, fontWeight:600, cursor:'pointer',
-                  boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                  background: colors.bgCard, color: colors.textSecondary, fontSize: font.size.md, fontWeight: font.weight.medium, cursor:'pointer',
+                  border:`1.5px solid ${colors.border}`,
                 }}>취소</button>
                 <button onClick={() => { removeFromMyList(deleteConfirmId); setDeleteConfirmId(null) }} style={{
                   flex:2, height:48, borderRadius:10, border:'none',
-                  background:'#e8e8e8', color:'#DC2626', fontSize:14, fontWeight:700, cursor:'pointer',
-                  boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                  background: colors.bgCard, color: colors.danger, fontSize:14, fontWeight:700, cursor:'pointer',
+                  border:`1.5px solid ${colors.border}`,
                 }}>삭제하기</button>
               </div>
             </div>
@@ -446,7 +438,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600, animation:'fadeIn 0.2s ease' }} />
           <div style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:390, background:'#e8e8e8',
+            width:'100%', maxWidth:390, background: colors.bgCard,
             borderRadius:'20px 20px 0 0', zIndex:601,
             animation:'slideUp 0.3s ease', maxHeight:'85vh', overflowY:'auto',
           }}>
@@ -464,9 +456,9 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
             <div style={{ padding:'16px 18px 40px' }}>
               <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, alignItems:'center' }}>
                 {selProduct.tags.map(tag => (
-                  <span key={tag} style={{ fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6, background: TAG_COLOR[tag]?.bg ?? '#e8e8e8', color: TAG_COLOR[tag]?.color ?? '#475569' }}>{tag}</span>
+                  <span key={tag} style={{ fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6, background: TAG_COLOR[tag]?.bg ?? colors.gray100, color: TAG_COLOR[tag]?.color ?? '#475569' }}>{tag}</span>
                 ))}
-                <span style={{ fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6, background:'#e8e8e8', color: PRICE_COLOR[selProduct.price_range] ?? '#475569', border:`1px solid ${PRICE_COLOR[selProduct.price_range] ?? '#C8C8C8'}`, marginLeft:'auto' }}>
+                <span style={{ fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6, background: colors.bgPage, color: PRICE_COLOR[selProduct.price_range] ?? '#475569', border:`1px solid ${PRICE_COLOR[selProduct.price_range] ?? '#C8C8C8'}`, marginLeft:'auto' }}>
                   {selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}
                 </span>
               </div>
@@ -480,7 +472,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                   <div style={{ fontSize:11, fontWeight:700, color:'#94A3B8', marginBottom:8 }}>어디서 살 수 있어요?</div>
                   <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
                     {selProduct.where_to_buy.map(store => (
-                      <span key={store} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', borderRadius:8, background:'#e8e8e8', color:'#475569', border:'1px solid #C8C8C8' }}>🏪 {store}</span>
+                      <span key={store} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', borderRadius:8, background: colors.bgPage, color: colors.textSecondary, border:`1px solid ${colors.border}` }}>🏪 {store}</span>
                     ))}
                   </div>
                 </div>
@@ -490,11 +482,11 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 myList.includes(selProduct.id) ? removeFromMyList(selProduct.id) : addToMyList(selProduct.id)
               }} style={{
                 width:'100%', height:50, borderRadius:12, border:'none', cursor:'pointer',
-                background:'#e8e8e8', color:'#FF6B9D',
+                background: colors.bgCard, color:'#FF6B9D',
                 fontSize:15, fontWeight:700,
                 display:'flex', alignItems:'center', justifyContent:'center', gap:8,
                 marginBottom:10,
-                boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                border:`1.5px solid ${colors.border}`,
                 WebkitTapHighlightColor:'transparent',
               }}>
                 <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color="#FF6B9D" />
@@ -502,8 +494,8 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
               </button>
               <button onClick={() => setSelProduct(null)} style={{
                 width:'100%', height:50, borderRadius:12, border:'none',
-                background:'#e8e8e8', color:'#94A3B8', fontSize:15, fontWeight:700, cursor:'pointer',
-                boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                background: colors.bgCard, color: colors.textTertiary, fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
+                border:`1.5px solid ${colors.border}`,
                 WebkitTapHighlightColor:'transparent',
               }}>닫기</button>
             </div>
@@ -714,13 +706,13 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:390, padding:'10px 14px 26px',
-        background:'#e8e8e8',
+        background: colors.bgCard,
         borderTop:'1.5px solid #D1D9E3', boxShadow:'0 -4px 16px rgba(0,0,0,0.08)',
         display:'flex', gap:8, zIndex:2,
       }}>
         <button onClick={handleSave} disabled={saving} style={{
           flex:1, height:46, borderRadius:12, cursor:'pointer',
-          border:'1.5px solid #D1D9E3', background:'#fff',
+          border:`1.5px solid ${colors.border}`, background: colors.bgCard,
           fontWeight:700, fontSize:13, color:'#FF6B9D',
           boxShadow:'0 2px 8px rgba(0,0,0,0.07)',
         }}>{saving ? '저장 중...' : !ready ? '준비 중...' : '이미지 저장'}</button>
