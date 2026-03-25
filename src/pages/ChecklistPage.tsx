@@ -191,6 +191,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     <div style={{ 
       minHeight: mainTab === 'nearby' ? undefined : '100dvh',
       height: mainTab === 'nearby' ? '100dvh' : undefined,
+      overflow: mainTab === 'nearby' ? 'hidden' : undefined,
       display: mainTab === 'nearby' ? 'flex' : undefined,
       flexDirection: mainTab === 'nearby' ? 'column' : undefined,
       background:colors.bgPage, fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
@@ -224,7 +225,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <MyShoppingView myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
       ) : mainTab==='nearby' ? (
         <>
-          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}`, flexShrink:0 }}>
+          <div style={{ position:'sticky', top:0, zIndex:10, background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}`, flexShrink:0 }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>내 주변</span>
             </div>
