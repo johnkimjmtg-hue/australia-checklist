@@ -273,7 +273,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         left:'50%', transform:'translateX(-50%)',
         width: footerWidth ?? '100%',
         padding:`${spacing[2]}px ${spacing[3]}px`,
-        background: colors.bgCard, zIndex:20, boxSizing:'border-box',
+        background: colors.bgPage, zIndex:20, boxSizing:'border-box',
         display:'flex', gap: spacing[2], borderTop:`1.5px solid ${colors.border}`,
       }}>
         <button onClick={onBack} style={{
