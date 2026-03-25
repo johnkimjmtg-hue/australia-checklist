@@ -652,18 +652,17 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
 
           {/* 상황판 */}
           <div style={{
-            background:'#e8b8e8', borderRadius:12, marginBottom:8,
-            boxShadow:'inset 3px 3px 8px #c898c8, inset -2px -2px 6px #f8d8f8',
+            background:'#fff', borderRadius:12, marginBottom:8,
+            border:'1.5px solid #CBD5E1',
             padding:'16px', display:'flex', alignItems:'center', gap:16,
           }}>
-            {/* 선물박스 그리드 */}
             <MiniGiftGrid total={total} checkedCount={checkedCount} />
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:15, fontWeight:800, color:'#2d1f2d', marginBottom:2 }}>내 쇼핑리스트</div>
-              <div style={{ fontSize:11, color:'#5a3a5a', marginBottom:4 }}>{dateStr}</div>
+              <div style={{ fontSize:15, fontWeight:800, color:'#0F172A', marginBottom:2 }}>내 쇼핑리스트</div>
+              <div style={{ fontSize:11, color:'#64748B', marginBottom:4 }}>{dateStr}</div>
               <div style={{ display:'flex', alignItems:'baseline', gap:3 }}>
-                <span style={{ fontSize:22, fontWeight:800, color:'#2d1f2d' }}>{checkedCount}</span>
-                <span style={{ fontSize:13, fontWeight:600, color:'#5a3a5a' }}>/{total}개 구매 완료</span>
+                <span style={{ fontSize:22, fontWeight:800, color:'#0F172A' }}>{checkedCount}</span>
+                <span style={{ fontSize:13, fontWeight:600, color:'#64748B' }}>/{total}개 구매 완료</span>
               </div>
             </div>
           </div>
@@ -844,10 +843,10 @@ function MiniGiftGrid({ total, checkedCount }: { total: number; checkedCount: nu
       <div style={{ display:'flex', flexWrap:'wrap', gap, width: cols * (boxSize + gap) - gap, justifyContent:'center', alignContent:'center' }}>
         {Array.from({ length: displayCount }).map((_, i) => {
           const filled = i < checkedCount
-          const body = filled ? '#FF6B9D' : '#c4a8c4'
-          const lid  = filled ? '#FF85B3' : '#d0b4d0'
-          const rib  = filled ? '#ffffff' : '#e8d8e8'
-          const knot = filled ? '#FF6B9D' : '#c4a8c4'
+          const body = filled ? '#FF6B9D' : '#CBD5E1'
+          const lid  = filled ? '#FF8FB3' : '#E2E8F0'
+          const rib  = filled ? '#ffffff' : '#F8FAFC'
+          const knot = filled ? '#FF6B9D' : '#CBD5E1'
           return (
             <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize * 1.05)}>
               <rect x="10" y="42" width="80" height="62" rx="5" fill={body}/>
