@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 import BusinessCard from '../components/BusinessCard'
@@ -255,9 +255,10 @@ function getStatusMsg(checked: number, bingo: number, city: 'melbourne'|'sydney'
 }
 
 type Props = { onBack?: () => void; embedded?: boolean; initialCity?: 'melbourne' | 'sydney'; onCityChange?: (city: 'melbourne'|'sydney') => void }
+export type BingoRef = { triggerSave: () => void; triggerShare: () => void; triggerReset: () => void }
 export { Props as BingoProps }
 
-export default function BingoPage({ onBack, embedded = false, initialCity, onCityChange }: Props) {
+const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embedded = false, initialCity, onCityChange }, ref) {
   const pageRef = useRef<HTMLDivElement>(null)
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
   const [city, setCity] = useState<'melbourne'|'sydney'>(initialCity ?? 'sydney')
@@ -432,6 +433,12 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       alert('클립보드에 복사됐어요!')
     }
   }
+
+  useImperativeHandle(ref, () => ({
+    triggerSave: () => setShowSaveConfirm(true),
+    triggerShare: () => handleShare(),
+    triggerReset: () => setShowReset(true),
+  }))
 
   const handleCloseIntro = () => {
     localStorage.setItem('bingo-mel-intro-seen', '1')
@@ -611,7 +618,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       </div>
 
       {/* ── 5x5 빙고판 */}
-      <div style={{ flex:1, padding:`8px 12px ${embedded ? '124px' : '62px'}`, overflowY:'auto', minHeight:0 }}>
+      <div style={{ flex:1, padding:`8px 12px ${embedded ? '60px' : '62px'}`, overflowY:'auto', minHeight:0 }}>
         <div style={{
           display:'grid', gridTemplateColumns:'repeat(5, 1fr)',
           gap:6,
@@ -809,13 +816,13 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       })()}
 
       {/* ── 푸터 */}
-      <div style={{
-        position:'fixed', bottom: embedded ? 62 : 0,
+      {!embedded && <div style={{
+        position:'fixed', bottom: 0,
         left:'50%', transform:'translateX(-50%)',
         width:'min(100%, 430px)',
         padding:`${spacing[2]}px ${spacing[3]}px`,
         background: colors.bgCard,
-        zIndex:50, boxSizing:'border-box',
+        zIndex:39, boxSizing:'border-box',
         display:'flex', gap: spacing[2],
         borderTop:`1.5px solid ${colors.border}`,
       }}>
@@ -832,7 +839,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         <button onClick={handleShare} style={{
           flex:1, height:44, borderRadius: radius.sm,
           border:`1px solid ${colors.border}`, background: colors.bgCard,
-          color: colors.primary, fontSize: font.size.sm, fontWeight: font.weight.bold,
+          color: colors.primary, fontSize: font.size.md, fontWeight: font.weight.bold,
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
           WebkitTapHighlightColor:'transparent', fontFamily: font.family,
         }}>
@@ -842,14 +849,14 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         <button onClick={() => setShowReset(true)} style={{
           flex:1, height:44, borderRadius: radius.sm,
           border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
-          color: colors.danger, fontSize: font.size.sm, fontWeight: font.weight.bold,
+          color: colors.danger, fontSize: font.size.md, fontWeight: font.weight.bold,
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
           WebkitTapHighlightColor:'transparent', fontFamily: font.family,
         }}>
           <Icon icon="ph:arrow-counter-clockwise" width={15} height={15} color={colors.danger} />
           리셋
         </button>
-      </div>
+      </div>}
 
       {/* ── 저장 확인 팝업 */}
       {showSaveConfirm && (
@@ -1114,7 +1121,9 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       {showFireworks && <Fireworks />}
     </div>
   )
-}
+})
+
+export default BingoPage
 
 // ── 업체 정보 컴포넌트
 function CafeBusinessInfo({ businessId }: { businessId: string }) {

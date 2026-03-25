@@ -28,6 +28,7 @@ import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 import NearbyMap from './NearbyMap'
 import BingoPage from './BingoPage'
+import type { BingoRef } from './BingoPage'
 
 const ff = font.family
 
@@ -80,6 +81,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch]   = useState(false)
   const logoTapTimer = useRef<any>(null)
+  const bingoRef = useRef<BingoRef>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [bizCount, setBizCount]       = useState(0)
@@ -249,7 +251,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : mainTab==='community' ? (
         <Community />
       ) : mainTab==='bingo' ? (
-        <BingoPage embedded={true} />
+        <BingoPage ref={bingoRef} embedded={true} />
       ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
         <>
           {/* 헤더 */}
@@ -502,6 +504,37 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               border:`1px solid ${colors.gray400}`, borderRadius:radius.sm, fontSize:font.size.sm, fontWeight:font.weight.bold,
               cursor:'pointer', fontFamily:ff,
             }}>초기화</button>
+          </div>
+        )}
+        {mainTab==='bingo'&&(
+          <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2], borderTop:`1.5px solid ${colors.border}`, background:colors.bgPage }}>
+            <button onClick={()=>bingoRef.current?.triggerSave()} style={{
+              flex:2, height:44, background:colors.primary, color:'#fff',
+              border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', fontFamily:ff,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+            }}>
+              <Icon icon="ph:floppy-disk" width={16} height={16} color="#fff" />
+              저장하기
+            </button>
+            <button onClick={()=>bingoRef.current?.triggerShare()} style={{
+              flex:1, height:44, background:colors.bgCard, color:colors.primary,
+              border:`1px solid ${colors.border}`, borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', fontFamily:ff,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+            }}>
+              <Icon icon="ph:share-network" width={15} height={15} color={colors.primary} />
+              공유
+            </button>
+            <button onClick={()=>bingoRef.current?.triggerReset()} style={{
+              flex:1, height:44, background:colors.dangerLight, color:colors.danger,
+              border:`1px solid ${colors.dangerLight}`, borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', fontFamily:ff,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+            }}>
+              <Icon icon="ph:arrow-counter-clockwise" width={15} height={15} color={colors.danger} />
+              리셋
+            </button>
           </div>
         )}
         <div style={{ display:'flex', padding:`${spacing[1]}px 0 ${spacing[2]}px`, borderTop:`1.5px solid ${colors.border}` }}>
