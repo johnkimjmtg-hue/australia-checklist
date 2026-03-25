@@ -414,11 +414,11 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                       if((db.related_business_ids?.length??0)>0){ const {data}=await supabase.from('businesses').select('*').in('id',db.related_business_ids!); setDetailBizCards(data??[]) } else setDetailBizCards([])
                     }}
                   >
-                    {/* 동그란 이미지 */}
-                    <div style={{ width:44, height:44, borderRadius:'50%', flexShrink:0, background:colors.gray100, border:`1px solid ${colors.border}`, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    {/* 이미지 */}
+                    <div style={{ width:56, height:56, borderRadius:radius.sm, flexShrink:0, background:colors.gray100, border:`1px solid ${colors.border}`, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
                       {db?.image_url
                         ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                        : <Icon icon={db?.icon ?? CAT_ICON_MAP[item.categoryId] ?? 'ph:star'} width={22} height={22} color={colors.gray400} />
+                        : <Icon icon={db?.icon ?? CAT_ICON_MAP[item.categoryId] ?? 'ph:star'} width={26} height={26} color={colors.gray400} />
                       }
                     </div>
                     {/* 텍스트 */}
