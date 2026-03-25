@@ -578,8 +578,18 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
               padding:`${spacing[3]}px ${spacing[3]}px ${spacing[8]}px`,
               boxSizing:'border-box',
             }}>
-              {/* 핸들 + 닫기 */}
+              {/* 핸들 */}
               <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[3]}px` }} />
+
+              {/* 카페 이미지 */}
+              {c.image_url && (
+                <div style={{
+                  width:'100%', height:180, borderRadius: radius.md,
+                  overflow:'hidden', marginBottom: spacing[3],
+                }}>
+                  <img src={c.image_url} alt={c.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                </div>
+              )}
 
               {/* 카페 카드 */}
               <div style={{ marginBottom: spacing[3] }}>
