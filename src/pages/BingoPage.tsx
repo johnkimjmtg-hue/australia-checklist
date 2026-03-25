@@ -340,7 +340,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
     if (userId) saveBingoDB(userId, 'sydney', checkedSydney)
   }, [checkedSydney, userId])
   const handleCell = (idx: number) => {
-    if (!userId) { setShowLoginPrompt(true); return }
     if (city === 'melbourne') {
       setCheckedMelbourne(prev => {
         const next = new Set(prev)
@@ -398,7 +397,10 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   }
 
   useImperativeHandle(ref, () => ({
-    triggerSave: () => setShowSaveConfirm(true),
+    triggerSave: () => {
+      if (!userId) { setShowLoginPrompt(true); return }
+      setShowSaveConfirm(true)
+    },
     triggerShare: () => handleShare(),
     triggerReset: () => setShowReset(true),
   }))
@@ -719,7 +721,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
             <div style={{ fontSize:32, marginBottom: spacing[3] }}>☕</div>
             <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>로그인이 필요해요</div>
             <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight:1.6 }}>
-              카페 방문 기록을 저장하려면<br/>로그인이 필요합니다.
+              빙고 진행 상황을 저장하려면<br/>로그인이 필요합니다.
             </div>
             <div style={{ display:'flex', gap: spacing[2] }}>
               <button onClick={() => setShowLoginPrompt(false)} style={{
@@ -759,7 +761,14 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                 background: colors.bgCard, color: colors.textSecondary,
                 fontSize: font.size.md, fontWeight: font.weight.medium, cursor:'pointer', fontFamily: font.family,
               }}>취소</button>
-              <button onClick={() => { setShowSaveConfirm(false); onBack?.() }} style={{
+              <button onClick={async () => {
+                if (userId) {
+                  await saveBingoDB(userId, 'melbourne', checkedMelbourne)
+                  await saveBingoDB(userId, 'sydney', checkedSydney)
+                }
+                setShowSaveConfirm(false)
+                onBack?.()
+              }} style={{
                 flex:2, height:48, borderRadius: radius.sm, border:'none',
                 background: colors.primary, color:'#fff',
                 fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer', fontFamily: font.family,
