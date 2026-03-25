@@ -147,23 +147,22 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
       <PetalBurst trigger={petalTrigger} />
 
       {/* ── 진행 카드 */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background: colors.bgPage, padding:`${spacing[4]}px ${spacing[4]}px 0` }}>
+      <div style={{ position:'sticky', top:0, zIndex:30, background: colors.bgPage, padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
         <div style={{
-          background:'#e8b8e8',
-          borderRadius:12,
-          boxShadow:'inset 3px 3px 8px #c898c8, inset -2px -2px 6px #f8d8f8',
-          padding:'20px', display:'flex', alignItems:'center', gap:20,
-          position:'relative', overflow:'hidden',
+          background: colors.bgCard,
+          borderRadius: radius.lg,
+          border: `1.5px solid ${colors.gray300}`,
+          padding: `${spacing[4]}px`, display:'flex', alignItems:'center', gap: spacing[4],
         }}>
           {/* 선물박스 그리드 */}
           <GiftBoxProgress total={total} checkedCount={checkedCount} myList={myList} myChecked={myChecked} />
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:20, fontWeight:800, color:'#2d1f2d', marginBottom:4, lineHeight:1.2 }}>내 쇼핑리스트</div>
-            <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:4 }}>
-              <span style={{ fontSize:28, fontWeight:800, color:'#2d1f2d', lineHeight:1 }}>{checkedCount}</span>
-              <span style={{ fontSize:17, fontWeight:600, color:'#5a3a5a' }}>/{total}개 구매 완료</span>
+            <div style={{ fontSize: font.size['2xl'], fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1], lineHeight:1.2 }}>내 쇼핑리스트</div>
+            <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom: spacing[1] }}>
+              <span style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: colors.textPrimary, lineHeight:1 }}>{checkedCount}</span>
+              <span style={{ fontSize: font.size.xl, fontWeight: font.weight.medium, color: colors.textSecondary }}>/{total}개 구매 완료</span>
             </div>
-            <div style={{ fontSize:13, color:'#5a3a5a', lineHeight:1.5 }}>
+            <div style={{ fontSize: font.size.sm, color: colors.textTertiary, lineHeight:1.5 }}>
               {pct === 100
                 ? '쇼핑 완료! 모든 상품을 구매했어요 🎉'
                 : pct > 0
@@ -175,8 +174,8 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
       </div>
 
       {/* ── 필터 */}
-      <div style={{ padding:'14px 16px 0', display:'flex', alignItems:'center', gap:8 }}>
-        <span style={{ fontSize:12, color:'#94A3B8', fontWeight:600, flexShrink:0 }}>
+      <div style={{ padding:`${spacing[3]}px ${spacing[4]}px 0`, display:'flex', alignItems:'center', gap: spacing[2] }}>
+        <span style={{ fontSize: font.size.xs, color: colors.textTertiary, fontWeight: font.weight.medium, flexShrink:0 }}>
           {total > 0 ? `${total}개 찜` : '아직 찜한 상품이 없어요'}
         </span>
       </div>
