@@ -188,7 +188,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const activeTabId: MainTab = mainTab==='myshoppinglist'?'shopping':mainTab
 
   return (
-    <div style={{ minHeight:'100dvh', background:colors.bgPage, fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
+    <div style={{ 
+      minHeight: mainTab === 'nearby' ? undefined : '100dvh',
+      height: mainTab === 'nearby' ? '100dvh' : undefined,
+      display: mainTab === 'nearby' ? 'flex' : undefined,
+      flexDirection: mainTab === 'nearby' ? 'column' : undefined,
+      background:colors.bgPage, fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
@@ -219,7 +224,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <MyShoppingView myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
       ) : mainTab==='nearby' ? (
         <>
-          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
+          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}`, flexShrink:0 }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>내 주변</span>
             </div>
