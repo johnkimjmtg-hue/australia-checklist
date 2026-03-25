@@ -27,6 +27,8 @@ import MyShoppingView from './MyShoppingView'
 import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 import NearbyMap from './NearbyMap'
+import BingoPage from './BingoPage'
+import type { BingoRef } from './BingoPage'
 
 const ff = font.family
 
@@ -54,7 +56,7 @@ const STATE_MAP: Record<string, { label: string }> = {
 
 type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker' | 'calendar'
-type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'community' | 'nearby'
+type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'community' | 'nearby' | 'bingo'
 
 export default function ChecklistPage({ state, setState, onLanding }: Props & { onLanding?: () => void }) {
   const [searchParams] = useSearchParams()
@@ -72,13 +74,14 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [customLabel, setCustomLabel] = useState('')
   const [mainTab, setMainTab]         = useState<MainTab>(() => {
     const tab = searchParams.get('tab')
-    if (tab === 'services' || tab === 'shopping' || tab === 'myshoppinglist' || tab === 'community' || tab === 'nearby') return tab as MainTab
+    if (tab === 'services' || tab === 'shopping' || tab === 'myshoppinglist' || tab === 'community' || tab === 'nearby' || tab === 'bingo') return tab as MainTab
     return 'bucketlist'
   })
   const [logoTapCount, setLogoTapCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch]   = useState(false)
   const logoTapTimer = useRef<any>(null)
+  const bingoRef = useRef<BingoRef>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [bizCount, setBizCount]       = useState(0)
@@ -178,7 +181,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     {id:'services',  icon:'ph:buildings',      label:'업체'},
     {id:'nearby',    icon:'ph:map-pin',        label:'내주변'},
     {id:'shopping',  icon:'ph:shopping-bag',   label:'쇼핑'},
-    {id:'community', icon:'ph:chats-circle',   label:'커뮤니티'},
+    {id:'community', icon:'ph:chats-circle',   label:'단톡방'},
+    {id:'bingo',     icon:'ph:coffee',         label:'카페빙고'},
   ] as {id:MainTab;icon:string;label:string}[]
 
   const handleTabClick = (id:MainTab) => {
@@ -230,6 +234,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         </div>
       ) : mainTab==='community' ? (
         <Community />
+      ) : mainTab==='bingo' ? (
+        <BingoPage ref={bingoRef} embedded={true} />
       ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
         <>
           {/* 헤더 */}
@@ -484,6 +490,37 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             }}>초기화</button>
           </div>
         )}
+        {mainTab==='bingo'&&(
+          <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2], borderTop:`1.5px solid ${colors.border}`, background:colors.bgPage }}>
+            <button onClick={()=>bingoRef.current?.triggerSave()} style={{
+              flex:2, height:44, background:colors.primary, color:'#fff',
+              border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', fontFamily:ff,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+            }}>
+              <Icon icon="ph:floppy-disk" width={16} height={16} color="#fff" />
+              저장하기
+            </button>
+            <button onClick={()=>bingoRef.current?.triggerShare()} style={{
+              flex:1, height:44, background:colors.bgCard, color:colors.primary,
+              border:`1px solid ${colors.border}`, borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', fontFamily:ff,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+            }}>
+              <Icon icon="ph:share-network" width={15} height={15} color={colors.primary} />
+              공유
+            </button>
+            <button onClick={()=>bingoRef.current?.triggerReset()} style={{
+              flex:1, height:44, background:colors.dangerLight, color:colors.danger,
+              border:`1px solid ${colors.dangerLight}`, borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', fontFamily:ff,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+            }}>
+              <Icon icon="ph:arrow-counter-clockwise" width={15} height={15} color={colors.danger} />
+              리셋
+            </button>
+          </div>
+        )}
         <div style={{ display:'flex', padding:`${spacing[1]}px 0 ${spacing[2]}px`, borderTop:`1.5px solid ${colors.border}` }}>
           {TABS.map(tab=>{
             const isActive = activeTabId===tab.id
@@ -492,7 +529,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
               <button key={tab.id} className="nav-btn" onClick={()=>handleTabClick(tab.id)}
                 style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, height:50, background:'none', border:'none', cursor:'pointer', position:'relative', fontFamily:ff }}>
                 <Icon icon={tab.icon} width={20} height={20} color={isActive?colors.primary:colors.textTertiary} />
-                <span style={{ fontSize:10, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.textTertiary }}>{tab.label}</span>
+                <span style={{ fontSize:11, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.textTertiary }}>{tab.label}</span>
                 {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:colors.primary, position:'absolute', bottom:2 }} />}
                 {showBadge&&<span style={{ position:'absolute', top:6, right:'calc(50% - 14px)', background:'#EF4444', color:'#fff', fontSize:8, fontWeight:font.weight.bold, borderRadius:radius.full, padding:'1px 4px', minWidth:14, textAlign:'center' }}>{todayPostCount}</span>}
               </button>
