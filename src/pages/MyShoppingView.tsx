@@ -198,14 +198,12 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
               <div key={p.id} className="my-item" style={{
                 display:'flex', alignItems:'stretch',
                 borderRadius: radius.md,
-                background: checked ? '#fff0f5' : colors.bgCard,
-                border:`1px solid ${colors.border}`,
-                borderLeft: checked ? '4px solid #FF6B9D' : `4px solid ${colors.gray200}`,
+                background: colors.bgCard,
+                border: checked ? `1.5px solid #FF6B9D` : `1px solid ${colors.border}`,
                 transition:'all 0.3s', overflow:'hidden',
-                boxShadow: shadow.card,
               }}>
                 <div onClick={() => setSelProduct(p)} style={{
-                  width:110, flexShrink:0,
+                  width:100, flexShrink:0,
                   background: p.image_url ? 'none' : colors.gray100,
                   display:'flex', alignItems:'center', justifyContent:'center',
                   overflow:'hidden', cursor:'pointer', position:'relative',
@@ -224,7 +222,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                   </div>
                 </div>
 
-                <div onClick={() => setSelProduct(p)} style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', justifyContent:'center', gap:4, cursor:'pointer', padding:`${spacing[3]}px ${spacing[2]}px ${spacing[3]}px ${spacing[3]}px` }}>
+                <div onClick={() => setSelProduct(p)} style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', justifyContent:'center', gap:3, cursor:'pointer', padding:`${spacing[3]}px ${spacing[2]}px ${spacing[3]}px ${spacing[3]}px` }}>
                   <span style={{
                     fontSize: font.size.md, fontWeight: font.weight.bold,
                     color: checked ? colors.textTertiary : colors.textPrimary,
@@ -232,26 +230,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                     lineHeight:1.4,
                     overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
                   }}>{p.name}</span>
-                  {p.description && (
-                    <span style={{
-                      fontSize: font.size.xs, color: colors.textTertiary, lineHeight:1.4,
-                      overflow:'hidden', textOverflow:'ellipsis',
-                      display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical',
-                    }}>{p.description}</span>
-                  )}
                   <span style={{ fontSize: font.size.xs, color: colors.gray400 }}>{p.brand}</span>
-                  <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                    <span style={{ fontSize:11, fontWeight: font.weight.bold, color: checked ? colors.gray300 : PRICE_COLOR[p.price_range] ?? colors.textSecondary }}>
-                      {p.price_range} · {PRICE_LABEL[p.price_range]}
-                    </span>
-                    {p.tags[0] && (
-                      <span style={{
-                        fontSize:9, fontWeight: font.weight.bold, padding:'2px 5px', borderRadius:4,
-                        background: TAG_COLOR[p.tags[0]]?.bg ?? colors.gray100,
-                        color: TAG_COLOR[p.tags[0]]?.color ?? colors.textSecondary,
-                      }}>{p.tags[0]}</span>
-                    )}
-                  </div>
                 </div>
 
                 <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', flexShrink:0, padding:`${spacing[3]}px ${spacing[3]}px ${spacing[3]}px 0` }}>

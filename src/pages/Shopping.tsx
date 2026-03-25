@@ -235,7 +235,6 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
           display:'flex', alignItems:'center', gap:spacing[2],
           background: colors.bgCard, border:`1.5px solid ${colors.border}`, borderRadius:radius.sm,
           padding:`0 ${spacing[3]}px`, height:42, marginBottom: spacing[3],
-          boxShadow: shadow.card,
         }}>
           <Icon icon="ph:magnifying-glass" width={16} height={16} color={colors.textTertiary} />
           <input
