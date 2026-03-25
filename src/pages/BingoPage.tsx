@@ -11,6 +11,7 @@ interface BingoCafe {
   name: string
   business_id: string | null
   is_active: boolean
+  image_url: string | null
 }
 
 
@@ -521,7 +522,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   overflow:'hidden', position:'relative',
                 }}>
                   <img
-                    src={city === 'melbourne' ? `/mel_coffee/mel_image/${c.sort_order}.jpg` : `/syd_coffee/syd_image/${c.sort_order}.jpg`}
+                    src={c.image_url ?? (city === 'melbourne' ? `/mel_coffee/mel_image/${c.sort_order}.jpg` : `/syd_coffee/syd_image/${c.sort_order}.jpg`)}
                     alt={c.name}
                     style={{ width:'100%', height:'100%', objectFit:'cover' }}
                     onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
