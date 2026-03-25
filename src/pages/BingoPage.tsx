@@ -283,6 +283,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   const [stampAnim, setStampAnim] = useState<number|null>(null)
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
   const [showSydAllDone, setShowSydAllDone] = useState(false)
   const [showIntro, setShowIntro] = useState(() => {
@@ -818,63 +819,69 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         display:'flex', gap: spacing[2],
         borderTop:`1.5px solid ${colors.border}`,
       }}>
-        <button onClick={() => onBack?.()} style={{
-          flex:1, height:44, borderRadius: radius.sm, border:`1px solid ${colors.border}`,
-          background: colors.bgCard, color: colors.primary,
+        <button onClick={() => setShowSaveConfirm(true)} style={{
+          flex:2, height:44, borderRadius: radius.sm, border:'none',
+          background: colors.primary, color: '#fff',
           fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
-          display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:6,
           WebkitTapHighlightColor:'transparent', fontFamily: font.family,
         }}>
-          <Icon icon="ph:check-circle" width={18} height={18} color={colors.primary} />
-          저장하고 나가기
+          <Icon icon="ph:floppy-disk" width={16} height={16} color="#fff" />
+          저장하기
         </button>
-        <button onClick={() => setShowMoreMenu(true)} style={{
-          width:44, height:44, borderRadius: radius.sm, flexShrink:0,
+        <button onClick={handleShare} style={{
+          flex:1, height:44, borderRadius: radius.sm,
           border:`1px solid ${colors.border}`, background: colors.bgCard,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-          WebkitTapHighlightColor:'transparent',
+          color: colors.primary, fontSize: font.size.sm, fontWeight: font.weight.bold,
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          WebkitTapHighlightColor:'transparent', fontFamily: font.family,
         }}>
-          <Icon icon="ph:dots-three-vertical" width={18} height={18} color={colors.textSecondary} />
+          <Icon icon="ph:share-network" width={15} height={15} color={colors.primary} />
+          공유
+        </button>
+        <button onClick={() => setShowReset(true)} style={{
+          flex:1, height:44, borderRadius: radius.sm,
+          border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
+          color: colors.danger, fontSize: font.size.sm, fontWeight: font.weight.bold,
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          WebkitTapHighlightColor:'transparent', fontFamily: font.family,
+        }}>
+          <Icon icon="ph:arrow-counter-clockwise" width={15} height={15} color={colors.danger} />
+          리셋
         </button>
       </div>
 
-      {/* ── 더보기 바텀시트 */}
-      {showMoreMenu && (
-        <div style={{
-          position:'fixed', inset:0, zIndex:600,
-          background:'rgba(0,0,0,0.45)', backdropFilter:'blur(2px)',
-          display:'flex', alignItems:'flex-end', justifyContent:'center',
-        }} onClick={() => setShowMoreMenu(false)}>
+      {/* ── 저장 확인 팝업 */}
+      {showSaveConfirm && (
+        <>
+          <div onClick={() => setShowSaveConfirm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:700 }} />
           <div style={{
-            width:'100%', maxWidth:390,
-            background: colors.bgCard, borderRadius:'20px 20px 0 0',
-            padding:'20px 16px 36px',
-          }} onClick={e => e.stopPropagation()}>
-            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'0 auto 20px' }}/>
-            <div style={{ fontSize:13, fontWeight:800, color:'#94A3B8', marginBottom:14, letterSpacing:0.5 }}>더보기</div>
-            <button onClick={handleShare} style={{
-              width:'100%', height:52, borderRadius:12, border:'none',
-              background: colors.bgCard, color: colors.primary,
-              fontSize:15, fontWeight:700, cursor:'pointer',
-              display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
-              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-              WebkitTapHighlightColor:'transparent',
-            }}>
-              <Icon icon="ph:share-network" width={18} height={18} color="#1B6EF3" />공유하기
-            </button>
-            <button onClick={() => { setShowMoreMenu(false); setShowReset(true) }} style={{
-              width:'100%', height:52, borderRadius:12, border:'none',
-              background: colors.bgCard, color: colors.danger,
-              fontSize:15, fontWeight:700, cursor:'pointer',
-              display:'flex', alignItems:'center', gap:10, padding:'0 18px',
-              boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-              WebkitTapHighlightColor:'transparent',
-            }}>
-              <Icon icon="ph:arrow-counter-clockwise" width={18} height={18} color="#DC2626" />리셋하기
-            </button>
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            background: colors.bgCard, borderRadius: radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,
+            zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.15)', fontFamily: font.family,
+          }}>
+            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>저장하기</div>
+            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight:1.6 }}>
+              현재 빙고 진행 상황을 저장할까요?<br/>나중에 언제든지 다시 저장할 수 있어요.
+            </div>
+            <div style={{ display:'flex', gap: spacing[2] }}>
+              <button onClick={() => setShowSaveConfirm(false)} style={{
+                flex:1, height:48, borderRadius: radius.sm, border:`1px solid ${colors.border}`,
+                background: colors.bgCard, color: colors.textSecondary,
+                fontSize: font.size.md, fontWeight: font.weight.medium, cursor:'pointer', fontFamily: font.family,
+              }}>취소</button>
+              <button onClick={() => { setShowSaveConfirm(false); onBack?.() }} style={{
+                flex:2, height:48, borderRadius: radius.sm, border:'none',
+                background: colors.primary, color:'#fff',
+                fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer', fontFamily: font.family,
+              }}>저장하기</button>
+            </div>
           </div>
-        </div>
+        </>
       )}
+
+      {/* ── 더보기 바텀시트 (미사용, 유지) */}
 
       {/* ── 인트로 팝업 */}
       {showIntro && city === 'melbourne' && (
