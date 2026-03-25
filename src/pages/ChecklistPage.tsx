@@ -235,7 +235,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : mainTab==='community' ? (
         <Community />
       ) : mainTab==='bingo' ? (
-        <BingoPage ref={bingoRef} embedded={true} />
+        <BingoPage ref={bingoRef} embedded={true} initialCity={(searchParams.get('city') as 'melbourne'|'sydney') ?? undefined} />
       ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
         <>
           {/* 헤더 */}

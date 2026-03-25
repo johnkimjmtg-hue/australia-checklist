@@ -334,7 +334,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
     setShowMoreMenu(false)
     const isMelbourne = city === 'melbourne'
     const cityName    = isMelbourne ? '멜번' : '시드니'
-    const link        = isMelbourne ? 'hojugaja.com/bingo/melbourne' : 'hojugaja.com/bingo/sydney'
+    const link = isMelbourne ? 'hojugaja.com/app?tab=bingo&city=melbourne' : 'hojugaja.com/app?tab=bingo&city=sydney'
     const title       = `${cityName} 카페 도장깨기 빙고게임`
     const lines: string[] = [
       `☕ ${cityName} 카페 도장깨기 빙고게임, 지금 바로 시작하세요!`,
@@ -482,7 +482,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       </div>
 
       {/* ── 5x5 빙고판 */}
-      <div style={{ flex:1, padding:`8px 12px ${embedded ? '60px' : '62px'}`, overflowY:'auto', minHeight:0 }}>
+      <div style={{ flex:1, padding:`8px 12px ${embedded ? '60px' : '80px'}`, overflowY:'auto', minHeight:0 }}>
         <div style={{
           display:'grid', gridTemplateColumns:'repeat(5, 1fr)',
           gap:6,
@@ -622,7 +622,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
         width:'min(100%, 430px)',
         padding:`${spacing[2]}px ${spacing[3]}px`,
         background: colors.bgCard,
-        zIndex:39, boxSizing:'border-box',
+        zIndex:50, boxSizing:'border-box',
         display:'flex', gap: spacing[2],
         borderTop:`1.5px solid ${colors.border}`,
       }}>
