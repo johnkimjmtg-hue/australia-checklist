@@ -791,18 +791,15 @@ function GiftBoxProgress({ total, checkedCount }: {
       }}>
         {Array.from({ length: displayCount }).map((_, i) => {
           const filled = i < checkedCount
-          // 켜진 상태 (구매완료): 핑크 단색
-          // 꺼진 상태 (미구매): 어두운 퍼플 단색 — 불꺼진 전광판
-          const body = filled ? '#FF6B9D' : '#c4a8c4'
-          const lid  = filled ? '#FF85B3' : '#d0b4d0'
-          const rib  = filled ? '#ffffff' : '#e8d8e8'
-          const knot = filled ? '#FF6B9D' : '#c4a8c4'
+          const body = filled ? '#FF6B9D' : '#CBD5E1'
+          const lid  = filled ? '#FF8FB3' : '#E2E8F0'
+          const rib  = filled ? '#ffffff' : '#F8FAFC'
+          const knot = filled ? '#FF6B9D' : '#CBD5E1'
 
           return (
             <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize * 1.05)}
               style={{
                 animation: filled ? `giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both` : 'none',
-                filter: filled ? 'drop-shadow(0 3px 8px rgba(255,107,157,0.5))' : 'none',
               }}>
               {/* 박스 본체 */}
               <rect x="10" y="42" width="80" height="62" rx="5" fill={body}/>
