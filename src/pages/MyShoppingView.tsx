@@ -288,7 +288,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         </button>
         <button onClick={() => setShowSaveConfirm(true)} style={{
           flex:1, height:44, borderRadius: radius.sm, border:'none',
-          background: colors.primary, color: '#fff',
+          background: '#FF6B9D', color: '#fff',
           fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
           WebkitTapHighlightColor:'transparent', fontFamily: font.family,
@@ -364,7 +364,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
               }}>취소</button>
               <button onClick={() => { setShowSaveConfirm(false); onLanding() }} style={{
                 flex:2, height:48, borderRadius:radius.sm, border:'none',
-                background:colors.primary, color:'#fff',
+                background:'#FF6B9D', color:'#fff',
                 fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family,
               }}>저장하기</button>
             </div>
