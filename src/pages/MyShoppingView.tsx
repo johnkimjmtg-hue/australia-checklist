@@ -61,6 +61,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showDeleteAll, setShowDeleteAll] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
 
   const SHOPPING_MSGS = [
     '지갑이 열릴 준비가 됐나요?',
@@ -125,6 +126,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
     }}>
       <style>{`
         @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
+        @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
         @keyframes petalFall {
           0%   { transform: translateY(-20px) rotate(0deg) scale(1); opacity:1; }
@@ -290,8 +292,8 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         display:'flex', gap: spacing[2], borderTop:`1.5px solid ${colors.border}`,
       }}>
         <button onClick={onBack} style={{
-          flex:1, height:44, borderRadius: radius.sm, border:`1.5px solid #FF6B9D`,
-          background: colors.bgCard, color:'#FF6B9D',
+          flex:1, height:44, borderRadius: radius.sm, border:`1px solid ${colors.border}`,
+          background: colors.bgCard, color: '#FF6B9D',
           fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
           WebkitTapHighlightColor:'transparent', fontFamily: font.family,
@@ -299,60 +301,90 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           <Icon icon="ph:shopping-bag" width={18} height={18} color="#FF6B9D" />
           상품 추가하기
         </button>
-        <button onClick={onLanding} style={{
-          flex:1, height:44, borderRadius: radius.sm, border:`1.5px solid ${colors.primary}`,
-          background: colors.bgCard, color: colors.primary,
+        <button onClick={() => setShowSaveConfirm(true)} style={{
+          flex:1, height:44, borderRadius: radius.sm, border:'none',
+          background: colors.primary, color: '#fff',
           fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
           WebkitTapHighlightColor:'transparent', fontFamily: font.family,
         }}>
-          <Icon icon="ph:check-circle" width={18} height={18} color={colors.primary} />
-          저장하고 나가기
+          <Icon icon="ph:floppy-disk" width={18} height={18} color="#fff" />
+          저장하기
         </button>
         <button onClick={() => setShowMoreMenu(true)} style={{
           width:44, height:44, borderRadius: radius.sm, flexShrink:0,
-          border:`1.5px solid ${colors.border}`, background: colors.bgCard,
+          border:`1px solid ${colors.border}`, background: colors.bgCard,
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
           WebkitTapHighlightColor:'transparent',
         }}>
-          <Icon icon="ph:dots-three-vertical" width={20} height={20} color="#64748B" />
+          <Icon icon="ph:dots-three-vertical" width={18} height={18} color={colors.textSecondary} />
         </button>
       </div>
 
-      {/* ── 더보기 모달 */}
+      {/* ══ 더보기 모달 (아래서 올라오는 시트) ══ */}
       {showMoreMenu && (
-        <div style={{
-          position:'fixed', inset:0, zIndex:100,
-          background:'rgba(0,0,0,0.45)', backdropFilter:'blur(2px)',
-          display:'flex', alignItems:'flex-end', justifyContent:'center',
-        }} onClick={() => setShowMoreMenu(false)}>
+        <>
+          <div style={{ position:'fixed', inset:0, zIndex:100, background:'rgba(0,0,0,0.5)' }}
+            onClick={() => setShowMoreMenu(false)} />
           <div style={{
-            width:'100%', maxWidth:390,
-            background: colors.bgCard, borderRadius:'20px 20px 0 0',
-            padding:'20px 16px 36px',
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:400,
+            background: colors.bgCard, borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
+            padding:`${spacing[4]}px ${spacing[3]}px ${spacing[8]}px`,
+            zIndex:101, animation:'slideUpSheet 0.25s ease',
           }} onClick={e => e.stopPropagation()}>
-            <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'0 auto 20px' }} />
-            <div style={{ fontSize:13, fontWeight:800, color:'#94A3B8', marginBottom:14, letterSpacing:0.5 }}>더보기</div>
+            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
+            <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textTertiary, marginBottom:spacing[3], letterSpacing:0.5 }}>더보기</div>
             <button onClick={() => { setShowMoreMenu(false); setShowReceipt(true) }} style={{
-              width:'100%', height:52, borderRadius:12, border:'none',
-              background: colors.bgCard, color: colors.primary,
-              fontSize:15, fontWeight:700, cursor:'pointer',
-              display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
-              border:`1.5px solid ${colors.border}`,
+              width:'100%', height:52, borderRadius:radius.md,
+              border:`1px solid ${colors.border}`, background:colors.bgCard,
+              color:colors.primary, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[2],
+              padding:`0 ${spacing[4]}px`, marginBottom:spacing[2], fontFamily:font.family,
             }}>
-              <Icon icon="ph:share-network" width={18} height={18} color="#1B6EF3" />공유하기
+              <Icon icon="ph:share-network" width={18} height={18} color={colors.primary} />공유하기
             </button>
             <button onClick={() => { setShowMoreMenu(false); setShowDeleteAll(true) }} style={{
-              width:'100%', height:52, borderRadius:12, border:'none',
-              background: colors.bgCard, color: colors.danger,
-              fontSize:15, fontWeight:700, cursor:'pointer',
-              display:'flex', alignItems:'center', gap:10, padding:'0 18px',
-              border:`1.5px solid ${colors.border}`,
+              width:'100%', height:52, borderRadius:radius.md,
+              border:`1px solid ${colors.dangerLight}`, background:colors.dangerLight,
+              color:colors.danger, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[2],
+              padding:`0 ${spacing[4]}px`, fontFamily:font.family,
             }}>
-              <Icon icon="ph:trash" width={18} height={18} color="#DC2626" />리스트 삭제하기
+              <Icon icon="ph:trash" width={18} height={18} color={colors.danger} />리스트 삭제하기
             </button>
           </div>
-        </div>
+        </>
+      )}
+
+      {/* ── 저장 확인 팝업 */}
+      {showSaveConfirm && (
+        <>
+          <div onClick={() => setShowSaveConfirm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:700 }} />
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            background: colors.bgCard, borderRadius: radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,
+            zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.15)', fontFamily: font.family,
+          }}>
+            <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[2] }}>저장하기</div>
+            <div style={{ fontSize:font.size.sm, color:colors.textSecondary, marginBottom:spacing[5], lineHeight:1.6 }}>
+              현재 쇼핑리스트를 저장할까요?<br/>나중에 언제든지 다시 저장할 수 있어요.
+            </div>
+            <div style={{ display:'flex', gap:spacing[2] }}>
+              <button onClick={() => setShowSaveConfirm(false)} style={{
+                flex:1, height:48, borderRadius:radius.sm, border:`1px solid ${colors.border}`,
+                background:colors.bgCard, color:colors.textSecondary,
+                fontSize:font.size.md, fontWeight:font.weight.medium, cursor:'pointer', fontFamily:font.family,
+              }}>취소</button>
+              <button onClick={() => { setShowSaveConfirm(false); onLanding() }} style={{
+                flex:2, height:48, borderRadius:radius.sm, border:'none',
+                background:colors.primary, color:'#fff',
+                fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family,
+              }}>저장하기</button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* ── 전체 삭제 확인 팝업 */}
