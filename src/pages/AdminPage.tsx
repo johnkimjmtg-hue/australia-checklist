@@ -2595,7 +2595,7 @@ function ShoppingTab() {
 // ── 빙고 탭
 function BingoTab() {
   const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
-  type BingoCafe = { id: string; city: string; sort_order: number; name: string; business_id: string | null; is_active: boolean }
+  type BingoCafe = { id: string; city: string; sort_order: number; name: string; business_id: string | null; is_active: boolean; image_url: string | null }
   type Business  = { id: string; name: string }
 
   const [cafes, setCafes]           = useState<BingoCafe[]>([])
@@ -2605,6 +2605,8 @@ function BingoTab() {
   const [saving, setSaving]         = useState<string | null>(null)
   const [editName, setEditName]     = useState<Record<string, string>>({})
   const [bizSearch, setBizSearch]   = useState<Record<string, string>>({})
+  const [uploadingImg, setUploadingImg] = useState<string | null>(null)
+  const imgInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
 
   useEffect(() => {
     const load = async () => {
@@ -2637,6 +2639,18 @@ function BingoTab() {
     setSaving(null)
   }
 
+  const handleImageUpload = async (cafeId: string, file: File) => {
+    setUploadingImg(cafeId)
+    try {
+      const url = await uploadToCloudinary(file, 'bingo')
+      await supabase.from('bingo_cafes').update({ image_url: url }).eq('id', cafeId)
+      setCafes(prev => prev.map(c => c.id === cafeId ? { ...c, image_url: url } : c))
+    } catch (e) {
+      alert('이미지 업로드 실패')
+    }
+    setUploadingImg(null)
+  }
+
   const filtered = cafes.filter(c => c.city === city)
 
   if (loading) return (
@@ -2666,6 +2680,31 @@ function BingoTab() {
             border:'1px solid #F1F5F9',
           }}>
             <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:10 }}>
+              {/* 이미지 썸네일 + 업로드 */}
+              <div
+                onClick={() => imgInputRefs.current[cafe.id]?.click()}
+                style={{
+                  width:48, height:48, borderRadius:8, flexShrink:0,
+                  background:'#F1F5F9', border:'1px solid #E2E8F0',
+                  overflow:'hidden', cursor:'pointer', position:'relative',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                }}>
+                {cafe.image_url
+                  ? <img src={cafe.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                  : <Icon icon="ph:camera-plus" width={18} height={18} color="#94A3B8" />
+                }
+                {uploadingImg === cafe.id && (
+                  <div style={{ position:'absolute', inset:0, background:'rgba(255,255,255,0.8)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <Icon icon="ph:circle-notch" width={16} height={16} color="#1B6EF3" style={{ animation:'spin 0.8s linear infinite' }} />
+                  </div>
+                )}
+                <input
+                  ref={el => { imgInputRefs.current[cafe.id] = el }}
+                  type="file" accept="image/*"
+                  style={{ display:'none' }}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) handleImageUpload(cafe.id, f); e.target.value = '' }}
+                />
+              </div>
               {/* 번호 */}
               <div style={{
                 width:28, height:28, borderRadius:8, background:'#EFF6FF',
