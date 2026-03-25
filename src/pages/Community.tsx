@@ -360,12 +360,17 @@ export default function Community() {
   const [showNameChange, setShowNameChange] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const emojiPickerRef = useRef<HTMLDivElement>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
+  const [weekOffset, setWeekOffset] = useState(0)   // 0 = 최근 1주, 1 = 2주 전, ...
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const weekOffsetRef = useRef(0)
 
   useEffect(() => {
     const updateWidth = () => {
@@ -380,12 +385,61 @@ export default function Community() {
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior }), 80)
   }
 
-  const fetchMessages = useCallback(async () => {
+  // from~to 범위의 메시지 + 좋아요 fetch
+  const fetchRange = useCallback(async (from: string, to: string): Promise<Message[]> => {
     const { data: postsData } = await supabase
       .from('community_posts')
       .select('*')
+      .gte('created_at', from)
+      .lt('created_at', to)
       .order('created_at', { ascending: true })
-      .limit(200)
+
+    if (!postsData || postsData.length === 0) return []
+
+    const postIds = postsData.map(p => p.id)
+    const { data: likesData } = await supabase
+      .from('community_likes')
+      .select('post_id')
+      .in('post_id', postIds)
+
+    const likeCountByPost: Record<string, number> = {}
+    likesData?.forEach(l => {
+      likeCountByPost[l.post_id] = (likeCountByPost[l.post_id] ?? 0) + 1
+    })
+
+    return postsData.map(p => ({
+      id: p.id,
+      text: p.text,
+      created_at: p.created_at,
+      author_id: p.author_id,
+      author_name: p.author_name ?? '익명',
+      likes: likeCountByPost[p.id] ?? 0,
+      reply_to_id: p.reply_to_id ?? null,
+      reply_to_text: p.reply_to_text ?? null,
+      reply_to_name: p.reply_to_name ?? null,
+      image_url: p.image_url ?? null,
+    }))
+  }, [])
+
+  // 주차 범위 계산 헬퍼
+  const getWeekRange = (offset: number) => {
+    const now = new Date()
+    const to = new Date(now)
+    to.setDate(now.getDate() - offset * 7)
+    const from = new Date(to)
+    from.setDate(to.getDate() - 7)
+    return { from: from.toISOString(), to: to.toISOString() }
+  }
+
+  // 초기 + 폴링용: 최근 1주일치 갱신 (messages 맨 끝 부분만 업데이트)
+  const fetchMessages = useCallback(async () => {
+    const { from, to } = getWeekRange(0)
+    // to는 미래까지 포함
+    const { data: postsData } = await supabase
+      .from('community_posts')
+      .select('*')
+      .gte('created_at', from)
+      .order('created_at', { ascending: true })
 
     if (!postsData) return
 
@@ -400,7 +454,7 @@ export default function Community() {
       likeCountByPost[l.post_id] = (likeCountByPost[l.post_id] ?? 0) + 1
     })
 
-    setMessages(postsData.map(p => ({
+    const newMsgs = postsData.map(p => ({
       id: p.id,
       text: p.text,
       created_at: p.created_at,
@@ -411,9 +465,43 @@ export default function Community() {
       reply_to_text: p.reply_to_text ?? null,
       reply_to_name: p.reply_to_name ?? null,
       image_url: p.image_url ?? null,
-    })))
+    }))
+
+    // 이전 주차 메시지는 유지하고 최근 1주일치만 교체
+    setMessages(prev => {
+      const cutoff = from
+      const older = prev.filter(m => m.created_at < cutoff)
+      return [...older, ...newMsgs]
+    })
     setLoading(false)
   }, [])
+
+  // 이전 주차 로드 (위로 스크롤 시)
+  const loadPrevWeek = useCallback(async () => {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    const nextOffset = weekOffsetRef.current + 1
+    const { from, to } = getWeekRange(nextOffset)
+    const older = await fetchRange(from, to)
+    if (older.length === 0) {
+      setHasMore(false)
+    } else {
+      // 스크롤 위치 유지
+      const prevHeight = document.documentElement.scrollHeight
+      setMessages(prev => {
+        const existingIds = new Set(prev.map(m => m.id))
+        const newOnes = older.filter(m => !existingIds.has(m.id))
+        return [...newOnes, ...prev]
+      })
+      weekOffsetRef.current = nextOffset
+      setWeekOffset(nextOffset)
+      setTimeout(() => {
+        const newHeight = document.documentElement.scrollHeight
+        window.scrollBy(0, newHeight - prevHeight)
+      }, 0)
+    }
+    setLoadingMore(false)
+  }, [loadingMore, hasMore, fetchRange])
 
   // Realtime 구독 + 자동 재연결
   const channelRef = useRef<any>(null)
@@ -492,6 +580,18 @@ export default function Community() {
   useEffect(() => {
     if (!loading) scrollToBottom('auto')
   }, [loading])
+
+  // 맨 위 도달 시 이전 주차 자동 로드
+  useEffect(() => {
+    const el = loadMoreRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) loadPrevWeek() },
+      { threshold: 0.1 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [loadPrevWeek])
 
   // 이모지 피커 외부 클릭 닫기
   useEffect(() => {
@@ -789,6 +889,20 @@ export default function Community() {
         </div>
       ) : (
         <div style={{ padding: '12px 14px 0' }}>
+
+          {/* 무한 스크롤 감지 + 로딩 표시 */}
+          <div ref={loadMoreRef} style={{ height: 1 }} />
+          {loadingMore && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0' }}>
+              <Icon icon="ph:circle-notch" width={20} height={20} color={colors.primary}
+                style={{ animation: 'spin 0.8s linear infinite' }} />
+            </div>
+          )}
+          {!hasMore && messages.length > 0 && (
+            <div style={{ textAlign: 'center', fontSize: font.size.xs, color: colors.textTertiary, padding: '8px 0 12px' }}>
+              처음 대화부터 불러왔어요
+            </div>
+          )}
 
           {messages.length === 0 && (
             <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94A3B8' }}>
