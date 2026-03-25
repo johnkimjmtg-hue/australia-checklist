@@ -571,29 +571,29 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       </div>
 
       {/* ── 상황판 */}
-      <div style={{ position:'sticky', top:44, zIndex:29, background: colors.bgPage, padding:'12px 16px 0' }}>
+      <div style={{ position:'sticky', top:44, zIndex:29, background: colors.bgPage, padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
         <div style={{
-          background:'#c8d4b8',
-          borderRadius:12,
-          boxShadow:'inset 3px 3px 8px #a8b498, inset -2px -2px 6px #e8f4d8',
-          padding:'16px 18px', display:'flex', alignItems:'center', gap:16,
+          background: colors.bgCard,
+          borderRadius: radius.lg,
+          border: `1.5px solid ${colors.gray300}`,
+          padding: `${spacing[4]}px`, display:'flex', alignItems:'center', gap: spacing[4],
         }}>
           <MiniGrid count={checked.size} />
           <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize:10, fontWeight:700, color:'#4a5e32', letterSpacing:1, marginBottom:2 }}>
+            <div style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.textTertiary, letterSpacing:1, marginBottom: spacing[1] }}>
               {city === 'melbourne' ? '멜번 판테온: 창조의 연대기' : '태양의 항해: 시드니 개척 연대기'}
             </div>
-            <div style={{ fontSize:15, fontWeight:800, color:'#2d3e1f', marginBottom:3, lineHeight:1.3 }}>
+            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1], lineHeight:1.3 }}>
               {getStatusMsg(checked.size, bingoCount, city).title}
             </div>
             {lastCheckedIdx !== null && checkOrder.includes(lastCheckedIdx) && (
-              <div style={{ fontSize:10, fontWeight:800, color:'#4a5e32', letterSpacing:0.5, marginBottom:2 }}>
+              <div style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.primary, letterSpacing:0.5, marginBottom: spacing[1] }}>
                 {city === 'melbourne'
                   ? PANTHEON_TITLE[checkOrder.indexOf(lastCheckedIdx)]
                   : SYDNEY_TITLE[checkOrder.indexOf(lastCheckedIdx)]}
               </div>
             )}
-            <div style={{ fontSize:11, color:'#4a5e32', fontWeight:500, marginBottom:8, lineHeight:1.5 }}>
+            <div style={{ fontSize: font.size.sm, color: colors.textTertiary, fontWeight: font.weight.regular, lineHeight:1.5 }}>
               {lastCheckedIdx !== null && checkOrder.includes(lastCheckedIdx)
                 ? (city === 'melbourne'
                     ? PANTHEON_LORE[checkOrder.indexOf(lastCheckedIdx)]
@@ -603,8 +603,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
           </div>
           {/* 카운터 */}
           <div style={{ textAlign:'center', flexShrink:0 }}>
-            <div style={{ fontSize:52, fontWeight:800, color:'#2d3e1f', lineHeight:1 }}>{checked.size}</div>
-            <div style={{ fontSize:22, color:'#4a5e32', fontWeight:600, marginTop:2 }}>/25 카페</div>
+            <div style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: colors.textPrimary, lineHeight:1 }}>{checked.size}</div>
+            <div style={{ fontSize: font.size.lg, color: colors.textSecondary, fontWeight: font.weight.medium, marginTop:2 }}>/25 카페</div>
           </div>
         </div>
       </div>
