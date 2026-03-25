@@ -182,7 +182,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
       </div>
 
       {/* ── 리스트 */}
-      <div style={{ padding:'12px 16px 130px', display:'flex', flexDirection:'column', gap:10 }}>
+      <div style={{ padding:'12px 16px 130px', display:'flex', flexDirection:'column', gap:20 }}>
         {loading ? (
           <div style={{ textAlign:'center', padding:'40px 0', color:'#94A3B8', fontSize:14 }}>불러오는 중...</div>
         ) : total === 0 ? (
@@ -230,6 +230,13 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                     lineHeight:1.4,
                     overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
                   }}>{p.name}</span>
+                  {p.description && (
+                    <span style={{
+                      fontSize: font.size.xs, color: colors.textTertiary, lineHeight:1.4,
+                      overflow:'hidden', textOverflow:'ellipsis',
+                      display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical',
+                    }}>{p.description}</span>
+                  )}
                   <span style={{ fontSize: font.size.xs, color: colors.gray400 }}>{p.brand}</span>
                 </div>
 
