@@ -444,6 +444,7 @@ export default function Community() {
   const MY_ID = getMyId()
   const [myName, setMyName] = useState<string | null>(getMyName)
   const [myIcon, setMyIcon] = useState<string | null>(getMyIcon)
+  const [userId, setUserId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [liked, setLiked] = useState<Set<string>>(getLiked)
   const [newText, setNewText] = useState('')
@@ -532,6 +533,33 @@ export default function Community() {
     from.setDate(to.getDate() - 7)
     return { from: from.toISOString(), to: to.toISOString() }
   }
+
+  // 로그인 감지 + profiles 로드
+  useEffect(() => {
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setUserId(user.id)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('nickname, community_icon')
+        .eq('id', user.id)
+        .single()
+      if (profile?.nickname) {
+        setMyName(profile.nickname)
+        localStorage.setItem('community-my-name', profile.nickname)
+      }
+      if (profile?.community_icon) {
+        setMyIcon(profile.community_icon)
+        localStorage.setItem('community-my-icon', profile.community_icon)
+      }
+    }
+    init()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUserId(session?.user?.id ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   // 초기 + 폴링용: 최근 1주일치 갱신 (messages 맨 끝 부분만 업데이트)
   const fetchMessages = useCallback(async () => {
@@ -738,11 +766,17 @@ export default function Community() {
     setSearchResults([])
   }
 
-  const handleSetProfile = (name: string, icon: string) => {
+  const handleSetProfile = async (name: string, icon: string) => {
     localStorage.setItem('community-my-name', name)
     localStorage.setItem('community-my-icon', icon)
     setMyName(name)
     setMyIcon(icon)
+    if (userId) {
+      await supabase.from('profiles').upsert(
+        { id: userId, nickname: name, community_icon: icon },
+        { onConflict: 'id' }
+      )
+    }
   }
 
   const handlePost = async () => {
@@ -762,7 +796,7 @@ export default function Community() {
 
     await supabase.from('community_posts').insert({
       text: text || '',
-      author_id: MY_ID,
+      author_id: userId ?? MY_ID,
       author_name: myName,
       author_icon: myIcon ?? null,
       reply_to_id: replyTo?.id ?? null,
