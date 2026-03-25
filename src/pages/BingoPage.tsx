@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 import BusinessCard from '../components/BusinessCard'
+import { colors, font, radius, spacing } from '../styles/tokens'
 
 interface BingoCafe {
   id: string
@@ -259,7 +260,7 @@ export { Props as BingoProps }
 export default function BingoPage({ onBack, embedded = false, initialCity, onCityChange }: Props) {
   const pageRef = useRef<HTMLDivElement>(null)
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
-  const [city, setCity] = useState<'melbourne'|'sydney'>(initialCity ?? 'melbourne')
+  const [city, setCity] = useState<'melbourne'|'sydney'>(initialCity ?? 'sydney')
   const [melbourneCafes, setMelbourneCafes] = useState<BingoCafe[]>([])
   const [sydneyCafes, setSydneyCafes] = useState<BingoCafe[]>([])
   const [cafesLoading, setCafesLoading] = useState(true)
@@ -542,31 +543,35 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         </div>
       </div>}
 
-      {/* ── 상황판 */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background:'#e8e8e8', padding:'12px 16px 0' }}>
-        {/* 도시 선택 */}
-        <div style={{ display:'flex', gap:8, marginBottom:10 }}>
+      {/* ── 도시 탭 (헤더 역할) */}
+      <div style={{
+        position:'sticky', top:0, zIndex:30,
+        background: colors.bgCard, borderBottom:`1.5px solid ${colors.border}`,
+      }}>
+        <div style={{ display:'flex' }}>
           {([
-            { id:'melbourne', label:'멜번' },
             { id:'sydney',    label:'시드니' },
+            { id:'melbourne', label:'멜번' },
           ] as { id: 'melbourne'|'sydney'; label: string }[]).map(c => (
             <button key={c.id} onClick={() => { setCity(c.id); onCityChange?.(c.id) }} style={{
-              flex:1, height:36, borderRadius:8, border:'none', cursor:'pointer',
-              fontWeight: city===c.id ? 700 : 500,
-              fontSize:13,
-              color: city===c.id ? '#1B6EF3' : '#94A3B8',
-              background: '#e8e8e8',
-              boxShadow: city===c.id
-                ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-                : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-              transition:'all 0.2s',
+              flex:1, height:48, border:'none', cursor:'pointer',
+              fontWeight: city===c.id ? font.weight.bold : font.weight.regular,
+              fontSize: font.size.md,
+              color: city===c.id ? colors.primary : colors.textTertiary,
+              background: 'none',
+              borderBottom: city===c.id ? `2px solid ${colors.primary}` : '2px solid transparent',
+              transition:'all 0.15s',
               WebkitTapHighlightColor: 'transparent',
-              touchAction: 'manipulation',
+              fontFamily: font.family,
             }}>
               {c.label}
             </button>
           ))}
         </div>
+      </div>
+
+      {/* ── 상황판 */}
+      <div style={{ position:'sticky', top:48, zIndex:29, background: colors.bgPage, padding:'12px 16px 0' }}>
         <div style={{
           background:'#c8d4b8',
           borderRadius:12,

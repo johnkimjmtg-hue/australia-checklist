@@ -249,7 +249,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : mainTab==='community' ? (
         <Community />
       ) : mainTab==='bingo' ? (
-        <BingoPage />
+        <BingoPage embedded={true} />
       ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
         <>
           {/* 헤더 */}
