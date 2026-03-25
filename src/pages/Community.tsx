@@ -11,6 +11,7 @@ interface Message {
   created_at: string
   author_id: string
   author_name: string
+  author_icon?: string | null
   likes: number
   reply_to_id?: string | null
   reply_to_text?: string | null
@@ -100,6 +101,17 @@ function getMyName(): string | null {
   return localStorage.getItem('community-my-name')
 }
 
+function getMyIcon(): string | null {
+  return localStorage.getItem('community-my-icon')
+}
+
+// 아이콘 그룹
+const ICON_GROUPS = [
+  { label: '사람', icons: ['👦','👧','👨','👩','👴','👵','🧑','🧒','👮','👷','🧑‍💻','🧑‍🍳','🧑‍🎨','🧑‍🎤','🧑‍✈️','🦸'] },
+  { label: '동물', icons: ['🐶','🐱','🐨','🐯','🦁','🐮','🐸','🦘','🐧','🦊','🐼','🐨','🦝','🐺','🦄','🐻'] },
+  { label: '모음',  icons: ['🌟','⭐','🔥','💎','🌈','🎉','🏆','🎸','🍀','🌸','🍕','⚽','🎮','🚀','🌍','💪'] },
+]
+
 function getLiked(): Set<string> {
   try { return new Set(JSON.parse(localStorage.getItem('community-liked') ?? '[]')) }
   catch { return new Set() }
@@ -139,33 +151,39 @@ const EMOJIS = [
 ]
 
 // ── 닉네임 변경 팝업
-function NameChangePopup({ currentName, onClose, onSet }: {
+function NameChangePopup({ currentName, currentIcon, onClose, onSet }: {
   currentName: string
+  currentIcon: string | null
   onClose: () => void
-  onSet: (name: string) => void
+  onSet: (name: string, icon: string) => void
 }) {
   const [input, setInput] = useState(currentName)
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState('')
+  const [selectedIcon, setSelectedIcon] = useState(currentIcon ?? '👦')
+  const [activeGroup, setActiveGroup] = useState(0)
 
   const handleSubmit = async () => {
     const name = input.trim()
-    if (!name || name === currentName) { onClose(); return }
-    setChecking(true)
-    setError('')
-    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-    const { data } = await supabase
-      .from('community_posts')
-      .select('id')
-      .eq('author_name', name)
-      .gte('created_at', since)
-      .limit(1)
-    setChecking(false)
-    if (data && data.length > 0) {
-      setError('이미 사용 중인 닉네임이에요.')
-      return
+    if (!name) { onClose(); return }
+    if (name === currentName && selectedIcon === currentIcon) { onClose(); return }
+    if (name !== currentName) {
+      setChecking(true)
+      setError('')
+      const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      const { data } = await supabase
+        .from('community_posts')
+        .select('id')
+        .eq('author_name', name)
+        .gte('created_at', since)
+        .limit(1)
+      setChecking(false)
+      if (data && data.length > 0) {
+        setError('이미 사용 중인 닉네임이에요.')
+        return
+      }
     }
-    onSet(name)
+    onSet(name, selectedIcon)
   }
 
   return createPortal(
@@ -180,11 +198,50 @@ function NameChangePopup({ currentName, onClose, onSet }: {
         width: 'calc(100% - 48px)', maxWidth: 340,
         boxShadow: shadow.modal,
       }} onClick={e => e.stopPropagation()}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing[4] }}>
-          <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary }}>닉네임 변경</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing[3] }}>
+          <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary }}>프로필 변경</div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
             <Icon icon="ph:x" width={18} height={18} color={colors.textTertiary} />
           </button>
+        </div>
+
+        {/* 미리보기 */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: spacing[3] }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: '50%',
+            background: colors.primaryLight, border: `2px solid ${colors.primary}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26,
+          }}>{selectedIcon}</div>
+        </div>
+
+        {/* 그룹 탭 */}
+        <div style={{ display: 'flex', gap: spacing[1], marginBottom: spacing[2] }}>
+          {ICON_GROUPS.map((g, i) => (
+            <button key={g.label} onClick={() => setActiveGroup(i)} style={{
+              flex: 1, height: 28, borderRadius: radius.sm, border: 'none',
+              background: activeGroup === i ? colors.primary : colors.gray100,
+              color: activeGroup === i ? colors.textInverse : colors.textSecondary,
+              fontSize: font.size.xs, fontWeight: font.weight.bold,
+              cursor: 'pointer', fontFamily: ff,
+            }}>{g.label}</button>
+          ))}
+        </div>
+
+        {/* 아이콘 그리드 */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 4,
+          marginBottom: spacing[3], padding: spacing[2],
+          background: colors.gray100, borderRadius: radius.md,
+        }}>
+          {ICON_GROUPS[activeGroup].icons.map(icon => (
+            <button key={icon} onClick={() => setSelectedIcon(icon)} style={{
+              width: '100%', aspectRatio: '1', borderRadius: radius.sm, border: 'none',
+              background: selectedIcon === icon ? colors.primaryLight : 'transparent',
+              outline: selectedIcon === icon ? `2px solid ${colors.primary}` : 'none',
+              fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 0,
+            }}>{icon}</button>
+          ))}
         </div>
 
         <input
@@ -215,7 +272,7 @@ function NameChangePopup({ currentName, onClose, onSet }: {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: spacing[2], marginTop: spacing[4] }}>
+        <div style={{ display: 'flex', gap: spacing[2], marginTop: spacing[3] }}>
           <button onClick={onClose} style={{
             flex: 1, height: 48, borderRadius: radius.md, border: `1.5px solid ${colors.border}`,
             background: colors.bgCard, color: colors.textSecondary,
@@ -238,10 +295,12 @@ function NameChangePopup({ currentName, onClose, onSet }: {
 }
 
 // ── 닉네임 설정 화면
-function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
+function NicknameSetup({ onSet }: { onSet: (name: string, icon: string) => void }) {
   const [input, setInput] = useState('')
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState('')
+  const [selectedIcon, setSelectedIcon] = useState('👦')
+  const [activeGroup, setActiveGroup] = useState(0)
   const examples = ['호주사랑', '시드니거주', '멜번이민자']
 
   const handleSubmit = async () => {
@@ -261,7 +320,7 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
       setError('이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해주세요.')
       return
     }
-    onSet(name)
+    onSet(name, selectedIcon)
   }
 
   return createPortal(
@@ -272,15 +331,55 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       <div style={{
-        background: colors.bgCard, borderRadius: radius.xl, padding: `${spacing[8]}px ${spacing[5]}px`,
+        background: colors.bgCard, borderRadius: radius.xl, padding: `${spacing[6]}px ${spacing[5]}px`,
         width: 'calc(100% - 48px)', maxWidth: 360,
         boxShadow: shadow.modal,
       }}>
         <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, textAlign: 'center', marginBottom: spacing[1] }}>
           채팅방 입장
         </div>
-        <div style={{ fontSize: font.size.sm, color: colors.textSecondary, textAlign: 'center', marginBottom: spacing[5], lineHeight: 1.6 }}>
-          호주에 사는 사람들과 자유롭게 대화해요.<br/>사용할 닉네임을 입력해주세요.
+        <div style={{ fontSize: font.size.sm, color: colors.textSecondary, textAlign: 'center', marginBottom: spacing[4], lineHeight: 1.6 }}>
+          호주에 사는 사람들과 자유롭게 대화해요.<br/>닉네임과 아이콘을 선택해주세요.
+        </div>
+
+        {/* 선택된 아이콘 미리보기 */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: spacing[4] }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: '50%',
+            background: colors.primaryLight, border: `2px solid ${colors.primary}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 30,
+          }}>{selectedIcon}</div>
+        </div>
+
+        {/* 그룹 탭 */}
+        <div style={{ display: 'flex', gap: spacing[1], marginBottom: spacing[2] }}>
+          {ICON_GROUPS.map((g, i) => (
+            <button key={g.label} onClick={() => setActiveGroup(i)} style={{
+              flex: 1, height: 30, borderRadius: radius.sm, border: 'none',
+              background: activeGroup === i ? colors.primary : colors.gray100,
+              color: activeGroup === i ? colors.textInverse : colors.textSecondary,
+              fontSize: font.size.xs, fontWeight: font.weight.bold,
+              cursor: 'pointer', fontFamily: ff,
+            }}>{g.label}</button>
+          ))}
+        </div>
+
+        {/* 아이콘 그리드 */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 4,
+          marginBottom: spacing[4], padding: `${spacing[2]}px`,
+          background: colors.gray100, borderRadius: radius.md,
+        }}>
+          {ICON_GROUPS[activeGroup].icons.map(icon => (
+            <button key={icon} onClick={() => setSelectedIcon(icon)} style={{
+              width: '100%', aspectRatio: '1', borderRadius: radius.sm, border: 'none',
+              background: selectedIcon === icon ? colors.primaryLight : 'transparent',
+              outline: selectedIcon === icon ? `2px solid ${colors.primary}` : 'none',
+              fontSize: 22, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 0,
+            }}>{icon}</button>
+          ))}
         </div>
 
         <input
@@ -312,7 +411,7 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: spacing[2], flexWrap: 'wrap', marginTop: spacing[3], marginBottom: spacing[5] }}>
+        <div style={{ display: 'flex', gap: spacing[2], flexWrap: 'wrap', marginTop: spacing[3], marginBottom: spacing[4] }}>
           <span style={{ fontSize: font.size.xs, color: colors.textTertiary, fontWeight: font.weight.bold, alignSelf: 'center' }}>예)</span>
           {examples.map(ex => (
             <span key={ex} style={{
@@ -344,6 +443,7 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
 export default function Community() {
   const MY_ID = getMyId()
   const [myName, setMyName] = useState<string | null>(getMyName)
+  const [myIcon, setMyIcon] = useState<string | null>(getMyIcon)
   const [messages, setMessages] = useState<Message[]>([])
   const [liked, setLiked] = useState<Set<string>>(getLiked)
   const [newText, setNewText] = useState('')
@@ -414,6 +514,7 @@ export default function Community() {
       created_at: p.created_at,
       author_id: p.author_id,
       author_name: p.author_name ?? '익명',
+      author_icon: p.author_icon ?? null,
       likes: likeCountByPost[p.id] ?? 0,
       reply_to_id: p.reply_to_id ?? null,
       reply_to_text: p.reply_to_text ?? null,
@@ -461,6 +562,7 @@ export default function Community() {
       created_at: p.created_at,
       author_id: p.author_id,
       author_name: p.author_name ?? '익명',
+      author_icon: p.author_icon ?? null,
       likes: likeCountByPost[p.id] ?? 0,
       reply_to_id: p.reply_to_id ?? null,
       reply_to_text: p.reply_to_text ?? null,
@@ -636,9 +738,11 @@ export default function Community() {
     setSearchResults([])
   }
 
-  const handleSetName = (name: string) => {
+  const handleSetProfile = (name: string, icon: string) => {
     localStorage.setItem('community-my-name', name)
+    localStorage.setItem('community-my-icon', icon)
     setMyName(name)
+    setMyIcon(icon)
   }
 
   const handlePost = async () => {
@@ -660,6 +764,7 @@ export default function Community() {
       text: text || '',
       author_id: MY_ID,
       author_name: myName,
+      author_icon: myIcon ?? null,
       reply_to_id: replyTo?.id ?? null,
       reply_to_text: replyTo?.text ?? null,
       reply_to_name: replyTo?.author_name ?? null,
@@ -748,7 +853,7 @@ export default function Community() {
       `}</style>
 
       {/* 닉네임 미설정 시 팝업 */}
-      {!myName && <NicknameSetup onSet={handleSetName} />}
+      {!myName && <NicknameSetup onSet={handleSetProfile} />}
 
       {/* ── 헤더 (채팅방 제목이 헤더 역할) */}
       <div style={{
@@ -758,12 +863,8 @@ export default function Community() {
       }}>
         <div style={{ padding: `${spacing[3]}px ${spacing[4]}px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: spacing[2] }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%',
-              overflow: 'hidden',
-              flexShrink: 0,
-            }}>
-              <img src={logoImg} alt="호주가자" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ width: 32, height: 32, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img src={logoImg} alt="호주가자" style={{ width: 32, height: 32, objectFit: 'contain' }} />
             </div>
             <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary }}>호주가자 단톡방</div>
           </div>
@@ -792,10 +893,10 @@ export default function Community() {
               }}>
                 <div style={{
                   width: 18, height: 18, borderRadius: '50%',
-                  background: avatarColor(myName),
+                  background: myIcon ? colors.gray100 : avatarColor(myName),
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 9, color: '#fff', fontWeight: font.weight.bold,
-                }}>{myName[0]}</div>
+                  fontSize: myIcon ? 13 : 9, color: '#fff', fontWeight: font.weight.bold,
+                }}>{myIcon ?? myName[0]}</div>
                 <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.textSecondary }}>{myName}</span>
               </button>
             )}
@@ -952,18 +1053,20 @@ export default function Community() {
                       {!continuous && (
                         <>
                           <div style={{
-                            fontSize: 10, fontWeight: 700, color: '#64748B',
+                            fontSize: 10, fontWeight: 700, color: colors.textSecondary,
                             whiteSpace: 'nowrap', maxWidth: 44,
                             overflow: 'hidden', textOverflow: 'ellipsis',
                             textAlign: 'center',
                           }}>{msg.author_name}</div>
                           <div style={{
                             width: 34, height: 34, borderRadius: '50%',
-                            background: color,
+                            background: msg.author_icon ? colors.gray100 : color,
+                            border: msg.author_icon ? `1px solid ${colors.border}` : 'none',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 14, fontWeight: 800, color: '#fff',
+                            fontSize: msg.author_icon ? 20 : 14,
+                            fontWeight: 800, color: '#fff',
                             flexShrink: 0,
-                          }}>{msg.author_name[0]}</div>
+                          }}>{msg.author_icon ?? msg.author_name[0]}</div>
                         </>
                       )}
                     </div>
@@ -1251,8 +1354,9 @@ export default function Community() {
         {showNameChange && myName && (
           <NameChangePopup
             currentName={myName}
+            currentIcon={myIcon}
             onClose={() => setShowNameChange(false)}
-            onSet={(name) => { handleSetName(name); setShowNameChange(false) }}
+            onSet={(name, icon) => { handleSetProfile(name, icon); setShowNameChange(false) }}
           />
         )}
 
