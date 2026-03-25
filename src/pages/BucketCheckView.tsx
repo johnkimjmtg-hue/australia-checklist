@@ -765,15 +765,16 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:700 }} />
           <div style={{
             position:'fixed', top:'50%', left:'50%', transform:'translate(-50%, -50%)',
-            width:'calc(100% - 32px)', maxWidth:400,
-            background:colors.bgCard, borderRadius:radius.xl,
-            zIndex:701, padding:`${spacing[5]}px`,
-            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+            background:colors.bgCard, borderRadius:radius.lg,
+            zIndex:701, padding:`${spacing[6]}px ${spacing[5]}px`,
+            boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
+            fontFamily:font.family,
           }}>
-            <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[2] }}>저장하기</div>
-            <div style={{ fontSize:font.size.md, color:colors.textSecondary, marginBottom:spacing[5], lineHeight:1.6 }}>
+            <p style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[2], lineHeight:1.5 }}>저장하기</p>
+            <p style={{ fontSize:font.size.sm, color:colors.textSecondary, marginBottom:spacing[5], lineHeight:1.6 }}>
               현재 달성 현황을 저장할까요?<br/>나중에 언제든지 다시 저장할 수 있어요.
-            </div>
+            </p>
             <div style={{ display:'flex', gap:spacing[2] }}>
               <button onClick={() => setShowSaveConfirm(false)} style={{
                 flex:1, height:48, borderRadius:radius.sm,
