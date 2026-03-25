@@ -189,11 +189,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   return (
     <div style={{ 
-      minHeight: mainTab === 'nearby' ? undefined : '100dvh',
-      height: mainTab === 'nearby' ? '100dvh' : undefined,
-      overflow: mainTab === 'nearby' ? 'hidden' : undefined,
-      display: mainTab === 'nearby' ? 'flex' : undefined,
-      flexDirection: mainTab === 'nearby' ? 'column' : undefined,
+      minHeight:'100dvh',
       background:colors.bgPage, fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
