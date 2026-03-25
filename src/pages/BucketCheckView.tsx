@@ -185,6 +185,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   const [showDelete, setShowDelete]   = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showAllDone, setShowAllDone] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [deleteItemId, setDeleteItemId] = useState<{ id: string; day?: number } | null>(null)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const prevAchieved = useRef(0)
@@ -543,7 +544,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           <Icon icon="ph:pencil-simple" width={16} height={16} color={colors.textSecondary} />
           리스트 수정하기
         </button>
-        <button onClick={() => {}} style={{
+        <button onClick={() => setShowSaveConfirm(true)} style={{
           flex:1, height:44, borderRadius:radius.sm,
           border:'none', background:colors.primary,
           color:'#fff', fontSize:font.size.md, fontWeight:font.weight.bold,
@@ -755,6 +756,40 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             }
           </div>
         </div>
+      )}
+
+      {/* 저장 확인 팝업 */}
+      {showSaveConfirm && (
+        <>
+          <div onClick={() => setShowSaveConfirm(false)}
+            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:700 }} />
+          <div style={{
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:400,
+            background:colors.bgCard, borderRadius:radius.xl,
+            zIndex:701, padding:`${spacing[5]}px`,
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+          }}>
+            <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[2] }}>저장하기</div>
+            <div style={{ fontSize:font.size.md, color:colors.textSecondary, marginBottom:spacing[5], lineHeight:1.6 }}>
+              현재 달성 현황을 저장할까요?<br/>나중에 언제든지 다시 저장할 수 있어요.
+            </div>
+            <div style={{ display:'flex', gap:spacing[2] }}>
+              <button onClick={() => setShowSaveConfirm(false)} style={{
+                flex:1, height:48, borderRadius:radius.sm,
+                border:`1px solid ${colors.border}`, background:colors.bgCard,
+                color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold,
+                cursor:'pointer', fontFamily:font.family,
+              }}>취소</button>
+              <button onClick={() => { setShowSaveConfirm(false) }} style={{
+                flex:2, height:48, borderRadius:radius.sm,
+                border:'none', background:colors.primary,
+                color:'#fff', fontSize:font.size.md, fontWeight:font.weight.bold,
+                cursor:'pointer', fontFamily:font.family,
+              }}>저장하기</button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
