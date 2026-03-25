@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { CheckItem, ITEM_ICONS } from '../data/checklist'
 import { supabase } from '../lib/supabase'
 import { colors, font, radius, spacing, shadow, T } from '../styles/tokens'
+import { AlertModal } from '../components/ui'
 
 type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null; image_url?: string | null; tips?: string | null; related_product_ids?: string[] | null }
 import { AppState, TripInfo, getTripDays, fmtMD, dow } from '../store/state'
@@ -760,37 +761,13 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       {/* 저장 확인 팝업 */}
       {showSaveConfirm && (
-        <>
-          <div onClick={() => setShowSaveConfirm(false)}
-            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:700 }} />
-          <div style={{
-            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%, -50%)',
-            width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
-            background:colors.bgCard, borderRadius:radius.lg,
-            zIndex:701, padding:`${spacing[6]}px ${spacing[5]}px`,
-            boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
-            fontFamily:font.family,
-          }}>
-            <p style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[2], lineHeight:1.5 }}>저장하기</p>
-            <p style={{ fontSize:font.size.sm, color:colors.textSecondary, marginBottom:spacing[5], lineHeight:1.6 }}>
-              현재 달성 현황을 저장할까요?<br/>나중에 언제든지 다시 저장할 수 있어요.
-            </p>
-            <div style={{ display:'flex', gap:spacing[2] }}>
-              <button onClick={() => setShowSaveConfirm(false)} style={{
-                flex:1, height:48, borderRadius:radius.sm,
-                border:`1px solid ${colors.border}`, background:colors.bgCard,
-                color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold,
-                cursor:'pointer', fontFamily:font.family,
-              }}>취소</button>
-              <button onClick={() => { setShowSaveConfirm(false) }} style={{
-                flex:2, height:48, borderRadius:radius.sm,
-                border:'none', background:colors.primary,
-                color:'#fff', fontSize:font.size.md, fontWeight:font.weight.bold,
-                cursor:'pointer', fontFamily:font.family,
-              }}>저장하기</button>
-            </div>
-          </div>
-        </>
+        <AlertModal
+          title="저장하기"
+          message="현재 달성 현황을 저장할까요? 나중에 언제든지 다시 저장할 수 있어요."
+          confirmLabel="저장하기"
+          onConfirm={() => { setShowSaveConfirm(false) }}
+          onCancel={() => setShowSaveConfirm(false)}
+        />
       )}
     </div>
   )

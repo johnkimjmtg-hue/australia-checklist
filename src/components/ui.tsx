@@ -331,3 +331,48 @@ export function ListItem({ leading, title, subtitle, trailing, onClick }: ListIt
     </div>
   )
 }
+
+// ── AlertModal ────────────────────────────────
+type AlertModalProps = {
+  title: string
+  message?: string
+  confirmLabel: string
+  cancelLabel?: string
+  confirmColor?: string
+  onConfirm: () => void
+  onCancel: () => void
+  hideCancel?: boolean
+  confirmFirst?: boolean
+}
+export function AlertModal({ title, message, confirmLabel, cancelLabel = '취소', confirmColor, onConfirm, onCancel, hideCancel, confirmFirst }: AlertModalProps) {
+  return (
+    <>
+      <div onClick={onCancel} style={{
+        position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600,
+        animation:'fadeIn 0.2s ease',
+      }} />
+      <div style={{
+        position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+        background:colors.bgCard, borderRadius:radius.lg,
+        padding:`${spacing[6]}px ${spacing[5]}px`,
+        zIndex:601, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+        animation:'scaleIn 0.22s ease', fontFamily:font.family,
+        boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
+      }}>
+        <p style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:message ? spacing[2] : spacing[5], lineHeight:1.5 }}>{title}</p>
+        {message && <p style={{ fontSize:font.size.sm, color:colors.textSecondary, marginBottom:spacing[5], lineHeight:1.6 }}>{message}</p>}
+        <div style={{ display:'flex', gap:spacing[2] }}>
+          {confirmFirst && (
+            <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:radius.sm, background:colors.primaryLight, color:confirmColor ?? colors.primary, fontWeight:font.weight.bold, fontSize:font.size.md, cursor:'pointer', fontFamily:font.family }}>{confirmLabel}</button>
+          )}
+          {!hideCancel && (
+            <button onClick={onCancel} style={{ flex:1, height:48, border:`1px solid ${colors.border}`, borderRadius:radius.sm, background:colors.bgCard, color:colors.textSecondary, fontWeight:font.weight.medium, fontSize:font.size.sm, cursor:'pointer', fontFamily:font.family }}>{cancelLabel}</button>
+          )}
+          {!confirmFirst && (
+            <button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:radius.sm, background:confirmColor === colors.danger ? colors.dangerLight : colors.primaryLight, color:confirmColor ?? colors.primary, fontWeight:font.weight.bold, fontSize:font.size.md, cursor:'pointer', fontFamily:font.family }}>{confirmLabel}</button>
+          )}
+        </div>
+      </div>
+    </>
+  )
+}
