@@ -269,7 +269,7 @@ export default function NearbyMap({ onBack }: Props) {
         .cat-scroll::-webkit-scrollbar { height:4px; }
         .cat-scroll::-webkit-scrollbar-track { background:${colors.bgPage}; border-radius:2px; }
         .cat-scroll::-webkit-scrollbar-thumb { background:${colors.gray300}; border-radius:2px; }
-        .map-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; border-radius: 8px !important; }
+        .map-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
       `}</style>
 
       {/* 스티키 필터 — 카테고리 + 거리 */}
@@ -288,7 +288,7 @@ export default function NearbyMap({ onBack }: Props) {
               <button key={cat.id} onClick={() => setCategory(cat.id)}
                 className="map-btn"
                 style={{
-                  height:36, borderRadius:radius.sm,
+                  height:36, borderRadius:8,
                   background: isActive ? colors.primary : colors.bgCard,
                   color: isActive ? '#fff' : colors.gray600,
                   border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
@@ -305,7 +305,7 @@ export default function NearbyMap({ onBack }: Props) {
           })}
         </div>
 
-        {/* 거리 필터 */}
+        {/* 거리 필터 — 더 둥글게, 비활성:흰배경+회색보더+진한글자, 활성:연한파랑배경+진한파랑보더+진한글자 */}
         <div style={{ display:'flex', gap:spacing[2] }}>
           {RADIUS_OPTIONS.map(opt => {
             const isActive = radius === opt.value
@@ -357,7 +357,7 @@ export default function NearbyMap({ onBack }: Props) {
         {/* 업체 수 배지 */}
         <div style={{
           position:'absolute', top:12, right:12,
-          background:colors.bgCard, borderRadius:8, padding:"4px 12px",
+          background:colors.bgCard, borderRadius:8, padding:'4px 12px',
           fontSize:font.size.xs, color:colors.textSecondary, fontWeight:font.weight.bold,
           border:`1px solid ${colors.border}`,
         }}>
@@ -365,16 +365,13 @@ export default function NearbyMap({ onBack }: Props) {
         </div>
 
         {/* 커스텀 줌 버튼 — 오른쪽 아래 12% 위치 */}
-        <div style={{
-          position:'absolute', right:12, bottom:'12%',
-          display:'flex', flexDirection:'column', gap:4,
-        }}>
+        <div style={{ position:'absolute', right:12, bottom:'12%', display:'flex', flexDirection:'column', gap:4 }}>
           <button onClick={() => mapObj.current?.setZoom((mapObj.current?.getZoom() ?? 13) + 1)}
             style={{
               width:36, height:36, borderRadius:8,
               background:colors.bgCard, border:`1px solid ${colors.border}`,
               cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-              fontSize:20, color:colors.textSecondary, fontWeight:400,
+              fontSize:20, color:colors.textSecondary,
               WebkitTapHighlightColor:'transparent',
             }}>+</button>
           <button onClick={() => mapObj.current?.setZoom((mapObj.current?.getZoom() ?? 13) - 1)}
@@ -382,7 +379,7 @@ export default function NearbyMap({ onBack }: Props) {
               width:36, height:36, borderRadius:8,
               background:colors.bgCard, border:`1px solid ${colors.border}`,
               cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-              fontSize:20, color:colors.textSecondary, fontWeight:400,
+              fontSize:20, color:colors.textSecondary,
               WebkitTapHighlightColor:'transparent',
             }}>−</button>
         </div>
@@ -412,7 +409,7 @@ export default function NearbyMap({ onBack }: Props) {
             left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:390,
             background:colors.bgCard,
-            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
+            borderRadius:'20px 20px 0 0',
             zIndex:501,
             animation:'slideUpSheet 0.25s ease',
             maxHeight:'75vh',
