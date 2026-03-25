@@ -185,7 +185,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
-  const [showAllDone, setShowAllDone] = useState(false)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [deleteItemId, setDeleteItemId] = useState<{ id: string; day?: number } | null>(null)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
@@ -269,7 +268,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
     if (total > 0 && achievedCount === total && prevAchieved.current < total) {
       setTimeout(() => {
         setConfettiTrigger(t => t+1)
-        setShowAllDone(true)
       }, 400)
     }
     prevAchieved.current = achievedCount
@@ -637,10 +635,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       {showDelete && (
         <DeleteModal onConfirm={() => { setShowDelete(false); onDelete() }} onCancel={() => setShowDelete(false)} />
       )}
-      {showAllDone && (
-        <AllDoneModal total={total} onReset={() => { setShowAllDone(false); onDelete() }} onClose={() => setShowAllDone(false)} />
-      )}
-
       {/* ── 쇼핑 상품 팝업 */}
       {selProduct && (
         <>
