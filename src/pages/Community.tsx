@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
+import { colors, font, radius, spacing, shadow } from '../styles/tokens'
 
 interface Message {
   id: string
@@ -16,8 +17,8 @@ interface Message {
   image_url?: string | null
 }
 
-const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
-const BLUE = '#1B6EF3'
+const ff = font.family
+const BLUE = colors.primary
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
 
@@ -174,13 +175,14 @@ function NameChangePopup({ currentName, onClose, onSet }: {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }} onClick={onClose}>
       <div style={{
-        background: '#e8e8e8', borderRadius: 20, padding: '24px',
+        background: colors.bgCard, borderRadius: radius.xl, padding: `${spacing[5]}px`,
         width: 'calc(100% - 48px)', maxWidth: 340,
+        boxShadow: shadow.modal,
       }} onClick={e => e.stopPropagation()}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A' }}>닉네임 변경</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing[4] }}>
+          <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary }}>닉네임 변경</div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-            <Icon icon="ph:x" width={18} height={18} color="#94A3B8" />
+            <Icon icon="ph:x" width={18} height={18} color={colors.textTertiary} />
           </button>
         </div>
 
@@ -193,36 +195,39 @@ function NameChangePopup({ currentName, onClose, onSet }: {
           autoFocus
           style={{
             width: '100%', height: 48,
-            border: `1px solid ${error ? '#EF4444' : '#C8C8C8'}`,
-            borderRadius: 12, padding: '0 14px', fontSize: 15,
-            color: '#0F172A', fontFamily: ff, outline: 'none',
-            background: '#fff',
+            border: `1.5px solid ${error ? colors.danger : colors.border}`,
+            borderRadius: radius.md, padding: '0 14px', fontSize: font.size.md,
+            color: colors.textPrimary, fontFamily: ff, outline: 'none',
+            background: colors.bgInput,
             boxSizing: 'border-box',
+            transition: 'border-color 0.12s',
           }}
         />
         {error && (
-          <div style={{ fontSize: 12, color: '#EF4444', marginTop: 6, fontWeight: 600 }}>
+          <div style={{
+            fontSize: font.size.sm, color: colors.danger,
+            background: colors.dangerLight, borderRadius: radius.sm,
+            padding: `${spacing[2]}px ${spacing[3]}px`, marginTop: spacing[2],
+            fontWeight: font.weight.bold,
+          }}>
             ⚠️ {error}
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+        <div style={{ display: 'flex', gap: spacing[2], marginTop: spacing[4] }}>
           <button onClick={onClose} style={{
-            flex: 1, height: 48, borderRadius: 12, border: 'none',
-            background: '#e8e8e8', color: '#64748B', fontSize: 14, fontWeight: 600,
+            flex: 1, height: 48, borderRadius: radius.md, border: `1.5px solid ${colors.border}`,
+            background: colors.bgCard, color: colors.textSecondary,
+            fontSize: font.size.md, fontWeight: font.weight.bold,
             cursor: 'pointer', fontFamily: ff,
-            boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           }}>취소</button>
           <button onClick={handleSubmit} disabled={!input.trim() || checking} style={{
-            flex: 1, height: 48, borderRadius: 12, border: 'none',
-            background: '#e8e8e8',
-            color: input.trim() && !checking ? BLUE : '#94A3B8',
-            fontSize: 14, fontWeight: 700,
+            flex: 1, height: 48, borderRadius: radius.md, border: 'none',
+            background: input.trim() && !checking ? colors.primary : colors.gray200,
+            color: input.trim() && !checking ? colors.textInverse : colors.textTertiary,
+            fontSize: font.size.md, fontWeight: font.weight.bold,
             cursor: input.trim() && !checking ? 'pointer' : 'default',
-            fontFamily: ff,
-            boxShadow: input.trim() && !checking
-              ? '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff'
-              : 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff',
+            fontFamily: ff, transition: 'all 0.12s',
           }}>{checking ? '확인 중...' : '변경하기'}</button>
         </div>
       </div>
@@ -236,7 +241,7 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
   const [input, setInput] = useState('')
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState('')
-  const examples = ['호주사랑', '시드니거주', '멜번이민자', '브리즈번사람', '캥거루팬']
+  const examples = ['호주사랑', '시드니거주', '멜번이민자']
 
   const handleSubmit = async () => {
     const name = input.trim()
@@ -266,14 +271,14 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       <div style={{
-        background: '#e8e8e8', borderRadius: 20, padding: '28px 24px',
+        background: colors.bgCard, borderRadius: radius.xl, padding: `${spacing[8]}px ${spacing[5]}px`,
         width: 'calc(100% - 48px)', maxWidth: 360,
+        boxShadow: shadow.modal,
       }}>
-        <div style={{ fontSize: 32, textAlign: 'center', marginBottom: 12 }}>💬</div>
-        <div style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', textAlign: 'center', marginBottom: 6 }}>
+        <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, textAlign: 'center', marginBottom: spacing[1] }}>
           채팅방 입장
         </div>
-        <div style={{ fontSize: 13, color: '#64748B', textAlign: 'center', marginBottom: 20, lineHeight: 1.6 }}>
+        <div style={{ fontSize: font.size.sm, color: colors.textSecondary, textAlign: 'center', marginBottom: spacing[5], lineHeight: 1.6 }}>
           호주에 사는 사람들과 자유롭게 대화해요.<br/>사용할 닉네임을 입력해주세요.
         </div>
 
@@ -286,27 +291,34 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
           autoFocus
           style={{
             width: '100%', height: 48,
-            border: `1px solid ${error ? '#EF4444' : '#C8C8C8'}`,
-            borderRadius: 12, padding: '0 14px', fontSize: 15,
-            color: '#0F172A', fontFamily: ff, outline: 'none',
-            background: '#fff',
+            border: `1.5px solid ${error ? colors.danger : colors.border}`,
+            borderRadius: radius.md, padding: '0 14px', fontSize: font.size.md,
+            color: colors.textPrimary, fontFamily: ff, outline: 'none',
+            background: colors.bgInput,
             boxSizing: 'border-box',
+            transition: 'border-color 0.12s',
           }}
         />
 
         {error && (
-          <div style={{ fontSize: 12, color: '#EF4444', marginTop: 6, fontWeight: 600 }}>
+          <div style={{
+            fontSize: font.size.sm, color: colors.danger,
+            background: colors.dangerLight, borderRadius: radius.sm,
+            padding: `${spacing[2]}px ${spacing[3]}px`, marginTop: spacing[2],
+            fontWeight: font.weight.bold,
+          }}>
             ⚠️ {error}
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10, marginBottom: 20 }}>
+        <div style={{ display: 'flex', gap: spacing[2], flexWrap: 'wrap', marginTop: spacing[3], marginBottom: spacing[5] }}>
+          <span style={{ fontSize: font.size.xs, color: colors.textTertiary, fontWeight: font.weight.bold, alignSelf: 'center' }}>예)</span>
           {examples.map(ex => (
-            <button key={ex} onClick={() => { setInput(ex); setError('') }} style={{
-              fontSize: 11, fontWeight: 600, padding: '4px 10px',
-              borderRadius: 20, border: '1px solid #C8C8C8',
-              background: '#e8e8e8', color: '#64748B', cursor: 'pointer',
-            }}>{ex}</button>
+            <span key={ex} style={{
+              fontSize: font.size.xs, fontWeight: font.weight.bold, padding: '4px 10px',
+              borderRadius: radius.full, border: `1px solid ${colors.border}`,
+              background: colors.gray100, color: colors.textSecondary,
+            }}>{ex}</span>
           ))}
         </div>
 
@@ -314,15 +326,12 @@ function NicknameSetup({ onSet }: { onSet: (name: string) => void }) {
           onClick={handleSubmit}
           disabled={!input.trim() || checking}
           style={{
-            width: '100%', height: 50, borderRadius: 12, border: 'none',
-            background: '#e8e8e8',
-            color: input.trim() && !checking ? BLUE : '#94A3B8',
-            fontSize: 15, fontWeight: 700,
+            width: '100%', height: 50, borderRadius: radius.md, border: 'none',
+            background: input.trim() && !checking ? colors.primary : colors.gray200,
+            color: input.trim() && !checking ? colors.textInverse : colors.textTertiary,
+            fontSize: font.size.md, fontWeight: font.weight.bold,
             cursor: input.trim() && !checking ? 'pointer' : 'default',
-            fontFamily: ff,
-            boxShadow: input.trim() && !checking
-              ? '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff'
-              : 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff',
+            fontFamily: ff, transition: 'all 0.12s',
           }}
         >{checking ? '확인 중...' : '입장하기 →'}</button>
       </div>
@@ -619,7 +628,7 @@ export default function Community() {
 
   return (
     <div ref={pageRef} style={{
-      background: '#e8e8e8',
+      background: colors.bgPage,
       fontFamily: ff,
       minHeight: '100%',
       paddingBottom: 80,
@@ -640,27 +649,25 @@ export default function Community() {
       {/* 닉네임 미설정 시 팝업 */}
       {!myName && <NicknameSetup onSet={handleSetName} />}
 
-      {/* ── 헤더 */}
+      {/* ── 헤더 (채팅방 제목이 헤더 역할) */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 50,
-        background: '#fff',
-        borderTop: '1px solid #C8C8C8',
-        borderBottom: '1px solid #C8C8C8',
+        background: colors.bgCard,
+        borderBottom: `1.5px solid ${colors.border}`,
       }}>
-        <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ padding: `${spacing[3]}px ${spacing[4]}px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: spacing[2] }}>
             <div style={{
-              width: 36, height: 36, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #1B6EF3, #6366F1)',
+              width: 32, height: 32, borderRadius: '50%',
+              background: `linear-gradient(135deg, ${colors.primary}, #6366F1)`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
             }}>
-              <Icon icon="mdi:kangaroo" width={22} height={22} color="#fff" />
+              <Icon icon="mdi:kangaroo" width={18} height={18} color="#fff" />
             </div>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>호주가자 단톡방</div>
-            </div>
+            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary }}>호주가자 단톡방</div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: spacing[2] }}>
             {/* 검색 버튼 */}
             <button onClick={() => {
               setShowSearch(v => !v)
@@ -668,30 +675,28 @@ export default function Community() {
               setSearchResults([])
               setTimeout(() => searchInputRef.current?.focus(), 100)
             }} style={{
-              width: 34, height: 34, borderRadius: '50%',
-              background: showSearch ? '#e8e8e8' : '#e8e8e8',
-              border: 'none', cursor: 'pointer',
+              width: 28, height: 28, borderRadius: radius.full,
+              border: `1.5px solid ${showSearch ? colors.primary : colors.border}`,
+              background: showSearch ? colors.primaryLight : colors.bgCard,
+              cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: showSearch
-                ? 'inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff'
-                : '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
             }}>
-              <Icon icon="ph:magnifying-glass" width={16} height={16} color={showSearch ? BLUE : '#64748B'} />
+              <Icon icon="ph:magnifying-glass" width={14} height={14} color={showSearch ? colors.primary : colors.textSecondary} />
             </button>
             {myName && (
               <button onClick={() => setShowNameChange(true)} style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                background: '#e8e8e8', border: 'none', borderRadius: 20,
-                padding: '6px 12px', cursor: 'pointer',
-                boxShadow: '3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
+                display: 'flex', alignItems: 'center', gap: spacing[1],
+                background: colors.bgCard, border: `1.5px solid ${colors.border}`,
+                borderRadius: radius.full,
+                padding: `5px ${spacing[3]}px`, cursor: 'pointer',
               }}>
                 <div style={{
-                  width: 20, height: 20, borderRadius: '50%',
+                  width: 18, height: 18, borderRadius: '50%',
                   background: avatarColor(myName),
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 10, color: '#fff', fontWeight: 800,
+                  fontSize: 9, color: '#fff', fontWeight: font.weight.bold,
                 }}>{myName[0]}</div>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>{myName}</span>
+                <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.textSecondary }}>{myName}</span>
               </button>
             )}
           </div>
@@ -699,13 +704,13 @@ export default function Community() {
 
         {/* 검색창 슬라이드 다운 */}
         {showSearch && (
-          <div style={{ padding: '0 14px 12px', borderTop: '1px solid #F1F5F9' }}>
+          <div style={{ padding: `0 ${spacing[4]}px ${spacing[3]}px`, borderTop: `1px solid ${colors.border}` }}>
             <div style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              background: '#e8e8e8', borderRadius: 12, padding: '0 12px',
-              height: 40, border: '1px solid #C8C8C8',
+              display: 'flex', alignItems: 'center', gap: spacing[2],
+              background: colors.bgInput, borderRadius: radius.sm, padding: `0 ${spacing[3]}px`,
+              height: 40, border: `1.5px solid ${colors.primary}`,
             }}>
-              <Icon icon="ph:magnifying-glass" width={14} height={14} color="#94A3B8" />
+              <Icon icon="ph:magnifying-glass" width={14} height={14} color={colors.primary} />
               <input
                 ref={searchInputRef}
                 value={searchQuery}
@@ -713,13 +718,13 @@ export default function Community() {
                 placeholder="대화 내용 검색..."
                 style={{
                   flex: 1, border: 'none', outline: 'none',
-                  fontSize: 13, color: '#1E293B', background: 'transparent', fontFamily: ff,
+                  fontSize: font.size.sm, color: colors.textPrimary, background: 'transparent', fontFamily: ff,
                 }}
               />
               {searchQuery && (
                 <button onClick={() => { setSearchQuery(''); setSearchResults([]) }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-                  <Icon icon="ph:x-circle" width={14} height={14} color="#94A3B8" />
+                  <Icon icon="ph:x-circle" width={14} height={14} color={colors.textTertiary} />
                 </button>
               )}
             </div>
@@ -809,9 +814,9 @@ export default function Community() {
                   }}>
                     <div style={{ flex: 1, height: 1, background: '#D1D9E3' }} />
                     <span style={{
-                      fontSize: 11, fontWeight: 600, color: '#94A3B8',
-                      background: '#e8e8e8', padding: '2px 10px', borderRadius: 20,
-                      border: '1px solid #C8C8C8',
+                      fontSize: 11, fontWeight: 600, color: colors.textTertiary,
+                      background: colors.bgPage, padding: '2px 10px', borderRadius: radius.full,
+                      border: `1px solid ${colors.border}`,
                     }}>{formatDateLabel(msg.created_at)}</span>
                     <div style={{ flex: 1, height: 1, background: '#D1D9E3' }} />
                   </div>
@@ -886,7 +891,7 @@ export default function Community() {
                           <div
                             onClick={() => scrollToMessage(msg.reply_to_id!)}
                             style={{
-                              background: isMine ? 'rgba(255,255,255,0.2)' : '#e8e8e8',
+                              background: isMine ? 'rgba(255,255,255,0.2)' : colors.gray100,
                               borderRadius: 8, padding: '6px 10px',
                               marginBottom: 8, cursor: 'pointer',
                             }}>
@@ -985,27 +990,28 @@ export default function Community() {
 
       {/* ── 입력창 */}
       <div style={{
-        position: 'fixed', bottom: 0,
+        position: 'fixed', bottom: 62,
         left: '50%', transform: 'translateX(-50%)',
         width: footerWidth ?? '100%',
-        background: '#e8e8e8',
-        borderTop: '1px solid #C8C8C8',
-        padding: '6px 14px 16px',
+        maxWidth: 430,
+        background: colors.bgCard,
+        borderTop: `1px solid ${colors.border}`,
+        padding: '6px 14px 10px',
         zIndex: 40, boxSizing: 'border-box',
       }}>
         {/* 답장 미리보기 */}
         {replyTo && (
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            background: '#e8e8e8', borderRadius: 10,
-            padding: '8px 12px', marginBottom: 6,
-            borderLeft: `3px solid ${BLUE}`,
+            display: 'flex', alignItems: 'center', gap: spacing[2],
+            background: colors.primaryLight, borderRadius: radius.sm,
+            padding: `${spacing[2]}px ${spacing[3]}px`, marginBottom: 6,
+            borderLeft: `3px solid ${colors.primary}`,
           }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: BLUE, marginBottom: 1 }}>
+              <div style={{ fontSize: 11, fontWeight: font.weight.bold, color: colors.primary, marginBottom: 1 }}>
                 {replyTo.author_name}에게 답장
               </div>
-              <div style={{ fontSize: 12, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontSize: 12, color: colors.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {replyTo.text}
               </div>
             </div>
@@ -1013,7 +1019,7 @@ export default function Community() {
               background: 'none', border: 'none', cursor: 'pointer',
               padding: 2, flexShrink: 0,
             }}>
-              <Icon icon="ph:x" width={14} height={14} color="#94A3B8" />
+              <Icon icon="ph:x" width={14} height={14} color={colors.textTertiary} />
             </button>
           </div>
         )}
@@ -1021,10 +1027,11 @@ export default function Community() {
         {showEmoji && (
           <div ref={emojiPickerRef} style={{
             position: 'absolute', bottom: '100%', left: 14, right: 14,
-            background: '#e8e8e8', borderRadius: 14, padding: 12,
-            border: '1px solid #C8C8C8', marginBottom: 6,
+            background: colors.bgCard, borderRadius: radius.md, padding: spacing[3],
+            border: `1px solid ${colors.border}`, marginBottom: 6,
             display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4,
             maxHeight: 200, overflowY: 'auto',
+            boxShadow: shadow.modal,
           }}>
             {EMOJIS.map((emoji, i) => (
               <button key={i} onClick={() => insertEmoji(emoji)} style={{
@@ -1065,8 +1072,8 @@ export default function Community() {
 
           {/* 입력창 */}
           <div style={{
-            flex:1, background:'#fff', borderRadius:20, padding:'8px 12px',
-            border:'1px solid #C8C8C8', display:'flex', flexDirection:'column', gap:6,
+            flex:1, background: colors.bgInput, borderRadius:20, padding:'8px 12px',
+            border:`1.5px solid ${colors.border}`, display:'flex', flexDirection:'column', gap:6,
           }}>
             {/* 이미지 미리보기 — 위쪽 */}
             {imgPreview && (
