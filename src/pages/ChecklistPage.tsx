@@ -95,9 +95,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const myCheckedCount = myList.filter(id => myChecked[id]).length
 
   const saveShoppingDB = async (list: string[], checked: Record<string,boolean>) => {
-    if (!userId) return
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
     await supabase.from('user_shopping').upsert(
-      { user_id: userId, my_list: list, my_checked: checked, updated_at: new Date().toISOString() },
+      { user_id: user.id, my_list: list, my_checked: checked, updated_at: new Date().toISOString() },
       { onConflict: 'user_id' }
     )
   }
@@ -163,9 +164,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   // DB 저장 함수
   const saveBucketlistDB = async (s: AppState, t: TripInfo | null, a: Record<string,boolean>) => {
-    if (!userId) return
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
     await supabase.from('user_bucketlists').upsert(
-      { user_id: userId, state_json: s, trip_json: t, achieved_json: a, updated_at: new Date().toISOString() },
+      { user_id: user.id, state_json: s, trip_json: t, achieved_json: a, updated_at: new Date().toISOString() },
       { onConflict: 'user_id' }
     )
   }

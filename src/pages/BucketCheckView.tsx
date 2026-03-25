@@ -765,9 +765,10 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           message="현재 달성 현황을 저장할까요? 나중에 언제든지 다시 저장할 수 있어요."
           confirmLabel="저장하기"
           onConfirm={async () => {
-            if (userId) {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) {
               await supabase.from('user_bucketlists').upsert(
-                { user_id: userId, state_json: state, trip_json: trip, achieved_json: achieved, updated_at: new Date().toISOString() },
+                { user_id: user.id, state_json: state, trip_json: trip, achieved_json: achieved, updated_at: new Date().toISOString() },
                 { onConflict: 'user_id' }
               )
             }

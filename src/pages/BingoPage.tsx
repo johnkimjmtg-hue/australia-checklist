@@ -233,9 +233,11 @@ function getStatusMsg(checked: number, bingo: number, city: 'melbourne'|'sydney'
 }
 
 // DB 저장 헬퍼
-async function saveBingoDB(userId: string, city: string, checked: Set<number>) {
+async function saveBingoDB(city: string, checked: Set<number>) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
   await supabase.from('user_bingo').upsert(
-    { user_id: userId, city, checked_indices: [...checked], updated_at: new Date().toISOString() },
+    { user_id: user.id, city, checked_indices: [...checked], updated_at: new Date().toISOString() },
     { onConflict: 'user_id,city' }
   )
 }
@@ -333,11 +335,11 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   // 로컬스토리지 저장
   useEffect(() => {
     localStorage.setItem('bingo-melbourne', JSON.stringify([...checkedMelbourne]))
-    if (userId) saveBingoDB(userId, 'melbourne', checkedMelbourne)
+    if (userId) saveBingoDB('melbourne', checkedMelbourne)
   }, [checkedMelbourne, userId])
   useEffect(() => {
     localStorage.setItem('bingo-sydney', JSON.stringify([...checkedSydney]))
-    if (userId) saveBingoDB(userId, 'sydney', checkedSydney)
+    if (userId) saveBingoDB('sydney', checkedSydney)
   }, [checkedSydney, userId])
   const handleCell = (idx: number) => {
     if (city === 'melbourne') {
@@ -730,7 +732,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                 color: colors.textSecondary, fontSize: font.size.md,
                 fontWeight: font.weight.medium, cursor:'pointer', fontFamily: font.family,
               }}>취소</button>
-              <button onClick={() => { setShowLoginPrompt(false); onBack?.() }} style={{
+              <button onClick={() => { setShowLoginPrompt(false); window.location.href = '/onboarding' }} style={{
                 flex:2, height:44, borderRadius: radius.sm, border:'none',
                 background: colors.primary, color:'#fff',
                 fontSize: font.size.md, fontWeight: font.weight.bold,
@@ -763,8 +765,8 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
               }}>취소</button>
               <button onClick={async () => {
                 if (userId) {
-                  await saveBingoDB(userId, 'melbourne', checkedMelbourne)
-                  await saveBingoDB(userId, 'sydney', checkedSydney)
+                  await saveBingoDB('melbourne', checkedMelbourne)
+                  await saveBingoDB('sydney', checkedSydney)
                 }
                 setShowSaveConfirm(false)
                 onBack?.()

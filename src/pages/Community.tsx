@@ -771,9 +771,10 @@ export default function Community() {
     localStorage.setItem('community-my-icon', icon)
     setMyName(name)
     setMyIcon(icon)
-    if (userId) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
       await supabase.from('profiles').upsert(
-        { id: userId, nickname: name, community_icon: icon },
+        { id: user.id, nickname: name, community_icon: icon },
         { onConflict: 'id' }
       )
     }
@@ -794,9 +795,10 @@ export default function Community() {
       setImgPreview(null)
     }
 
+    const { data: { user } } = await supabase.auth.getUser()
     await supabase.from('community_posts').insert({
       text: text || '',
-      author_id: userId ?? MY_ID,
+      author_id: user?.id ?? MY_ID,
       author_name: myName,
       author_icon: myIcon ?? null,
       reply_to_id: replyTo?.id ?? null,

@@ -369,9 +369,10 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 fontSize:font.size.md, fontWeight:font.weight.medium, cursor:'pointer', fontFamily:font.family,
               }}>취소</button>
               <button onClick={async () => {
-                if (userId) {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (user) {
                   await supabase.from('user_shopping').upsert(
-                    { user_id: userId, my_list: myList, my_checked: myChecked, updated_at: new Date().toISOString() },
+                    { user_id: user.id, my_list: myList, my_checked: myChecked, updated_at: new Date().toISOString() },
                     { onConflict: 'user_id' }
                   )
                 }
