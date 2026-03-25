@@ -465,8 +465,8 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
   return (
     <div ref={pageRef} style={{
       height: embedded ? 'auto' : '100vh',
-      background: '#e8e8e8',
-      fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
+      background: colors.bgPage,
+      fontFamily: font.family,
       display: 'flex', flexDirection: 'column',
       overflow: embedded ? 'visible' : 'hidden',
     }}>
@@ -510,7 +510,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       `}</style>
 
       {/* ── 헤더 */}
-      {!embedded && <div style={{ background:'#e8e8e8', paddingBottom:8, flexShrink:0 }}>
+      {!embedded && <div style={{ background: colors.bgPage, paddingBottom:8, flexShrink:0 }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px 12px' }}>
           <span onClick={handleLogoTap}
             style={{ fontSize:13, color:'#1B6EF3', fontWeight:800, letterSpacing:2, cursor:'pointer', userSelect:'none' }}>
@@ -610,7 +610,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       </div>
 
       {/* ── 5x5 빙고판 */}
-      <div style={{ flex:1, padding:'8px 12px 120px', overflowY:'auto', minHeight:0 }}>
+      <div style={{ flex:1, padding:`8px 12px ${embedded ? '62px' : '120px'}`, overflowY:'auto', minHeight:0 }}>
         <div style={{
           display:'grid', gridTemplateColumns:'repeat(5, 1fr)',
           gap:6,
@@ -731,7 +731,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
               width:'100%', maxWidth:390,
               maxHeight:'85vh', overflowY:'auto',
               borderRadius:'20px 20px 0 0',
-              background:'#e8e8e8',
+              background: colors.bgCard,
               padding:'12px 12px 32px',
               boxSizing:'border-box',
             }}>
@@ -808,37 +808,35 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
       })()}
 
       {/* ── 푸터 */}
-      <div style={{
+      {!embedded && <div style={{
         position:'fixed', bottom:0,
         left:'50%', transform:'translateX(-50%)',
         width:'min(100%, 430px)',
-        padding:'12px 14px 20px',
-        background:'#e8e8e8',
+        padding:`${spacing[2]}px ${spacing[3]}px`,
+        background: colors.bgCard,
         zIndex:50, boxSizing:'border-box',
-        display:'flex', gap:8,
-        borderTop:'1px solid #C8C8C8',
+        display:'flex', gap: spacing[2],
+        borderTop:`1.5px solid ${colors.border}`,
       }}>
         <button onClick={() => onBack?.()} style={{
-          flex:1, height:44, borderRadius:8, border:'none',
-          background:'#e8e8e8', color:'#1B6EF3',
-          fontSize:15, fontWeight:700, cursor:'pointer',
+          flex:1, height:44, borderRadius: radius.sm, border:`1px solid ${colors.border}`,
+          background: colors.bgCard, color: colors.primary,
+          fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
-          WebkitTapHighlightColor:'transparent',
+          WebkitTapHighlightColor:'transparent', fontFamily: font.family,
         }}>
-          <Icon icon="ph:check-circle" width={18} height={18} color="#1B6EF3" />
+          <Icon icon="ph:check-circle" width={18} height={18} color={colors.primary} />
           저장하고 나가기
         </button>
         <button onClick={() => setShowMoreMenu(true)} style={{
-          width:44, height:44, borderRadius:12, flexShrink:0,
-          border:'none', background:'#e8e8e8',
+          width:44, height:44, borderRadius: radius.sm, flexShrink:0,
+          border:`1px solid ${colors.border}`, background: colors.bgCard,
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-          boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
           WebkitTapHighlightColor:'transparent',
         }}>
-          <Icon icon="ph:dots-three-vertical" width={20} height={20} color="#64748B" />
+          <Icon icon="ph:dots-three-vertical" width={18} height={18} color={colors.textSecondary} />
         </button>
-      </div>
+      </div>}
 
       {/* ── 더보기 바텀시트 */}
       {showMoreMenu && (
@@ -849,14 +847,14 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
         }} onClick={() => setShowMoreMenu(false)}>
           <div style={{
             width:'100%', maxWidth:390,
-            background:'#e8e8e8', borderRadius:'20px 20px 0 0',
+            background: colors.bgCard, borderRadius:'20px 20px 0 0',
             padding:'20px 16px 36px',
           }} onClick={e => e.stopPropagation()}>
             <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'0 auto 20px' }}/>
             <div style={{ fontSize:13, fontWeight:800, color:'#94A3B8', marginBottom:14, letterSpacing:0.5 }}>더보기</div>
             <button onClick={handleShare} style={{
               width:'100%', height:52, borderRadius:12, border:'none',
-              background:'#e8e8e8', color:'#1B6EF3',
+              background: colors.bgCard, color: colors.primary,
               fontSize:15, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:10, padding:'0 18px', marginBottom:10,
               boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
@@ -866,7 +864,7 @@ export default function BingoPage({ onBack, embedded = false, initialCity, onCit
             </button>
             <button onClick={() => { setShowMoreMenu(false); setShowReset(true) }} style={{
               width:'100%', height:52, borderRadius:12, border:'none',
-              background:'#e8e8e8', color:'#DC2626',
+              background: colors.bgCard, color: colors.danger,
               fontSize:15, fontWeight:700, cursor:'pointer',
               display:'flex', alignItems:'center', gap:10, padding:'0 18px',
               boxShadow:'3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff',
