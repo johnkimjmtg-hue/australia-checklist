@@ -342,7 +342,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                             cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:ff,
                             WebkitTapHighlightColor:'transparent',
                           }}>
-                          <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:isActive ? '#fff' : colors.gray700, lineHeight:1.2, textAlign:'center', padding:'0 2px', wordBreak:'keep-all' }}>
+                          <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:isActive ? '#fff' : colors.gray700, lineHeight:1.2, textAlign:'center', padding:'0 2px', wordBreak:'keep-all' }}>
                             {cat.label}
                           </span>
                           {catDone>0 && (
