@@ -261,7 +261,7 @@ export default function NearbyMap({ onBack }: Props) {
   const filtered = getFiltered()
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', position:'fixed', top:0, left:0, right:0, bottom:62, maxWidth:430, margin:'0 auto', fontFamily:ff, background:colors.bgPage, zIndex:5 }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'100%', fontFamily:ff, background:colors.bgPage, position:'relative' }}>
 
       <style>{`
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
