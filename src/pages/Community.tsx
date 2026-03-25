@@ -107,9 +107,9 @@ function getMyIcon(): string | null {
 
 // 아이콘 그룹
 const ICON_GROUPS = [
-  { label: '사람', icons: ['👦','👧','👨','👩','👴','👵','🧑','🧒','👮','👷','🧑‍💻','🧑‍🍳','🧑‍🎨','🧑‍🎤','🧑‍✈️','🦸'] },
-  { label: '동물', icons: ['🐶','🐱','🐨','🐯','🦁','🐮','🐸','🦘','🐧','🦊','🐼','🐨','🦝','🐺','🦄','🐻'] },
-  { label: '모음',  icons: ['🌟','⭐','🔥','💎','🌈','🎉','🏆','🎸','🍀','🌸','🍕','⚽','🎮','🚀','🌍','💪'] },
+  { label: '사람', icons: ['👦','👧','👨','👩','👴','👵','🧑','🧒','👮','👷','🧑‍💻','🧑‍🍳','🧑‍🎨','🧑‍🎤','🧑‍✈️','🦸','🧙','🧝','🧛','🧟','👸','🤴','🥷','🕵️','👨‍🚀','👩‍🚀','🧑‍🔬','🧑‍🏫','🧑‍⚕️','🧑‍🌾','🤵','👰'] },
+  { label: '동물', icons: ['🐶','🐱','🐨','🐯','🦁','🐮','🐸','🦘','🐧','🦊','🐼','🦝','🐺','🦄','🐻','🐰','🐹','🐭','🐱','🐻‍❄️','🦋','🐢','🦎','🐊','🦈','🐬','🦭','🦦','🦥','🦔','🐿️','🦜'] },
+  { label: '모음',  icons: ['🌟','⭐','🔥','💎','🌈','🎉','🏆','🎸','🍀','🌸','🍕','⚽','🎮','🚀','🌍','💪','🎯','🎨','🎭','🎪','🏄','🧗','🤿','🎿','🏋️','🤸','⛷️','🏊','🚴','🧘','🌺','🌻'] },
 ]
 
 function getLiked(): Set<string> {
@@ -231,7 +231,7 @@ function NameChangePopup({ currentName, currentIcon, onClose, onSet }: {
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 4,
           marginBottom: spacing[3], padding: spacing[2],
-          background: colors.gray100, borderRadius: radius.md,
+          background: colors.bgCard, borderRadius: radius.md, border: `1px solid ${colors.border}`,
         }}>
           {ICON_GROUPS[activeGroup].icons.map(icon => (
             <button key={icon} onClick={() => setSelectedIcon(icon)} style={{
@@ -369,7 +369,7 @@ function NicknameSetup({ onSet }: { onSet: (name: string, icon: string) => void 
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 4,
           marginBottom: spacing[4], padding: `${spacing[2]}px`,
-          background: colors.gray100, borderRadius: radius.md,
+          background: colors.bgCard, borderRadius: radius.md, border: `1px solid ${colors.border}`,
         }}>
           {ICON_GROUPS[activeGroup].icons.map(icon => (
             <button key={icon} onClick={() => setSelectedIcon(icon)} style={{
