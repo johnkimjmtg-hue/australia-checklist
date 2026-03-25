@@ -61,6 +61,8 @@ type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'comm
 export default function ChecklistPage({ state, setState, onLanding }: Props & { onLanding?: () => void }) {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const [userId, setUserId] = useState<string | null>(null)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
   const [categories, setCategories]   = useState<Category[]>([])
   const [dbItems, setDbItems]         = useState<DBItem[]>([])
@@ -99,6 +101,41 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [detailItem, setDetailItem]   = useState<DBItem|null>(null)
   const [detailBizCards, setDetailBizCards] = useState<Business[]>([])
   const [selProduct, setSelProduct]   = useState<any|null>(null)
+
+  useEffect(() => {
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setUserId(user.id)
+      const { data } = await supabase
+        .from('user_bucketlists')
+        .select('state_json, trip_json, achieved_json')
+        .eq('user_id', user.id)
+        .single()
+      if (data) {
+        if (data.state_json) setState(data.state_json as AppState)
+        if (data.trip_json) { setTrip(data.trip_json as TripInfo); saveTrip(data.trip_json as TripInfo) }
+        if (data.achieved_json) {
+          setAchieved(data.achieved_json as Record<string,boolean>)
+          localStorage.setItem('bucket-achieved', JSON.stringify(data.achieved_json))
+        }
+      }
+    }
+    init()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUserId(session?.user?.id ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // DB 저장 함수
+  const saveBucketlistDB = async (s: AppState, t: TripInfo | null, a: Record<string,boolean>) => {
+    if (!userId) return
+    await supabase.from('user_bucketlists').upsert(
+      { user_id: userId, state_json: s, trip_json: t, achieved_json: a, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id' }
+    )
+  }
 
   useEffect(() => {
     supabase.from('businesses').select('*',{count:'exact',head:true}).eq('is_active',true).then(({count})=>{ if(count!==null) setBizCount(count) })
@@ -160,20 +197,35 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   const handleDateSelect = (val:string) => {
     if(pickerStep==='start'){ setStartDate(val); setPickerStep('end') }
-    else { const t={startDate,endDate:val}; saveTrip(t); setTrip(t); setModal('none') }
+    else {
+      const t={startDate,endDate:val}
+      saveTrip(t); setTrip(t); setModal('none')
+      saveBucketlistDB(state, t, achieved)
+    }
   }
 
   const handleIssue = () => {
+    if(!userId) { setShowLoginPrompt(true); return }
     if(!trip){ setModal('noTrip'); return }
     if(done===0){ setModal('noItems'); return }
     const checkedIds=Object.keys(state.selected)
     const unscheduled=checkedIds.filter(id=>!(state.schedules[id]?.length))
     if(unscheduled.length>0){ setModal('noSchedule'); return }
-    const at=fmt(new Date()); setIssuedAt(at); setState(issueReceipt(state,at))
+    const at=fmt(new Date()); setIssuedAt(at)
+    const next = issueReceipt(state,at)
+    setState(next)
+    saveBucketlistDB(next, trip, achieved)
   }
   const triggerShake = () => { setShakeBtn(true); setTimeout(()=>setShakeBtn(false),600) }
   const handleAddCustom = () => { const label=customLabel.trim(); if(!label) return; setState(addCustom(state,label,activeCategory)); setCustomLabel('') }
-  const doReset = () => { setState(resetAll()); setTrip(null); setStartDate(''); setEndDate(''); setShowReceipt(false); setModal('none'); try{localStorage.removeItem('bucket-achieved')}catch{} }
+  const doReset = () => {
+    const next = resetAll()
+    setState(next); setTrip(null); setStartDate(''); setEndDate('')
+    setShowReceipt(false); setModal('none')
+    setAchieved({})
+    try{localStorage.removeItem('bucket-achieved')}catch{}
+    if(userId) saveBucketlistDB(next, null, {})
+  }
   const isIssued = !!state.meta.lastIssuedAt
 
   const TABS = [
@@ -661,6 +713,41 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       {showReceipt&&trip&&(
         <ReceiptModal state={state} trip={trip} issuedAt={issuedAt} achieved={achieved} dbItems={dbItems}
           onClose={()=>setShowReceipt(false)} onReset={()=>setModal('confirmReset')} />
+      )}
+
+      {/* ── 로그인 유도 팝업 */}
+      {showLoginPrompt && (
+        <>
+          <div onClick={() => setShowLoginPrompt(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:900 }} />
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            background: colors.bgCard, borderRadius: radius.lg,
+            padding:`${spacing[6]}px ${spacing[5]}px`,
+            zIndex:901, width:'calc(100% - 48px)', maxWidth:300,
+            textAlign:'center', fontFamily: ff,
+            boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
+          }}>
+            <div style={{ fontSize:32, marginBottom: spacing[3] }}>🔐</div>
+            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>로그인이 필요해요</div>
+            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight:1.6 }}>
+              버킷리스트를 저장하려면<br/>로그인이 필요합니다.
+            </div>
+            <div style={{ display:'flex', gap: spacing[2] }}>
+              <button onClick={() => setShowLoginPrompt(false)} style={{
+                flex:1, height:44, borderRadius: radius.sm,
+                border:`1px solid ${colors.border}`, background: colors.bgCard,
+                color: colors.textSecondary, fontSize: font.size.md,
+                fontWeight: font.weight.medium, cursor:'pointer', fontFamily: ff,
+              }}>취소</button>
+              <button onClick={() => { setShowLoginPrompt(false); navigate('/onboarding') }} style={{
+                flex:2, height:44, borderRadius: radius.sm, border:'none',
+                background: colors.primary, color:'#fff',
+                fontSize: font.size.md, fontWeight: font.weight.bold,
+                cursor:'pointer', fontFamily: ff,
+              }}>로그인하기</button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
