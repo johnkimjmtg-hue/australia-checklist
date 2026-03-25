@@ -282,10 +282,10 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
 
       {/* ── 하단 버튼 */}
       <div style={{
-        position:'fixed', bottom:0,
+        position:'fixed', bottom:62,
         left:'50%', transform:'translateX(-50%)',
         width: footerWidth ?? '100%',
-        padding:`${spacing[3]}px ${spacing[3]}px ${spacing[5]}px`,
+        padding:`${spacing[2]}px ${spacing[3]}px`,
         background: colors.bgCard, zIndex:20, boxSizing:'border-box',
         display:'flex', gap: spacing[2], borderTop:`1.5px solid ${colors.border}`,
       }}>
@@ -481,15 +481,17 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
               <button onClick={() => {
                 myList.includes(selProduct.id) ? removeFromMyList(selProduct.id) : addToMyList(selProduct.id)
               }} style={{
-                width:'100%', height:50, borderRadius:12, border:'none', cursor:'pointer',
-                background: colors.bgCard, color:'#FF6B9D',
-                fontSize:15, fontWeight:700,
+                width:'100%', height:50, borderRadius: radius.md,
+                border: '1.5px solid #FF6B9D', cursor:'pointer',
+                background: myList.includes(selProduct.id) ? '#FF6B9D' : colors.bgCard,
+                color: myList.includes(selProduct.id) ? '#fff' : '#FF6B9D',
+                fontSize: font.size.md, fontWeight: font.weight.bold,
                 display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-                marginBottom:10,
-                border:`1.5px solid ${colors.border}`,
+                marginBottom: spacing[2],
                 WebkitTapHighlightColor:'transparent',
+                fontFamily: font.family,
               }}>
-                <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color="#FF6B9D" />
+                <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color={myList.includes(selProduct.id) ? '#fff' : '#FF6B9D'} />
                 {myList.includes(selProduct.id) ? '찜 취소하기' : '내 쇼핑리스트에 찜하기'}
               </button>
               <button onClick={() => setSelProduct(null)} style={{

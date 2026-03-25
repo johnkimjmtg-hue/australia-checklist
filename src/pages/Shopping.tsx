@@ -207,7 +207,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
         {/* 카테고리 스크롤 */}
         <div className="cat-scroll" style={{ display:'flex', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, overflowX:'auto', flex:1 }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
-            flexShrink:0, height:32, padding:`0 ${spacing[3]}px`, borderRadius:radius.full, cursor:'pointer',
+            flexShrink:0, height:34, padding:`0 ${spacing[3]}px`, borderRadius:radius.full, cursor:'pointer',
             background: selCat === null ? colors.primaryLight : colors.bgCard,
             border: `1.5px solid ${selCat === null ? colors.primary : colors.border}`,
             color: selCat === null ? colors.primary : colors.textTertiary,
@@ -216,7 +216,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
           }}>전체</button>
           {categories.map(cat => (
             <button key={cat.id} className="cat-btn" onClick={() => setSelCat(cat.id)} style={{
-              flexShrink:0, height:32, padding:`0 ${spacing[3]}px`, borderRadius:radius.full, cursor:'pointer',
+              flexShrink:0, height:34, padding:`0 ${spacing[3]}px`, borderRadius:radius.full, cursor:'pointer',
               background: selCat === cat.id ? colors.primaryLight : colors.bgCard,
               border: `1.5px solid ${selCat === cat.id ? colors.primary : colors.border}`,
               color: selCat === cat.id ? colors.primary : colors.textTertiary,
