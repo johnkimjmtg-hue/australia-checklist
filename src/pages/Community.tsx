@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 import { colors, font, radius, spacing, shadow } from '../styles/tokens'
+import logoImg from '../assets/logo.png'
 
 interface Message {
   id: string
@@ -759,11 +760,10 @@ export default function Community() {
           <div style={{ display: 'flex', alignItems: 'center', gap: spacing[2] }}>
             <div style={{
               width: 32, height: 32, borderRadius: '50%',
-              background: `linear-gradient(135deg, ${colors.primary}, #6366F1)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden',
               flexShrink: 0,
             }}>
-              <Icon icon="mdi:kangaroo" width={18} height={18} color="#fff" />
+              <img src={logoImg} alt="호주가자" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary }}>호주가자 단톡방</div>
           </div>
