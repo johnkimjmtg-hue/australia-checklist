@@ -16,6 +16,61 @@ interface BingoCafe {
 
 
 // ── 빙고 라인 체크 (5x5)
+// ── 카페 방문 멘트 (sort_order 기준)
+const MEL_CAFE_MSG: Record<number, string> = {
+  1:  "St. Ali 다녀오셨군요! 멜번 스페셜티의 선구자, 필굿 에스프레소 마셨나요?",
+  2:  "Dukes Coffee! 작은 공간에 꽉 찬 커피 실력, 싱글오리진 드셨나요?",
+  3:  "Acoffee 방문 완료! 한국인 바리스타가 만든 정교한 브루잉 커피, 어떠셨나요?",
+  4:  "Shortstop 다녀왔군요! 도넛과 커피의 완벽한 조합, 올드패션드 드셨나요?",
+  5:  "Market Lane 완료! 멜번 파머스 마켓 단골 로스터리, 계절 블렌드 맛보셨나요?",
+  6:  "Mork Chocolate! 커피와 초콜릿의 콜라보, 핫초코 라테도 꼭 드셔보세요.",
+  7:  "Industry Beans 방문! 창고형 공간에서 즐기는 싱글오리진, 플랫화이트 어땠나요?",
+  8:  "Maker Coffee 완료! 조용한 동네 카페의 진심, 핸드드립 커피 한 잔의 여유.",
+  9:  "Patricia Coffee! 줄 서서 먹는 스탠딩 에스프레소 바, 리스트레토 드셨나요?",
+  10: "Good Measure 다녀왔군요! 수치처럼 정확한 추출, 브루잉 메뉴 도전해보셨나요?",
+  11: "Brother Baba Budan! 천장에 매달린 의자, 독특한 공간에서 에스프레소 한 잔.",
+  12: "Seven Seeds 완료! 멜번 스페셜티 씬의 OG, 콜드브루 어떠셨나요?",
+  13: "Tone Coffee 방문! 음악처럼 섬세하게 조율된 커피, 오늘의 필터 마셨나요?",
+  14: "Ona Coffee 완료! 월드 바리스타 챔피언 출신의 원두, 시그니처 블렌드 드셨나요?",
+  15: "Palace Coffee 다녀왔군요! 우아한 공간에서 즐기는 클래식 에스프레소.",
+  16: "Regulars 방문! 동네 단골처럼 편안한 분위기, 카푸치노 한 잔의 여유.",
+  17: "Campos Coffee 완료! 호주 스페셜티의 대명사, 수페리어 블렌드 맛보셨나요?",
+  18: "Small Batch 다녀왔군요! 이름처럼 소량으로 정성껏 로스팅한 원두.",
+  19: "Overlay 방문! 레이어처럼 쌓이는 풍미, 플랫화이트의 정석을 경험하셨나요?",
+  20: "Padre Coffee 완료! 아버지의 마음처럼 든든한 커피, 오늘의 싱글오리진은요?",
+  21: "Puzzle Coffee 방문! 퍼즐 조각 맞추듯 완성되는 한 잔, 브루잉 메뉴 도전!",
+  22: "Brick Lane 다녀왔군요! 골목길 감성 가득한 공간에서 에스프레소 한 잔.",
+  23: "Little Rogue 완료! 작지만 거친 개성, 내추럴 프로세스 원두 어떠셨나요?",
+  24: "Ini Studio 방문! 스튜디오처럼 세련된 공간, 시그니처 라테 드셨나요?",
+  25: "Code Black 완료! 멜번 스페셜티의 마지막 보스, 싱글오리진 에스프레소 도전!",
+}
+const SYD_CAFE_MSG: Record<number, string> = {
+  1:  "Single O 다녀오셨군요! 시드니 스페셜티의 시작, 해링턴 블렌드 마셨나요?",
+  2:  "Artificer Coffee 완료! 장인정신으로 만든 커피, 핸드드립 메뉴 도전해보셨나요?",
+  3:  "Room Ten 방문! 좁지만 꽉 찬 바리스타 실력, 에스프레소 바의 진수.",
+  4:  "bills Darlinghurst 완료! 전설의 리코타 팬케이크와 함께한 플랫화이트!",
+  5:  "The Grounds of Alexandria! 정원 속 커피 천국, 피트 더 빌리 고트 만났나요?",
+  6:  "Toby's Estate 방문! 시드니 스페셜티 1세대, 싱글오리진 드셨나요?",
+  7:  "Paramount Coffee 완료! 영화관 건물 속 힙한 카페, 시그니처 라테 어땠나요?",
+  8:  "Reuben Hills 다녀왔군요! 중미 커피 전문, 코스타리카 싱글오리진 마셨나요?",
+  9:  "Edition Roasters 방문! 소량 정성 로스팅, 오늘의 필터 커피 드셨나요?",
+  10: "AP Bakery 완료! 크루아상과 커피의 최강 조합, 맛있는 페어링이었나요?",
+  11: "Skittle Lane 방문! 골목 속 숨은 보석, 핸드드립 한 잔의 여유 어땠나요?",
+  12: "Pablo & Rusty's 완료! 지속가능한 커피의 선구자, 시그니처 블렌드 드셨나요?",
+  13: "Mecca Coffee 다녀왔군요! 성지순례 완료! 시드니 스페셜티의 메카.",
+  14: "Gumption 방문! 신세계 백화점 안 힙한 카페, 에스프레소 한 잔의 여유.",
+  15: "Double Roasters 완료! 두 배의 정성으로 로스팅, 계절 블렌드 어떠셨나요?",
+  16: "Campos Coffee 완료! 시드니 스페셜티의 아이콘, 수페리어 블렌드 드셨나요?",
+  17: "Circa Espresso 방문! 시드니 CBD의 아늑한 쉼터, 플랫화이트 한 잔.",
+  18: "Sample Coffee 완료! 샘플처럼 다양한 원두 경험, 오늘의 추천 메뉴는요?",
+  19: "ONA Coffee Sydney 방문! 멜번에서 건너온 챔피언, 시그니처 드셨나요?",
+  20: "Three Williams 완료! 세 친구가 만든 카페, 따뜻한 감성의 브런치 커피.",
+  21: "Normcore Coffee 방문! 평범함 속의 비범함, 심플한 에스프레소의 진수.",
+  22: "Devon Cafe 완료! 데번셔 크림티 영감의 브런치 카페, 커피도 일품!",
+  23: "Speedos Cafe 방문! 본다이 비치 뷰와 함께한 커피, 서퍼들의 아침.",
+  24: "The Fine Food Store 완료! 식재료처럼 엄선된 원두, 브루잉 메뉴 도전!",
+  25: "Coffee Alchemy 완료! 연금술처럼 마법같은 한 잔, 시드니 빙고 정복!",
+}
 function getBingoLines(checked: Set<number>): number[][] {
   const lines: number[][] = []
   // 가로
@@ -207,6 +262,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   const [showReset, setShowReset] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
+  const [lastCheckedCafe, setLastCheckedCafe] = useState<{ idx: number; sort_order: number } | null>(null)
   const [selectedCafe, setSelectedCafe] = useState<{ cafe: BingoCafe; idx: number } | null>(null)
 
   const completedLines = getCompletedLines(checked)
@@ -242,9 +298,13 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
     if (city === 'melbourne') {
       setCheckedMelbourne(prev => {
         const next = new Set(prev)
-        if (next.has(idx)) { next.delete(idx) }
-        else {
+        if (next.has(idx)) {
+          next.delete(idx)
+          setLastCheckedCafe(null)
+        } else {
           next.add(idx)
+          const c = melbourneCafes[idx]
+          if (c) setLastCheckedCafe({ idx, sort_order: c.sort_order })
           setStampAnim(idx)
           setTimeout(() => setStampAnim(null), 600)
           setConfettiTrigger(v => v+1)
@@ -254,9 +314,13 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
     } else {
       setCheckedSydney(prev => {
         const next = new Set(prev)
-        if (next.has(idx)) { next.delete(idx) }
-        else {
+        if (next.has(idx)) {
+          next.delete(idx)
+          setLastCheckedCafe(null)
+        } else {
           next.add(idx)
+          const c = sydneyCafes[idx]
+          if (c) setLastCheckedCafe({ idx, sort_order: c.sort_order })
           setStampAnim(idx)
           setTimeout(() => setStampAnim(null), 600)
           setConfettiTrigger(v => v+1)
@@ -435,8 +499,12 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
             <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1], lineHeight:1.3 }}>
               {getStatusMsg(checked.size, bingoCount, city).title}
             </div>
-            <div style={{ fontSize: font.size.sm, color: colors.textTertiary, fontWeight: font.weight.regular, lineHeight:1.5 }}>
-              {getStatusMsg(checked.size, bingoCount, city).sub}
+            <div style={{ fontSize: font.size.sm, color: colors.textTertiary, fontWeight: font.weight.regular, lineHeight:1.6 }}>
+              {lastCheckedCafe && checked.has(lastCheckedCafe.idx)
+                ? (city === 'melbourne'
+                    ? MEL_CAFE_MSG[lastCheckedCafe.sort_order]
+                    : SYD_CAFE_MSG[lastCheckedCafe.sort_order])
+                : getStatusMsg(checked.size, bingoCount, city).sub}
             </div>
           </div>
           {/* 카운터 */}
