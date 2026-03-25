@@ -764,7 +764,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           <div onClick={() => setShowSaveConfirm(false)}
             style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:700 }} />
           <div style={{
-            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%, -50%)',
             width:'calc(100% - 32px)', maxWidth:400,
             background:colors.bgCard, borderRadius:radius.xl,
             zIndex:701, padding:`${spacing[5]}px`,
