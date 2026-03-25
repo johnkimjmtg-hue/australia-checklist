@@ -93,8 +93,25 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [myChecked, setMyChecked] = useState<Record<string,boolean>>(() => { try { return JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}') } catch { return {} } })
   const myListCount    = myList.length
   const myCheckedCount = myList.filter(id => myChecked[id]).length
-  const handleMyListChange    = (next: string[]) => { setMyList(next); try { localStorage.setItem('my-shopping-list', JSON.stringify(next)) } catch {} }
-  const handleMyCheckedChange = (next: Record<string,boolean>) => { setMyChecked(next); try { localStorage.setItem('my-shopping-checked', JSON.stringify(next)) } catch {} }
+
+  const saveShoppingDB = async (list: string[], checked: Record<string,boolean>) => {
+    if (!userId) return
+    await supabase.from('user_shopping').upsert(
+      { user_id: userId, my_list: list, my_checked: checked, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id' }
+    )
+  }
+
+  const handleMyListChange = (next: string[]) => {
+    setMyList(next)
+    try { localStorage.setItem('my-shopping-list', JSON.stringify(next)) } catch {}
+    saveShoppingDB(next, myChecked)
+  }
+  const handleMyCheckedChange = (next: Record<string,boolean>) => {
+    setMyChecked(next)
+    try { localStorage.setItem('my-shopping-checked', JSON.stringify(next)) } catch {}
+    saveShoppingDB(myList, next)
+  }
 
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
   const [detailBiz, setDetailBiz]     = useState<Business|null>(null)
@@ -118,6 +135,22 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         if (data.achieved_json) {
           setAchieved(data.achieved_json as Record<string,boolean>)
           localStorage.setItem('bucket-achieved', JSON.stringify(data.achieved_json))
+        }
+      }
+      // 쇼핑 데이터 로드
+      const { data: shoppingData } = await supabase
+        .from('user_shopping')
+        .select('my_list, my_checked')
+        .eq('user_id', user.id)
+        .single()
+      if (shoppingData) {
+        if (shoppingData.my_list) {
+          setMyList(shoppingData.my_list as string[])
+          localStorage.setItem('my-shopping-list', JSON.stringify(shoppingData.my_list))
+        }
+        if (shoppingData.my_checked) {
+          setMyChecked(shoppingData.my_checked as Record<string,boolean>)
+          localStorage.setItem('my-shopping-checked', JSON.stringify(shoppingData.my_checked))
         }
       }
     }
