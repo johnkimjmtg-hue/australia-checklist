@@ -27,6 +27,7 @@ import MyShoppingView from './MyShoppingView'
 import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 import NearbyMap from './NearbyMap'
+import BingoPage from './BingoPage'
 
 const ff = font.family
 
@@ -54,7 +55,7 @@ const STATE_MAP: Record<string, { label: string }> = {
 
 type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker' | 'calendar'
-type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'community' | 'nearby'
+type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'community' | 'nearby' | 'bingo'
 
 export default function ChecklistPage({ state, setState, onLanding }: Props & { onLanding?: () => void }) {
   const [searchParams] = useSearchParams()
@@ -72,7 +73,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [customLabel, setCustomLabel] = useState('')
   const [mainTab, setMainTab]         = useState<MainTab>(() => {
     const tab = searchParams.get('tab')
-    if (tab === 'services' || tab === 'shopping' || tab === 'myshoppinglist' || tab === 'community' || tab === 'nearby') return tab as MainTab
+    if (tab === 'services' || tab === 'shopping' || tab === 'myshoppinglist' || tab === 'community' || tab === 'nearby' || tab === 'bingo') return tab as MainTab
     return 'bucketlist'
   })
   const [logoTapCount, setLogoTapCount] = useState(0)
@@ -178,7 +179,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     {id:'services',  icon:'ph:buildings',      label:'업체'},
     {id:'nearby',    icon:'ph:map-pin',        label:'내주변'},
     {id:'shopping',  icon:'ph:shopping-bag',   label:'쇼핑'},
-    {id:'community', icon:'ph:chats-circle',   label:'커뮤니티'},
+    {id:'community', icon:'ph:chats-circle',   label:'단톡방'},
+    {id:'bingo',     icon:'ph:coffee',         label:'카페빙고'},
   ] as {id:MainTab;icon:string;label:string}[]
 
   const handleTabClick = (id:MainTab) => {
@@ -246,6 +248,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         </div>
       ) : mainTab==='community' ? (
         <Community />
+      ) : mainTab==='bingo' ? (
+        <BingoPage />
       ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
         <>
           {/* 헤더 */}
