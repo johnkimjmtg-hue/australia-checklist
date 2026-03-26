@@ -36,8 +36,14 @@ async function loadAllUserData(userId: string) {
   // 빙고
   if (bingoRes.data) {
     bingoRes.data.forEach((row: any) => {
-      if (row.city === 'melbourne') try { localStorage.setItem('bingo-melbourne', JSON.stringify(row.checked_indices ?? [])) } catch {}
-      if (row.city === 'sydney')    try { localStorage.setItem('bingo-sydney',    JSON.stringify(row.checked_indices ?? [])) } catch {}
+      if (row.city === 'melbourne') {
+        try { localStorage.setItem('bingo-melbourne', JSON.stringify(row.checked_indices ?? [])) } catch {}
+        try { localStorage.setItem('bingo-photos-melbourne', JSON.stringify(row.photos ?? {})) } catch {}
+      }
+      if (row.city === 'sydney') {
+        try { localStorage.setItem('bingo-sydney', JSON.stringify(row.checked_indices ?? [])) } catch {}
+        try { localStorage.setItem('bingo-photos-sydney', JSON.stringify(row.photos ?? {})) } catch {}
+      }
     })
   }
 

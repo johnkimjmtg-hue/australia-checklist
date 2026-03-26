@@ -39,6 +39,7 @@ function clearAllUserData() {
     'korea-receipt', 'bucket-achieved', 'korea-trip',
     'my-shopping-list', 'my-shopping-checked',
     'bingo-melbourne', 'bingo-sydney',
+    'bingo-photos-melbourne', 'bingo-photos-sydney',
     'community-my-name', 'community-my-icon', 'community-my-id', 'community-liked',
     'biz-bookmarks',
   ]

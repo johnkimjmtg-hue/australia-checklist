@@ -234,11 +234,12 @@ function getStatusMsg(checked: number, bingo: number, city: 'melbourne'|'sydney'
 }
 
 // DB 저장 헬퍼
-async function saveBingoDB(city: string, checked: Set<number>) {
-  const { data: { user } } = await supabase.auth.getUser()
+async function saveBingoDB(city: string, checked: Set<number>, photos: Record<number, string> = {}) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
   if (!user) return
   await supabase.from('user_bingo').upsert(
-    { user_id: user.id, city, checked_indices: [...checked], updated_at: new Date().toISOString() },
+    { user_id: user.id, city, checked_indices: [...checked], photos, updated_at: new Date().toISOString() },
     { onConflict: 'user_id,city' }
   )
 }
@@ -278,6 +279,19 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [lastCheckedCafe, setLastCheckedCafe] = useState<{ idx: number; sort_order: number } | null>(null)
   const [selectedCafe, setSelectedCafe] = useState<{ cafe: BingoCafe; idx: number } | null>(null)
+  const [photosMelbourne, setPhotosMelbourne] = useState<Record<number, string>>(() => {
+    try { return JSON.parse(localStorage.getItem('bingo-photos-melbourne') ?? '{}') } catch { return {} }
+  })
+  const [photosSydney, setPhotosSydney] = useState<Record<number, string>>(() => {
+    try { return JSON.parse(localStorage.getItem('bingo-photos-sydney') ?? '{}') } catch { return {} }
+  })
+  const photos = city === 'melbourne' ? photosMelbourne : photosSydney
+  const setPhotos = (val: Record<number, string>) => {
+    if (city === 'melbourne') { setPhotosMelbourne(val); localStorage.setItem('bingo-photos-melbourne', JSON.stringify(val)) }
+    else { setPhotosSydney(val); localStorage.setItem('bingo-photos-sydney', JSON.stringify(val)) }
+  }
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const photoInputRef = useRef<HTMLInputElement>(null)
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
@@ -319,11 +333,11 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   // 로컬스토리지 저장
   useEffect(() => {
     localStorage.setItem('bingo-melbourne', JSON.stringify([...checkedMelbourne]))
-    if (userId) saveBingoDB('melbourne', checkedMelbourne)
+    if (userId) saveBingoDB('melbourne', checkedMelbourne, photosMelbourne)
   }, [checkedMelbourne, userId])
   useEffect(() => {
     localStorage.setItem('bingo-sydney', JSON.stringify([...checkedSydney]))
-    if (userId) saveBingoDB('sydney', checkedSydney)
+    if (userId) saveBingoDB('sydney', checkedSydney, photosSydney)
   }, [checkedSydney, userId])
   const handleCell = (idx: number) => {
     if (city === 'melbourne') {
@@ -563,13 +577,13 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   overflow:'hidden', position:'relative',
                 }}>
                   <img
-                    src={c.image_url ?? (city === 'melbourne' ? `/mel_coffee/mel_image/${c.sort_order}.jpg` : `/syd_coffee/syd_image/${c.sort_order}.jpg`)}
+                    src={photos[idx] ?? c.image_url ?? (city === 'melbourne' ? `/mel_coffee/mel_image/${c.sort_order}.jpg` : `/syd_coffee/syd_image/${c.sort_order}.jpg`)}
                     alt={c.name}
                     style={{ width:'100%', height:'100%', objectFit:'cover' }}
                     onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
                   />
-                  {/* 체크 오버레이 */}
-                  {isChecked && (
+                  {/* 체크 오버레이 — 인증샷 없을 때만 */}
+                  {isChecked && !photos[idx] && (
                     <div style={{
                       position:'absolute', inset:0,
                       background:'rgba(27,110,243,0.55)',
@@ -577,6 +591,16 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                       animation: isStamping ? 'stampIn 0.5s ease both' : 'none',
                     }}>
                       <Icon icon="ph:check-bold" width={28} height={28} color="#fff" />
+                    </div>
+                  )}
+                  {/* 인증샷 있으면 카메라 아이콘 뱃지 */}
+                  {photos[idx] && (
+                    <div style={{
+                      position:'absolute', bottom:2, right:2,
+                      background:'rgba(0,0,0,0.5)', borderRadius:'50%',
+                      width:16, height:16, display:'flex', alignItems:'center', justifyContent:'center',
+                    }}>
+                      <Icon icon="ph:camera-fill" width={10} height={10} color="#fff" />
                     </div>
                   )}
                 </div>
@@ -622,6 +646,25 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
               {/* 핸들 */}
               <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[3]}px` }} />
 
+              {/* 인증샷 미리보기 */}
+              {photos[idx] && (
+                <div style={{ position:'relative', marginBottom: spacing[3], borderRadius: radius.md, overflow:'hidden', height:180 }}>
+                  <img src={photos[idx]} alt="인증샷" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                  <button onClick={() => {
+                    const next = { ...photos }
+                    delete next[idx]
+                    setPhotos(next)
+                  }} style={{
+                    position:'absolute', top:8, right:8,
+                    background:'rgba(0,0,0,0.5)', border:'none', borderRadius:'50%',
+                    width:28, height:28, cursor:'pointer', color:'#fff',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                  }}>
+                    <Icon icon="ph:x" width={14} height={14} color="#fff" />
+                  </button>
+                </div>
+              )}
+
               {/* 카페 카드 */}
               <div style={{ marginBottom: spacing[3] }}>
                 {c.business_id
@@ -639,19 +682,85 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                 }
               </div>
 
-              {/* 방문 완료 버튼 */}
-              <button onClick={handleToggle} style={{
-                width:'100%', height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
-                background: isChecked ? colors.dangerLight : colors.primary,
-                color: isChecked ? colors.danger : '#fff',
-                fontSize: font.size.md, fontWeight: font.weight.bold,
-                display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
-                fontFamily: font.family,
-                transition:'all 0.15s',
-              }}>
-                <Icon icon={isChecked ? 'ph:x-circle' : 'ph:check-circle'} width={20} height={20} color={isChecked ? colors.danger : '#fff'} />
-                {isChecked ? '방문 취소하기' : '방문 완료!'}
-              </button>
+              {/* 버튼 영역 */}
+              <div style={{ display:'flex', gap: spacing[2] }}>
+                {/* 방문 완료 버튼 */}
+                <button onClick={handleToggle} style={{
+                  flex:2, height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
+                  background: isChecked ? colors.dangerLight : colors.primary,
+                  color: isChecked ? colors.danger : '#fff',
+                  fontSize: font.size.md, fontWeight: font.weight.bold,
+                  display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
+                  fontFamily: font.family, transition:'all 0.15s',
+                }}>
+                  <Icon icon={isChecked ? 'ph:x-circle' : 'ph:check-circle'} width={20} height={20} color={isChecked ? colors.danger : '#fff'} />
+                  {isChecked ? '방문 취소' : '방문 완료!'}
+                </button>
+
+                {/* 인증샷 업로드 버튼 */}
+                <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
+                  flex:1, height:50, borderRadius: radius.md,
+                  border:`1px solid ${colors.border}`, background: colors.bgCard,
+                  color: colors.textSecondary, fontSize: font.size.sm, fontWeight: font.weight.bold,
+                  display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+                  cursor:'pointer', fontFamily: font.family,
+                  opacity: uploadingPhoto ? 0.6 : 1,
+                }}>
+                  {uploadingPhoto
+                    ? <Icon icon="ph:circle-notch" width={16} height={16} color={colors.textSecondary} style={{ animation:'spin 0.8s linear infinite' }} />
+                    : <Icon icon="ph:camera" width={16} height={16} color={colors.textSecondary} />
+                  }
+                  {photos[idx] ? '변경' : '인증샷'}
+                </button>
+              </div>
+
+              {/* 숨겨진 파일 입력 */}
+              <input
+                ref={photoInputRef}
+                type="file" accept="image/*"
+                style={{ display:'none' }}
+                onChange={async e => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  setUploadingPhoto(true)
+                  try {
+                    const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+                    const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+                    const compressed = await new Promise<Blob>(resolve => {
+                      const img = new Image()
+                      const url = URL.createObjectURL(file)
+                      img.onload = () => {
+                        let w = img.width, h = img.height
+                        const max = 800
+                        if (w > max || h > max) {
+                          if (w > h) { h = Math.round(h * max / w); w = max }
+                          else { w = Math.round(w * max / h); h = max }
+                        }
+                        const canvas = document.createElement('canvas')
+                        canvas.width = w; canvas.height = h
+                        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
+                        canvas.toBlob(blob => resolve(blob!), 'image/webp', 0.8)
+                        URL.revokeObjectURL(url)
+                      }
+                      img.src = url
+                    })
+                    const fd = new FormData()
+                    fd.append('file', compressed, 'photo.webp')
+                    fd.append('upload_preset', UPLOAD_PRESET)
+                    fd.append('folder', 'bingo-photos')
+                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:'POST', body:fd })
+                    const data = await res.json()
+                    if (data.secure_url) {
+                      const next = { ...photos, [idx]: data.secure_url }
+                      setPhotos(next)
+                      // 방문완료도 자동으로
+                      if (!isChecked) handleCell(idx)
+                    }
+                  } catch { alert('업로드 실패') }
+                  setUploadingPhoto(false)
+                  e.target.value = ''
+                }}
+              />
             </div>
           </div>
         )
@@ -757,8 +866,8 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
               }}>취소</button>
               <button onClick={async () => {
                 if (userId) {
-                  await saveBingoDB('melbourne', checkedMelbourne)
-                  await saveBingoDB('sydney', checkedSydney)
+                  await saveBingoDB('melbourne', checkedMelbourne, photosMelbourne)
+                  await saveBingoDB('sydney', checkedSydney, photosSydney)
                 }
                 setShowSaveConfirm(false)
                 onBack?.()
