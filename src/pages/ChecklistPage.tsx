@@ -32,11 +32,24 @@ import type { BingoRef } from './BingoPage'
 
 const ff = font.family
 
+// ── 로그아웃 시 로컬스토리지 초기화
+function clearAllUserData() {
+  const keys = [
+    'korea-receipt', 'bucket-achieved', 'trip',
+    'my-shopping-list', 'my-shopping-checked',
+    'bingo-melbourne', 'bingo-sydney',
+    'community-my-name', 'community-my-icon', 'community-my-id', 'community-liked',
+    'biz-bookmarks',
+  ]
+  keys.forEach(k => { try { localStorage.removeItem(k) } catch {} })
+}
+
 // ── 로그인 배지 컴포넌트 (모든 헤더에서 공통 사용)
 function AuthBadge() {
   const navigate = useNavigate()
   const [email, setEmail] = useState<string | null>(null)
   const [checked, setChecked] = useState(false)
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -49,35 +62,71 @@ function AuthBadge() {
     return () => subscription.unsubscribe()
   }, [])
 
-  if (!checked) return null
-
-  if (email) {
-    const short = email.split('@')[0].slice(0, 8)
-    return (
-      <div style={{ display:'flex', alignItems:'center', gap:spacing[1],
-        background: colors.primaryLight, border:`1px solid ${colors.primary}`,
-        borderRadius: radius.full, padding:`4px ${spacing[2]}px`, cursor:'pointer',
-      }} onClick={async () => {
-        if (confirm('로그아웃 하시겠어요?')) {
-          await supabase.auth.signOut()
-          window.location.href = '/onboarding'
-        }
-      }}>
-        <Icon icon="ph:user-circle-fill" width={14} height={14} color={colors.primary} />
-        <span style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.primary }}>{short}</span>
-      </div>
-    )
+  const handleLogout = async () => {
+    clearAllUserData()
+    await supabase.auth.signOut()
+    window.location.href = '/onboarding'
   }
 
+  if (!checked) return null
+
   return (
-    <button onClick={() => navigate('/onboarding')} style={{
-      display:'flex', alignItems:'center', gap:spacing[1],
-      background: colors.bgCard, border:`1px solid ${colors.border}`,
-      borderRadius: radius.full, padding:`4px ${spacing[2]}px`, cursor:'pointer',
-    }}>
-      <Icon icon="ph:sign-in" width={14} height={14} color={colors.textSecondary} />
-      <span style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.textSecondary }}>로그인</span>
-    </button>
+    <>
+      {/* 아이콘 버튼 */}
+      <button onClick={() => email ? setShowLogoutPopup(true) : navigate('/onboarding')} style={{
+        background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        WebkitTapHighlightColor: 'transparent',
+      }}>
+        <Icon
+          icon="ph:user-circle"
+          width={26} height={26}
+          color={email ? colors.primary : colors.gray300}
+        />
+      </button>
+
+      {/* 로그아웃 확인 팝업 */}
+      {showLogoutPopup && (
+        <>
+          <div onClick={() => setShowLogoutPopup(false)} style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 900,
+          }} />
+          <div style={{
+            position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+            background: colors.bgCard, borderRadius: radius.lg,
+            padding: `${spacing[6]}px ${spacing[5]}px`,
+            zIndex: 901, width: 'calc(100% - 48px)', maxWidth: 300,
+            textAlign: 'center', fontFamily: font.family,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+          }}>
+            <Icon icon="ph:user-circle" width={40} height={40} color={colors.primary} style={{ marginBottom: spacing[3] }} />
+            <div style={{ fontSize: font.size.md, color: colors.textTertiary, marginBottom: spacing[1] }}>
+              {email}
+            </div>
+            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>
+              로그아웃 할까요?
+            </div>
+            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight: 1.6 }}>
+              로그아웃하면 저장된 데이터가<br/>이 기기에서 삭제됩니다.
+            </div>
+            <div style={{ display: 'flex', gap: spacing[2] }}>
+              <button onClick={() => setShowLogoutPopup(false)} style={{
+                flex: 1, height: 44, borderRadius: radius.sm,
+                border: `1px solid ${colors.border}`, background: colors.bgCard,
+                color: colors.textSecondary, fontSize: font.size.md,
+                fontWeight: font.weight.medium, cursor: 'pointer', fontFamily: font.family,
+              }}>취소</button>
+              <button onClick={handleLogout} style={{
+                flex: 2, height: 44, borderRadius: radius.sm, border: 'none',
+                background: colors.danger, color: '#fff',
+                fontSize: font.size.md, fontWeight: font.weight.bold,
+                cursor: 'pointer', fontFamily: font.family,
+              }}>로그아웃</button>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   )
 }
 
