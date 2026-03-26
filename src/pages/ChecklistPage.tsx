@@ -456,7 +456,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span onClick={handleLogoTap} style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary, cursor:'pointer', userSelect:'none' }}>버킷리스트</span>
               <div style={{ display:'flex', alignItems:'center', gap:spacing[2] }}>
-                <AuthBadge />
                 <button onClick={()=>{ setShowSearch(v=>!v); if(showSearch) setSearchQuery('') }} style={{
                   width:28, height:28, borderRadius:radius.full,
                   border:`1.5px solid ${showSearch ? colors.primary : colors.border}`,
@@ -465,6 +464,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 }}>
                   <Icon icon={showSearch ? 'ph:x' : 'ph:magnifying-glass'} width={14} height={14} color={showSearch ? colors.primary : colors.textSecondary} />
                 </button>
+                <AuthBadge />
               </div>
             </div>
             {showSearch && (
