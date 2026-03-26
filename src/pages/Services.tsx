@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import { CATEGORIES } from '../data/businesses'
-import { Business, getBusinesses, getBusinessesCount, searchBusinesses, searchBusinessesCount } from '../lib/businessService'
+import { Business, getBusinesses } from '../lib/businessService'
 import { getBookmarks } from '../lib/businessBookmarks'
 import { getCachedBusinesses } from '../lib/dataCache'
 import BusinessCard from '../components/BusinessCard'
@@ -12,7 +12,6 @@ type Props = { onSelectBusiness: (id: string) => void; onBack: () => void }
 type ServiceTab = 'all' | 'korean' | 'bookmarks' | 'emergency'
 
 const ff = font.family
-const PAGE_SIZE = 30
 
 // 가나다 → ABC 정렬
 function sortByName(list: Business[]): Business[] {
@@ -30,180 +29,99 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const [serviceTab, setServiceTab]   = useState<ServiceTab>('all')
   const [search, setSearch]           = useState('')
   const [category, setCategory]       = useState('')
-  const [businesses, setBusinesses]   = useState<Business[]>([])
-  const [allBusinesses, setAllBusinesses] = useState<Business[]>([]) // 전체 캐시
-  const [loading, setLoading]         = useState(false)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [hasMore, setHasMore]         = useState(true)
-  const [page, setPage]               = useState(0)
-  const [totalCount, setTotalCount]   = useState(0)
-  const [bookmarked, setBookmarked]   = useState<Business[]>([])
+  const [allBusinesses, setAllBusinesses] = useState<Business[]>([])
+  const [loading, setLoading]         = useState(true)
   const [bookmarkCount, setBookmarkCount] = useState(() => getBookmarks().length)
   const [catCounts, setCatCounts]     = useState<Record<string, number>>({})
   const [sortedCategories, setSortedCategories] = useState(CATEGORIES)
-  const loaderRef = useRef<HTMLDivElement>(null)
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const searchTimerRef = useRef<any>(null)
 
-  // 캐시에서 전체 업체 로드 (마운트 시 한 번)
+  // 캐시 또는 DB에서 전체 업체 로드
   useEffect(() => {
     const cached = getCachedBusinesses()
-    if (cached) setAllBusinesses(cached)
+    if (cached && cached.length > 0) {
+      setAllBusinesses(cached)
+      setLoading(false)
+    } else {
+      getBusinesses(undefined, 0, 9999).then(data => {
+        setAllBusinesses(data)
+        setLoading(false)
+      })
+    }
   }, [])
 
-  // 카테고리 선택 or 검색 시 데이터 로드
-  const loadData = useCallback(async (cat: string, q: string, reset = true, korean = false) => {
-    if (reset) {
-      setLoading(true)
-      setPage(0)
-      setBusinesses([])
-    } else {
-      setLoadingMore(true)
-    }
+  // 검색 디바운스
+  useEffect(() => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    searchTimerRef.current = setTimeout(() => setDebouncedSearch(search), 300)
+  }, [search])
 
-    const currentPage = reset ? 0 : page
-    let data: Business[]
+  // 카테고리 카운트 (캐시 데이터 기반)
+  useEffect(() => {
+    const counts: Record<string, number> = {}
+    CATEGORIES.filter(c => c.id !== 'all').forEach(c => {
+      counts[c.id] = allBusinesses.filter(b => b.category === c.id).length
+    })
+    setCatCounts(counts)
+  }, [allBusinesses])
 
-    // 캐시 있으면 클라이언트 필터링
-    if (allBusinesses.length > 0 && !q.trim()) {
-      data = allBusinesses
-      if (cat) data = data.filter(b => b.category === cat)
-      if (korean) data = data.filter(b => b.is_korean)
-      if (!korean && !cat) data = data.filter(b => b.is_featured)
-      setBusinesses(sortByName(data.filter(b => b.is_featured)).concat(sortByName(data.filter(b => !b.is_featured))))
-      setTotalCount(data.length)
-      setHasMore(false)
-      setLoading(false)
-      return
-    }
+  // 카테고리 정렬
+  useEffect(() => {
+    const rest = CATEGORIES.filter(c => c.id !== 'all')
+    setSortedCategories([...rest].sort((a, b) => (catCounts[b.id] || 0) - (catCounts[a.id] || 0)))
+  }, [catCounts])
 
-    if (q.trim()) {
-      data = await searchBusinesses(q.trim(), currentPage, PAGE_SIZE)
-    } else {
-      data = await getBusinesses(cat ? cat : undefined, currentPage, PAGE_SIZE)
+  // 북마크 이벤트
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { count } = (e as CustomEvent).detail
+      setBookmarkCount(count)
     }
+    window.addEventListener('bookmark-change', handler)
+    return () => window.removeEventListener('bookmark-change', handler)
+  }, [])
+
+  // ── 필터링된 업체 목록
+  const displayedBusinesses = useMemo(() => {
+    let list = [...allBusinesses]
 
     // 한인업체 필터
-    if (korean) data = data.filter(b => b.is_korean)
+    if (serviceTab === 'korean') list = list.filter(b => b.is_korean)
+    else if (serviceTab === 'all') {} // 전체
 
-    // 전체업종 + 카테고리 미선택 + 미검색 → 추천만 표시
-    if (!korean && !cat && !q.trim()) data = data.filter(b => b.is_featured)
+    // 검색
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.trim().toLowerCase()
+      list = list.filter(b =>
+        b.name.toLowerCase().includes(q) ||
+        (b.description ?? '').toLowerCase().includes(q) ||
+        (b.city ?? '').toLowerCase().includes(q)
+      )
+      return sortByName(list)
+    }
 
-    // 추천업체 가나다순 → 일반업체 가나다순 정렬
-    const sortMixed = (list: Business[]) => {
+    // 카테고리 필터
+    if (category) list = list.filter(b => b.category === category)
+
+    // 전체업종 + 카테고리 없음: 추천 앞에, 나머지 뒤에
+    if (!category) {
       const featured = sortByName(list.filter(b => b.is_featured))
       const normal   = sortByName(list.filter(b => !b.is_featured))
       return [...featured, ...normal]
     }
 
-    if (reset) {
-      setBusinesses(sortMixed(data))
-      setLoading(false)
-      if (!q.trim()) {
-        getBusinessesCount(cat ? cat : undefined).then(c => setTotalCount(c))
-      } else {
-        searchBusinessesCount(q.trim()).then(c => setTotalCount(c))
-      }
-    } else {
-      setBusinesses(prev => {
-        const newData = [...prev, ...data]
-        const featured = sortByName(newData.filter(b => b.is_featured))
-        const normal   = sortByName(newData.filter(b => !b.is_featured))
-        return [...featured, ...normal]
-      })
-      setLoadingMore(false)
-      if (!reset) setPage(p => p + 1)
-    }
+    // 카테고리 선택 시: 가나다 ABC 순 전체
+    return sortByName(list)
+  }, [allBusinesses, serviceTab, category, debouncedSearch])
 
-    setHasMore(data.length === PAGE_SIZE)
-  }, [page, allBusinesses])
-
-  useEffect(() => {
-    // 카테고리별 count 병렬 로드 (all 제외)
-    const cats = CATEGORIES.filter(c => c.id !== 'all')
-    Promise.all(
-      cats.map(c => getBusinessesCount(c.id).then(n => ({ id: c.id, n })))
-    ).then(results => {
-      const counts: Record<string, number> = {}
-      results.forEach(r => { counts[r.id] = r.n })
-      setCatCounts(counts)
-    })
-  }, [])
-
-  // 카테고리 정렬 — 업체 많은 순, all 제외
-  useEffect(() => {
-    const rest = CATEGORIES.filter(c => c.id !== 'all')
-    const sorted = [...rest].sort((a, b) => (catCounts[b.id] || 0) - (catCounts[a.id] || 0))
-    setSortedCategories(sorted)
-  }, [catCounts])
-
-  // 검색어/카테고리/탭 변경 시 재로드
-  useEffect(() => {
-    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
-    const korean = serviceTab === 'korean'
-    searchTimerRef.current = setTimeout(() => {
-      loadData(category, search, true, korean)
-    }, search.trim() ? 400 : 0)
-  }, [category, search, serviceTab])
-
-  // 무한 스크롤 — IntersectionObserver
-  useEffect(() => {
-    if (!loaderRef.current) return
-    const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore && !loadingMore && !loading) {
-        setPage(p => {
-          const nextPage = p + 1
-          setLoadingMore(true)
-          const q = search.trim()
-          const cat = category
-          const korean = serviceTab === 'korean'
-          Promise.resolve().then(async () => {
-            let data: Business[]
-            if (q) data = await searchBusinesses(q, nextPage, PAGE_SIZE)
-            else data = await getBusinesses(cat ? cat : undefined, nextPage, PAGE_SIZE)
-            if (korean) data = data.filter(b => b.is_korean)
-            setBusinesses(prev => {
-              const newData = [...prev, ...data]
-              const featured = sortByName(newData.filter(b => b.is_featured))
-              const normal   = sortByName(newData.filter(b => !b.is_featured))
-              return [...featured, ...normal]
-            })
-            setLoadingMore(false)
-            setHasMore(data.length === PAGE_SIZE)
-          })
-          return nextPage
-        })
-      }
-    }, { threshold: 0.1 })
-    observer.observe(loaderRef.current)
-    return () => observer.disconnect()
-  }, [hasMore, loadingMore, loading, search, category, serviceTab])
-
-  // 북마크
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const { count } = (e as CustomEvent).detail
-      setBookmarkCount(count)
-      if (serviceTab === 'bookmarks') {
-        const ids = getBookmarks()
-        setBookmarked(businesses.filter(b => ids.includes(b.id)))
-      }
-    }
-    window.addEventListener('bookmark-change', handler)
-    return () => window.removeEventListener('bookmark-change', handler)
-  }, [serviceTab, businesses])
-
-  useEffect(() => {
-    if (serviceTab !== 'bookmarks') return
+  // 북마크 목록
+  const bookmarked = useMemo(() => {
     const ids = getBookmarks()
-    setBookmarkCount(ids.length)
-    if (ids.length === 0) { setBookmarked([]); return }
-    // 북마크는 전체에서 가져와야 해서 별도 로드
-    getBusinesses(undefined, 0, 1000).then(all => {
-      setBookmarked(all.filter(b => ids.includes(b.id)))
-    })
-  }, [serviceTab])
+    return sortByName(allBusinesses.filter(b => ids.includes(b.id)))
+  }, [allBusinesses, bookmarkCount])
 
-  const isSearch    = !!search.trim()
+  const isSearch    = !!debouncedSearch.trim()
   const isCatFilter = !!category
   const isFiltered  = isSearch || isCatFilter
 
@@ -339,21 +257,17 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 ? (serviceTab === 'korean' ? 'ph:flag' : 'ph:star')
                 : isSearch ? 'ph:magnifying-glass' : 'ph:list-bullets'}
               label={!isFiltered
-                ? (serviceTab === 'korean' ? `한인업체 (${totalCount})` : `추천 업체 (${totalCount})`)
+                ? (serviceTab === 'korean' ? `한인업체 (${displayedBusinesses.length})` : `전체 업체 (${displayedBusinesses.length})`)
                 : isSearch
-                  ? `검색 결과 (${totalCount})`
-                  : `${CATEGORIES.find(c => c.id === category)?.label ?? ''} (${totalCount})`}
+                  ? `검색 결과 (${displayedBusinesses.length})`
+                  : `${CATEGORIES.find(c => c.id === category)?.label ?? ''} (${displayedBusinesses.length})`}
               color={colors.textSecondary}
             />
-            {loading ? <LoadingState /> : businesses.length === 0 ? <EmptyState /> : (
+            {loading ? <LoadingState /> : displayedBusinesses.length === 0 ? <EmptyState /> : (
               <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
-                {businesses.map(b => <BusinessCard key={b.id} business={b} />)}
+                {displayedBusinesses.map(b => <BusinessCard key={b.id} business={b} />)}
               </div>
             )}
-            {/* 무한스크롤 트리거 */}
-            <div ref={loaderRef} style={{ height:40, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              {loadingMore && <Icon icon="ph:spinner" width={20} height={20} color={colors.textTertiary} style={{ animation:'spin 1s linear infinite' }} />}
-            </div>
           </>
         )}
       </div>
