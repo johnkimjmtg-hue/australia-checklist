@@ -109,7 +109,9 @@ function AuthBadge() {
             <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>
               로그아웃 할까요?
             </div>
-
+            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight: 1.6 }}>
+              로그아웃하면 저장된 데이터가<br/>이 기기에서 삭제됩니다.
+            </div>
             <div style={{ display: 'flex', gap: spacing[2] }}>
               <button onClick={() => setShowLogoutPopup(false)} style={{
                 flex: 1, height: 44, borderRadius: radius.sm,
@@ -161,6 +163,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [userId, setUserId] = useState<string | null>(null)
+  const autoSaveTimer = useRef<any>(null)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
   const [categories, setCategories]   = useState<Category[]>([])
@@ -192,6 +195,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [myChecked, setMyChecked] = useState<Record<string,boolean>>(() => { try { return JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}') } catch { return {} } })
   const myListCount    = myList.length
   const myCheckedCount = myList.filter(id => myChecked[id]).length
+  const shoppingAutoSaveTimer = useRef<any>(null)
 
   const saveShoppingDB = async (list: string[], checked: Record<string,boolean>) => {
     const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
@@ -202,15 +206,20 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     )
   }
 
+  const debouncedSaveShopping = (list: string[], checked: Record<string,boolean>) => {
+    if (shoppingAutoSaveTimer.current) clearTimeout(shoppingAutoSaveTimer.current)
+    shoppingAutoSaveTimer.current = setTimeout(() => { saveShoppingDB(list, checked) }, 3000)
+  }
+
   const handleMyListChange = (next: string[]) => {
     setMyList(next)
     try { localStorage.setItem('my-shopping-list', JSON.stringify(next)) } catch {}
-    saveShoppingDB(next, myChecked)
+    debouncedSaveShopping(next, myChecked)
   }
   const handleMyCheckedChange = (next: Record<string,boolean>) => {
     setMyChecked(next)
     try { localStorage.setItem('my-shopping-checked', JSON.stringify(next)) } catch {}
-    saveShoppingDB(myList, next)
+    debouncedSaveShopping(myList, next)
   }
 
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
@@ -233,6 +242,15 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     return () => subscription.unsubscribe()
   }, [])
 
+  // state/trip/achieved 변경 시 3초 debounce → DB 자동 저장
+  useEffect(() => {
+    if (!userId) return
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current)
+    autoSaveTimer.current = setTimeout(() => { saveBucketlistDB(state, trip, achieved) }, 3000)
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state, trip, achieved, userId])
+
   // DB 저장 함수
   const saveBucketlistDB = async (s: AppState, t: TripInfo | null, a: Record<string,boolean>) => {
     const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
@@ -241,6 +259,11 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       { user_id: user.id, state_json: s, trip_json: t, achieved_json: a, updated_at: new Date().toISOString() },
       { onConflict: 'user_id' }
     )
+  }
+
+  const debouncedSaveBucketlist = (s: AppState, t: TripInfo | null, a: Record<string,boolean>) => {
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current)
+    autoSaveTimer.current = setTimeout(() => { saveBucketlistDB(s, t, a) }, 3000)
   }
 
   useEffect(() => {

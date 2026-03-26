@@ -72,19 +72,23 @@ function MainApp() {
       // 백그라운드에서 유저 데이터 + 리스트 캐시 동시 로드
       const jobs = [syncDataCache()]
       if (session?.user) {
-        jobs.push(
-          loadAllUserData(session.user.id)
-            .then(() => setState(loadState()))
-            .catch(e => console.error('loadAllUserData error:', e))
-        )
+        const alreadyLoaded = sessionStorage.getItem('user-data-loaded') === session.user.id
+        if (!alreadyLoaded) {
+          jobs.push(
+            loadAllUserData(session.user.id)
+              .then(() => { sessionStorage.setItem('user-data-loaded', session.user.id); setState(loadState()) })
+              .catch(e => console.error('loadAllUserData error:', e))
+          )
+        }
       }
       Promise.all(jobs).catch(e => console.error('background load error:', e))
     }).catch(() => { clearTimeout(timeout); setAuthChecked(true) })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
+        sessionStorage.removeItem('user-data-loaded')
         loadAllUserData(session.user.id)
-          .then(() => setState(loadState()))
+          .then(() => { sessionStorage.setItem('user-data-loaded', session.user.id); setState(loadState()) })
           .catch(e => console.error('loadAllUserData error:', e))
       }
     })
