@@ -570,9 +570,26 @@ export default function Community() {
       }
     }
     init()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUserId(session.user.id)
+        // SIGNED_IN 시 profiles 다시 로드
+        if (event === 'SIGNED_IN') {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('nickname, community_icon')
+            .eq('id', session.user.id)
+            .maybeSingle()
+          if (profile?.nickname) {
+            setMyName(profile.nickname)
+            setMyIcon(profile.community_icon ?? null)
+            localStorage.setItem('community-my-name', profile.nickname)
+            if (profile.community_icon) localStorage.setItem('community-my-icon', profile.community_icon)
+          } else {
+            setMyName(null)
+            setMyIcon(null)
+          }
+        }
       } else {
         setUserId(null)
       }
