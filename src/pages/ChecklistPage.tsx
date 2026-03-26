@@ -32,6 +32,55 @@ import type { BingoRef } from './BingoPage'
 
 const ff = font.family
 
+// ── 로그인 배지 컴포넌트 (모든 헤더에서 공통 사용)
+function AuthBadge() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState<string | null>(null)
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setEmail(user?.email ?? null)
+      setChecked(true)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setEmail(session?.user?.email ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  if (!checked) return null
+
+  if (email) {
+    const short = email.split('@')[0].slice(0, 8)
+    return (
+      <div style={{ display:'flex', alignItems:'center', gap:spacing[1],
+        background: colors.primaryLight, border:`1px solid ${colors.primary}`,
+        borderRadius: radius.full, padding:`4px ${spacing[2]}px`, cursor:'pointer',
+      }} onClick={async () => {
+        if (confirm('로그아웃 하시겠어요?')) {
+          await supabase.auth.signOut()
+          window.location.href = '/onboarding'
+        }
+      }}>
+        <Icon icon="ph:user-circle-fill" width={14} height={14} color={colors.primary} />
+        <span style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.primary }}>{short}</span>
+      </div>
+    )
+  }
+
+  return (
+    <button onClick={() => navigate('/onboarding')} style={{
+      display:'flex', alignItems:'center', gap:spacing[1],
+      background: colors.bgCard, border:`1px solid ${colors.border}`,
+      borderRadius: radius.full, padding:`4px ${spacing[2]}px`, cursor:'pointer',
+    }}>
+      <Icon icon="ph:sign-in" width={14} height={14} color={colors.textSecondary} />
+      <span style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.textSecondary }}>로그인</span>
+    </button>
+  )
+}
+
 const CAT_ICON_MAP: Record<string,string> = {
   hospital:'ph:first-aid-kit', food:'ph:fork-knife', shopping:'ph:shopping-bag',
   admin:'ph:files', people:'ph:users', parenting:'ph:baby', places:'ph:map-pin',
@@ -301,7 +350,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>업체리스트</span>
-              <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>{bizCount > 0 ? `${bizCount}개 업체` : ''}</span>
+              <AuthBadge />
             </div>
           </div>
           <Services onSelectBusiness={()=>{}} onBack={()=>setMainTab('bucketlist')} />
@@ -311,7 +360,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>쇼핑리스트</span>
-              <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>{shopCount > 0 ? `총 ${shopCount}개 상품` : ''}</span>
+              <AuthBadge />
             </div>
           </div>
           <Shopping myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onGoToMyList={()=>setMainTab('myshoppinglist')} />
@@ -321,7 +370,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>쇼핑리스트</span>
-              <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>{myCheckedCount}/{myListCount}개 구매</span>
+              <AuthBadge />
             </div>
           </div>
           <MyShoppingView myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
@@ -331,6 +380,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}`, flexShrink:0 }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>내 주변</span>
+              <AuthBadge />
             </div>
           </div>
           <NearbyMap onBack={()=>setMainTab('bucketlist')} />
@@ -338,24 +388,22 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       ) : mainTab==='community' ? (
         <Community />
       ) : mainTab==='bingo' ? (
-        <BingoPage ref={bingoRef} embedded={true} initialCity={(searchParams.get('city') as 'melbourne'|'sydney') ?? undefined} />
+        <>
+          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
+              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>카페 빙고</span>
+              <AuthBadge />
+            </div>
+          </div>
+          <BingoPage ref={bingoRef} embedded={true} initialCity={(searchParams.get('city') as 'melbourne'|'sydney') ?? undefined} />
+        </>
       ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
         <>
           {/* 헤더 */}
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>버킷리스트</span>
-              <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>
-                {Object.values(achieved).filter(Boolean).length}/{(() => {
-                  const allRows: number[] = []
-                  Object.keys(state.selected).forEach(id => {
-                    const days = state.schedules[id] ?? []
-                    if (days.length === 0) allRows.push(0)
-                    else days.forEach(() => allRows.push(0))
-                  })
-                  return allRows.length
-                })()} 완료
-              </span>
+              <AuthBadge />
             </div>
           </div>
           <BucketCheckView state={state} trip={trip} setState={setState} items={ITEMS} dbItems={dbItems} onAchievedChange={setAchieved}
@@ -376,14 +424,17 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span onClick={handleLogoTap} style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary, cursor:'pointer', userSelect:'none' }}>버킷리스트</span>
-              <button onClick={()=>{ setShowSearch(v=>!v); if(showSearch) setSearchQuery('') }} style={{
-                width:28, height:28, borderRadius:radius.full,
-                border:`1.5px solid ${showSearch ? colors.primary : colors.border}`,
-                background: showSearch ? colors.primaryLight : colors.bgCard,
-                display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer',
-              }}>
-                <Icon icon={showSearch ? 'ph:x' : 'ph:magnifying-glass'} width={14} height={14} color={showSearch ? colors.primary : colors.textSecondary} />
-              </button>
+              <div style={{ display:'flex', alignItems:'center', gap:spacing[2] }}>
+                <AuthBadge />
+                <button onClick={()=>{ setShowSearch(v=>!v); if(showSearch) setSearchQuery('') }} style={{
+                  width:28, height:28, borderRadius:radius.full,
+                  border:`1.5px solid ${showSearch ? colors.primary : colors.border}`,
+                  background: showSearch ? colors.primaryLight : colors.bgCard,
+                  display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer',
+                }}>
+                  <Icon icon={showSearch ? 'ph:x' : 'ph:magnifying-glass'} width={14} height={14} color={showSearch ? colors.primary : colors.textSecondary} />
+                </button>
+              </div>
             </div>
             {showSearch && (
               <div style={{ padding:`0 ${spacing[4]}px ${spacing[3]}px` }}>

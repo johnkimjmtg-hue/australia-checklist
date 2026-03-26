@@ -920,7 +920,8 @@ export default function Community() {
             }}>
               <Icon icon="ph:magnifying-glass" width={14} height={14} color={showSearch ? colors.primary : colors.textSecondary} />
             </button>
-            {myName && (
+            {/* 닉네임/로그인 상태 */}
+            {myName ? (
               <button onClick={() => setShowNameChange(true)} style={{
                 display: 'flex', alignItems: 'center', gap: spacing[1],
                 background: colors.bgCard, border: `1.5px solid ${colors.border}`,
@@ -934,6 +935,15 @@ export default function Community() {
                   fontSize: myIcon ? 13 : 9, color: '#fff', fontWeight: font.weight.bold,
                 }}>{myIcon ?? myName[0]}</div>
                 <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.textSecondary }}>{myName}</span>
+              </button>
+            ) : (
+              <button onClick={() => window.location.href = '/onboarding'} style={{
+                display:'flex', alignItems:'center', gap:spacing[1],
+                background: colors.bgCard, border:`1px solid ${colors.border}`,
+                borderRadius: radius.full, padding:`4px ${spacing[2]}px`, cursor:'pointer',
+              }}>
+                <Icon icon="ph:sign-in" width={14} height={14} color={colors.textSecondary} />
+                <span style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.textSecondary }}>로그인</span>
               </button>
             )}
           </div>
