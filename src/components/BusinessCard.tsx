@@ -114,7 +114,10 @@ export default function BusinessCard({ business }: Props) {
                 }}>
                 <Icon icon="ph:caret-down" width={18} height={18} color="#94A3B8" />
               </button>
-              <button onClick={() => setBookmarked(toggleBookmark(business.id))} style={{
+              <button onClick={async () => {
+                const next = await toggleBookmark(business.id)
+                setBookmarked(next)
+              }} style={{
                 background:'none', border:'none', cursor:'pointer', padding:'4px 6px', borderRadius:8,
                 display:'flex', alignItems:'center', justifyContent:'center',
               }}>
