@@ -48,6 +48,5 @@ export async function loadBookmarksFromDB(): Promise<void> {
     .single()
   if (data?.bookmarks) {
     try { localStorage.setItem(KEY, JSON.stringify(data.bookmarks)) } catch {}
-    try { window.dispatchEvent(new CustomEvent('bookmark-change', { detail: { count: data.bookmarks.length } })) } catch {}
   }
 }
