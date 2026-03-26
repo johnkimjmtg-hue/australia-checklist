@@ -461,7 +461,6 @@ export default function Community() {
   const [onlineCount, setOnlineCount] = useState(1)
   const [showNameChange, setShowNameChange] = useState(false)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
-  const [profileLoaded, setProfileLoaded] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const loadMoreRef = useRef<HTMLDivElement>(null)
@@ -536,72 +535,28 @@ export default function Community() {
     return { from: from.toISOString(), to: to.toISOString() }
   }
 
-  // 로그인 감지 (profiles는 ChecklistPage에서 이미 로컬에 캐시됨)
+  // 로그인 감지 (데이터는 App.tsx에서 이미 로컬에 캐시됨)
   useEffect(() => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       const user = session?.user
-      if (!user) {
-        setProfileLoaded(true)
-        return
-      }
+      if (!user) return
       setUserId(user.id)
-      // 로컬스토리지에서 닉네임 읽기 (ChecklistPage에서 이미 캐시됨)
+      // 로컬스토리지에서 읽기 (App.tsx에서 캐시됨)
       const cachedName = localStorage.getItem('community-my-name')
       const cachedIcon = localStorage.getItem('community-my-icon')
       if (cachedName) {
         setMyName(cachedName)
         setMyIcon(cachedIcon)
       } else {
-        // 혹시 캐시 없으면 DB에서 직접 로드
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('nickname, community_icon')
-          .eq('id', user.id)
-          .maybeSingle()
-        if (profile?.nickname) {
-          setMyName(profile.nickname)
-          setMyIcon(profile.community_icon ?? null)
-          localStorage.setItem('community-my-name', profile.nickname)
-          if (profile.community_icon) localStorage.setItem('community-my-icon', profile.community_icon)
-        } else {
-          setMyName(null)
-          setMyIcon(null)
-        }
+        setMyName(null)
+        setMyIcon(null)
       }
-      setProfileLoaded(true)
     }
     init()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        setUserId(session.user.id)
-        if (event === 'SIGNED_IN') {
-          const cachedName = localStorage.getItem('community-my-name')
-          const cachedIcon = localStorage.getItem('community-my-icon')
-          if (cachedName) {
-            setMyName(cachedName)
-            setMyIcon(cachedIcon)
-          } else {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('nickname, community_icon')
-              .eq('id', session.user.id)
-              .maybeSingle()
-            if (profile?.nickname) {
-              setMyName(profile.nickname)
-              setMyIcon(profile.community_icon ?? null)
-              localStorage.setItem('community-my-name', profile.nickname)
-              if (profile.community_icon) localStorage.setItem('community-my-icon', profile.community_icon)
-            } else {
-              setMyName(null)
-              setMyIcon(null)
-            }
-          }
-          setProfileLoaded(true)
-        }
-      } else {
-        setUserId(null)
-      }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (session?.user) setUserId(session.user.id)
+      else setUserId(null)
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -816,7 +771,7 @@ export default function Community() {
     localStorage.setItem('community-my-icon', icon)
     setMyName(name)
     setMyIcon(icon)
-    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
+    const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       await supabase.from('profiles').upsert(
         { id: user.id, nickname: name, community_icon: icon },
@@ -841,7 +796,7 @@ export default function Community() {
       setImgPreview(null)
     }
 
-    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
+    const { data: { user } } = await supabase.auth.getUser()
     await supabase.from('community_posts').insert({
       text: text || '',
       author_id: user?.id ?? MY_ID,
@@ -935,7 +890,7 @@ export default function Community() {
       `}</style>
 
       {/* 닉네임 미설정 시 팝업 */}
-      {profileLoaded && userId && !myName && <NicknameSetup onSet={handleSetProfile} />}
+      {userId && !myName && <NicknameSetup onSet={handleSetProfile} />}
 
       {/* ── 헤더 (채팅방 제목이 헤더 역할) */}
       <div style={{

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import { CATEGORIES } from '../data/businesses'
 import { Business, getBusinesses, getBusinessesCount, searchBusinesses, searchBusinessesCount } from '../lib/businessService'
-import { getBookmarks, loadBookmarksFromDB } from '../lib/businessBookmarks'
+import { getBookmarks } from '../lib/businessBookmarks'
 import BusinessCard from '../components/BusinessCard'
 import CategoryFilter from '../components/CategoryFilter'
 import { colors, font, radius, spacing } from '../styles/tokens'
@@ -97,13 +97,6 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   }, [page])
 
   // 카테고리 카운트 + 초기 추천 랜덤 로드 (한번만)
-  // 로그인 시 DB에서 북마크 로드
-  useEffect(() => {
-    loadBookmarksFromDB().then(() => {
-      setBookmarkCount(getBookmarks().length)
-    })
-  }, [])
-
   useEffect(() => {
     // 카테고리별 count 병렬 로드 (all 제외)
     const cats = CATEGORIES.filter(c => c.id !== 'all')
