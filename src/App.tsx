@@ -55,31 +55,21 @@ function MainApp() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session?.user) {
-          await loadAllUserData(session.user.id)
-          setState(loadState())
-        }
-      } catch (e) {
-        console.error('loadAllUserData error:', e)
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setAuthChecked(true)
-    }
-    init()
+      // 백그라운드에서 데이터 로드 (앱 진입 블로킹 안 함)
+      if (session?.user) {
+        loadAllUserData(session.user.id)
+          .then(() => setState(loadState()))
+          .catch(e => console.error('loadAllUserData error:', e))
+      }
+    }).catch(() => setAuthChecked(true))
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        try {
-          await loadAllUserData(session.user.id)
-          setState(loadState())
-        } catch (e) {
-          console.error('loadAllUserData error:', e)
-        }
-        setAuthChecked(true)
-      } else if (event === 'SIGNED_OUT') {
-        setAuthChecked(true)
+        loadAllUserData(session.user.id)
+          .then(() => setState(loadState()))
+          .catch(e => console.error('loadAllUserData error:', e))
       }
     })
     return () => subscription.unsubscribe()
