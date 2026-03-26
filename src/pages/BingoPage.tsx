@@ -234,7 +234,7 @@ function getStatusMsg(checked: number, bingo: number, city: 'melbourne'|'sydney'
 
 // DB 저장 헬퍼
 async function saveBingoDB(city: string, checked: Set<number>) {
-  const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
   await supabase.from('user_bingo').upsert(
     { user_id: user.id, city, checked_indices: [...checked], updated_at: new Date().toISOString() },
@@ -300,32 +300,15 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
     setPrevBingoCount(bingoCount)
   }, [bingoCount])
 
-  // 로그인 감지 + DB 데이터 로드
+  // 로그인 감지
   useEffect(() => {
     const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) return
       setUserId(user.id)
-      // DB에서 빙고 체크 현황 로드
-      const { data } = await supabase
-        .from('user_bingo')
-        .select('city, checked_indices')
-        .eq('user_id', user.id)
-      if (data) {
-        data.forEach(row => {
-          const indices = new Set<number>(row.checked_indices ?? [])
-          if (row.city === 'melbourne') {
-            setCheckedMelbourne(indices)
-            localStorage.setItem('bingo-melbourne', JSON.stringify([...indices]))
-          } else if (row.city === 'sydney') {
-            setCheckedSydney(indices)
-            localStorage.setItem('bingo-sydney', JSON.stringify([...indices]))
-          }
-        })
-      }
     }
     init()
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setUserId(session?.user?.id ?? null)
     })

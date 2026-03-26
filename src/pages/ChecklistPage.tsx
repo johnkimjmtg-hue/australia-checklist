@@ -171,48 +171,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   useEffect(() => {
     const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) return
       setUserId(user.id)
-      const { data } = await supabase
-        .from('user_bucketlists')
-        .select('state_json, trip_json, achieved_json')
-        .eq('user_id', user.id)
-        .single()
-      if (data) {
-        if (data.state_json) setState(data.state_json as AppState)
-        if (data.trip_json) { setTrip(data.trip_json as TripInfo); saveTrip(data.trip_json as TripInfo) }
-        if (data.achieved_json) {
-          setAchieved(data.achieved_json as Record<string,boolean>)
-          localStorage.setItem('bucket-achieved', JSON.stringify(data.achieved_json))
-        }
-      }
-      // 쇼핑 데이터 로드
-      const { data: shoppingData } = await supabase
-        .from('user_shopping')
-        .select('my_list, my_checked')
-        .eq('user_id', user.id)
-        .single()
-      if (shoppingData) {
-        if (shoppingData.my_list) {
-          setMyList(shoppingData.my_list as string[])
-          localStorage.setItem('my-shopping-list', JSON.stringify(shoppingData.my_list))
-        }
-        if (shoppingData.my_checked) {
-          setMyChecked(shoppingData.my_checked as Record<string,boolean>)
-          localStorage.setItem('my-shopping-checked', JSON.stringify(shoppingData.my_checked))
-        }
-      }
-      // 커뮤니티 프로필 로드 → 로컬에 캐시
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('nickname, community_icon')
-        .eq('id', user.id)
-        .maybeSingle()
-      if (profile?.nickname) {
-        localStorage.setItem('community-my-name', profile.nickname)
-        if (profile.community_icon) localStorage.setItem('community-my-icon', profile.community_icon)
-      }
     }
     init()
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
