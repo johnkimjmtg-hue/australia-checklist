@@ -69,16 +69,12 @@ function MainApp() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       clearTimeout(timeout)
       setAuthChecked(true)
-      // 백그라운드에서 리스트 캐시만 로드 (유저 데이터는 로그인 시에만)
-      syncDataCache().catch(e => console.error('background load error:', e))
+      // 백그라운드에서 유저 데이터 + 리스트 캐시 동시 로드
+      const jobs = [syncDataCache()]
+      Promise.all(jobs).catch(e => console.error('background load error:', e))
     }).catch(() => { clearTimeout(timeout); setAuthChecked(true) })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        loadAllUserData(session.user.id)
-          .then(() => setState(loadState()))
-          .catch(e => console.error('loadAllUserData error:', e))
-      }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, _session) => {
     })
     return () => { clearTimeout(timeout); subscription.unsubscribe() }
   }, [])
@@ -122,8 +118,12 @@ function OnboardingWrapper() {
       if (session) navigate('/app', { replace: true })
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN') navigate('/app', { replace: true })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        loadAllUserData(session.user.id)
+          .catch(e => console.error('loadAllUserData error:', e))
+          .finally(() => navigate('/app', { replace: true }))
+      }
     })
     return () => subscription.unsubscribe()
   }, [])
