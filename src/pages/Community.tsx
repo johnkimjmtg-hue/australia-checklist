@@ -538,20 +538,27 @@ export default function Community() {
   // 로그인 감지 + profiles 로드 (DB 항상 우선)
   useEffect(() => {
     const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
-      if (!user) {
-        // 비로그인 - 로컬 닉네임 유지하되 글쓰기는 막음
-        return
+      // getSession 실패 시 짧게 재시도
+      let session = (await supabase.auth.getSession()).data.session
+      if (!session) {
+        await new Promise(r => setTimeout(r, 300))
+        session = (await supabase.auth.getSession()).data.session
       }
+      const user = session?.user
+      if (!user) return
+
       setUserId(user.id)
+
       // 로그인 시 항상 DB profiles 우선 로드
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('nickname, community_icon')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
+
+      if (error) console.error('profiles load error:', error)
+
       if (profile?.nickname) {
-        // DB 값으로 덮어쓰기 (로컬 무시)
         setMyName(profile.nickname)
         setMyIcon(profile.community_icon ?? null)
         localStorage.setItem('community-my-name', profile.nickname)
