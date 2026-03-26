@@ -34,7 +34,7 @@ import { getCachedChecklist } from '../lib/dataCache'
 const ff = font.family
 
 // ── 로그아웃 시 로컬스토리지 초기화
-function clearAllUserData() {
+function clearAllUserData(userId?: string | null) {
   const keys = [
     'korea-receipt', 'bucket-achieved', 'korea-trip',
     'my-shopping-list', 'my-shopping-checked',
@@ -44,6 +44,7 @@ function clearAllUserData() {
     'biz-bookmarks',
   ]
   keys.forEach(k => { try { localStorage.removeItem(k) } catch {} })
+  if (userId) { try { localStorage.removeItem(`user-data-loaded-${userId}`) } catch {} }
 }
 
 // ── 로그인 배지 컴포넌트 (모든 헤더에서 공통 사용)
@@ -65,7 +66,8 @@ function AuthBadge() {
   }, [])
 
   const handleLogout = async () => {
-    clearAllUserData()
+    const { data: { session } } = await supabase.auth.getSession()
+    clearAllUserData(session?.user?.id)
     await supabase.auth.signOut()
     window.location.href = '/onboarding'
   }
