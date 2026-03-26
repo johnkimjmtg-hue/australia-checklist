@@ -71,10 +71,22 @@ function MainApp() {
       setAuthChecked(true)
       // 백그라운드에서 유저 데이터 + 리스트 캐시 동시 로드
       const jobs = [syncDataCache()]
+      if (session?.user) {
+        jobs.push(
+          loadAllUserData(session.user.id)
+            .then(() => setState(loadState()))
+            .catch(e => console.error('loadAllUserData error:', e))
+        )
+      }
       Promise.all(jobs).catch(e => console.error('background load error:', e))
     }).catch(() => { clearTimeout(timeout); setAuthChecked(true) })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, _session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        loadAllUserData(session.user.id)
+          .then(() => setState(loadState()))
+          .catch(e => console.error('loadAllUserData error:', e))
+      }
     })
     return () => { clearTimeout(timeout); subscription.unsubscribe() }
   }, [])
@@ -118,25 +130,15 @@ function OnboardingWrapper() {
       if (session) navigate('/app', { replace: true })
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        loadAllUserData(session.user.id)
-          .catch(e => console.error('loadAllUserData error:', e))
-          .finally(() => navigate('/app', { replace: true }))
-      }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') navigate('/app', { replace: true })
     })
     return () => subscription.unsubscribe()
   }, [])
 
   return (
     <div className="app-shell">
-      <OnboardingPage onComplete={async () => {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session?.user) {
-          await loadAllUserData(session.user.id).catch(e => console.error('loadAllUserData error:', e))
-        }
-        navigate('/app', { replace: true })
-      }} />
+      <OnboardingPage onComplete={() => navigate('/app', { replace: true })} />
     </div>
   )
 }
