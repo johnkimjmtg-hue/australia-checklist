@@ -109,9 +109,7 @@ function AuthBadge() {
             <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>
               로그아웃 할까요?
             </div>
-            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight: 1.6 }}>
-              로그아웃하면 저장된 데이터가<br/>이 기기에서 삭제됩니다.
-            </div>
+
             <div style={{ display: 'flex', gap: spacing[2] }}>
               <button onClick={() => setShowLogoutPopup(false)} style={{
                 flex: 1, height: 44, borderRadius: radius.sm,
