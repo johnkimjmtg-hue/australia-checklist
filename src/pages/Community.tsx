@@ -538,7 +538,7 @@ export default function Community() {
   // 로그인 감지 + profiles 로드 (DB 항상 우선)
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
       if (!user) {
         // 비로그인 - 로컬 닉네임 유지하되 글쓰기는 막음
         return
@@ -783,7 +783,7 @@ export default function Community() {
     localStorage.setItem('community-my-icon', icon)
     setMyName(name)
     setMyIcon(icon)
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (user) {
       await supabase.from('profiles').upsert(
         { id: user.id, nickname: name, community_icon: icon },
@@ -808,7 +808,7 @@ export default function Community() {
       setImgPreview(null)
     }
 
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     await supabase.from('community_posts').insert({
       text: text || '',
       author_id: user?.id ?? MY_ID,

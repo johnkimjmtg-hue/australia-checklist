@@ -39,8 +39,8 @@ function AuthBadge() {
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setEmail(user?.email ?? null)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setEmail(session?.user?.email ?? null)
       setChecked(true)
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -144,7 +144,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const myCheckedCount = myList.filter(id => myChecked[id]).length
 
   const saveShoppingDB = async (list: string[], checked: Record<string,boolean>) => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return
     await supabase.from('user_shopping').upsert(
       { user_id: user.id, my_list: list, my_checked: checked, updated_at: new Date().toISOString() },
@@ -171,7 +171,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
       if (!user) return
       setUserId(user.id)
       const { data } = await supabase
@@ -213,7 +213,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   // DB 저장 함수
   const saveBucketlistDB = async (s: AppState, t: TripInfo | null, a: Record<string,boolean>) => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return
     await supabase.from('user_bucketlists').upsert(
       { user_id: user.id, state_json: s, trip_json: t, achieved_json: a, updated_at: new Date().toISOString() },

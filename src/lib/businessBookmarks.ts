@@ -22,7 +22,7 @@ export async function toggleBookmark(id: string): Promise<boolean> {
   try { window.dispatchEvent(new CustomEvent('bookmark-change', { detail: { id, bookmarked: next.includes(id), count: next.length } })) } catch {}
 
   // DB 저장
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
   if (user) {
     await supabase.from('profiles').upsert(
       { id: user.id, bookmarks: next },
@@ -39,7 +39,7 @@ export function getBookmarkCount(): number {
 
 // 로그인 시 DB에서 북마크 로드
 export async function loadBookmarksFromDB(): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
   if (!user) return
   const { data } = await supabase
     .from('profiles')

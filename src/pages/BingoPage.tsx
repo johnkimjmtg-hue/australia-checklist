@@ -234,7 +234,7 @@ function getStatusMsg(checked: number, bingo: number, city: 'melbourne'|'sydney'
 
 // DB 저장 헬퍼
 async function saveBingoDB(city: string, checked: Set<number>) {
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
   if (!user) return
   await supabase.from('user_bingo').upsert(
     { user_id: user.id, city, checked_indices: [...checked], updated_at: new Date().toISOString() },
@@ -303,7 +303,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   // 로그인 감지 + DB 데이터 로드
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
       if (!user) return
       setUserId(user.id)
       // DB에서 빙고 체크 현황 로드

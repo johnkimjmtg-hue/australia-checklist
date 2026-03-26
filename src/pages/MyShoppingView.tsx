@@ -66,7 +66,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => setUserId(user?.id ?? null))
+    supabase.auth.getSession().then(({ data: { session } }) => setUserId(session?.user?.id ?? null))
   }, [])
 
   const SHOPPING_MSGS = [
@@ -369,7 +369,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 fontSize:font.size.md, fontWeight:font.weight.medium, cursor:'pointer', fontFamily:font.family,
               }}>취소</button>
               <button onClick={async () => {
-                const { data: { user } } = await supabase.auth.getUser()
+                const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
                 if (user) {
                   await supabase.from('user_shopping').upsert(
                     { user_id: user.id, my_list: myList, my_checked: myChecked, updated_at: new Date().toISOString() },
