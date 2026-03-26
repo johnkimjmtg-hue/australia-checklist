@@ -29,6 +29,7 @@ import type { Business } from '../lib/businessService'
 import NearbyMap from './NearbyMap'
 import BingoPage from './BingoPage'
 import type { BingoRef } from './BingoPage'
+import { getCachedChecklist } from '../lib/dataCache'
 
 const ff = font.family
 
@@ -261,10 +262,18 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     return () => { if(channel) channel.unsubscribe() }
   }, [])
   useEffect(() => {
-    Promise.all([
-      supabase.from('checklist_categories').select('*').order('sort_order'),
-      supabase.from('checklist_items').select('*').eq('is_active',true).order('sort_order'),
-    ]).then(([{data:cats},{data:items}]) => { if(cats) setCategories(cats); if(items) setDbItems(items); setDbLoading(false) })
+    // 체크리스트 캐시 우선 사용
+    const cached = getCachedChecklist()
+    if (cached) {
+      setCategories(cached.categories)
+      setDbItems(cached.items)
+      setDbLoading(false)
+    } else {
+      Promise.all([
+        supabase.from('checklist_categories').select('*').order('sort_order'),
+        supabase.from('checklist_items').select('*').eq('is_active',true).order('sort_order'),
+      ]).then(([{data:cats},{data:items}]) => { if(cats) setCategories(cats); if(items) setDbItems(items); setDbLoading(false) })
+    }
   }, [])
 
   const [highlightItem, setHighlightItem] = useState<string|null>(null)

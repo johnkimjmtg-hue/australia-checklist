@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
+import { getCachedBingo } from '../lib/dataCache'
 import BusinessCard from '../components/BusinessCard'
 import { colors, font, radius, spacing } from '../styles/tokens'
 
@@ -395,6 +396,14 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
   useEffect(() => {
     const load = async () => {
+      // 캐시 우선 사용
+      const cached = getCachedBingo()
+      if (cached && cached.length > 0) {
+        setMelbourneCafes(cached.filter((c: any) => c.city === 'melbourne'))
+        setSydneyCafes(cached.filter((c: any) => c.city === 'sydney'))
+        setCafesLoading(false)
+        return
+      }
       const { data } = await supabase
         .from('bingo_cafes')
         .select('*')

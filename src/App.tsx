@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import { loadState, saveTrip, AppState } from './store/state'
 import { supabase } from './lib/supabase'
+import { syncDataCache } from './lib/dataCache'
 import OnboardingPage from './pages/OnboardingPage'
 import ChecklistPage from './pages/ChecklistPage'
 import AdminPage from './pages/AdminPage'
@@ -62,11 +63,16 @@ function MainApp() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       clearTimeout(timeout)
       setAuthChecked(true)
+      // 백그라운드에서 유저 데이터 + 리스트 캐시 동시 로드
+      const jobs = [syncDataCache()]
       if (session?.user) {
-        loadAllUserData(session.user.id)
-          .then(() => setState(loadState()))
-          .catch(e => console.error('loadAllUserData error:', e))
+        jobs.push(
+          loadAllUserData(session.user.id)
+            .then(() => setState(loadState()))
+            .catch(e => console.error('loadAllUserData error:', e))
+        )
       }
+      Promise.all(jobs).catch(e => console.error('background load error:', e))
     }).catch(() => { clearTimeout(timeout); setAuthChecked(true) })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {

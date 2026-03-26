@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
+import { getCachedShopping } from '../lib/dataCache'
 import imgShopping from '../assets/landing/shopping.png'
 import { colors, font, radius, spacing, shadow } from '../styles/tokens'
 
@@ -76,16 +77,23 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
   }
 
   useEffect(() => {
-    const fetch = async () => {
-      const [{ data: cats }, { data: prods }] = await Promise.all([
-        supabase.from('shopping_categories').select('*').eq('is_active', true).order('sort_order'),
-        supabase.from('shopping_products').select('*').eq('is_active', true).order('sort_order'),
-      ])
-      setCategories(cats ?? [])
-      setProducts(prods ?? [])
+    const cached = getCachedShopping()
+    if (cached) {
+      setCategories(cached.categories)
+      setProducts(cached.products)
       setLoading(false)
+    } else {
+      const fetch = async () => {
+        const [{ data: cats }, { data: prods }] = await Promise.all([
+          supabase.from('shopping_categories').select('*').eq('is_active', true).order('sort_order'),
+          supabase.from('shopping_products').select('*').eq('is_active', true).order('sort_order'),
+        ])
+        setCategories(cats ?? [])
+        setProducts(prods ?? [])
+        setLoading(false)
+      }
+      fetch()
     }
-    fetch()
   }, [])
 
   const featured = useMemo(() => products.filter(p => p.is_featured), [products])

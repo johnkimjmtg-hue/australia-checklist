@@ -3,6 +3,7 @@ import { Icon } from '@iconify/react'
 import { CATEGORIES } from '../data/businesses'
 import { Business, getBusinesses, getBusinessesCount, searchBusinesses, searchBusinessesCount } from '../lib/businessService'
 import { getBookmarks } from '../lib/businessBookmarks'
+import { getCachedBusinesses } from '../lib/dataCache'
 import BusinessCard from '../components/BusinessCard'
 import CategoryFilter from '../components/CategoryFilter'
 import { colors, font, radius, spacing } from '../styles/tokens'
@@ -28,8 +29,9 @@ function sortByName(list: Business[]): Business[] {
 export default function Services({ onSelectBusiness, onBack }: Props) {
   const [serviceTab, setServiceTab]   = useState<ServiceTab>('all')
   const [search, setSearch]           = useState('')
-  const [category, setCategory]       = useState('')  // 미선택 = ''
+  const [category, setCategory]       = useState('')
   const [businesses, setBusinesses]   = useState<Business[]>([])
+  const [allBusinesses, setAllBusinesses] = useState<Business[]>([]) // 전체 캐시
   const [loading, setLoading]         = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore]         = useState(true)
@@ -41,6 +43,12 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const [sortedCategories, setSortedCategories] = useState(CATEGORIES)
   const loaderRef = useRef<HTMLDivElement>(null)
   const searchTimerRef = useRef<any>(null)
+
+  // 캐시에서 전체 업체 로드 (마운트 시 한 번)
+  useEffect(() => {
+    const cached = getCachedBusinesses()
+    if (cached) setAllBusinesses(cached)
+  }, [])
 
   // 카테고리 선택 or 검색 시 데이터 로드
   const loadData = useCallback(async (cat: string, q: string, reset = true, korean = false) => {
@@ -54,6 +62,19 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
 
     const currentPage = reset ? 0 : page
     let data: Business[]
+
+    // 캐시 있으면 클라이언트 필터링
+    if (allBusinesses.length > 0 && !q.trim()) {
+      data = allBusinesses
+      if (cat) data = data.filter(b => b.category === cat)
+      if (korean) data = data.filter(b => b.is_korean)
+      if (!korean && !cat) data = data.filter(b => b.is_featured)
+      setBusinesses(sortByName(data.filter(b => b.is_featured)).concat(sortByName(data.filter(b => !b.is_featured))))
+      setTotalCount(data.length)
+      setHasMore(false)
+      setLoading(false)
+      return
+    }
 
     if (q.trim()) {
       data = await searchBusinesses(q.trim(), currentPage, PAGE_SIZE)
@@ -94,7 +115,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     }
 
     setHasMore(data.length === PAGE_SIZE)
-  }, [page])
+  }, [page, allBusinesses])
 
   useEffect(() => {
     // 카테고리별 count 병렬 로드 (all 제외)
