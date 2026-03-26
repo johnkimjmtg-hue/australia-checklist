@@ -130,7 +130,13 @@ function OnboardingWrapper() {
 
   return (
     <div className="app-shell">
-      <OnboardingPage onComplete={() => navigate('/app', { replace: true })} />
+      <OnboardingPage onComplete={async () => {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user) {
+          await loadAllUserData(session.user.id).catch(e => console.error('loadAllUserData error:', e))
+        }
+        navigate('/app', { replace: true })
+      }} />
     </div>
   )
 }
