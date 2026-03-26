@@ -35,7 +35,7 @@ const ff = font.family
 // ── 로그아웃 시 로컬스토리지 초기화
 function clearAllUserData() {
   const keys = [
-    'korea-receipt', 'bucket-achieved', 'trip',
+    'korea-receipt', 'bucket-achieved', 'korea-trip',
     'my-shopping-list', 'my-shopping-checked',
     'bingo-melbourne', 'bingo-sydney',
     'community-my-name', 'community-my-icon', 'community-my-id', 'community-liked',
