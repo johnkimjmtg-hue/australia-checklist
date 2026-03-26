@@ -377,7 +377,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                   )
                 }
                 setShowSaveConfirm(false)
-                onLanding()
               }} style={{
                 flex:2, height:48, borderRadius:radius.sm, border:'none',
                 background:'#FF6B9D', color:'#fff',
