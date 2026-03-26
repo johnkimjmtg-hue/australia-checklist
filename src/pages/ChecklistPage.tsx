@@ -74,13 +74,14 @@ function AuthBadge() {
     <>
       {/* 아이콘 버튼 */}
       <button onClick={() => email ? setShowLogoutPopup(true) : navigate('/onboarding')} style={{
+        width: 28, height: 28, borderRadius: radius.full,
         background: 'none', border: 'none', cursor: 'pointer', padding: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         WebkitTapHighlightColor: 'transparent',
       }}>
         <Icon
-          icon="ph:user-circle"
-          width={26} height={26}
+          icon={email ? 'ph:user-circle-fill' : 'ph:user-circle'}
+          width={28} height={28}
           color={email ? colors.primary : colors.gray300}
         />
       </button>
