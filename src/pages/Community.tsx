@@ -939,12 +939,11 @@ export default function Community() {
               </button>
             ) : (
               <button onClick={() => window.location.href = '/onboarding'} style={{
-                display:'flex', alignItems:'center', gap:spacing[1],
-                background: colors.bgCard, border:`1px solid ${colors.border}`,
-                borderRadius: radius.full, padding:`4px ${spacing[2]}px`, cursor:'pointer',
+                background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                WebkitTapHighlightColor: 'transparent',
               }}>
-                <Icon icon="ph:sign-in" width={14} height={14} color={colors.textSecondary} />
-                <span style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.textSecondary }}>로그인</span>
+                <Icon icon="ph:user-circle" width={28} height={28} color={colors.gray300} />
               </button>
             )}
           </div>
