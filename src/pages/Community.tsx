@@ -460,6 +460,7 @@ export default function Community() {
   const [searchResults, setSearchResults] = useState<Message[]>([])
   const [onlineCount, setOnlineCount] = useState(1)
   const [showNameChange, setShowNameChange] = useState(false)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const loadMoreRef = useRef<HTMLDivElement>(null)
@@ -534,29 +535,40 @@ export default function Community() {
     return { from: from.toISOString(), to: to.toISOString() }
   }
 
-  // 로그인 감지 + profiles 로드
+  // 로그인 감지 + profiles 로드 (DB 항상 우선)
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) {
+        // 비로그인 - 로컬 닉네임 유지하되 글쓰기는 막음
+        return
+      }
       setUserId(user.id)
+      // 로그인 시 항상 DB profiles 우선 로드
       const { data: profile } = await supabase
         .from('profiles')
         .select('nickname, community_icon')
         .eq('id', user.id)
         .single()
       if (profile?.nickname) {
+        // DB 값으로 덮어쓰기 (로컬 무시)
         setMyName(profile.nickname)
+        setMyIcon(profile.community_icon ?? null)
         localStorage.setItem('community-my-name', profile.nickname)
-      }
-      if (profile?.community_icon) {
-        setMyIcon(profile.community_icon)
-        localStorage.setItem('community-my-icon', profile.community_icon)
+        if (profile.community_icon) localStorage.setItem('community-my-icon', profile.community_icon)
+      } else {
+        // DB에 닉네임 없으면 닉네임 설정 팝업 띄우기
+        setMyName(null)
+        setMyIcon(null)
       }
     }
     init()
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUserId(session?.user?.id ?? null)
+      if (session?.user) {
+        setUserId(session.user.id)
+      } else {
+        setUserId(null)
+      }
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -783,6 +795,7 @@ export default function Community() {
   const handlePost = async () => {
     const text = newText.trim()
     if (!text && !imgFile) return
+    if (!userId) { setShowLoginPrompt(true); return }
     if (!myName) return
     setUploading(true)
     setNewText('')
@@ -820,13 +833,13 @@ export default function Community() {
     if (isAlreadyLiked) {
       newLiked.delete(key)
       setMessages(prev => prev.map(m => m.id === msgId ? { ...m, likes: Math.max(0, m.likes - 1) } : m))
-      await supabase.from('community_likes').delete().eq('post_id', msgId).eq('author_id', MY_ID)
+      await supabase.from('community_likes').delete().eq('post_id', msgId).eq('author_id', userId ?? MY_ID)
     } else {
       newLiked.add(key)
       setMessages(prev => prev.map(m => m.id === msgId ? { ...m, likes: m.likes + 1 } : m))
       setLikedAnim(msgId)
       setTimeout(() => setLikedAnim(null), 600)
-      await supabase.from('community_likes').insert({ post_id: msgId, author_id: MY_ID })
+      await supabase.from('community_likes').insert({ post_id: msgId, author_id: userId ?? MY_ID })
     }
     setLiked(newLiked)
     saveLiked(newLiked)
@@ -889,7 +902,7 @@ export default function Community() {
       `}</style>
 
       {/* 닉네임 미설정 시 팝업 */}
-      {!myName && <NicknameSetup onSet={handleSetProfile} />}
+      {userId && !myName && <NicknameSetup onSet={handleSetProfile} />}
 
       {/* ── 헤더 (채팅방 제목이 헤더 역할) */}
       <div style={{
@@ -1060,7 +1073,7 @@ export default function Community() {
           )}
 
           {messages.map((msg, idx) => {
-            const isMine = msg.author_id === MY_ID
+            const isMine = userId ? msg.author_id === userId : msg.author_id === MY_ID
             const isLiked = liked.has(`post_${msg.id}`)
             const continuous = isContinuous(idx)
             const color = avatarColor(msg.author_name)
@@ -1363,6 +1376,7 @@ export default function Community() {
               <textarea
                 ref={textareaRef}
                 value={newText}
+                onFocus={() => { if (!userId) { setShowLoginPrompt(true); textareaRef.current?.blur() } }}
                 onChange={e => {
                   setNewText(e.target.value)
                   e.target.style.height = 'auto'
@@ -1374,7 +1388,7 @@ export default function Community() {
                     handlePost()
                   }
                 }}
-                placeholder="메시지 입력..."
+                placeholder={userId ? '메시지 입력...' : '로그인 후 채팅할 수 있어요'}
                 rows={1}
                 className="chat-textarea"
                 style={{ fontSize:14, color:'#1E293B', lineHeight:1.6, minHeight:24, maxHeight:120 }}
@@ -1404,6 +1418,41 @@ export default function Community() {
             onClose={() => setShowNameChange(false)}
             onSet={(name, icon) => { handleSetProfile(name, icon); setShowNameChange(false) }}
           />
+        )}
+
+        {/* ── 로그인 유도 팝업 */}
+        {showLoginPrompt && (
+          <>
+            <div onClick={() => setShowLoginPrompt(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:900 }} />
+            <div style={{
+              position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+              background: colors.bgCard, borderRadius: radius.lg,
+              padding:`${spacing[6]}px ${spacing[5]}px`,
+              zIndex:901, width:'calc(100% - 48px)', maxWidth:300,
+              textAlign:'center', fontFamily: font.family,
+              boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
+            }}>
+              <div style={{ fontSize:32, marginBottom: spacing[3] }}>💬</div>
+              <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>로그인이 필요해요</div>
+              <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight:1.6 }}>
+                채팅에 참여하려면<br/>로그인이 필요합니다.
+              </div>
+              <div style={{ display:'flex', gap: spacing[2] }}>
+                <button onClick={() => setShowLoginPrompt(false)} style={{
+                  flex:1, height:44, borderRadius: radius.sm,
+                  border:`1px solid ${colors.border}`, background: colors.bgCard,
+                  color: colors.textSecondary, fontSize: font.size.md,
+                  fontWeight: font.weight.medium, cursor:'pointer', fontFamily: font.family,
+                }}>취소</button>
+                <button onClick={() => { setShowLoginPrompt(false); window.location.href = '/onboarding' }} style={{
+                  flex:2, height:44, borderRadius: radius.sm, border:'none',
+                  background: colors.primary, color:'#fff',
+                  fontSize: font.size.md, fontWeight: font.weight.bold,
+                  cursor:'pointer', fontFamily: font.family,
+                }}>로그인하기</button>
+              </div>
+            </div>
+          </>
         )}
 
         {/* 풀스크린 이미지 뷰어 — createPortal로 body에 직접 렌더링 */}
