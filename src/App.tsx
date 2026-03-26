@@ -56,22 +56,31 @@ function MainApp() {
 
   useEffect(() => {
     const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        await loadAllUserData(session.user.id)
-        // 로컬에 캐시 후 state 다시 로드
-        setState(loadState())
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user) {
+          await loadAllUserData(session.user.id)
+          setState(loadState())
+        }
+      } catch (e) {
+        console.error('loadAllUserData error:', e)
+      } finally {
+        setAuthChecked(true)
       }
-      setAuthChecked(true)
     }
     init()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        await loadAllUserData(session.user.id)
-        setState(loadState())
+      try {
+        if (event === 'SIGNED_IN' && session?.user) {
+          await loadAllUserData(session.user.id)
+          setState(loadState())
+        }
+      } catch (e) {
+        console.error('loadAllUserData onAuthStateChange error:', e)
+      } finally {
+        setAuthChecked(true)
       }
-      setAuthChecked(true)
     })
     return () => subscription.unsubscribe()
   }, [])
