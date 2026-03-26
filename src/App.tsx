@@ -64,21 +64,21 @@ function MainApp() {
         }
       } catch (e) {
         console.error('loadAllUserData error:', e)
-      } finally {
-        setAuthChecked(true)
       }
+      setAuthChecked(true)
     }
     init()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      try {
-        if (event === 'SIGNED_IN' && session?.user) {
+      if (event === 'SIGNED_IN' && session?.user) {
+        try {
           await loadAllUserData(session.user.id)
           setState(loadState())
+        } catch (e) {
+          console.error('loadAllUserData error:', e)
         }
-      } catch (e) {
-        console.error('loadAllUserData onAuthStateChange error:', e)
-      } finally {
+        setAuthChecked(true)
+      } else if (event === 'SIGNED_OUT') {
         setAuthChecked(true)
       }
     })
