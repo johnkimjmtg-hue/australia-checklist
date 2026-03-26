@@ -34,7 +34,7 @@ import { getCachedChecklist } from '../lib/dataCache'
 const ff = font.family
 
 // ── 로그아웃 시 로컬스토리지 초기화
-function clearAllUserData(userId?: string | null) {
+function clearAllUserData() {
   const keys = [
     'korea-receipt', 'bucket-achieved', 'korea-trip',
     'my-shopping-list', 'my-shopping-checked',
@@ -44,7 +44,7 @@ function clearAllUserData(userId?: string | null) {
     'biz-bookmarks',
   ]
   keys.forEach(k => { try { localStorage.removeItem(k) } catch {} })
-  if (userId) { try { localStorage.removeItem(`user-data-loaded-${userId}`) } catch {} }
+
 }
 
 // ── 로그인 배지 컴포넌트 (모든 헤더에서 공통 사용)
@@ -66,8 +66,7 @@ function AuthBadge() {
   }, [])
 
   const handleLogout = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    clearAllUserData(session?.user?.id)
+    clearAllUserData()
     await supabase.auth.signOut()
     window.location.href = '/onboarding'
   }
@@ -261,11 +260,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
       { user_id: user.id, state_json: s, trip_json: t, achieved_json: a, updated_at: new Date().toISOString() },
       { onConflict: 'user_id' }
     )
-  }
-
-  const debouncedSaveBucketlist = (s: AppState, t: TripInfo | null, a: Record<string,boolean>) => {
-    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current)
-    autoSaveTimer.current = setTimeout(() => { saveBucketlistDB(s, t, a) }, 3000)
   }
 
   useEffect(() => {
