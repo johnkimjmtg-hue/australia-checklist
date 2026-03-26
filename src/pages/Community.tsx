@@ -461,6 +461,7 @@ export default function Community() {
   const [onlineCount, setOnlineCount] = useState(1)
   const [showNameChange, setShowNameChange] = useState(false)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const [profileLoaded, setProfileLoaded] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const loadMoreRef = useRef<HTMLDivElement>(null)
@@ -535,60 +536,68 @@ export default function Community() {
     return { from: from.toISOString(), to: to.toISOString() }
   }
 
-  // 로그인 감지 + profiles 로드 (DB 항상 우선)
+  // 로그인 감지 (profiles는 ChecklistPage에서 이미 로컬에 캐시됨)
   useEffect(() => {
     const init = async () => {
-      // getSession 실패 시 짧게 재시도
-      let session = (await supabase.auth.getSession()).data.session
-      if (!session) {
-        await new Promise(r => setTimeout(r, 300))
-        session = (await supabase.auth.getSession()).data.session
-      }
+      const { data: { session } } = await supabase.auth.getSession()
       const user = session?.user
-      if (!user) return
-
-      setUserId(user.id)
-
-      // 로그인 시 항상 DB profiles 우선 로드
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('nickname, community_icon')
-        .eq('id', user.id)
-        .maybeSingle()
-
-      if (error) console.error('profiles load error:', error)
-
-      if (profile?.nickname) {
-        setMyName(profile.nickname)
-        setMyIcon(profile.community_icon ?? null)
-        localStorage.setItem('community-my-name', profile.nickname)
-        if (profile.community_icon) localStorage.setItem('community-my-icon', profile.community_icon)
-      } else {
-        // DB에 닉네임 없으면 닉네임 설정 팝업 띄우기
-        setMyName(null)
-        setMyIcon(null)
+      if (!user) {
+        setProfileLoaded(true)
+        return
       }
+      setUserId(user.id)
+      // 로컬스토리지에서 닉네임 읽기 (ChecklistPage에서 이미 캐시됨)
+      const cachedName = localStorage.getItem('community-my-name')
+      const cachedIcon = localStorage.getItem('community-my-icon')
+      if (cachedName) {
+        setMyName(cachedName)
+        setMyIcon(cachedIcon)
+      } else {
+        // 혹시 캐시 없으면 DB에서 직접 로드
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('nickname, community_icon')
+          .eq('id', user.id)
+          .maybeSingle()
+        if (profile?.nickname) {
+          setMyName(profile.nickname)
+          setMyIcon(profile.community_icon ?? null)
+          localStorage.setItem('community-my-name', profile.nickname)
+          if (profile.community_icon) localStorage.setItem('community-my-icon', profile.community_icon)
+        } else {
+          setMyName(null)
+          setMyIcon(null)
+        }
+      }
+      setProfileLoaded(true)
     }
     init()
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUserId(session.user.id)
-        // SIGNED_IN 시 profiles 다시 로드
         if (event === 'SIGNED_IN') {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('nickname, community_icon')
-            .eq('id', session.user.id)
-            .maybeSingle()
-          if (profile?.nickname) {
-            setMyName(profile.nickname)
-            setMyIcon(profile.community_icon ?? null)
-            localStorage.setItem('community-my-name', profile.nickname)
-            if (profile.community_icon) localStorage.setItem('community-my-icon', profile.community_icon)
+          const cachedName = localStorage.getItem('community-my-name')
+          const cachedIcon = localStorage.getItem('community-my-icon')
+          if (cachedName) {
+            setMyName(cachedName)
+            setMyIcon(cachedIcon)
           } else {
-            setMyName(null)
-            setMyIcon(null)
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('nickname, community_icon')
+              .eq('id', session.user.id)
+              .maybeSingle()
+            if (profile?.nickname) {
+              setMyName(profile.nickname)
+              setMyIcon(profile.community_icon ?? null)
+              localStorage.setItem('community-my-name', profile.nickname)
+              if (profile.community_icon) localStorage.setItem('community-my-icon', profile.community_icon)
+            } else {
+              setMyName(null)
+              setMyIcon(null)
+            }
           }
+          setProfileLoaded(true)
         }
       } else {
         setUserId(null)
@@ -926,7 +935,7 @@ export default function Community() {
       `}</style>
 
       {/* 닉네임 미설정 시 팝업 */}
-      {userId && !myName && <NicknameSetup onSet={handleSetProfile} />}
+      {profileLoaded && userId && !myName && <NicknameSetup onSet={handleSetProfile} />}
 
       {/* ── 헤더 (채팅방 제목이 헤더 역할) */}
       <div style={{

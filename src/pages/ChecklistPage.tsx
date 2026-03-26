@@ -203,6 +203,16 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           localStorage.setItem('my-shopping-checked', JSON.stringify(shoppingData.my_checked))
         }
       }
+      // 커뮤니티 프로필 로드 → 로컬에 캐시
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('nickname, community_icon')
+        .eq('id', user.id)
+        .maybeSingle()
+      if (profile?.nickname) {
+        localStorage.setItem('community-my-name', profile.nickname)
+        if (profile.community_icon) localStorage.setItem('community-my-icon', profile.community_icon)
+      }
     }
     init()
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
