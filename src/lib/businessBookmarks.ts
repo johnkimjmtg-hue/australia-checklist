@@ -36,17 +36,3 @@ export async function toggleBookmark(id: string): Promise<boolean> {
 export function getBookmarkCount(): number {
   return getBookmarks().length
 }
-
-// 로그인 시 DB에서 북마크 로드
-export async function loadBookmarksFromDB(): Promise<void> {
-  const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
-  if (!user) return
-  const { data } = await supabase
-    .from('profiles')
-    .select('bookmarks')
-    .eq('id', user.id)
-    .single()
-  if (data?.bookmarks) {
-    try { localStorage.setItem(KEY, JSON.stringify(data.bookmarks)) } catch {}
-  }
-}

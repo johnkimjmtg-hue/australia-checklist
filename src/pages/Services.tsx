@@ -96,7 +96,6 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     setHasMore(data.length === PAGE_SIZE)
   }, [page])
 
-  // 카테고리 카운트 + 초기 추천 랜덤 로드 (한번만)
   useEffect(() => {
     // 카테고리별 count 병렬 로드 (all 제외)
     const cats = CATEGORIES.filter(c => c.id !== 'all')
