@@ -6,6 +6,7 @@ import { supabase } from './lib/supabase'
 import OnboardingPage from './pages/OnboardingPage'
 import ChecklistPage from './pages/ChecklistPage'
 import AdminPage from './pages/AdminPage'
+import logoImg from './assets/logo.png'
 
 // ── 로그인 시 모든 유저 데이터를 한 번에 로드해서 로컬에 캐시
 async function loadAllUserData(userId: string) {
@@ -55,15 +56,18 @@ function MainApp() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    // 3초 타임아웃 — 어떤 경우에도 앱 진입 보장
+    const timeout = setTimeout(() => setAuthChecked(true), 3000)
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(timeout)
       setAuthChecked(true)
-      // 백그라운드에서 데이터 로드 (앱 진입 블로킹 안 함)
       if (session?.user) {
         loadAllUserData(session.user.id)
           .then(() => setState(loadState()))
           .catch(e => console.error('loadAllUserData error:', e))
       }
-    }).catch(() => setAuthChecked(true))
+    }).catch(() => { clearTimeout(timeout); setAuthChecked(true) })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
@@ -72,7 +76,7 @@ function MainApp() {
           .catch(e => console.error('loadAllUserData error:', e))
       }
     })
-    return () => subscription.unsubscribe()
+    return () => { clearTimeout(timeout); subscription.unsubscribe() }
   }, [])
 
   // 로딩 중
@@ -81,12 +85,13 @@ function MainApp() {
       <div style={{
         minHeight: '100dvh',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: '#F8FAFC',
+        background: '#FFFFFF',
         fontFamily: '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif',
       }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>🦘</div>
-          <div style={{ fontSize: 14, color: '#94A3B8', fontWeight: 600 }}>불러오는 중...</div>
+          <img src={logoImg} alt="호주가자" style={{ width: 80, height: 80, objectFit: 'contain', marginBottom: 16 }} />
+          <div style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: 1 }}>호주가자</div>
+          <div style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500, marginTop: 6 }}>호주 여행 정보 앱</div>
         </div>
       </div>
     )
