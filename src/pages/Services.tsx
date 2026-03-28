@@ -37,18 +37,32 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const searchTimerRef = useRef<any>(null)
 
-  // 캐시 또는 DB에서 전체 업체 로드
+  // 캐시에서 전체 업체 로드 (캐시 없으면 syncDataCache 완료 대기)
   useEffect(() => {
     const cached = getCachedBusinesses()
     if (cached && cached.length > 0) {
       setAllBusinesses(cached)
       setLoading(false)
-    } else {
-      getBusinesses(undefined, 0, 9999).then(data => {
-        setAllBusinesses(data)
-        setLoading(false)
-      })
+      return
     }
+    // 캐시 없음 → 500ms 간격으로 최대 10초 대기
+    let attempts = 0
+    const interval = setInterval(() => {
+      const c = getCachedBusinesses()
+      if (c && c.length > 0) {
+        setAllBusinesses(c)
+        setLoading(false)
+        clearInterval(interval)
+      } else if (++attempts >= 20) {
+        // 10초 후에도 없으면 DB에서 직접
+        getBusinesses(undefined, 0, 9999).then(data => {
+          setAllBusinesses(data)
+          setLoading(false)
+        })
+        clearInterval(interval)
+      }
+    }, 500)
+    return () => clearInterval(interval)
   }, [])
 
   // 검색 디바운스

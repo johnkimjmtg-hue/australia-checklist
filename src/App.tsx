@@ -8,7 +8,6 @@ import AdminPage from './pages/AdminPage'
 
 function MainApp() {
   const [state, setState] = useState<AppState>(() => loadState())
-  const navigate = useNavigate()
 
   useEffect(() => {
     syncDataCache().catch(e => console.error('syncDataCache error:', e))
@@ -16,7 +15,7 @@ function MainApp() {
 
   return (
     <div className="app-shell">
-      <ChecklistPage state={state} setState={setState} onLanding={() => navigate('/onboarding')} />
+      <ChecklistPage state={state} setState={setState} />
     </div>
   )
 }

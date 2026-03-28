@@ -60,7 +60,7 @@ type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker' | 'calendar'
 type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'nearby' | 'bingo'
 
-export default function ChecklistPage({ state, setState, onLanding }: Props & { onLanding?: () => void }) {
+export default function ChecklistPage({ state, setState }: Props) {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
@@ -285,7 +285,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
             onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{} }}
             onDelete={doReset}
             onShare={()=>{ const at=state.meta.lastIssuedAt??issuedAt; setIssuedAt(at); setShowReceipt(true) }}
-            onLanding={()=>onLanding?.()} />
+            onLanding={()=>navigate('/')} />
           {showReceipt&&trip&&(
             <ReceiptModal state={state} trip={trip} issuedAt={issuedAt} achieved={achieved} dbItems={dbItems}
               onClose={()=>setShowReceipt(false)} onReset={()=>{ setShowReceipt(false); doReset() }} />
