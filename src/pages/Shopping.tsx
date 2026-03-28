@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Icon } from '@iconify/react'
-import { supabase } from '../lib/supabase'
 import { getCachedShopping } from '../lib/dataCache'
 import imgShopping from '../assets/landing/shopping.png'
 import { colors, font, radius, spacing, shadow } from '../styles/tokens'
@@ -77,23 +76,13 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
   }
 
   useEffect(() => {
+    // DB 직접 호출 제거 — syncDataCache()가 App.tsx에서 관리하므로 캐시만 읽음
     const cached = getCachedShopping()
     if (cached) {
       setCategories(cached.categories)
       setProducts(cached.products)
-      setLoading(false)
-    } else {
-      const fetch = async () => {
-        const [{ data: cats }, { data: prods }] = await Promise.all([
-          supabase.from('shopping_categories').select('*').eq('is_active', true).order('sort_order'),
-          supabase.from('shopping_products').select('*').eq('is_active', true).order('sort_order'),
-        ])
-        setCategories(cats ?? [])
-        setProducts(prods ?? [])
-        setLoading(false)
-      }
-      fetch()
     }
+    setLoading(false)
   }, [])
 
   const featured = useMemo(() => products.filter(p => p.is_featured), [products])

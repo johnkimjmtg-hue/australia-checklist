@@ -112,10 +112,11 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [selProduct, setSelProduct]   = useState<any|null>(null)
 
   useEffect(() => {
-    supabase.from('businesses').select('*',{count:'exact',head:true}).eq('is_active',true).then(({count})=>{ if(count!==null) setBizCount(count) })
-  }, [])
-  useEffect(() => {
-    supabase.from('shopping_products').select('*',{count:'exact',head:true}).eq('is_active',true).then(({count})=>{ if(count!==null) setShopCount(count) })
+    // count 쿼리 대신 캐시에서 계산 (DB Disk IO 절감)
+    const biz = getCachedBusinesses()
+    if (biz) setBizCount(biz.length)
+    const shop = getCachedShopping()
+    if (shop) setShopCount(shop.products.length)
   }, [])
   useEffect(() => {
     // 체크리스트 캐시 우선 사용

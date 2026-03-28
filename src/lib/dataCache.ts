@@ -1,15 +1,20 @@
 // ── 리스트 데이터 캐시 유틸
 // 어드민 배포 버튼 → cache_version 버전 업 → 다음 방문 시 해당 데이터만 재다운로드
 // 캐시 있고 버전 같으면 절대 DB 재다운로드 안 함 (새로고침 포함)
+// TTL(5분) 기반 버전 체크 → cache_version 조회 횟수 최소화
 import { supabase } from './supabase'
 
 const CACHE_KEYS = {
-  checklist:  'cache-checklist',
-  businesses: 'cache-businesses',
-  shopping:   'cache-shopping',
-  bingo:      'cache-bingo',
-  version:    'cache-version',
+  checklist:    'cache-checklist',
+  businesses:   'cache-businesses',
+  shopping:     'cache-shopping',
+  bingo:        'cache-bingo',
+  version:      'cache-version',
+  lastChecked:  'cache-last-checked',
 }
+
+// 5분마다 한 번만 cache_version DB 조회
+const VERSION_CHECK_INTERVAL = 5 * 60 * 1000
 
 type CacheVersion = { checklist: number; businesses: number; shopping: number; bingo: number }
 const DEFAULT_VERSION: CacheVersion = { checklist: 0, businesses: 0, shopping: 0, bingo: 0 }
@@ -26,6 +31,12 @@ function getCache<T>(key: string): T | null {
 }
 function setCache<T>(key: string, data: T) {
   try { localStorage.setItem(key, JSON.stringify(data)) } catch {}
+}
+function getLastChecked(): number {
+  return parseInt(localStorage.getItem(CACHE_KEYS.lastChecked) ?? '0')
+}
+function saveLastChecked() {
+  try { localStorage.setItem(CACHE_KEYS.lastChecked, Date.now().toString()) } catch {}
 }
 
 async function fetchServerVersions(): Promise<CacheVersion> {
@@ -68,7 +79,8 @@ async function fetchBingo() {
 }
 
 // ── 메인 캐시 동기화
-export async function syncDataCache() {
+// 반환값: true = 새 데이터 다운로드됨 (리렌더 필요), false = 캐시 그대로
+export async function syncDataCache(): Promise<boolean> {
   try {
     const allCached =
       getCache(CACHE_KEYS.checklist) &&
@@ -77,26 +89,40 @@ export async function syncDataCache() {
       getCache(CACHE_KEYS.bingo)
 
     if (!allCached) {
-      // 캐시 없음 → 전체 다운로드
+      // 캐시 자체가 없으면 무조건 전체 다운로드 (TTL 무시)
       const serverVer = await fetchServerVersions()
       await Promise.all([fetchChecklist(), fetchBusinesses(), fetchShopping(), fetchBingo()])
       saveLocalVersion(serverVer)
-      return
+      saveLastChecked()
+      return true
     }
 
-    // 캐시 있음 → 버전만 체크
+    // 5분 이내에 이미 체크했으면 DB 조회 자체를 스킵
+    if (Date.now() - getLastChecked() < VERSION_CHECK_INTERVAL) {
+      return false
+    }
+
+    // 5분 지났으면 cache_version 체크
     const [serverVer, localVer] = [await fetchServerVersions(), getLocalVersion()]
     const tasks: Promise<any>[] = []
     if (serverVer.checklist > localVer.checklist)   tasks.push(fetchChecklist())
     if (serverVer.businesses > localVer.businesses) tasks.push(fetchBusinesses())
     if (serverVer.shopping > localVer.shopping)     tasks.push(fetchShopping())
     if (serverVer.bingo > localVer.bingo)           tasks.push(fetchBingo())
+
     if (tasks.length > 0) {
       await Promise.all(tasks)
       saveLocalVersion(serverVer)
+      saveLastChecked()
+      return true
     }
+
+    // 버전 동일 — 체크 시간만 갱신
+    saveLastChecked()
+    return false
   } catch (e) {
     console.error('syncDataCache error:', e)
+    return false
   }
 }
 
