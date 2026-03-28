@@ -429,11 +429,12 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
             zIndex:500, animation:'fadeIn 0.2s ease',
           }} />
           <div style={{
-            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:390, background: colors.bgCard,
-            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, zIndex:501,
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398, background: colors.bgCard,
+            borderRadius:radius.xl, zIndex:501,
             animation:'slideUp 0.3s ease',
             maxHeight:'85vh', overflowY:'auto',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
             <style>{`@keyframes slideUp{from{transform:translateX(-50%) translateY(100%)}to{transform:translateX(-50%) translateY(0)}}
             @keyframes fadeIn{from{opacity:0}to{opacity:1}}`}</style>

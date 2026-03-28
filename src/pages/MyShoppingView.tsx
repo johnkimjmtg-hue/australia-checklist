@@ -463,10 +463,11 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         <>
           <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600, animation:'fadeIn 0.2s ease' }} />
           <div style={{
-            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:390, background: colors.bgCard,
-            borderRadius:'20px 20px 0 0', zIndex:601,
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398, background: colors.bgCard,
+            borderRadius:20, zIndex:601,
             animation:'slideUp 0.3s ease', maxHeight:'85vh', overflowY:'auto',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
             <div style={{ width:40, height:4, borderRadius:2, background:'#C8C8C8', margin:'12px auto 0' }} />
             <div style={{
