@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
+import { getCachedShopping } from '../lib/dataCache'
 import { colors, font, radius, spacing, shadow } from '../styles/tokens'
 
 // ── 공유 상수
@@ -83,8 +84,14 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
   }, [])
 
   useEffect(() => {
-    supabase.from('shopping_products').select('*').eq('is_active', true).order('sort_order')
-      .then(({ data }) => { setAllProducts(data ?? []); setLoading(false) })
+    const cached = getCachedShopping()
+    if (cached) {
+      setAllProducts(cached.products)
+      setLoading(false)
+    } else {
+      supabase.from('shopping_products').select('*').eq('is_active', true).order('sort_order')
+        .then(({ data }) => { setAllProducts(data ?? []); setLoading(false) })
+    }
   }, [])
 
   const myProducts = useMemo(() =>
