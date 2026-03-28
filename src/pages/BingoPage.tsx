@@ -567,11 +567,12 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   {/* 인증샷 있으면 카메라 아이콘 뱃지 */}
                   {photos[idx] && (
                     <div style={{
-                      position:'absolute', bottom:2, right:2,
-                      background:'rgba(0,0,0,0.5)', borderRadius:'50%',
-                      width:16, height:16, display:'flex', alignItems:'center', justifyContent:'center',
+                      position:'absolute', bottom:3, right:3,
+                      background: colors.primary, borderRadius:'50%',
+                      width:20, height:20, display:'flex', alignItems:'center', justifyContent:'center',
+                      boxShadow:'0 1px 4px rgba(0,0,0,0.3)',
                     }}>
-                      <Icon icon="ph:camera-fill" width={10} height={10} color="#fff" />
+                      <Icon icon="ph:camera-fill" width={12} height={12} color="#fff" />
                     </div>
                   )}
                 </div>
