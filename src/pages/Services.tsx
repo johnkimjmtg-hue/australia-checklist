@@ -349,7 +349,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         .cat-scroll::-webkit-scrollbar { height:4px; }
         .cat-scroll::-webkit-scrollbar-track { background:${colors.bgPage}; border-radius:2px; }
         .cat-scroll::-webkit-scrollbar-thumb { background:${colors.gray300}; border-radius:2px; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes slideUpSheet { from { transform: translateX(-50%) translateY(100%); } to { transform: translateX(-50%) translateY(0); } }
       `}</style>
 
       {/* ── 스티키 헤더 (탭+검색+카테고리) — 연한 회색 배경 ── */}
@@ -536,28 +536,30 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
 
       {/* ── 업체 등록 신청 모달 */}
       {showRequestForm && (
-        <div style={{ position:'fixed', inset:0, zIndex:500, display:'flex', alignItems:'flex-end', justifyContent:'center' }}>
-          <div onClick={() => setShowRequestForm(false)} style={{ position:'absolute', inset:0, background:'rgba(10,20,40,0.6)' }}/>
+        <>
+          <div onClick={() => setShowRequestForm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600, backdropFilter:'blur(4px)' }}/>
           <div style={{
-            position:'relative', width:'100%', maxWidth:430, background:colors.bgCard,
-            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
-            padding:`${spacing[5]}px ${spacing[4]}px ${spacing[10]}px`,
-            maxHeight:'90vh', overflowY:'auto', zIndex:1,
-            animation:'slideUp 0.25s ease',
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
+            borderRadius:radius.xl, zIndex:601,
+            animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
-            <div style={{ width:36, height:4, background:colors.gray200, borderRadius:radius.full, margin:`0 auto ${spacing[5]}px` }}/>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:spacing[5] }}>
-              <div>
-                <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary }}>업체 등록 신청</div>
-                <div style={{ fontSize:font.size.sm, color:colors.textSecondary, marginTop:2 }}>검토 후 등록해드려요</div>
+            <div style={{ width:36, height:4, background:colors.gray200, borderRadius:radius.full, margin:`${spacing[3]}px auto 0` }}/>
+            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[10]}px` }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:spacing[4] }}>
+                <div>
+                  <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary }}>업체 등록 신청</div>
+                  <div style={{ fontSize:font.size.sm, color:colors.textSecondary, marginTop:2 }}>검토 후 등록해드려요</div>
+                </div>
+                <button onClick={() => setShowRequestForm(false)} style={{ background:'none', border:'none', cursor:'pointer', padding:4, display:'flex' }}>
+                  <Icon icon="ph:x" width={20} height={20} color={colors.textTertiary} />
+                </button>
               </div>
-              <button onClick={() => setShowRequestForm(false)} style={{ background:'none', border:'none', cursor:'pointer', padding:4, display:'flex' }}>
-                <Icon icon="ph:x" width={20} height={20} color={colors.textTertiary} />
-              </button>
+              <RequestForm onClose={() => setShowRequestForm(false)} />
             </div>
-            <RequestForm onClose={() => setShowRequestForm(false)} />
           </div>
-        </div>
+        </>
       )}
     </div>
   )
