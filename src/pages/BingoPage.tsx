@@ -617,13 +617,15 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
           <div style={{ position:'fixed', inset:0, zIndex:800 }}>
             <div onClick={() => setSelectedCafe(null)} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
             <div style={{
-              position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-              width:'100%', maxWidth:390,
+              position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+              width:'calc(100% - 32px)', maxWidth:398,
               maxHeight:'85vh', overflowY:'auto',
-              borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
+              borderRadius:radius.xl,
               background: colors.bgPage,
               padding:`${spacing[3]}px ${spacing[3]}px ${spacing[8]}px`,
               boxSizing:'border-box',
+              boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+              animation:'slideUpSheet 0.25s ease',
             }}>
               {/* 핸들 */}
               <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[3]}px` }} />
