@@ -2926,22 +2926,10 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
   const [total, setTotal] = useState(0)
   const [done, setDone] = useState(0)
   const [error, setError] = useState<string | null>(null)
-  const [selectedAreas, setSelectedAreas] = useState<string[]>(['CBD'])
+  const [postcode, setPostcode]           = useState('')
+  const [postcodeInfo, setPostcodeInfo]   = useState<{ lat: number; lng: number; city: string } | null>(null)
+  const [postcodeLoading, setPostcodeLoading] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<string[]>(['cafe', 'restaurant'])
-
-  const AREAS = [
-    { id: 'CBD',          label: 'CBD',           lat: -33.8688, lng: 151.2093 },
-    { id: 'Bondi',        label: 'Bondi',          lat: -33.8914, lng: 151.2767 },
-    { id: 'Manly',        label: 'Manly',          lat: -33.7969, lng: 151.2851 },
-    { id: 'Chatswood',    label: 'Chatswood',      lat: -33.7980, lng: 151.1794 },
-    { id: 'Parramatta',   label: 'Parramatta',     lat: -33.8150, lng: 151.0011 },
-    { id: 'Strathfield',  label: 'Strathfield',    lat: -33.8749, lng: 151.0826 },
-    { id: 'Eastwood',     label: 'Eastwood',       lat: -33.7906, lng: 151.0814 },
-    { id: 'Burwood',      label: 'Burwood',        lat: -33.8774, lng: 151.1030 },
-    { id: 'Campsie',      label: 'Campsie',        lat: -33.9105, lng: 151.1032 },
-    { id: 'BlueMountains',label: 'Blue Mountains', lat: -33.7138, lng: 150.3119 },
-    { id: 'PortStephens', label: 'Port Stephens',  lat: -32.7165, lng: 152.1544 },
-  ]
 
   const TYPES = [
     { id: 'cafe',               label: '카페·베이커리', category: 'cafe',       googleType: 'cafe' },
@@ -2949,8 +2937,34 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
     { id: 'tourist_attraction', label: '명소·관광지',   category: 'travel', googleType: 'tourist_attraction' },
   ]
 
-  const toggleArea = (id: string) => setSelectedAreas(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id])
   const toggleType = (id: string) => setSelectedTypes(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id])
+
+  const geocodePostcode = async (code: string) => {
+    setPostcodeLoading(true)
+    setPostcodeInfo(null)
+    try {
+      await loadGoogleMaps()
+      const geocoder = new (window as any).google.maps.Geocoder()
+      const result = await new Promise<any>((resolve, reject) => {
+        geocoder.geocode({ address: `${code}, NSW, Australia` }, (results: any[], status: string) => {
+          if (status === 'OK' && results.length > 0) resolve(results[0])
+          else reject(new Error('주소를 찾을 수 없어요'))
+        })
+      })
+      const lat = result.geometry.location.lat()
+      const lng = result.geometry.location.lng()
+      const components = result.address_components
+      const city =
+        components.find((c: any) => c.types.includes('locality'))?.long_name ||
+        components.find((c: any) => c.types.includes('sublocality'))?.long_name ||
+        components.find((c: any) => c.types.includes('postal_town'))?.long_name ||
+        code
+      setPostcodeInfo({ lat, lng, city })
+    } catch (e: any) {
+      alert(`우편번호 오류: ${e.message}`)
+    }
+    setPostcodeLoading(false)
+  }
 
   const searchNearby = (service: any, location: any, type: string): Promise<any[]> => {
     return new Promise((resolve) => {
@@ -2977,9 +2991,9 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
   }
 
   const handleRun = async () => {
-    if (selectedAreas.length === 0) { alert('지역을 선택해주세요'); return }
+    if (!postcodeInfo) { alert('우편번호를 먼저 조회해주세요'); return }
     if (selectedTypes.length === 0) { alert('카테고리를 선택해주세요'); return }
-    if (!confirm(`${selectedAreas.length}개 지역 × ${selectedTypes.length}개 카테고리 수집을 시작할까요?`)) return
+    if (!confirm(`${postcodeInfo.city}(${postcode}) × ${selectedTypes.length}개 카테고리 수집을 시작할까요?`)) return
 
     setRunning(true); setResults([]); setError(null); setDone(0); setTotal(0)
 
@@ -2989,60 +3003,66 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
       if (!googleMaps) throw new Error('Google Maps가 로드되지 않았습니다')
 
       const mapDiv = mapRef.current!
-      const map = new googleMaps.Map(mapDiv, { center: { lat: -33.8688, lng: 151.2093 }, zoom: 13 })
+      const map = new googleMaps.Map(mapDiv, { center: { lat: postcodeInfo.lat, lng: postcodeInfo.lng }, zoom: 13 })
       const service = new googleMaps.places.PlacesService(map)
 
-      const areas = AREAS.filter(a => selectedAreas.includes(a.id))
       const types = TYPES.filter(t => selectedTypes.includes(t.id))
+      const location = new googleMaps.LatLng(postcodeInfo.lat, postcodeInfo.lng)
 
-      for (const area of areas) {
-        for (const type of types) {
-          const location = new googleMaps.LatLng(area.lat, area.lng)
-          const places = await searchNearby(service, location, type.googleType)
+      for (const type of types) {
+        const places = await searchNearby(service, location, type.googleType)
 
-          setTotal(prev => prev + places.length)
+        setTotal(prev => prev + places.length)
 
-          for (const place of places) {
-            try {
-              const { data: existing } = await supabase
-                .from('businesses')
-                .select('id')
-                .eq('google_place_id', place.place_id)
-                .maybeSingle()
+        for (const place of places) {
+          try {
+            const lat = place.geometry?.location?.lat() ?? null
+            const lng = place.geometry?.location?.lng() ?? null
 
-              if (existing) {
-                setResults(prev => [...prev, { name: place.name, status: '⏭ 중복 스킵' }])
-                setDone(prev => prev + 1)
-                continue
-              }
-
-              await supabase.from('businesses').insert({
-                name: place.name,
-                category: type.category,
-                description: '',
-                address: place.vicinity ?? '',
-                city: area.label,
-                rating: 0,
-                reviews_count: 0,
-                is_featured: false,
-                is_active: true,
-                is_korean: false,
-                source: 'google',
-                tags: [],
-                google_place_id: place.place_id,
-                google_rating: place.rating ?? null,
-                google_review_count: place.user_ratings_total ?? null,
-                latitude: place.geometry?.location?.lat() ?? null,
-                longitude: place.geometry?.location?.lng() ?? null,
-              })
-              setResults(prev => [...prev, { name: place.name, status: '✅ 추가' }])
-            } catch {
-              setResults(prev => [...prev, { name: place.name, status: '❌ 실패' }])
+            if (lat === null || lng === null) {
+              setResults(prev => [...prev, { name: place.name, status: '⏭ 좌표 없음 스킵' }])
+              setDone(prev => prev + 1)
+              continue
             }
-            setDone(prev => prev + 1)
+
+            const { data: existing } = await supabase
+              .from('businesses')
+              .select('id')
+              .eq('google_place_id', place.place_id)
+              .maybeSingle()
+
+            if (existing) {
+              setResults(prev => [...prev, { name: place.name, status: '⏭ 중복 스킵' }])
+              setDone(prev => prev + 1)
+              continue
+            }
+
+            await supabase.from('businesses').insert({
+              name: place.name,
+              category: type.category,
+              description: '',
+              address: place.vicinity ?? '',
+              city: postcodeInfo.city,
+              rating: 0,
+              reviews_count: 0,
+              is_featured: false,
+              is_active: true,
+              is_korean: false,
+              source: 'google',
+              tags: [],
+              google_place_id: place.place_id,
+              google_rating: place.rating ?? null,
+              google_review_count: place.user_ratings_total ?? null,
+              latitude: lat,
+              longitude: lng,
+            })
+            setResults(prev => [...prev, { name: place.name, status: '✅ 추가' }])
+          } catch {
+            setResults(prev => [...prev, { name: place.name, status: '❌ 실패' }])
           }
-          await new Promise(r => setTimeout(r, 500))
+          setDone(prev => prev + 1)
         }
+        await new Promise(r => setTimeout(r, 500))
       }
     } catch (e: any) {
       setError(String(e?.message ?? e))
@@ -3065,19 +3085,38 @@ function GooglePlacesCollectSection({ ff }: { ff: string }) {
         기존 Google Maps 키를 사용하며 별도 API 키 불필요합니다.
       </div>
 
-      {/* 지역 선택 */}
+      {/* 우편번호 입력 */}
       <div style={{ marginBottom:12 }}>
-        <div style={{ fontSize:11, fontWeight:700, color:'#64748B', marginBottom:6 }}>지역 선택</div>
-        <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
-          {AREAS.map(a => (
-            <button key={a.id} onClick={() => toggleArea(a.id)} style={{
-              padding:'5px 12px', borderRadius:20, fontSize:12, fontWeight:700, cursor:'pointer',
-              background: selectedAreas.includes(a.id) ? '#1B6EF3' : '#F1F5F9',
-              color: selectedAreas.includes(a.id) ? '#fff' : '#64748B',
-              border: 'none',
-            }}>{a.label}</button>
-          ))}
+        <div style={{ fontSize:11, fontWeight:700, color:'#64748B', marginBottom:6 }}>우편번호 입력</div>
+        <div style={{ display:'flex', gap:8 }}>
+          <input
+            value={postcode}
+            onChange={e => { setPostcode(e.target.value); setPostcodeInfo(null) }}
+            onKeyDown={e => e.key === 'Enter' && postcode.trim() && geocodePostcode(postcode.trim())}
+            placeholder="예: 2000"
+            maxLength={4}
+            style={{
+              flex:1, height:40, borderRadius:10, border:'1px solid #E2E8F0',
+              padding:'0 12px', fontSize:14, color:'#1E293B', outline:'none',
+            }}
+          />
+          <button
+            onClick={() => postcode.trim() && geocodePostcode(postcode.trim())}
+            disabled={postcodeLoading || !postcode.trim()}
+            style={{
+              height:40, padding:'0 14px', borderRadius:10, border:'none',
+              background: postcodeLoading ? '#94A3B8' : '#1B6EF3',
+              color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer',
+            }}
+          >
+            {postcodeLoading ? '조회 중...' : '조회'}
+          </button>
         </div>
+        {postcodeInfo && (
+          <div style={{ marginTop:8, padding:'8px 12px', background:'#F0FDF4', borderRadius:8, border:'1px solid #BBF7D0', fontSize:12, color:'#15803D', fontWeight:600 }}>
+            ✅ {postcodeInfo.city} — {postcodeInfo.lat.toFixed(5)}, {postcodeInfo.lng.toFixed(5)}
+          </div>
+        )}
       </div>
 
       {/* 카테고리 선택 */}
