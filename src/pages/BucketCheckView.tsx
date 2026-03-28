@@ -571,11 +571,12 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           <div style={{ position:'fixed', inset:0, zIndex:100, background:'rgba(0,0,0,0.5)' }}
             onClick={() => setShowMoreMenu(false)} />
           <div style={{
-            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:400,
-            background:colors.bgCard, borderRadius:`${radius.xl}px ${radius.xl}px 0 0`,
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398,
+            background:colors.bgCard, borderRadius:radius.xl,
             padding:`${spacing[4]}px ${spacing[3]}px ${spacing[8]}px`,
             zIndex:101, animation:'slideUpSheet 0.25s ease',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }} onClick={e => e.stopPropagation()}>
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
             <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textTertiary, marginBottom:spacing[3], letterSpacing:0.5 }}>더보기</div>
