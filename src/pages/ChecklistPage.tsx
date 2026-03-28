@@ -30,6 +30,7 @@ import BingoPage from './BingoPage'
 import type { BingoRef } from './BingoPage'
 import { getCachedChecklist } from '../lib/dataCache'
 import TermsPage from './TermsPage'
+import logoImg from '../assets/logo.png'
 
 const ff = font.family
 
@@ -280,7 +281,10 @@ export default function ChecklistPage({ state, setState }: Props) {
           {/* 헤더 */}
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>버킷리스트</span>
+              <div style={{ display:'flex', alignItems:'center', gap:spacing[2] }}>
+                <img src={logoImg} alt="호주가자" style={{ width:28, height:28, objectFit:'contain' }} />
+                <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>호주가자</span>
+              </div>
             </div>
           </div>
           <BucketCheckView state={state} trip={trip} setState={setState} items={ITEMS} dbItems={dbItems} onAchievedChange={setAchieved}
@@ -300,7 +304,10 @@ export default function ChecklistPage({ state, setState }: Props) {
           {/* ── 헤더 (스크롤 시 올라감) ── */}
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-              <span onClick={handleLogoTap} style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary, cursor:'pointer', userSelect:'none' }}>버킷리스트</span>
+              <div style={{ display:'flex', alignItems:'center', gap:spacing[2] }}>
+                <img src={logoImg} alt="호주가자" style={{ width:28, height:28, objectFit:'contain' }} onClick={handleLogoTap} />
+                <span onClick={handleLogoTap} style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary, cursor:'pointer', userSelect:'none' }}>호주가자</span>
+              </div>
               <div style={{ display:'flex', alignItems:'center', gap:spacing[2] }}>
                 <button onClick={()=>{ setShowSearch(v=>!v); if(showSearch) setSearchQuery('') }} style={{
                   width:28, height:28, borderRadius:radius.full,
@@ -466,7 +473,10 @@ export default function ChecklistPage({ state, setState }: Props) {
                     </div>
                     {/* 텍스트 */}
                     <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color:checked?colors.success:colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                      <div style={{
+                        fontSize:font.size.md, fontWeight:font.weight.medium, color:checked?colors.success:colors.gray800,
+                        display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', lineHeight:1.4,
+                      }}>
                         {item.label}
                       </div>
                       <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'wrap' }}>
