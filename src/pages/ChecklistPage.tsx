@@ -228,65 +228,19 @@ export default function ChecklistPage({ state, setState }: Props) {
 
       {/* ── 다른 탭들 ── */}
       {mainTab==='services' ? (
-        <>
-          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>업체리스트</span>
-              
-            </div>
-          </div>
           <Services onSelectBusiness={()=>{}} onBack={()=>setMainTab('bucketlist')} />
-        </>
       ) : mainTab==='shopping' ? (
-        <>
-          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>쇼핑리스트</span>
-              
-            </div>
-          </div>
           <Shopping myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onGoToMyList={()=>setMainTab('myshoppinglist')} />
-        </>
       ) : mainTab==='myshoppinglist' ? (
-        <>
-          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>쇼핑리스트</span>
-              
-            </div>
-          </div>
           <MyShoppingView myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
-        </>
       ) : mainTab==='nearby' ? (
         <div style={{ position:'fixed', top:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, height:'calc(100dvh - 62px)', display:'flex', flexDirection:'column', zIndex:5, background:colors.bgPage }}>
-          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}`, flexShrink:0 }}>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>내 주변</span>
-              
-            </div>
-          </div>
           <NearbyMap onBack={()=>setMainTab('bucketlist')} />
         </div>
       ) : mainTab==='bingo' ? (
-        <>
-          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>카페 빙고</span>
-            </div>
-          </div>
           <BingoPage ref={bingoRef} embedded={true} initialCity={(searchParams.get('city') as 'melbourne'|'sydney') ?? undefined} />
-        </>
       ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
         <>
-          {/* 헤더 */}
-          <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
-              <div style={{ display:'flex', alignItems:'center', gap:spacing[2] }}>
-                <img src={logoImg} alt="호주가자" style={{ width:28, height:28, objectFit:'contain' }} />
-                <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>호주가자</span>
-              </div>
-            </div>
-          </div>
           <BucketCheckView state={state} trip={trip} setState={setState} items={ITEMS} dbItems={dbItems} onAchievedChange={setAchieved}
             onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{} }}
             onDelete={doReset}
