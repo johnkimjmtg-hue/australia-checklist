@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">호주가자</string>
+    <string name="title_activity_main">호주가자</string>
+    <string name="package_name">com.hojugaja.app</string>
+    <string name="custom_url_scheme">com.hojugaja.app</string>
+</resources>
