@@ -26,21 +26,6 @@ export type Business = {
   updated_at?: string
 }
 
-export type Review = {
-  id?: string
-  business_id: string
-  author_name: string
-  rating: number
-  content?: string
-  created_at?: string
-}
-
-export async function getReviews(businessId: string): Promise<Review[]> {
-  const { data, error } = await supabase.from('reviews').select('*').eq('business_id', businessId).order('created_at', { ascending: false })
-  if (error) { console.error('getReviews error:', error); return [] }
-  return data as Review[]
-}
-
 export async function getBusinesses(category?: string, page = 0, pageSize = 30): Promise<Business[]> {
   let query = supabase.from('businesses').select('*').eq('is_active', true)
     .order('is_featured', { ascending: false }).order('rating', { ascending: false })
@@ -106,8 +91,4 @@ export async function toggleFeatured(id: string, isFeatured: boolean): Promise<b
   return true
 }
 
-export async function addReview(review: Omit<Review, 'id' | 'created_at'>): Promise<Review | null> {
-  const { data, error } = await supabase.from('reviews').insert(review).select().single()
-  if (error) { console.error('addReview error:', error); return null }
-  return data as Review
-}
+
