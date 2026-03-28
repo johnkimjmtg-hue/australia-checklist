@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { CheckItem, ITEM_ICONS } from '../data/checklist'
 import { supabase } from '../lib/supabase'
+import { getCachedBusinesses, getCachedShopping } from '../lib/dataCache'
 import { colors, font, radius, spacing, shadow, T } from '../styles/tokens'
 import { AlertModal } from '../components/ui'
 
@@ -335,18 +336,19 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
     const region = regionKey ? stateMap[regionKey] : null
     const hasDetail = !!(db?.description || db?.address || (db?.related_business_ids?.length ?? 0) > 0 || db?.tips)
 
-    const openDetail = async (e: React.MouseEvent) => {
+    const openDetail = (e: React.MouseEvent) => {
       e.stopPropagation()
       if (!db) return
       if ((db.related_product_ids?.length ?? 0) > 0) {
-        const { data } = await supabase.from('shopping_products').select('*').eq('id', db.related_product_ids![0]).single()
-        if (data) setSelProduct(data)
+        const cached = getCachedShopping()
+        const prod = cached?.products.find(p => p.id === db.related_product_ids![0])
+        if (prod) setSelProduct(prod)
         return
       }
       setDetailItem(db)
       if ((db.related_business_ids?.length ?? 0) > 0) {
-        const { data } = await supabase.from('businesses').select('*').in('id', db.related_business_ids!)
-        setDetailBizCards(data ?? [])
+        const cached = getCachedBusinesses()
+        setDetailBizCards(cached?.filter(b => db.related_business_ids!.includes(b.id)) ?? [])
       } else setDetailBizCards([])
     }
 

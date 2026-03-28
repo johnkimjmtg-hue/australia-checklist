@@ -28,7 +28,7 @@ import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 import BingoPage from './BingoPage'
 import type { BingoRef } from './BingoPage'
-import { getCachedChecklist } from '../lib/dataCache'
+import { getCachedChecklist, getCachedShopping, getCachedBusinesses } from '../lib/dataCache'
 import TermsPage from './TermsPage'
 import logoImg from '../assets/logo.png'
 
@@ -411,11 +411,19 @@ export default function ChecklistPage({ state, setState }: Props) {
                       border: checked ? `1px solid ${colors.success}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                       cursor:'pointer', transition:'all 0.15s',
                     }}
-                    onClick={async()=>{
+                    onClick={()=>{
                       if(!db) return
-                      if((db.related_product_ids?.length??0)>0){ const {data}=await supabase.from('shopping_products').select('*').eq('id',db.related_product_ids![0]).single(); if(data) setSelProduct(data); return }
+                      if((db.related_product_ids?.length??0)>0){
+                        const cached = getCachedShopping()
+                        const prod = cached?.products.find(p => p.id === db.related_product_ids![0])
+                        if(prod) setSelProduct(prod)
+                        return
+                      }
                       setDetailItem(db)
-                      if((db.related_business_ids?.length??0)>0){ const {data}=await supabase.from('businesses').select('*').in('id',db.related_business_ids!); setDetailBizCards(data??[]) } else setDetailBizCards([])
+                      if((db.related_business_ids?.length??0)>0){
+                        const cached = getCachedBusinesses()
+                        setDetailBizCards(cached?.filter(b => db.related_business_ids!.includes(b.id)) ?? [])
+                      } else setDetailBizCards([])
                     }}
                   >
                     {/* 이미지 */}
