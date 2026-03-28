@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { Icon } from '@iconify/react'
-import { getBusinesses } from '../lib/businessService'
 import type { Business } from '../lib/businessService'
+import { getCachedBusinesses } from '../lib/dataCache'
 import { CATEGORIES } from '../data/businesses'
 import BusinessCard from '../components/BusinessCard'
 
@@ -101,12 +101,13 @@ export default function NearbyMap({ onBack }: Props) {
     }
   }, [allBiz])
 
-  // DB 최초 1회 로드
+  // 캐시에서 로드
   useEffect(() => {
-    getBusinesses(undefined, 0, 2000).then(data => {
-      setAllBiz(data.filter(b => (b as any).latitude && (b as any).longitude))
+    const cached = getCachedBusinesses()
+    if (cached) {
+      setAllBiz(cached.filter(b => b.latitude && b.longitude))
       setLoading(false)
-    })
+    }
   }, [])
 
   // 카테고리별 업체 수 (Services.tsx 동일 로직)
