@@ -598,8 +598,18 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
         const isChecked = checked.has(idx)
 
         const handleToggle = () => {
-          handleCell(idx)
-          if (!isChecked) setTimeout(() => setSelectedCafe(null), 400)
+          if (isChecked) {
+            // 방문 취소 → 인증샷 삭제 + 체크 해제 + 팝업 닫기
+            const next = { ...photos }
+            delete next[idx]
+            setPhotos(next)
+            handleCell(idx)
+            setSelectedCafe(null)
+          } else {
+            // 방문 완료
+            handleCell(idx)
+            setTimeout(() => setSelectedCafe(null), 400)
+          }
         }
 
         return (
