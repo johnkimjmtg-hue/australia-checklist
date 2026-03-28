@@ -5,7 +5,6 @@ import { loadState, AppState } from './store/state'
 import { syncDataCache } from './lib/dataCache'
 import ChecklistPage from './pages/ChecklistPage'
 import AdminPage from './pages/AdminPage'
-import DebugPage from './pages/DebugPage'
 
 function MainApp() {
   const [state, setState] = useState<AppState>(() => loadState())
@@ -54,7 +53,6 @@ export default function App() {
         <Route path="/"       element={<MainApp />} />
         <Route path="/app"    element={<MainApp />} />
         <Route path="/admin"  element={<AdminWrapper />} />
-        <Route path="/debug"  element={<DebugPage />} />
         <Route path="*"       element={<MainApp />} />
       </Routes>
       <Analytics />
