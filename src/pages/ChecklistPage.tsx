@@ -197,9 +197,9 @@ export default function ChecklistPage({ state, setState }: Props) {
 
   const TABS = [
     {id:'bucketlist',icon:'ph:check-square',  label:'버킷리스트'},
-    {id:'services',  icon:'ph:buildings',      label:'업체'},
+    {id:'services',  icon:'ph:buildings',      label:'업체정보'},
     {id:'nearby',    icon:'ph:map-pin',        label:'내주변'},
-    {id:'shopping',  icon:'ph:shopping-bag',   label:'쇼핑'},
+    {id:'shopping',  icon:'ph:shopping-bag',   label:'쇼핑정보'},
     {id:'bingo',     icon:'ph:coffee',         label:'카페빙고'},
   ] as {id:MainTab;icon:string;label:string}[]
 
