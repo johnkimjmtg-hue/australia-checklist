@@ -851,7 +851,11 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                 flex:1, height:48, border:'1px solid #C8C8C8', borderRadius:6,
                 background:'#fff', color:'#64748B', fontWeight:600, fontSize:14, cursor:'pointer',
               }}>아니요</button>
-              <button onClick={() => { setChecked(new Set()); setShowReset(false) }} style={{
+              <button onClick={() => {
+                setChecked(new Set())
+                setPhotos({})
+                setShowReset(false)
+              }} style={{
                 flex:2, height:48, border:'none', borderRadius:6,
                 background:'#DC2626', color:'#fff', fontWeight:700, fontSize:15, cursor:'pointer',
               }}>리셋하기</button>
