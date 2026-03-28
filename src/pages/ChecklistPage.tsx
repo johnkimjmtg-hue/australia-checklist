@@ -574,9 +574,9 @@ export default function ChecklistPage({ state, setState }: Props) {
         <>
           <div onClick={()=>setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600 }} />
           <div style={{
-            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
-            borderRadius:radius.xl, zIndex:601,
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, background:colors.bgCard,
+            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, zIndex:601,
             animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
@@ -614,9 +614,9 @@ export default function ChecklistPage({ state, setState }: Props) {
       {detailItem&&(
         <div onClick={()=>setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', fontFamily:ff }}>
           <div onClick={e=>e.stopPropagation()} style={{
-            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
-            borderRadius:radius.xl, maxHeight:'85vh', overflowY:'auto',
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, background:colors.bgCard,
+            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, maxHeight:'85vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
