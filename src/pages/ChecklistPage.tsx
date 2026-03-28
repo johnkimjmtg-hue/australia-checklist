@@ -26,10 +26,10 @@ import Shopping from './Shopping'
 import MyShoppingView from './MyShoppingView'
 import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
-import NearbyMap from './NearbyMap'
 import BingoPage from './BingoPage'
 import type { BingoRef } from './BingoPage'
 import { getCachedChecklist } from '../lib/dataCache'
+import TermsPage from './TermsPage'
 
 const ff = font.family
 
@@ -82,6 +82,8 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [logoTapCount, setLogoTapCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch]   = useState(false)
+  const [showMenu, setShowMenu]       = useState(false)
+  const [termsTab, setTermsTab]       = useState<'terms'|'privacy'|null>(null)
   const logoTapTimer = useRef<any>(null)
   const bingoRef = useRef<BingoRef>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -308,7 +310,13 @@ export default function ChecklistPage({ state, setState }: Props) {
                 }}>
                   <Icon icon={showSearch ? 'ph:x' : 'ph:magnifying-glass'} width={14} height={14} color={showSearch ? colors.primary : colors.textSecondary} />
                 </button>
-                
+                <button onClick={()=>setShowMenu(true)} style={{
+                  width:28, height:28, borderRadius:radius.full,
+                  border:`1.5px solid ${colors.border}`, background:colors.bgCard,
+                  display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer',
+                }}>
+                  <Icon icon="ph:list" width={14} height={14} color={colors.textSecondary} />
+                </button>
               </div>
             </div>
             {showSearch && (
@@ -674,7 +682,47 @@ export default function ChecklistPage({ state, setState }: Props) {
           onClose={()=>setShowReceipt(false)} onReset={()=>setModal('confirmReset')} />
       )}
 
+      {/* ── 메뉴 바텀시트 */}
+      {showMenu && (
+        <>
+          <div onClick={()=>setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', zIndex:800 }} />
+          <div style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, zIndex:801,
+            background:colors.bgCard, borderRadius:`${spacing[4]}px ${spacing[4]}px 0 0`,
+            padding:`${spacing[3]}px ${spacing[4]}px ${spacing[8]}px`,
+            boxShadow:'0 -4px 24px rgba(0,0,0,0.12)',
+          }}>
+            {/* 핸들 */}
+            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
+            <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.textTertiary, marginBottom:spacing[3], textAlign:'center' }}>호주가자</div>
+            {[
+              { icon:'ph:file-text', label:'이용약관', tab:'terms' as const },
+              { icon:'ph:shield-check', label:'개인정보처리방침', tab:'privacy' as const },
+            ].map(item => (
+              <button key={item.tab} onClick={()=>{ setTermsTab(item.tab); setShowMenu(false) }} style={{
+                width:'100%', display:'flex', alignItems:'center', gap:spacing[3],
+                padding:`${spacing[4]}px ${spacing[2]}px`,
+                background:'none', border:'none', borderBottom:`1px solid ${colors.border}`,
+                cursor:'pointer', fontFamily:font.family, textAlign:'left',
+              }}>
+                <Icon icon={item.icon} width={20} height={20} color={colors.textSecondary} />
+                <span style={{ fontSize:font.size.md, color:colors.textPrimary, fontWeight:font.weight.medium }}>{item.label}</span>
+                <Icon icon="ph:caret-right" width={16} height={16} color={colors.textTertiary} style={{ marginLeft:'auto' }} />
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
+      {/* ── 약관 페이지 */}
+      {termsTab && (
+        <div style={{ position:'fixed', inset:0, zIndex:900, background:'#fff', overflowY:'auto', display:'flex', justifyContent:'center' }}>
+          <div style={{ width:'100%', maxWidth:430 }}>
+            <TermsPage initialTab={termsTab} onBack={()=>setTermsTab(null)} />
+          </div>
+        </div>
+      )}
 
     </div>
   )
