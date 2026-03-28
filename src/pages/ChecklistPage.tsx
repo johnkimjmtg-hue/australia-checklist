@@ -687,11 +687,11 @@ export default function ChecklistPage({ state, setState }: Props) {
         <>
           <div onClick={()=>setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', zIndex:800 }} />
           <div style={{
-            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:430, zIndex:801,
-            background:colors.bgCard, borderRadius:`${spacing[4]}px ${spacing[4]}px 0 0`,
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398, zIndex:801,
+            background:colors.bgCard, borderRadius:radius.xl,
             padding:`${spacing[3]}px ${spacing[4]}px ${spacing[8]}px`,
-            boxShadow:'0 -4px 24px rgba(0,0,0,0.12)',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
             {/* 핸들 */}
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
