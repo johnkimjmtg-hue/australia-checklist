@@ -695,7 +695,7 @@ export default function ChecklistPage({ state, setState }: Props) {
           }}>
             {/* 핸들 */}
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
-            <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.textTertiary, marginBottom:spacing[3], textAlign:'center' }}>호주가자</div>
+            <div style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[3], paddingBottom:spacing[3], borderBottom:`1px solid ${colors.border}` }}>호주가자</div>
             {[
               { icon:'ph:file-text', label:'이용약관', tab:'terms' as const },
               { icon:'ph:shield-check', label:'개인정보처리방침', tab:'privacy' as const },
