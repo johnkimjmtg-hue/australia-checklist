@@ -233,16 +233,7 @@ function getStatusMsg(checked: number, bingo: number, city: 'melbourne'|'sydney'
   return { title: `${checked}개 카페 방문!`, sub: isMel ? '멜번 카페 투어가 시작됐어요 ☕' : '시드니 카페 투어가 시작됐어요 ☕' }
 }
 
-// DB 저장 헬퍼
-async function saveBingoDB(city: string, checked: Set<number>, photos: Record<number, string> = {}) {
-  const { data: { session } } = await supabase.auth.getSession()
-  const user = session?.user
-  if (!user) return
-  await supabase.from('user_bingo').upsert(
-    { user_id: user.id, city, checked_indices: [...checked], photos, updated_at: new Date().toISOString() },
-    { onConflict: 'user_id,city' }
-  )
-}
+
 
 type Props = { onBack?: () => void; embedded?: boolean; initialCity?: 'melbourne' | 'sydney'; onCityChange?: (city: 'melbourne'|'sydney') => void }
 export type BingoRef = { triggerSave: () => void; triggerShare: () => void; triggerReset: () => void }
@@ -255,8 +246,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   const [melbourneCafes, setMelbourneCafes] = useState<BingoCafe[]>([])
   const [sydneyCafes, setSydneyCafes] = useState<BingoCafe[]>([])
   const [cafesLoading, setCafesLoading] = useState(true)
-  const [userId, setUserId] = useState<string | null>(null)
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [checkedMelbourne, setCheckedMelbourne] = useState<Set<number>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')) }
     catch { return new Set() }
@@ -315,30 +305,13 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
     setPrevBingoCount(bingoCount)
   }, [bingoCount])
 
-  // 로그인 감지
-  useEffect(() => {
-    const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      const user = session?.user
-      if (!user) return
-      setUserId(user.id)
-    }
-    init()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUserId(session?.user?.id ?? null)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
-
   // 로컬스토리지 저장
   useEffect(() => {
     localStorage.setItem('bingo-melbourne', JSON.stringify([...checkedMelbourne]))
-    if (userId) saveBingoDB('melbourne', checkedMelbourne, photosMelbourne)
-  }, [checkedMelbourne, userId])
+  }, [checkedMelbourne])
   useEffect(() => {
     localStorage.setItem('bingo-sydney', JSON.stringify([...checkedSydney]))
-    if (userId) saveBingoDB('sydney', checkedSydney, photosSydney)
-  }, [checkedSydney, userId])
+  }, [checkedSydney])
   const handleCell = (idx: number) => {
     if (city === 'melbourne') {
       setCheckedMelbourne(prev => {
@@ -398,7 +371,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
   useImperativeHandle(ref, () => ({
     triggerSave: () => {
-      if (!userId) { setShowLoginPrompt(true); return }
       setShowSaveConfirm(true)
     },
     triggerShare: () => handleShare(),
@@ -809,41 +781,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
         </button>
       </div>}
 
-      {/* ── 로그인 유도 팝업 */}
-      {showLoginPrompt && (
-        <>
-          <div onClick={() => setShowLoginPrompt(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:900 }} />
-          <div style={{
-            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-            background: colors.bgCard, borderRadius: radius.lg,
-            padding:`${spacing[6]}px ${spacing[5]}px`,
-            zIndex:901, width:'calc(100% - 48px)', maxWidth:300,
-            textAlign:'center', fontFamily: font.family,
-            boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
-          }}>
-            <div style={{ fontSize:32, marginBottom: spacing[3] }}>☕</div>
-            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>로그인이 필요해요</div>
-            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight:1.6 }}>
-              빙고 진행 상황을 저장하려면<br/>로그인이 필요합니다.
-            </div>
-            <div style={{ display:'flex', gap: spacing[2] }}>
-              <button onClick={() => setShowLoginPrompt(false)} style={{
-                flex:1, height:44, borderRadius: radius.sm,
-                border:`1px solid ${colors.border}`, background: colors.bgCard,
-                color: colors.textSecondary, fontSize: font.size.md,
-                fontWeight: font.weight.medium, cursor:'pointer', fontFamily: font.family,
-              }}>취소</button>
-              <button onClick={() => { setShowLoginPrompt(false); window.location.href = '/onboarding' }} style={{
-                flex:2, height:44, borderRadius: radius.sm, border:'none',
-                background: colors.primary, color:'#fff',
-                fontSize: font.size.md, fontWeight: font.weight.bold,
-                cursor:'pointer', fontFamily: font.family,
-              }}>로그인하기</button>
-            </div>
-          </div>
-        </>
-      )}
-
       {/* ── 저장 확인 팝업 */}
       {showSaveConfirm && (
         <>
@@ -864,11 +801,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                 background: colors.bgCard, color: colors.textSecondary,
                 fontSize: font.size.md, fontWeight: font.weight.medium, cursor:'pointer', fontFamily: font.family,
               }}>취소</button>
-              <button onClick={async () => {
-                if (userId) {
-                  await saveBingoDB('melbourne', checkedMelbourne, photosMelbourne)
-                  await saveBingoDB('sydney', checkedSydney, photosSydney)
-                }
+              <button onClick={() => {
                 setShowSaveConfirm(false)
                 onBack?.()
               }} style={{

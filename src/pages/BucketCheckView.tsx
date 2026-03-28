@@ -186,11 +186,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   const [showDelete, setShowDelete]   = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => setUserId(session?.user?.id ?? null))
-  }, [])
   const [deleteItemId, setDeleteItemId] = useState<{ id: string; day?: number } | null>(null)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const prevAchieved = useRef(0)
@@ -764,14 +759,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           title="저장하기"
           message="현재 달성 현황을 저장할까요? 나중에 언제든지 다시 저장할 수 있어요."
           confirmLabel="저장하기"
-          onConfirm={async () => {
-            const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
-            if (user) {
-              await supabase.from('user_bucketlists').upsert(
-                { user_id: user.id, state_json: state, trip_json: trip, achieved_json: achieved, updated_at: new Date().toISOString() },
-                { onConflict: 'user_id' }
-              )
-            }
+          onConfirm={() => {
             setShowSaveConfirm(false)
           }}
           onCancel={() => setShowSaveConfirm(false)}

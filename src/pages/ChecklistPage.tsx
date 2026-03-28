@@ -21,7 +21,7 @@ import ScheduleSheet from '../components/ScheduleSheet'
 import ReceiptModal from '../components/ReceiptModal'
 import Services from './Services'
 import BucketCheckView from './BucketCheckView'
-import Community from './Community'
+import NearbyMap from './NearbyMap'
 import Shopping from './Shopping'
 import MyShoppingView from './MyShoppingView'
 import BusinessCard from '../components/BusinessCard'
@@ -34,107 +34,6 @@ import { getCachedChecklist } from '../lib/dataCache'
 const ff = font.family
 
 // ── 로그아웃 시 로컬스토리지 초기화
-function clearAllUserData(userId?: string | null) {
-  const keys = [
-    'korea-receipt', 'bucket-achieved', 'korea-trip',
-    'my-shopping-list', 'my-shopping-checked',
-    'bingo-melbourne', 'bingo-sydney',
-    'bingo-photos-melbourne', 'bingo-photos-sydney',
-    'community-my-name', 'community-my-icon', 'community-my-id', 'community-liked',
-    'biz-bookmarks',
-  ]
-  keys.forEach(k => { try { localStorage.removeItem(k) } catch {} })
-  if (userId) { try { localStorage.removeItem(`user-data-loaded-${userId}`) } catch {} }
-}
-
-// ── 로그인 배지 컴포넌트 (모든 헤더에서 공통 사용)
-function AuthBadge() {
-  const navigate = useNavigate()
-  const [email, setEmail] = useState<string | null>(null)
-  const [checked, setChecked] = useState(false)
-  const [showLogoutPopup, setShowLogoutPopup] = useState(false)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setEmail(session?.user?.email ?? null)
-      setChecked(true)
-    })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setEmail(session?.user?.email ?? null)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const handleLogout = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    clearAllUserData(session?.user?.id)
-    await supabase.auth.signOut()
-    window.location.href = '/onboarding'
-  }
-
-  if (!checked) return null
-
-  return (
-    <>
-      {/* 아이콘 버튼 */}
-      <button onClick={() => email ? setShowLogoutPopup(true) : navigate('/onboarding')} style={{
-        width: 28, height: 28, borderRadius: radius.full,
-        background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        WebkitTapHighlightColor: 'transparent',
-      }}>
-        <Icon
-          icon={email ? 'ph:user-circle-fill' : 'ph:user-circle'}
-          width={28} height={28}
-          color={email ? colors.primary : colors.gray300}
-        />
-      </button>
-
-      {/* 로그아웃 확인 팝업 */}
-      {showLogoutPopup && (
-        <>
-          <div onClick={() => setShowLogoutPopup(false)} style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 900,
-          }} />
-          <div style={{
-            position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-            background: colors.bgCard, borderRadius: radius.lg,
-            padding: `${spacing[6]}px ${spacing[5]}px`,
-            zIndex: 901, width: 'calc(100% - 48px)', maxWidth: 300,
-            textAlign: 'center', fontFamily: font.family,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-          }}>
-            <Icon icon="ph:user-circle" width={40} height={40} color={colors.primary} style={{ marginBottom: spacing[3] }} />
-            <div style={{ fontSize: font.size.md, color: colors.textTertiary, marginBottom: spacing[1] }}>
-              {email}
-            </div>
-            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>
-              로그아웃 할까요?
-            </div>
-            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight: 1.6 }}>
-              로그아웃하면 저장된 데이터가<br/>이 기기에서 삭제됩니다.
-            </div>
-            <div style={{ display: 'flex', gap: spacing[2] }}>
-              <button onClick={() => setShowLogoutPopup(false)} style={{
-                flex: 1, height: 44, borderRadius: radius.sm,
-                border: `1px solid ${colors.border}`, background: colors.bgCard,
-                color: colors.textSecondary, fontSize: font.size.md,
-                fontWeight: font.weight.medium, cursor: 'pointer', fontFamily: font.family,
-              }}>취소</button>
-              <button onClick={handleLogout} style={{
-                flex: 2, height: 44, borderRadius: radius.sm, border: 'none',
-                background: colors.danger, color: '#fff',
-                fontSize: font.size.md, fontWeight: font.weight.bold,
-                cursor: 'pointer', fontFamily: font.family,
-              }}>로그아웃</button>
-            </div>
-          </div>
-        </>
-      )}
-    </>
-  )
-}
-
 const CAT_ICON_MAP: Record<string,string> = {
   hospital:'ph:first-aid-kit', food:'ph:fork-knife', shopping:'ph:shopping-bag',
   admin:'ph:files', people:'ph:users', parenting:'ph:baby', places:'ph:map-pin',
@@ -159,14 +58,11 @@ const STATE_MAP: Record<string, { label: string }> = {
 
 type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker' | 'calendar'
-type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'community' | 'nearby' | 'bingo'
+type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'nearby' | 'bingo'
 
 export default function ChecklistPage({ state, setState, onLanding }: Props & { onLanding?: () => void }) {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const [userId, setUserId] = useState<string | null>(null)
-  const autoSaveTimer = useRef<any>(null)
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
   const [categories, setCategories]   = useState<Category[]>([])
   const [dbItems, setDbItems]         = useState<DBItem[]>([])
@@ -180,7 +76,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [customLabel, setCustomLabel] = useState('')
   const [mainTab, setMainTab]         = useState<MainTab>(() => {
     const tab = searchParams.get('tab')
-    if (tab === 'services' || tab === 'shopping' || tab === 'myshoppinglist' || tab === 'community' || tab === 'nearby' || tab === 'bingo') return tab as MainTab
+    if (tab === 'services' || tab === 'shopping' || tab === 'myshoppinglist' || tab === 'nearby' || tab === 'bingo') return tab as MainTab
     return 'bucketlist'
   })
   const [logoTapCount, setLogoTapCount] = useState(0)
@@ -192,36 +88,18 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
 
   const [bizCount, setBizCount]       = useState(0)
   const [shopCount, setShopCount]     = useState(0)
-  const [todayPostCount, setTodayPostCount] = useState(0)
   const [myList, setMyList] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] } })
   const [myChecked, setMyChecked] = useState<Record<string,boolean>>(() => { try { return JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}') } catch { return {} } })
   const myListCount    = myList.length
   const myCheckedCount = myList.filter(id => myChecked[id]).length
-  const shoppingAutoSaveTimer = useRef<any>(null)
-
-  const saveShoppingDB = async (list: string[], checked: Record<string,boolean>) => {
-    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
-    if (!user) return
-    await supabase.from('user_shopping').upsert(
-      { user_id: user.id, my_list: list, my_checked: checked, updated_at: new Date().toISOString() },
-      { onConflict: 'user_id' }
-    )
-  }
-
-  const debouncedSaveShopping = (list: string[], checked: Record<string,boolean>) => {
-    if (shoppingAutoSaveTimer.current) clearTimeout(shoppingAutoSaveTimer.current)
-    shoppingAutoSaveTimer.current = setTimeout(() => { saveShoppingDB(list, checked) }, 3000)
-  }
 
   const handleMyListChange = (next: string[]) => {
     setMyList(next)
     try { localStorage.setItem('my-shopping-list', JSON.stringify(next)) } catch {}
-    debouncedSaveShopping(next, myChecked)
   }
   const handleMyCheckedChange = (next: Record<string,boolean>) => {
     setMyChecked(next)
     try { localStorage.setItem('my-shopping-checked', JSON.stringify(next)) } catch {}
-    debouncedSaveShopping(myList, next)
   }
 
   const [detailBizId, setDetailBizId] = useState<string|null>(null)
@@ -231,59 +109,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
   const [selProduct, setSelProduct]   = useState<any|null>(null)
 
   useEffect(() => {
-    const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      const user = session?.user
-      if (!user) return
-      setUserId(user.id)
-    }
-    init()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUserId(session?.user?.id ?? null)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
-
-  // state/trip/achieved 변경 시 3초 debounce → DB 자동 저장
-  useEffect(() => {
-    if (!userId) return
-    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current)
-    autoSaveTimer.current = setTimeout(() => { saveBucketlistDB(state, trip, achieved) }, 3000)
-    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current) }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state, trip, achieved, userId])
-
-  // DB 저장 함수
-  const saveBucketlistDB = async (s: AppState, t: TripInfo | null, a: Record<string,boolean>) => {
-    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
-    if (!user) return
-    await supabase.from('user_bucketlists').upsert(
-      { user_id: user.id, state_json: s, trip_json: t, achieved_json: a, updated_at: new Date().toISOString() },
-      { onConflict: 'user_id' }
-    )
-  }
-
-  const debouncedSaveBucketlist = (s: AppState, t: TripInfo | null, a: Record<string,boolean>) => {
-    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current)
-    autoSaveTimer.current = setTimeout(() => { saveBucketlistDB(s, t, a) }, 3000)
-  }
-
-  useEffect(() => {
     supabase.from('businesses').select('*',{count:'exact',head:true}).eq('is_active',true).then(({count})=>{ if(count!==null) setBizCount(count) })
   }, [])
   useEffect(() => {
     supabase.from('shopping_products').select('*',{count:'exact',head:true}).eq('is_active',true).then(({count})=>{ if(count!==null) setShopCount(count) })
-  }, [])
-  useEffect(() => {
-    let channel: any
-    const today = new Date(); today.setHours(0,0,0,0); const todayStr = today.toISOString()
-    const refetch = async () => { const {count} = await supabase.from('community_posts').select('*',{count:'exact',head:true}).gte('created_at',todayStr); if(count!==null) setTodayPostCount(count) }
-    refetch()
-    channel = supabase.channel('today-posts')
-      .on('postgres_changes',{event:'INSERT',schema:'public',table:'community_posts'},(p:any)=>{ if(new Date(p.new.created_at)>=today) setTodayPostCount(prev=>prev+1) })
-      .on('postgres_changes',{event:'DELETE',schema:'public',table:'community_posts'},()=>refetch())
-      .subscribe()
-    return () => { if(channel) channel.unsubscribe() }
   }, [])
   useEffect(() => {
     // 체크리스트 캐시 우선 사용
@@ -339,12 +168,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     else {
       const t={startDate,endDate:val}
       saveTrip(t); setTrip(t); setModal('none')
-      saveBucketlistDB(state, t, achieved)
     }
   }
 
   const handleIssue = () => {
-    if(!userId) { setShowLoginPrompt(true); return }
     if(!trip){ setModal('noTrip'); return }
     if(done===0){ setModal('noItems'); return }
     const checkedIds=Object.keys(state.selected)
@@ -353,7 +180,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     const at=fmt(new Date()); setIssuedAt(at)
     const next = issueReceipt(state,at)
     setState(next)
-    saveBucketlistDB(next, trip, achieved)
   }
   const triggerShake = () => { setShakeBtn(true); setTimeout(()=>setShakeBtn(false),600) }
   const handleAddCustom = () => { const label=customLabel.trim(); if(!label) return; setState(addCustom(state,label,activeCategory)); setCustomLabel('') }
@@ -363,7 +189,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     setShowReceipt(false); setModal('none')
     setAchieved({})
     try{localStorage.removeItem('bucket-achieved')}catch{}
-    if(userId) saveBucketlistDB(next, null, {})
   }
   const isIssued = !!state.meta.lastIssuedAt
 
@@ -372,7 +197,6 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
     {id:'services',  icon:'ph:buildings',      label:'업체'},
     {id:'nearby',    icon:'ph:map-pin',        label:'내주변'},
     {id:'shopping',  icon:'ph:shopping-bag',   label:'쇼핑'},
-    {id:'community', icon:'ph:chats-circle',   label:'단톡방'},
     {id:'bingo',     icon:'ph:coffee',         label:'카페빙고'},
   ] as {id:MainTab;icon:string;label:string}[]
 
@@ -405,7 +229,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>업체리스트</span>
-              <AuthBadge />
+              
             </div>
           </div>
           <Services onSelectBusiness={()=>{}} onBack={()=>setMainTab('bucketlist')} />
@@ -415,7 +239,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>쇼핑리스트</span>
-              <AuthBadge />
+              
             </div>
           </div>
           <Shopping myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onGoToMyList={()=>setMainTab('myshoppinglist')} />
@@ -425,7 +249,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>쇼핑리스트</span>
-              <AuthBadge />
+              
             </div>
           </div>
           <MyShoppingView myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
@@ -435,19 +259,16 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}`, flexShrink:0 }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>내 주변</span>
-              <AuthBadge />
+              
             </div>
           </div>
           <NearbyMap onBack={()=>setMainTab('bucketlist')} />
         </div>
-      ) : mainTab==='community' ? (
-        <Community />
       ) : mainTab==='bingo' ? (
         <>
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>카페 빙고</span>
-              <AuthBadge />
             </div>
           </div>
           <BingoPage ref={bingoRef} embedded={true} initialCity={(searchParams.get('city') as 'melbourne'|'sydney') ?? undefined} />
@@ -458,11 +279,10 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>
               <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>버킷리스트</span>
-              <AuthBadge />
             </div>
           </div>
           <BucketCheckView state={state} trip={trip} setState={setState} items={ITEMS} dbItems={dbItems} onAchievedChange={setAchieved}
-            onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{}; if(userId) saveBucketlistDB(next, trip, achieved) }}
+            onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{} }}
             onDelete={doReset}
             onShare={()=>{ const at=state.meta.lastIssuedAt??issuedAt; setIssuedAt(at); setShowReceipt(true) }}
             onLanding={()=>onLanding?.()} />
@@ -488,7 +308,7 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
                 }}>
                   <Icon icon={showSearch ? 'ph:x' : 'ph:magnifying-glass'} width={14} height={14} color={showSearch ? colors.primary : colors.textSecondary} />
                 </button>
-                <AuthBadge />
+                
               </div>
             </div>
             {showSearch && (
@@ -733,14 +553,12 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
         <div style={{ display:'flex', padding:`${spacing[1]}px 0 ${spacing[2]}px`, borderTop:`1.5px solid ${colors.border}` }}>
           {TABS.map(tab=>{
             const isActive = activeTabId===tab.id
-            const showBadge = tab.id==='community'&&todayPostCount>0
             return (
               <button key={tab.id} className="nav-btn" onClick={()=>handleTabClick(tab.id)}
                 style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, height:50, background:'none', border:'none', cursor:'pointer', position:'relative', fontFamily:ff }}>
                 <Icon icon={tab.icon} width={20} height={20} color={isActive?colors.primary:colors.textTertiary} />
                 <span style={{ fontSize:11, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.textTertiary }}>{tab.label}</span>
                 {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:colors.primary, position:'absolute', bottom:2 }} />}
-                {showBadge&&<span style={{ position:'absolute', top:6, right:'calc(50% - 14px)', background:'#EF4444', color:'#fff', fontSize:8, fontWeight:font.weight.bold, borderRadius:radius.full, padding:'1px 4px', minWidth:14, textAlign:'center' }}>{todayPostCount}</span>}
               </button>
             )
           })}
@@ -856,40 +674,8 @@ export default function ChecklistPage({ state, setState, onLanding }: Props & { 
           onClose={()=>setShowReceipt(false)} onReset={()=>setModal('confirmReset')} />
       )}
 
-      {/* ── 로그인 유도 팝업 */}
-      {showLoginPrompt && (
-        <>
-          <div onClick={() => setShowLoginPrompt(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:900 }} />
-          <div style={{
-            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-            background: colors.bgCard, borderRadius: radius.lg,
-            padding:`${spacing[6]}px ${spacing[5]}px`,
-            zIndex:901, width:'calc(100% - 48px)', maxWidth:300,
-            textAlign:'center', fontFamily: ff,
-            boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
-          }}>
-            <div style={{ fontSize:32, marginBottom: spacing[3] }}>🔐</div>
-            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>로그인이 필요해요</div>
-            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight:1.6 }}>
-              버킷리스트를 저장하려면<br/>로그인이 필요합니다.
-            </div>
-            <div style={{ display:'flex', gap: spacing[2] }}>
-              <button onClick={() => setShowLoginPrompt(false)} style={{
-                flex:1, height:44, borderRadius: radius.sm,
-                border:`1px solid ${colors.border}`, background: colors.bgCard,
-                color: colors.textSecondary, fontSize: font.size.md,
-                fontWeight: font.weight.medium, cursor:'pointer', fontFamily: ff,
-              }}>취소</button>
-              <button onClick={() => { setShowLoginPrompt(false); navigate('/onboarding') }} style={{
-                flex:2, height:44, borderRadius: radius.sm, border:'none',
-                background: colors.primary, color:'#fff',
-                fontSize: font.size.md, fontWeight: font.weight.bold,
-                cursor:'pointer', fontFamily: ff,
-              }}>로그인하기</button>
-            </div>
-          </div>
-        </>
-      )}
+
+
     </div>
   )
 }

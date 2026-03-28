@@ -62,12 +62,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showDeleteAll, setShowDeleteAll] = useState(false)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => setUserId(session?.user?.id ?? null))
-  }, [])
 
   const SHOPPING_MSGS = [
     '지갑이 열릴 준비가 됐나요?',
@@ -292,7 +286,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           <Icon icon="ph:shopping-bag" width={18} height={18} color="#FF6B9D" />
           상품 추가하기
         </button>
-        <button onClick={() => { if (!userId) { setShowLoginPrompt(true) } else { setShowSaveConfirm(true) } }} style={{
+        <button onClick={() => setShowSaveConfirm(true)} style={{
           flex:1, height:44, borderRadius: radius.sm, border:'none',
           background: '#FF6B9D', color: '#fff',
           fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
@@ -369,13 +363,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 fontSize:font.size.md, fontWeight:font.weight.medium, cursor:'pointer', fontFamily:font.family,
               }}>취소</button>
               <button onClick={async () => {
-                const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
-                if (user) {
-                  await supabase.from('user_shopping').upsert(
-                    { user_id: user.id, my_list: myList, my_checked: myChecked, updated_at: new Date().toISOString() },
-                    { onConflict: 'user_id' }
-                  )
-                }
                 setShowSaveConfirm(false)
               }} style={{
                 flex:2, height:48, borderRadius:radius.sm, border:'none',
@@ -537,40 +524,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         </>
       )}
 
-      {/* ── 로그인 유도 팝업 */}
-      {showLoginPrompt && (
-        <>
-          <div onClick={() => setShowLoginPrompt(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:900 }} />
-          <div style={{
-            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-            background: colors.bgCard, borderRadius: radius.lg,
-            padding:`${spacing[6]}px ${spacing[5]}px`,
-            zIndex:901, width:'calc(100% - 48px)', maxWidth:300,
-            textAlign:'center', fontFamily: font.family,
-            boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
-          }}>
-            <div style={{ fontSize:32, marginBottom: spacing[3] }}>🛍️</div>
-            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>로그인이 필요해요</div>
-            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight:1.6 }}>
-              구매 현황을 저장하려면<br/>로그인이 필요합니다.
-            </div>
-            <div style={{ display:'flex', gap: spacing[2] }}>
-              <button onClick={() => setShowLoginPrompt(false)} style={{
-                flex:1, height:44, borderRadius: radius.sm,
-                border:`1px solid ${colors.border}`, background: colors.bgCard,
-                color: colors.textSecondary, fontSize: font.size.md,
-                fontWeight: font.weight.medium, cursor:'pointer', fontFamily: font.family,
-              }}>취소</button>
-              <button onClick={() => { setShowLoginPrompt(false); window.location.href = '/onboarding' }} style={{
-                flex:2, height:44, borderRadius: radius.sm, border:'none',
-                background: colors.primary, color:'#fff',
-                fontSize: font.size.md, fontWeight: font.weight.bold,
-                cursor:'pointer', fontFamily: font.family,
-              }}>로그인하기</button>
-            </div>
-          </div>
-        </>
-      )}
     </div>
   )
 }
