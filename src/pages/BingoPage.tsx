@@ -619,19 +619,23 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
               {/* 인증샷 미리보기 */}
               {photos[idx] && (
-                <div style={{ position:'relative', marginBottom: spacing[3], borderRadius: radius.md, overflow:'hidden', height:180 }}>
-                  <img src={photos[idx]} alt="인증샷" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                <div style={{ marginBottom: spacing[3] }}>
+                  <div style={{ borderRadius: radius.md, overflow:'hidden', height:180 }}>
+                    <img src={photos[idx]} alt="인증샷" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                  </div>
                   <button onClick={() => {
                     const next = { ...photos }
                     delete next[idx]
                     setPhotos(next)
                   }} style={{
-                    position:'absolute', top:8, right:8,
-                    background:'rgba(0,0,0,0.5)', border:'none', borderRadius:'50%',
-                    width:28, height:28, cursor:'pointer', color:'#fff',
-                    display:'flex', alignItems:'center', justifyContent:'center',
+                    width:'100%', marginTop: spacing[1], height:32,
+                    background:'none', border:`1px solid ${colors.border}`,
+                    borderRadius: radius.sm, cursor:'pointer',
+                    fontSize: font.size.xs, color: colors.textTertiary,
+                    fontFamily: font.family, display:'flex', alignItems:'center', justifyContent:'center', gap:4,
                   }}>
-                    <Icon icon="ph:x" width={14} height={14} color="#fff" />
+                    <Icon icon="ph:trash" width={13} height={13} color={colors.textTertiary} />
+                    인증샷 삭제
                   </button>
                 </div>
               )}
