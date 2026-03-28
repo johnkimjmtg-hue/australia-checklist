@@ -246,7 +246,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   const [melbourneCafes, setMelbourneCafes] = useState<BingoCafe[]>([])
   const [sydneyCafes, setSydneyCafes] = useState<BingoCafe[]>([])
   const [cafesLoading, setCafesLoading] = useState(true)
-  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [checkedMelbourne, setCheckedMelbourne] = useState<Set<number>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bingo-melbourne') ?? '[]')) }
     catch { return new Set() }
