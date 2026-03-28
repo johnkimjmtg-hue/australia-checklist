@@ -406,17 +406,18 @@ export default function NearbyMap({ onBack }: Props) {
             style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.35)', zIndex:500 }}
           />
           <div style={{
-            position:'fixed', bottom:0,
+            position:'fixed', bottom:16,
             left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:390,
+            width:'calc(100% - 32px)', maxWidth:398,
             background:colors.bgCard,
-            borderRadius:'20px 20px 0 0',
+            borderRadius:20,
             zIndex:501,
             animation:'slideUpSheet 0.25s ease',
             maxHeight:'75vh',
             overflowY:'auto',
             boxSizing:'border-box',
             paddingBottom:32,
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
             <div style={{ width:40, height:4, borderRadius:2, background:colors.gray300, margin:'12px auto 16px' }} />
             {myPos && (
