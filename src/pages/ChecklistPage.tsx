@@ -522,15 +522,19 @@ export default function ChecklistPage({ state, setState }: Props) {
             </button>
           </div>
         )}
-        <div style={{ display:'flex', padding:`${spacing[1]}px 0 ${spacing[2]}px`, borderTop:`1.5px solid ${colors.border}` }}>
+        <div style={{
+          display:'flex', padding:`${spacing[1]}px ${spacing[3]}px 0`,
+          borderTop:`1.5px solid ${colors.border}`,
+          paddingBottom:'env(safe-area-inset-bottom)',
+        }}>
           {TABS.map(tab=>{
             const isActive = activeTabId===tab.id
             return (
               <button key={tab.id} className="nav-btn" onClick={()=>handleTabClick(tab.id)}
-                style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, height:50, background:'none', border:'none', cursor:'pointer', position:'relative', fontFamily:ff }}>
-                <Icon icon={tab.icon} width={20} height={20} color={isActive?colors.primary:colors.textTertiary} />
-                <span style={{ fontSize:11, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.textTertiary }}>{tab.label}</span>
-                {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:colors.primary, position:'absolute', bottom:2 }} />}
+                style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, height:54, background:'none', border:'none', cursor:'pointer', position:'relative', fontFamily:ff }}>
+                <Icon icon={tab.icon} width={22} height={22} color={isActive?colors.primary:colors.textTertiary} />
+                <span style={{ fontSize:12, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.textTertiary }}>{tab.label}</span>
+                {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:colors.primary, position:'absolute', bottom:4 }} />}
               </button>
             )
           })}
