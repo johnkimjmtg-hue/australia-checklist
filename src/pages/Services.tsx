@@ -135,6 +135,11 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     return sortByName(allBusinesses.filter(b => ids.includes(b.id)))
   }, [allBusinesses, bookmarkCount])
 
+  const [showAll, setShowAll] = useState(false)
+
+  // category나 tab 바뀌면 showAll 리셋
+  useEffect(() => { setShowAll(false) }, [category, serviceTab, debouncedSearch])
+
   const isSearch    = !!debouncedSearch.trim()
   const isCatFilter = !!category
   const isFiltered  = isSearch || isCatFilter
@@ -277,11 +282,41 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                   : `${CATEGORIES.find(c => c.id === category)?.label ?? ''} (${displayedBusinesses.length})`}
               color={colors.textSecondary}
             />
-            {loading ? <LoadingState /> : displayedBusinesses.length === 0 ? <EmptyState /> : (
-              <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
-                {displayedBusinesses.map(b => <BusinessCard key={b.id} business={b} />)}
-              </div>
-            )}
+            {loading ? <LoadingState /> : displayedBusinesses.length === 0 ? <EmptyState /> : (() => {
+              // 첫화면(카테고리 없음, 검색 없음)만 제한 — 추천 전체 + 나머지 50개
+              const isFirstScreen = !isFiltered && !category
+              const featured = isFirstScreen ? displayedBusinesses.filter(b => b.is_featured) : []
+              const normal   = isFirstScreen ? displayedBusinesses.filter(b => !b.is_featured) : []
+              const visibleNormal = isFirstScreen && !showAll ? normal.slice(0, 50) : normal
+              const hasMore  = isFirstScreen && !showAll && normal.length > 50
+
+              const listToRender = isFirstScreen
+                ? [...featured, ...visibleNormal]
+                : displayedBusinesses
+
+              return (
+                <>
+                  <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
+                    {listToRender.map(b => <BusinessCard key={b.id} business={b} />)}
+                  </div>
+                  {hasMore && (
+                    <button
+                      onClick={() => setShowAll(true)}
+                      style={{
+                        width:'100%', marginTop:spacing[4], height:48,
+                        borderRadius:radius.md, border:`1px solid ${colors.border}`,
+                        background:colors.bgCard, color:colors.textSecondary,
+                        fontSize:font.size.md, fontWeight:font.weight.bold,
+                        cursor:'pointer', fontFamily:ff,
+                        display:'flex', alignItems:'center', justifyContent:'center', gap:spacing[2],
+                      }}
+                    >
+                      더 많은 업체 보기 ({normal.length - 50}개 더)
+                    </button>
+                  )}
+                </>
+              )
+            })()}
           </>
         )}
       </div>
