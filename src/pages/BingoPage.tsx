@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react'
+import { useState, useEffect, useRef, useImperativeHandle, forwardRef, useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
-import { getCachedBingo } from '../lib/dataCache'
+import { getCachedBingo, getCachedBusinesses } from '../lib/dataCache'
 import BusinessCard from '../components/BusinessCard'
 import { colors, font, radius, spacing } from '../styles/tokens'
 
@@ -856,25 +856,11 @@ export default BingoPage
 
 // ── 업체 정보 컴포넌트
 function CafeBusinessInfo({ businessId }: { businessId: string }) {
-  const [biz, setBiz] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const load = async () => {
-      const { data } = await supabase
-        .from('businesses')
-        .select('*')
-        .eq('id', businessId)
-        .single()
-      setBiz(data)
-      setLoading(false)
-    }
-    load()
+  const biz = useMemo(() => {
+    const cached = getCachedBusinesses()
+    return cached?.find(b => b.id === businessId) ?? null
   }, [businessId])
 
-  if (loading) return (
-    <div style={{ textAlign:'center', padding:'24px 0', color:'#94A3B8', fontSize:14 }}>불러오는 중...</div>
-  )
   if (!biz) return (
     <div style={{ textAlign:'center', padding:'24px 0', color:'#94A3B8', fontSize:14 }}>업체 정보를 찾을 수 없어요</div>
   )
