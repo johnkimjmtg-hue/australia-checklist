@@ -28,7 +28,7 @@ import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 import BingoPage from './BingoPage'
 import type { BingoRef } from './BingoPage'
-import { getCachedChecklist } from '../lib/dataCache'
+import { getCachedChecklist, getCachedShopping, getCachedBusinesses } from '../lib/dataCache'
 import TermsPage from './TermsPage'
 import logoImg from '../assets/logo.png'
 
@@ -411,11 +411,19 @@ export default function ChecklistPage({ state, setState }: Props) {
                       border: checked ? `1px solid ${colors.success}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
                       cursor:'pointer', transition:'all 0.15s',
                     }}
-                    onClick={async()=>{
+                    onClick={()=>{
                       if(!db) return
-                      if((db.related_product_ids?.length??0)>0){ const {data}=await supabase.from('shopping_products').select('*').eq('id',db.related_product_ids![0]).single(); if(data) setSelProduct(data); return }
+                      if((db.related_product_ids?.length??0)>0){
+                        const cached = getCachedShopping()
+                        const prod = cached?.products.find(p => p.id === db.related_product_ids![0])
+                        if(prod) setSelProduct(prod)
+                        return
+                      }
                       setDetailItem(db)
-                      if((db.related_business_ids?.length??0)>0){ const {data}=await supabase.from('businesses').select('*').in('id',db.related_business_ids!); setDetailBizCards(data??[]) } else setDetailBizCards([])
+                      if((db.related_business_ids?.length??0)>0){
+                        const cached = getCachedBusinesses()
+                        setDetailBizCards(cached?.filter(b => db.related_business_ids!.includes(b.id)) ?? [])
+                      } else setDetailBizCards([])
                     }}
                   >
                     {/* 이미지 */}
@@ -566,9 +574,9 @@ export default function ChecklistPage({ state, setState }: Props) {
         <>
           <div onClick={()=>setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600 }} />
           <div style={{
-            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
-            borderRadius:radius.xl, zIndex:601,
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, background:colors.bgCard,
+            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, zIndex:601,
             animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
@@ -606,9 +614,9 @@ export default function ChecklistPage({ state, setState }: Props) {
       {detailItem&&(
         <div onClick={()=>setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', fontFamily:ff }}>
           <div onClick={e=>e.stopPropagation()} style={{
-            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
-            borderRadius:radius.xl, maxHeight:'85vh', overflowY:'auto',
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, background:colors.bgCard,
+            borderRadius:`${radius.xl}px ${radius.xl}px 0 0`, maxHeight:'85vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
@@ -660,6 +668,7 @@ export default function ChecklistPage({ state, setState }: Props) {
             background:colors.bgCard, borderRadius:radius.xl,
             padding:`${spacing[3]}px ${spacing[4]}px ${spacing[8]}px`,
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            animation:'slideUpSheet 0.25s ease',
           }}>
             {/* 핸들 */}
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
