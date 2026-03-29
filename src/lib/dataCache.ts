@@ -1,16 +1,20 @@
 // ── 리스트 데이터 캐시 유틸
 // 어드민 배포 버튼 → cache_version 버전 업 → 다음 방문 시 해당 데이터만 재다운로드
 // 캐시 있고 버전 같으면 절대 DB 재다운로드 안 함 (새로고침 포함)
-// force_reset = true 이면 해당 캐시 강제 삭제 후 재다운로드
+// TTL(5분) 기반 버전 체크 → cache_version 조회 횟수 최소화
 import { supabase } from './supabase'
 
 const CACHE_KEYS = {
-  checklist:  'cache-checklist',
-  businesses: 'cache-businesses',
-  shopping:   'cache-shopping',
-  bingo:      'cache-bingo',
-  version:    'cache-version',
+  checklist:    'cache-checklist',
+  businesses:   'cache-businesses',
+  shopping:     'cache-shopping',
+  bingo:        'cache-bingo',
+  version:      'cache-version',
+  lastChecked:  'cache-last-checked',
 }
+
+// 5분마다 한 번만 cache_version DB 조회
+const VERSION_CHECK_INTERVAL = 5 * 60 * 1000
 
 type CacheVersion = { checklist: number; businesses: number; shopping: number; bingo: number }
 const DEFAULT_VERSION: CacheVersion = { checklist: 0, businesses: 0, shopping: 0, bingo: 0 }
@@ -28,15 +32,19 @@ function getCache<T>(key: string): T | null {
 function setCache<T>(key: string, data: T) {
   try { localStorage.setItem(key, JSON.stringify(data)) } catch {}
 }
-function clearCache(key: string) {
-  try { localStorage.removeItem(key) } catch {}
+function getLastChecked(): number {
+  return parseInt(localStorage.getItem(CACHE_KEYS.lastChecked) ?? '0')
+}
+function saveLastChecked() {
+  try { localStorage.setItem(CACHE_KEYS.lastChecked, Date.now().toString()) } catch {}
 }
 
-type ServerVersionRow = { key: string; version: number; force_reset: boolean }
-
-async function fetchServerVersionRows(): Promise<ServerVersionRow[]> {
-  const { data } = await supabase.from('cache_version').select('key, version, force_reset')
-  return data ?? []
+async function fetchServerVersions(): Promise<CacheVersion> {
+  const { data } = await supabase.from('cache_version').select('key, version')
+  if (!data) return DEFAULT_VERSION
+  const v = { ...DEFAULT_VERSION }
+  data.forEach((row: any) => { if (row.key in v) (v as any)[row.key] = row.version })
+  return v
 }
 
 async function fetchChecklist() {
@@ -49,20 +57,10 @@ async function fetchChecklist() {
   return data
 }
 async function fetchBusinesses() {
-  const PAGE = 1000
-  let all: any[] = []
-  let from = 0
-  while (true) {
-    const { data } = await supabase.from('businesses').select('*').eq('is_active', true)
-      .order('is_featured', { ascending: false }).order('name')
-      .range(from, from + PAGE - 1)
-    if (!data || data.length === 0) break
-    all = [...all, ...data]
-    if (data.length < PAGE) break
-    from += PAGE
-  }
-  setCache(CACHE_KEYS.businesses, all)
-  return all
+  const { data } = await supabase.from('businesses').select('*').eq('is_active', true)
+    .order('is_featured', { ascending: false }).order('name')
+  setCache(CACHE_KEYS.businesses, data ?? [])
+  return data ?? []
 }
 async function fetchShopping() {
   const [cats, prods] = await Promise.all([
@@ -80,79 +78,51 @@ async function fetchBingo() {
   return data ?? []
 }
 
-const FETCH_MAP: Record<string, () => Promise<any>> = {
-  checklist:  fetchChecklist,
-  businesses: fetchBusinesses,
-  shopping:   fetchShopping,
-  bingo:      fetchBingo,
-}
-
-const CACHE_KEY_MAP: Record<string, string> = {
-  checklist:  CACHE_KEYS.checklist,
-  businesses: CACHE_KEYS.businesses,
-  shopping:   CACHE_KEYS.shopping,
-  bingo:      CACHE_KEYS.bingo,
-}
-
-// force_reset 완료 후 서버 플래그 해제
-async function clearForceReset(key: string) {
-  await supabase.from('cache_version').update({ force_reset: false }).eq('key', key)
-}
-
 // ── 메인 캐시 동기화
-export async function syncDataCache() {
+// 반환값: true = 새 데이터 다운로드됨 (리렌더 필요), false = 캐시 그대로
+export async function syncDataCache(): Promise<boolean> {
   try {
-    const rows = await fetchServerVersionRows()
-    const localVer = getLocalVersion()
+    const allCached =
+      getCache(CACHE_KEYS.checklist) &&
+      getCache(CACHE_KEYS.businesses) &&
+      getCache(CACHE_KEYS.shopping) &&
+      getCache(CACHE_KEYS.bingo)
 
-    const serverVer: CacheVersion = { ...DEFAULT_VERSION }
-    rows.forEach((row) => {
-      if (row.key in serverVer) (serverVer as any)[row.key] = row.version
-    })
-
-    const tasks: Promise<any>[] = []
-    const resetKeys: string[] = []
-
-    for (const row of rows) {
-      const key = row.key as keyof CacheVersion
-      if (!(key in FETCH_MAP)) continue
-
-      const forceReset = row.force_reset === true
-      const versionChanged = serverVer[key] > localVer[key]
-
-      if (forceReset) {
-        // 강제 초기화: 캐시 삭제 후 재다운로드
-        clearCache(CACHE_KEY_MAP[key])
-        tasks.push(FETCH_MAP[key]())
-        resetKeys.push(key)
-      } else if (versionChanged || !getCache(CACHE_KEY_MAP[key])) {
-        // 버전 변경 또는 캐시 없음: 재다운로드
-        tasks.push(FETCH_MAP[key]())
-      }
+    if (!allCached) {
+      // 캐시 자체가 없으면 무조건 전체 다운로드 (TTL 무시)
+      const serverVer = await fetchServerVersions()
+      await Promise.all([fetchChecklist(), fetchBusinesses(), fetchShopping(), fetchBingo()])
+      saveLocalVersion(serverVer)
+      saveLastChecked()
+      return true
     }
+
+    // 5분 이내에 이미 체크했으면 DB 조회 자체를 스킵
+    if (Date.now() - getLastChecked() < VERSION_CHECK_INTERVAL) {
+      return false
+    }
+
+    // 5분 지났으면 cache_version 체크
+    const [serverVer, localVer] = [await fetchServerVersions(), getLocalVersion()]
+    const tasks: Promise<any>[] = []
+    if (serverVer.checklist > localVer.checklist)   tasks.push(fetchChecklist())
+    if (serverVer.businesses > localVer.businesses) tasks.push(fetchBusinesses())
+    if (serverVer.shopping > localVer.shopping)     tasks.push(fetchShopping())
+    if (serverVer.bingo > localVer.bingo)           tasks.push(fetchBingo())
 
     if (tasks.length > 0) {
       await Promise.all(tasks)
       saveLocalVersion(serverVer)
-    } else {
-      // 캐시 없는 항목만 체크
-      const allCached =
-        getCache(CACHE_KEYS.checklist) &&
-        getCache(CACHE_KEYS.businesses) &&
-        getCache(CACHE_KEYS.shopping) &&
-        getCache(CACHE_KEYS.bingo)
-      if (!allCached) {
-        await Promise.all([fetchChecklist(), fetchBusinesses(), fetchShopping(), fetchBingo()])
-        saveLocalVersion(serverVer)
-      }
+      saveLastChecked()
+      return true
     }
 
-    // force_reset 플래그 서버에서 해제 (백그라운드)
-    if (resetKeys.length > 0) {
-      Promise.all(resetKeys.map(clearForceReset)).catch(() => {})
-    }
+    // 버전 동일 — 체크 시간만 갱신
+    saveLastChecked()
+    return false
   } catch (e) {
     console.error('syncDataCache error:', e)
+    return false
   }
 }
 
