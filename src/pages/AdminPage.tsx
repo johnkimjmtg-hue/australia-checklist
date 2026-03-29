@@ -453,8 +453,17 @@ function BusinessTab() {
 
   async function load() {
     setLoading(true)
-    const { data } = await supabase.from('businesses').select('*').order('name')
-    setBusinesses(data || [])
+    const PAGE = 1000
+    let all: Business[] = []
+    let from = 0
+    while (true) {
+      const { data, error } = await supabase.from('businesses').select('*').order('name').range(from, from + PAGE - 1)
+      if (error || !data || data.length === 0) break
+      all = [...all, ...data]
+      if (data.length < PAGE) break
+      from += PAGE
+    }
+    setBusinesses(all)
     setLoading(false)
   }
 
@@ -971,20 +980,8 @@ function ItemsTab({ cats, items, setItems }: {
   const [bizFocused, setBizFocused] = useState(false)
 
   useEffect(() => {
-    const fetchAllBusinesses = async () => {
-      const PAGE = 1000
-      let all: {id:string;name:string}[] = []
-      let from = 0
-      while (true) {
-        const { data, error } = await supabase.from('businesses').select('id, name').eq('is_active', true).order('name').range(from, from + PAGE - 1)
-        if (error || !data || data.length === 0) break
-        all = [...all, ...data]
-        if (data.length < PAGE) break
-        from += PAGE
-      }
-      setBusinesses(all)
-    }
-    fetchAllBusinesses()
+    supabase.from('businesses').select('id, name').eq('is_active', true).order('name')
+      .then(({ data }) => { if (data) setBusinesses(data) })
     supabase.from('shopping_products').select('id, name').eq('is_active', true).order('name')
       .then(({ data }) => { if (data) setProducts(data) })
   }, [])
@@ -2624,12 +2621,19 @@ function BingoTab() {
 
   useEffect(() => {
     const load = async () => {
-      const [{ data: cafeData }, { data: bizData }] = await Promise.all([
-        supabase.from('bingo_cafes').select('*').order('city').order('sort_order'),
-        supabase.from('businesses').select('id, name').eq('is_active', true).order('name'),
-      ])
+      const PAGE = 1000
+      let allBiz: {id:string;name:string}[] = []
+      let from = 0
+      while (true) {
+        const { data, error } = await supabase.from('businesses').select('id, name').eq('is_active', true).order('name').range(from, from + PAGE - 1)
+        if (error || !data || data.length === 0) break
+        allBiz = [...allBiz, ...data]
+        if (data.length < PAGE) break
+        from += PAGE
+      }
+      const { data: cafeData } = await supabase.from('bingo_cafes').select('*').order('city').order('sort_order')
       if (cafeData) setCafes(cafeData)
-      if (bizData)  setBusinesses(bizData)
+      setBusinesses(allBiz)
       setLoading(false)
     }
     load()
