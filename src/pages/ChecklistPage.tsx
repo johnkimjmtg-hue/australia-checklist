@@ -414,12 +414,6 @@ export default function ChecklistPage({ state, setState }: Props) {
                     }}
                     onClick={()=>{
                       if(!db) return
-                      if((db.related_product_ids?.length??0)>0){
-                        const cached = getCachedShopping()
-                        const prod = cached?.products.find(p => p.id === db.related_product_ids![0])
-                        if(prod) setSelProduct(prod)
-                        return
-                      }
                       setDetailItem(db)
                       if((db.related_business_ids?.length??0)>0){
                         const cached = getCachedBusinesses()
@@ -648,6 +642,27 @@ export default function ChecklistPage({ state, setState }: Props) {
                   <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>{detailBizCards.map(biz=><BusinessCard key={biz.id} business={biz} />)}</div>
                 </div>
               )}
+              {(detailItem.related_product_ids?.length??0)>0&&(()=>{
+                const cached = getCachedShopping()
+                const prods = cached?.products.filter(p => detailItem.related_product_ids!.includes(p.id)).slice(0,5) ?? []
+                return prods.length>0 ? (
+                  <div style={{ marginBottom:spacing[4] }}>
+                    <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>🛍️ 관련 상품</div>
+                    <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
+                      {prods.map(prod=>(
+                        <button key={prod.id} onClick={()=>setSelProduct(prod)} style={{ display:'flex', alignItems:'center', gap:spacing[3], background:colors.bgInput, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:`${spacing[3]}px`, cursor:'pointer', textAlign:'left', width:'100%' }}>
+                          {prod.image_url && <img src={prod.image_url} alt="" style={{ width:44, height:44, borderRadius:radius.sm, objectFit:'cover', flexShrink:0 }} />}
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:2 }}>{prod.name}</div>
+                            <div style={{ fontSize:font.size.xs, color:colors.textTertiary }}>{prod.brand}</div>
+                          </div>
+                          <Icon icon="ph:arrow-right" width={16} height={16} color={colors.textTertiary} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null
+              })()}
               <button onClick={()=>setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${colors.border}`, background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>닫기</button>
             </div>
           </div>
