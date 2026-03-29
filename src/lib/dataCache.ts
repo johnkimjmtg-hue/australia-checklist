@@ -57,10 +57,24 @@ async function fetchChecklist() {
   return data
 }
 async function fetchBusinesses() {
-  const { data } = await supabase.from('businesses').select('*').eq('is_active', true)
-    .order('is_featured', { ascending: false }).order('name')
-  setCache(CACHE_KEYS.businesses, data ?? [])
-  return data ?? []
+  const PAGE = 1000
+  let all: any[] = []
+  let from = 0
+  while (true) {
+    const { data, error } = await supabase
+      .from('businesses')
+      .select('*')
+      .eq('is_active', true)
+      .order('is_featured', { ascending: false })
+      .order('name')
+      .range(from, from + PAGE - 1)
+    if (error || !data || data.length === 0) break
+    all = [...all, ...data]
+    if (data.length < PAGE) break
+    from += PAGE
+  }
+  setCache(CACHE_KEYS.businesses, all)
+  return all
 }
 async function fetchShopping() {
   const [cats, prods] = await Promise.all([
