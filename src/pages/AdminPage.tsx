@@ -971,8 +971,20 @@ function ItemsTab({ cats, items, setItems }: {
   const [bizFocused, setBizFocused] = useState(false)
 
   useEffect(() => {
-    supabase.from('businesses').select('id, name').eq('is_active', true).order('name')
-      .then(({ data }) => { if (data) setBusinesses(data) })
+    const fetchAllBusinesses = async () => {
+      const PAGE = 1000
+      let all: {id:string;name:string}[] = []
+      let from = 0
+      while (true) {
+        const { data, error } = await supabase.from('businesses').select('id, name').eq('is_active', true).order('name').range(from, from + PAGE - 1)
+        if (error || !data || data.length === 0) break
+        all = [...all, ...data]
+        if (data.length < PAGE) break
+        from += PAGE
+      }
+      setBusinesses(all)
+    }
+    fetchAllBusinesses()
     supabase.from('shopping_products').select('id, name').eq('is_active', true).order('name')
       .then(({ data }) => { if (data) setProducts(data) })
   }, [])
