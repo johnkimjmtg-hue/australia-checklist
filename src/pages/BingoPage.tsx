@@ -485,51 +485,52 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
           background: colors.bgCard,
           borderRadius: radius.lg,
           border: `1.5px solid ${colors.gray300}`,
-          padding: `${spacing[4]}px`, display:'flex', alignItems:'center', gap: spacing[4],
+          padding: `${spacing[4]}px`,
         }}>
-          <MiniGrid count={checked.size} />
-          <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1], lineHeight:1.3 }}>
-              {getStatusMsg(checked.size, bingoCount, city).title}
+          <div style={{ display:'flex', alignItems:'center', gap: spacing[4] }}>
+            <MiniGrid count={checked.size} />
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1], lineHeight:1.3 }}>
+                {getStatusMsg(checked.size, bingoCount, city).title}
+              </div>
+              <div style={{ fontSize: font.size.sm, color: colors.textTertiary, fontWeight: font.weight.regular, lineHeight:1.6 }}>
+                {lastCheckedCafe && checked.has(lastCheckedCafe.idx)
+                  ? (city === 'melbourne'
+                      ? MEL_CAFE_MSG[lastCheckedCafe.sort_order]
+                      : SYD_CAFE_MSG[lastCheckedCafe.sort_order])
+                  : getStatusMsg(checked.size, bingoCount, city).sub}
+              </div>
             </div>
-            <div style={{ fontSize: font.size.sm, color: colors.textTertiary, fontWeight: font.weight.regular, lineHeight:1.6 }}>
-              {lastCheckedCafe && checked.has(lastCheckedCafe.idx)
-                ? (city === 'melbourne'
-                    ? MEL_CAFE_MSG[lastCheckedCafe.sort_order]
-                    : SYD_CAFE_MSG[lastCheckedCafe.sort_order])
-                : getStatusMsg(checked.size, bingoCount, city).sub}
+            {/* 카운터 */}
+            <div style={{ textAlign:'center', flexShrink:0 }}>
+              <div style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: colors.textPrimary, lineHeight:1 }}>{checked.size}</div>
+              <div style={{ fontSize: font.size.lg, color: colors.textSecondary, fontWeight: font.weight.medium, marginTop:2 }}>/25 카페</div>
             </div>
           </div>
-          {/* 카운터 */}
-          <div style={{ textAlign:'center', flexShrink:0 }}>
-            <div style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: colors.textPrimary, lineHeight:1 }}>{checked.size}</div>
-            <div style={{ fontSize: font.size.lg, color: colors.textSecondary, fontWeight: font.weight.medium, marginTop:2 }}>/25 카페</div>
+          {/* 공유 / 리셋 버튼 — 카드 오른쪽 하단 */}
+          <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[2], marginTop: spacing[3] }}>
+            <button onClick={handleShare} style={{
+              height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
+              border:`1px solid ${colors.border}`, background: colors.bgPage,
+              color: colors.textSecondary, fontSize: font.size.xs, fontWeight: font.weight.bold,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+              cursor:'pointer', fontFamily: font.family,
+            }}>
+              <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
+              공유하기
+            </button>
+            <button onClick={() => setShowReset(true)} style={{
+              height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
+              border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
+              color: colors.danger, fontSize: font.size.xs, fontWeight: font.weight.bold,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+              cursor:'pointer', fontFamily: font.family,
+            }}>
+              <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color={colors.danger} />
+              전체 리셋
+            </button>
           </div>
         </div>
-      </div>
-
-      {/* ── 공유 / 리셋 버튼 */}
-      <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[2], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
-        <button onClick={handleShare} style={{
-          height:30, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-          border:`1px solid ${colors.border}`, background: colors.bgCard,
-          color: colors.textSecondary, fontSize: font.size.xs, fontWeight: font.weight.bold,
-          display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-          cursor:'pointer', fontFamily: font.family,
-        }}>
-          <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
-          공유하기
-        </button>
-        <button onClick={() => setShowReset(true)} style={{
-          height:30, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-          border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
-          color: colors.danger, fontSize: font.size.xs, fontWeight: font.weight.bold,
-          display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-          cursor:'pointer', fontFamily: font.family,
-        }}>
-          <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color={colors.danger} />
-          전체 리셋
-        </button>
       </div>
 
       {/* ── 5x5 빙고판 */}
