@@ -511,7 +511,10 @@ export default function ChecklistPage({ state, setState }: Props) {
         }}>
           {TABS.map(tab=>{
             const isActive = activeTabId===tab.id
-            const badge = tab.id==='bucketlist' ? Object.keys(state.selected).length
+            const badge = tab.id==='bucketlist' ? Object.keys(state.selected).reduce((acc, id) => {
+                          const days = state.schedules[id] ?? []
+                          return acc + (days.length === 0 ? 1 : days.length)
+                        }, 0)
                         : tab.id==='shopping'   ? myListCount
                         : 0
             return (
