@@ -14,7 +14,7 @@ type DBItem = { id: string; category_id: string; label: string; icon: string | n
 import {
   AppState, TripInfo,
   toggleItem, setSchedule, setCategory, addCustom,
-  issueReceipt, resetAll, saveTrip, loadTrip, clearTrip,
+  issueReceipt, resetAll, saveTrip, loadTrip, loadState, clearTrip,
   fmt, getTripDays, fmtMD,
 } from '../store/state'
 import ScheduleSheet from '../components/ScheduleSheet'
