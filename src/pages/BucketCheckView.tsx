@@ -219,7 +219,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
   const allItems     = [...items, ...state.customItems.map(c => ({ ...c, emoji:'📝', categoryId: c.categoryId ?? 'custom' }))]
   const checkedItems = allItems.filter(i => state.selected[i.id])
-  const tripDays     = getTripDays(trip)
+  const tripDays     = trip ? getTripDays(trip) : []
 
   const byDay = new Map<number, typeof checkedItems>()
   checkedItems.forEach(item => {
