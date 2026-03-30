@@ -549,7 +549,24 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           )
         })()}
         {sortedDays.length===0 && checkedItems.filter(i => !(state.schedules[i.id]?.length)).length===0 && (
-          <div style={{ textAlign:'center', padding:'60px 20px', color:colors.textTertiary, fontSize:font.size.md }}>아직 담긴 항목이 없어요</div>
+          <div style={{ textAlign:'center', padding:'60px 20px', display:'flex', flexDirection:'column', alignItems:'center', gap:spacing[4] }}>
+            <Icon icon="ph:list-checks" width={48} height={48} color={colors.gray300} />
+            <div>
+              <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[1] }}>아직 담긴 항목이 없어요</div>
+              <div style={{ fontSize:font.size.sm, color:colors.textTertiary }}>호주에서 꼭 해볼 것들을 담아보세요!</div>
+            </div>
+            <button onClick={onEdit} style={{
+              height:44, padding:`0 ${spacing[6]}px`,
+              background:colors.primary, color:'#fff',
+              border:'none', borderRadius:radius.sm,
+              fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', fontFamily:font.family,
+              display:'flex', alignItems:'center', gap:spacing[2],
+            }}>
+              <Icon icon="ph:plus-circle" width={18} height={18} color="#fff" />
+              리스트 추가하기
+            </button>
+          </div>
         )}
       </div>
 
