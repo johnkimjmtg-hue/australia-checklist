@@ -509,25 +509,25 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       </div>
 
       {/* ── 공유 / 리셋 버튼 */}
-      <div style={{ display:'flex', gap: spacing[2], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
+      <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[2], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
         <button onClick={handleShare} style={{
-          flex:1, height:34, borderRadius: radius.full,
+          height:30, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
           border:`1px solid ${colors.border}`, background: colors.bgCard,
           color: colors.textSecondary, fontSize: font.size.xs, fontWeight: font.weight.bold,
           display:'flex', alignItems:'center', justifyContent:'center', gap:4,
           cursor:'pointer', fontFamily: font.family,
         }}>
-          <Icon icon="ph:share-network" width={13} height={13} color={colors.textSecondary} />
+          <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
           공유하기
         </button>
         <button onClick={() => setShowReset(true)} style={{
-          flex:1, height:34, borderRadius: radius.full,
+          height:30, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
           border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
           color: colors.danger, fontSize: font.size.xs, fontWeight: font.weight.bold,
           display:'flex', alignItems:'center', justifyContent:'center', gap:4,
           cursor:'pointer', fontFamily: font.family,
         }}>
-          <Icon icon="ph:arrow-counter-clockwise" width={13} height={13} color={colors.danger} />
+          <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color={colors.danger} />
           전체 리셋
         </button>
       </div>
