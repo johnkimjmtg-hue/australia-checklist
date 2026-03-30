@@ -222,7 +222,7 @@ function Fireworks() {
 // ── 상황 메시지
 function getStatusMsg(checked: number, bingo: number, city: 'melbourne'|'sydney'): { title: string; sub: string } {
   const isMel = city === 'melbourne'
-  if (checked === 0)  return { title: '카페 도장깨기 시작!', sub: '카페를 방문하면 해당 칸을 눌러보세요 ☕' }
+  if (checked === 0)  return { title: '카페 빙고 시작!', sub: '카페를 방문하면 해당 칸을 눌러보세요 ☕' }
   if (checked === 25) return { title: '🏆 판테온 완전정복!', sub: isMel ? '당신은 멜번을 지배하는 궁극의 카페의 신입니다!' : '당신은 시드니를 지배하는 궁극의 카페의 신입니다!' }
   if (bingo >= 5)     return { title: `🎉 ${bingo}빙고 달성!`, sub: `${checked}개 카페를 방문했어요. 거의 다 왔어요!` }
   if (bingo >= 3)     return { title: `✨ ${bingo}빙고 달성!`, sub: `${checked}개 카페 완료! 계속 도전해봐요` }
@@ -352,9 +352,9 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
     const isMelbourne = city === 'melbourne'
     const cityName    = isMelbourne ? '멜번' : '시드니'
     const link = isMelbourne ? 'hojugaja.com/app?tab=bingo&city=melbourne' : 'hojugaja.com/app?tab=bingo&city=sydney'
-    const title       = `${cityName} 카페 도장깨기 빙고게임`
+    const title       = `${cityName} 카페 빙고게임`
     const lines: string[] = [
-      `☕ ${cityName} 카페 도장깨기 빙고게임, 지금 바로 시작하세요!`,
+      `☕ ${cityName} 카페 빙고게임, 지금 바로 시작하세요!`,
       `${cityName}의 스페셜티 카페 25곳을 방문하고, 빙고를 완성하세요.`,
     ]
     if (checked.size > 0) lines.push(`나는 현재 ${checked.size}/25개 카페를 방문했어요!${bingoCount > 0 ? ` 🟢 ${bingoCount}빙고 달성!` : ''}`)
@@ -867,7 +867,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
             animation:'scaleIn 0.22s ease',
           }}>
             <div style={{ fontSize:32, marginBottom:8 }}>☕</div>
-            <p style={{ fontSize:16, fontWeight:700, color:'#0F172A', marginBottom:8, lineHeight:1.5 }}>도장깨기를 리셋하시겠습니까?</p>
+            <p style={{ fontSize:16, fontWeight:700, color:'#0F172A', marginBottom:8, lineHeight:1.5 }}>빙고를 리셋하시겠습니까?</p>
             <p style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.6 }}>지금까지의 방문 기록이 모두 삭제됩니다.</p>
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={() => setShowReset(false)} style={{
