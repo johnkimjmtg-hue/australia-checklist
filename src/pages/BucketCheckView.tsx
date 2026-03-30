@@ -4,9 +4,10 @@ import { supabase } from '../lib/supabase'
 import { getCachedBusinesses, getCachedShopping } from '../lib/dataCache'
 import { colors, font, radius, spacing, shadow, T } from '../styles/tokens'
 import { AlertModal } from '../components/ui'
+import ScheduleSheet from '../components/ScheduleSheet'
 
 type DBItem = { id: string; category_id: string; label: string; icon: string | null; sort_order: number; address?: string | null; description?: string | null; related_business_id?: string | null; related_business_ids?: string[] | null; image_url?: string | null; tips?: string | null; related_product_ids?: string[] | null }
-import { AppState, TripInfo, getTripDays, fmtMD, dow } from '../store/state'
+import { AppState, TripInfo, getTripDays, fmtMD, dow, setSchedule } from '../store/state'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import BusinessCard from '../components/BusinessCard'
@@ -15,7 +16,7 @@ import type { Business } from '../lib/businessService'
 type Filter = 'all' | 'done' | 'todo'
 type Props = {
   state:      AppState
-  trip:       TripInfo
+  trip:       TripInfo | null
   setState:   (s: AppState) => void
   items:      CheckItem[]
   dbItems:    DBItem[]
@@ -186,6 +187,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [sheetItem, setSheetItem]       = useState<{id:string;label:string}|null>(null)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [deleteItemId, setDeleteItemId] = useState<{ id: string; day?: number } | null>(null)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
@@ -446,7 +448,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           <div style={{ flex:1 }}>
             <div style={{ fontSize:font.size['2xl'], fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[1], lineHeight:1.2 }}>나의 버킷리스트</div>
             <div style={{ fontSize:font.size.sm, color:colors.textSecondary, fontWeight:font.weight.medium, marginBottom:spacing[2] }}>
-              {trip.startDate.slice(5).replace('-','/')} ~ {trip.endDate.slice(5).replace('-','/')}
+              {trip ? `${trip.startDate.slice(5).replace('-','/')} ~ ${trip.endDate.slice(5).replace('-','/')}` : '일정 미설정'}
             </div>
             <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:spacing[1] }}>
               <span style={{ fontSize:font.size['3xl'], fontWeight:font.weight.bold, color:colors.textPrimary, lineHeight:1 }}>{achievedCount}</span>
@@ -533,7 +535,21 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                 <span style={{ fontSize:font.size.sm, color:colors.textSecondary, fontWeight:font.weight.medium }}>{doneCount}/{items.length}</span>
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
-                {items.map(item => <CheckRow key={item.id} item={item}/>)}
+                {items.map(item => (
+                  <div key={item.id} style={{ position:'relative' }}>
+                    <CheckRow item={item}/>
+                    <button
+                      onClick={e => { e.stopPropagation(); setSheetItem({ id: item.id, label: item.label }) }}
+                      style={{
+                        position:'absolute', bottom:8, right:52,
+                        background:'none', border:'none', cursor:'pointer',
+                        fontSize:font.size.xs, color:colors.primary, fontWeight:font.weight.bold,
+                        padding:'2px 6px', fontFamily:font.family,
+                        textDecoration:'underline',
+                      }}
+                    >일정 지정</button>
+                  </div>
+                ))}
               </div>
             </div>
           )
@@ -544,6 +560,17 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       </div>
 
 
+
+      {/* ── ScheduleSheet ── */}
+      {sheetItem && trip && (
+        <ScheduleSheet
+          itemLabel={sheetItem.label}
+          trip={trip}
+          currentDays={state.schedules[sheetItem.id] ?? []}
+          onSelect={days => { setState(setSchedule(state, sheetItem.id, days)) }}
+          onClose={() => setSheetItem(null)}
+        />
+      )}
 
       {/* ══ 더보기 모달 ══ */}
       {showMoreMenu && (

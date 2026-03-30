@@ -178,14 +178,7 @@ export default function ChecklistPage({ state, setState }: Props) {
   }
 
   const handleIssue = () => {
-    if(!trip){ setModal('noTrip'); return }
     if(done===0){ setModal('noItems'); return }
-    const checkedIds=Object.keys(state.selected)
-    const unscheduled=checkedIds.filter(id=>!(state.schedules[id]?.length))
-    if(unscheduled.length>0){ setModal('noSchedule'); return }
-    const at=fmt(new Date()); setIssuedAt(at)
-    const next = issueReceipt(state,at)
-    setState(next)
     setMainTab('bucketcheck')
   }
   const triggerShake = () => { setShakeBtn(true); setTimeout(()=>setShakeBtn(false),600) }
@@ -493,8 +486,8 @@ export default function ChecklistPage({ state, setState }: Props) {
               cursor:'pointer', fontFamily:ff, animation:shakeBtn?'shake 0.5s ease':'none',
               display:'flex', alignItems:'center', justifyContent:'center', gap:6,
             }}>
-              <Icon icon="ph:paper-plane-right" width={16} height={16} color="#fff" />
-              버킷리스트 발행하기
+              <Icon icon="ph:list-checks" width={16} height={16} color="#fff" />
+              나의 버킷리스트 보기
             </button>
             <button onClick={()=>setModal('confirmReset')} style={{
               flex:1, height:44, background:colors.bgCard, color:colors.gray600,
