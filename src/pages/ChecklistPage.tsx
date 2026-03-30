@@ -161,6 +161,10 @@ export default function ChecklistPage({ state, setState }: Props) {
   const searchResults = searchQuery.trim() ? allItems.filter(i=>{ const q=searchQuery.trim().toLowerCase(); const db=dbItems.find(d=>d.id===i.id); return i.label.toLowerCase().includes(q)||(db?.description??'').toLowerCase().includes(q)||(db?.address??'').toLowerCase().includes(q) }) : null
 
   const done  = Object.keys(state.selected).length
+  const bucketBadge = Object.keys(state.selected).reduce((acc, id) => {
+    const days = state.schedules[id] ?? []
+    return acc + (days.length === 0 ? 1 : days.length)
+  }, 0)
   const total = allItems.length
   const unscheduledCount = Object.keys(state.selected).filter(id=>!(state.schedules[id]?.length)).length
   const tripLabel = trip ? `${trip.startDate.slice(5).replace('-','/')}~${trip.endDate.slice(5).replace('-','/')}` : null
@@ -372,7 +376,7 @@ export default function ChecklistPage({ state, setState }: Props) {
                     display:'flex', alignItems:'center', gap:4,
                   }}>
                     <Icon icon="ph:list-checks" width={12} height={12} color="#fff" />
-                    {`내 버킷리스트 (${done})`}
+                    {`내 버킷리스트 (${bucketBadge})`}
                   </button>
                   <button onClick={()=>setModal('confirmReset')} style={{
                     height:28, paddingLeft:10, paddingRight:10, background:colors.bgCard, color:colors.gray600,
