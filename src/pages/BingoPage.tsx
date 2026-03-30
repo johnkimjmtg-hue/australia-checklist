@@ -508,8 +508,32 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
         </div>
       </div>
 
+      {/* ── 공유 / 리셋 버튼 */}
+      <div style={{ display:'flex', gap: spacing[2], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
+        <button onClick={handleShare} style={{
+          flex:1, height:34, borderRadius: radius.full,
+          border:`1px solid ${colors.border}`, background: colors.bgCard,
+          color: colors.textSecondary, fontSize: font.size.xs, fontWeight: font.weight.bold,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          cursor:'pointer', fontFamily: font.family,
+        }}>
+          <Icon icon="ph:share-network" width={13} height={13} color={colors.textSecondary} />
+          공유하기
+        </button>
+        <button onClick={() => setShowReset(true)} style={{
+          flex:1, height:34, borderRadius: radius.full,
+          border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
+          color: colors.danger, fontSize: font.size.xs, fontWeight: font.weight.bold,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          cursor:'pointer', fontFamily: font.family,
+        }}>
+          <Icon icon="ph:arrow-counter-clockwise" width={13} height={13} color={colors.danger} />
+          전체 리셋
+        </button>
+      </div>
+
       {/* ── 5x5 빙고판 */}
-      <div style={{ flex:1, padding:`8px 12px ${embedded ? '60px' : '80px'}`, overflowY:'auto', minHeight:0 }}>
+      <div style={{ flex:1, padding:`8px 12px ${embedded ? '60px' : '20px'}`, overflowY:'auto', minHeight:0 }}>
         <div style={{
           display:'grid', gridTemplateColumns:'repeat(5, 1fr)',
           gap:6,
@@ -607,15 +631,10 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
             handleCell(idx)
             setSelectedCafe(null)
           } else {
-            // 방문 완료 (인증샷 유무 상관없이 방문하기 버튼으로만)
+            // 방문 완료
             handleCell(idx)
             setTimeout(() => setSelectedCafe(null), 400)
           }
-        }
-        const handleVisitWithPhoto = () => {
-          // 미방문 → 방문하기 버튼
-          handleCell(idx)
-          setTimeout(() => setSelectedCafe(null), 400)
         }
 
         return (
@@ -637,25 +656,24 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
               {/* 인증샷 미리보기 */}
               {photos[idx] && (
-                <div style={{ marginBottom: spacing[3], position:'relative' }}>
+                <div style={{ marginBottom: spacing[3] }}>
                   <div style={{ borderRadius: radius.md, overflow:'hidden', height:180 }}>
                     <img src={photos[idx]} alt="인증샷" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                   </div>
-                  {/* 방문완료 상태일 때만 삭제 아이콘 표시 */}
-                  {isChecked && (
-                    <button onClick={() => {
-                      const next = { ...photos }
-                      delete next[idx]
-                      setPhotos(next)
-                    }} style={{
-                      position:'absolute', top:8, right:8,
-                      width:32, height:32, borderRadius:'50%',
-                      background:'rgba(0,0,0,0.55)', border:'none',
-                      cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-                    }}>
-                      <Icon icon="ph:trash" width={16} height={16} color="#fff" />
-                    </button>
-                  )}
+                  <button onClick={() => {
+                    const next = { ...photos }
+                    delete next[idx]
+                    setPhotos(next)
+                  }} style={{
+                    width:'100%', marginTop: spacing[1], height:32,
+                    background:'none', border:`1px solid ${colors.border}`,
+                    borderRadius: radius.sm, cursor:'pointer',
+                    fontSize: font.size.xs, color: colors.textTertiary,
+                    fontFamily: font.family, display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+                  }}>
+                    <Icon icon="ph:trash" width={13} height={13} color={colors.textTertiary} />
+                    인증샷 삭제
+                  </button>
                 </div>
               )}
 
@@ -678,63 +696,34 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
               {/* 버튼 영역 */}
               <div style={{ display:'flex', gap: spacing[2] }}>
-                {isChecked ? (
-                  <>
-                    {/* 방문완료 상태: 방문 취소 + 이미지 변경 */}
-                    <button onClick={handleToggle} style={{
-                      flex:2, height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
-                      background: colors.dangerLight, color: colors.danger,
-                      fontSize: font.size.md, fontWeight: font.weight.bold,
-                      display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
-                      fontFamily: font.family, transition:'all 0.15s',
-                    }}>
-                      <Icon icon="ph:x-circle" width={20} height={20} color={colors.danger} />
-                      방문 취소
-                    </button>
-                    <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
-                      flex:1, height:50, borderRadius: radius.md,
-                      border:`1px solid ${colors.border}`, background: colors.bgCard,
-                      color: colors.textSecondary, fontSize: font.size.sm, fontWeight: font.weight.bold,
-                      display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-                      cursor:'pointer', fontFamily: font.family,
-                      opacity: uploadingPhoto ? 0.6 : 1,
-                    }}>
-                      {uploadingPhoto
-                        ? <Icon icon="ph:circle-notch" width={16} height={16} color={colors.textSecondary} style={{ animation:'spin 0.8s linear infinite' }} />
-                        : <Icon icon="ph:camera" width={16} height={16} color={colors.textSecondary} />
-                      }
-                      이미지 변경
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    {/* 미방문 상태: 방문하기 + 인증샷 */}
-                    <button onClick={handleVisitWithPhoto} style={{
-                      flex:2, height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
-                      background: colors.primary, color: '#fff',
-                      fontSize: font.size.md, fontWeight: font.weight.bold,
-                      display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
-                      fontFamily: font.family, transition:'all 0.15s',
-                    }}>
-                      <Icon icon="ph:check-circle" width={20} height={20} color="#fff" />
-                      방문완료
-                    </button>
-                    <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
-                      flex:1, height:50, borderRadius: radius.md,
-                      border:`1px solid ${colors.border}`, background: colors.bgCard,
-                      color: colors.textSecondary, fontSize: font.size.sm, fontWeight: font.weight.bold,
-                      display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-                      cursor:'pointer', fontFamily: font.family,
-                      opacity: uploadingPhoto ? 0.6 : 1,
-                    }}>
-                      {uploadingPhoto
-                        ? <Icon icon="ph:circle-notch" width={16} height={16} color={colors.textSecondary} style={{ animation:'spin 0.8s linear infinite' }} />
-                        : <Icon icon="ph:camera" width={16} height={16} color={colors.textSecondary} />
-                      }
-                      인증샷
-                    </button>
-                  </>
-                )}
+                {/* 방문 완료 버튼 */}
+                <button onClick={handleToggle} style={{
+                  flex:2, height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
+                  background: isChecked ? colors.dangerLight : colors.primary,
+                  color: isChecked ? colors.danger : '#fff',
+                  fontSize: font.size.md, fontWeight: font.weight.bold,
+                  display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
+                  fontFamily: font.family, transition:'all 0.15s',
+                }}>
+                  <Icon icon={isChecked ? 'ph:x-circle' : 'ph:check-circle'} width={20} height={20} color={isChecked ? colors.danger : '#fff'} />
+                  {isChecked ? '방문 취소' : '방문 완료!'}
+                </button>
+
+                {/* 인증샷 업로드 버튼 */}
+                <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
+                  flex:1, height:50, borderRadius: radius.md,
+                  border:`1px solid ${colors.border}`, background: colors.bgCard,
+                  color: colors.textSecondary, fontSize: font.size.sm, fontWeight: font.weight.bold,
+                  display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+                  cursor:'pointer', fontFamily: font.family,
+                  opacity: uploadingPhoto ? 0.6 : 1,
+                }}>
+                  {uploadingPhoto
+                    ? <Icon icon="ph:circle-notch" width={16} height={16} color={colors.textSecondary} style={{ animation:'spin 0.8s linear infinite' }} />
+                    : <Icon icon="ph:camera" width={16} height={16} color={colors.textSecondary} />
+                  }
+                  {photos[idx] ? '변경' : '인증샷'}
+                </button>
               </div>
 
               {/* 숨겨진 파일 입력 */}
@@ -776,6 +765,8 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                     if (data.secure_url) {
                       const next = { ...photos, [idx]: data.secure_url }
                       setPhotos(next)
+                      // 방문완료도 자동으로
+                      if (!isChecked) handleCell(idx)
                     }
                   } catch { alert('업로드 실패') }
                   setUploadingPhoto(false)
@@ -787,48 +778,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
         )
       })()}
 
-      {/* ── 푸터 */}
-      {!embedded && <div style={{
-        position:'fixed', bottom: 0,
-        left:'50%', transform:'translateX(-50%)',
-        width:'min(100%, 430px)',
-        padding:`${spacing[2]}px ${spacing[3]}px`,
-        background: colors.bgCard,
-        zIndex:50, boxSizing:'border-box',
-        display:'flex', gap: spacing[2],
-        borderTop:`1.5px solid ${colors.border}`,
-      }}>
-        <button onClick={() => setShowSaveConfirm(true)} style={{
-          flex:2, height:44, borderRadius: radius.sm, border:'none',
-          background: colors.primary, color: '#fff',
-          fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
-          display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-          WebkitTapHighlightColor:'transparent', fontFamily: font.family,
-        }}>
-          <Icon icon="ph:floppy-disk" width={16} height={16} color="#fff" />
-          저장하기
-        </button>
-        <button onClick={handleShare} style={{
-          flex:1, height:44, borderRadius: radius.sm,
-          border:`1px solid ${colors.border}`, background: colors.bgCard,
-          color: colors.primary, fontSize: font.size.md, fontWeight: font.weight.bold,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-          WebkitTapHighlightColor:'transparent', fontFamily: font.family,
-        }}>
-          <Icon icon="ph:share-network" width={15} height={15} color={colors.primary} />
-          공유
-        </button>
-        <button onClick={() => setShowReset(true)} style={{
-          flex:1, height:44, borderRadius: radius.sm,
-          border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
-          color: colors.danger, fontSize: font.size.md, fontWeight: font.weight.bold,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-          WebkitTapHighlightColor:'transparent', fontFamily: font.family,
-        }}>
-          <Icon icon="ph:arrow-counter-clockwise" width={15} height={15} color={colors.danger} />
-          리셋
-        </button>
-      </div>}
+
 
       {/* ── 저장 확인 팝업 */}
       {showSaveConfirm && (
