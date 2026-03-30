@@ -717,7 +717,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                       fontFamily: font.family, transition:'all 0.15s',
                     }}>
                       <Icon icon="ph:check-circle" width={20} height={20} color="#fff" />
-                      방문하기
+                      방문완료
                     </button>
                     <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
                       flex:1, height:50, borderRadius: radius.md,
