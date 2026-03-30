@@ -463,6 +463,39 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           </div>
           <CoinStack count={achievedCount} total={total} />
         </div>
+        {/* ── 버튼 */}
+        <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
+          <button onClick={onEdit} style={{
+            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
+            border:`1px solid ${colors.border}`, background: colors.bgCard,
+            color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
+            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+            cursor:'pointer', fontFamily: font.family,
+          }}>
+            <Icon icon="ph:pencil-simple" width={12} height={12} color={colors.textSecondary} />
+            리스트 수정하기
+          </button>
+          <button onClick={onShare} style={{
+            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
+            border:`1px solid ${colors.border}`, background: colors.bgCard,
+            color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
+            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+            cursor:'pointer', fontFamily: font.family,
+          }}>
+            <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
+            공유하기
+          </button>
+          <button onClick={() => setShowDelete(true)} style={{
+            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
+            border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
+            color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
+            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+            cursor:'pointer', fontFamily: font.family,
+          }}>
+            <Icon icon="ph:trash" width={12} height={12} color={colors.danger} />
+            리스트 비우기
+          </button>
+        </div>
       </div>
 
       {/* ══ 필터 ══ */}
@@ -481,7 +514,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       </div>
 
       {/* ══ 리스트 ══ */}
-      <div style={{ padding:`${spacing[2]}px 0 180px`, display:'flex', flexDirection:'column', gap:spacing[4] }}>
+      <div style={{ padding:`${spacing[2]}px 0 20px`, display:'flex', flexDirection:'column', gap:spacing[4] }}>
         {sortedDays.map(dayIdx => {
           const dayItems = (byDay.get(dayIdx) ?? []).filter(item => filterRow(item.id, dayIdx))
           if (!dayItems.length) return null
@@ -524,46 +557,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         )}
       </div>
 
-      {/* ══ 하단 버튼 — 탭바 위 ══ */}
-      <div style={{
-        position:'fixed', bottom:62,
-        left:'50%', transform:'translateX(-50%)',
-        width:'100%', maxWidth:430,
-        padding:`${spacing[2]}px ${spacing[3]}px`,
-        background:colors.bgPage,
-        zIndex:20, boxSizing:'border-box',
-        display:'flex', gap:spacing[2],
-        borderTop:`1.5px solid ${colors.border}`,
-      }}>
-        <button onClick={onEdit} style={{
-          flex:1, height:44, borderRadius:radius.sm,
-          border:`1px solid ${colors.border}`, background:colors.bgCard,
-          color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-          WebkitTapHighlightColor:'transparent', fontFamily:font.family,
-        }}>
-          <Icon icon="ph:pencil-simple" width={16} height={16} color={colors.textSecondary} />
-          리스트 수정하기
-        </button>
-        <button onClick={() => setShowSaveConfirm(true)} style={{
-          flex:1, height:44, borderRadius:radius.sm,
-          border:'none', background:colors.primary,
-          color:'#fff', fontSize:font.size.md, fontWeight:font.weight.bold,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-          WebkitTapHighlightColor:'transparent', fontFamily:font.family,
-        }}>
-          <Icon icon="ph:floppy-disk" width={16} height={16} color="#fff" />
-          저장하기
-        </button>
-        <button onClick={() => setShowMoreMenu(true)} style={{
-          width:44, height:44, borderRadius:radius.sm, flexShrink:0,
-          border:`1px solid ${colors.border}`, background:colors.bgCard,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-          WebkitTapHighlightColor:'transparent',
-        }}>
-          <Icon icon="ph:dots-three-vertical" width={18} height={18} color={colors.textSecondary} />
-        </button>
-      </div>
+
 
       {/* ══ 더보기 모달 ══ */}
       {showMoreMenu && (
