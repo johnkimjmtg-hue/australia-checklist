@@ -467,12 +467,12 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
           <button onClick={onEdit} style={{
             height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.border}`, background: colors.bgCard,
-            color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
+            border:`1px solid ${colors.primary}`, background: colors.bgCard,
+            color: colors.primary, fontSize: 11, fontWeight: font.weight.bold,
             display:'flex', alignItems:'center', justifyContent:'center', gap:3,
             cursor:'pointer', fontFamily: font.family,
           }}>
-            <Icon icon="ph:pencil-simple" width={12} height={12} color={colors.textSecondary} />
+            <Icon icon="ph:pencil-simple" width={12} height={12} color={colors.primary} />
             리스트 수정하기
           </button>
           <button onClick={onShare} style={{
@@ -498,20 +498,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         </div>
       </div>
 
-      {/* ══ 필터 ══ */}
-      <div style={{ padding:`${spacing[3]}px ${spacing[3]}px 0`, display:'flex', alignItems:'center', gap:spacing[2] }}>
-        <span style={{ fontSize:font.size.xs, color:colors.textTertiary, fontWeight:font.weight.medium, flexShrink:0 }}>필터</span>
-        {FILTERS.map(f => (
-          <button key={f.key} onClick={() => setFilter(f.key)} style={{
-            height:30, padding:`0 ${spacing[3]}px`, borderRadius:radius.full,
-            border: filter===f.key ? `1.5px solid ${colors.primary}` : `1px solid ${colors.border}`,
-            background: filter===f.key ? colors.primaryLight : colors.bgCard,
-            color: filter===f.key ? colors.primary : colors.textSecondary,
-            fontSize:font.size.sm, fontWeight: filter===f.key ? font.weight.bold : font.weight.regular,
-            cursor:'pointer', WebkitTapHighlightColor:'transparent', fontFamily:font.family,
-          }}>{f.label}</button>
-        ))}
-      </div>
 
       {/* ══ 리스트 ══ */}
       <div style={{ padding:`${spacing[2]}px 0 20px`, display:'flex', flexDirection:'column', gap:spacing[4] }}>
