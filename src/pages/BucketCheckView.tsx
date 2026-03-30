@@ -381,17 +381,19 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color: isAchieved ? colors.success : colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
             {item.label}
           </div>
-          <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'nowrap', overflow:'hidden' }}>
+          <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, overflow:'hidden' }}>
             {db?.description && (
-              <span style={{ fontSize:font.size.xs, color:colors.textTertiary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', maxWidth:80 }}>{db.description}</span>
+              <span style={{ fontSize:font.size.xs, color:colors.textTertiary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', flex:1, minWidth:0 }}>{db.description}</span>
             )}
-            {day === undefined && (
-              <span
-                onClick={e => { e.stopPropagation(); setSheetItem({ id: item.id, label: item.label }) }}
-                style={{ fontSize:font.size.xs, color:colors.warning, fontWeight:font.weight.bold, cursor:'pointer', textDecoration:'underline', textUnderlineOffset:2, whiteSpace:'nowrap', flexShrink:0 }}
-              >일정 지정</span>
-            )}
-            {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium, marginLeft:'auto', whiteSpace:'nowrap', flexShrink:0 }}>📍 {region.label}</span>}
+            <div style={{ display:'flex', alignItems:'center', gap:spacing[1], marginLeft:'auto', flexShrink:0 }}>
+              {day === undefined && (
+                <span
+                  onClick={e => { e.stopPropagation(); setSheetItem({ id: item.id, label: item.label }) }}
+                  style={{ fontSize:font.size.xs, color:colors.warning, fontWeight:font.weight.bold, cursor:'pointer', textDecoration:'underline', textUnderlineOffset:2, whiteSpace:'nowrap' }}
+                >일정 지정</span>
+              )}
+              {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium, whiteSpace:'nowrap' }}>📍 {region.label}</span>}
+            </div>
           </div>
         </div>
 
