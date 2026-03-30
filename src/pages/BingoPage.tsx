@@ -607,10 +607,15 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
             handleCell(idx)
             setSelectedCafe(null)
           } else {
-            // 방문 완료
+            // 방문 완료 (인증샷 유무 상관없이 방문하기 버튼으로만)
             handleCell(idx)
             setTimeout(() => setSelectedCafe(null), 400)
           }
+        }
+        const handleVisitWithPhoto = () => {
+          // 미방문 → 방문하기 버튼
+          handleCell(idx)
+          setTimeout(() => setSelectedCafe(null), 400)
         }
 
         return (
@@ -632,24 +637,25 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
               {/* 인증샷 미리보기 */}
               {photos[idx] && (
-                <div style={{ marginBottom: spacing[3] }}>
+                <div style={{ marginBottom: spacing[3], position:'relative' }}>
                   <div style={{ borderRadius: radius.md, overflow:'hidden', height:180 }}>
                     <img src={photos[idx]} alt="인증샷" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                   </div>
-                  <button onClick={() => {
-                    const next = { ...photos }
-                    delete next[idx]
-                    setPhotos(next)
-                  }} style={{
-                    width:'100%', marginTop: spacing[1], height:32,
-                    background:'none', border:`1px solid ${colors.border}`,
-                    borderRadius: radius.sm, cursor:'pointer',
-                    fontSize: font.size.xs, color: colors.textTertiary,
-                    fontFamily: font.family, display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-                  }}>
-                    <Icon icon="ph:trash" width={13} height={13} color={colors.textTertiary} />
-                    인증샷 삭제
-                  </button>
+                  {/* 방문완료 상태일 때만 삭제 아이콘 표시 */}
+                  {isChecked && (
+                    <button onClick={() => {
+                      const next = { ...photos }
+                      delete next[idx]
+                      setPhotos(next)
+                    }} style={{
+                      position:'absolute', top:8, right:8,
+                      width:32, height:32, borderRadius:'50%',
+                      background:'rgba(0,0,0,0.55)', border:'none',
+                      cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+                    }}>
+                      <Icon icon="ph:trash" width={16} height={16} color="#fff" />
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -672,34 +678,63 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
               {/* 버튼 영역 */}
               <div style={{ display:'flex', gap: spacing[2] }}>
-                {/* 방문 완료 버튼 */}
-                <button onClick={handleToggle} style={{
-                  flex:2, height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
-                  background: isChecked ? colors.dangerLight : colors.primary,
-                  color: isChecked ? colors.danger : '#fff',
-                  fontSize: font.size.md, fontWeight: font.weight.bold,
-                  display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
-                  fontFamily: font.family, transition:'all 0.15s',
-                }}>
-                  <Icon icon={isChecked ? 'ph:x-circle' : 'ph:check-circle'} width={20} height={20} color={isChecked ? colors.danger : '#fff'} />
-                  {isChecked ? '방문 취소' : '방문 완료!'}
-                </button>
-
-                {/* 인증샷 업로드 버튼 */}
-                <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
-                  flex:1, height:50, borderRadius: radius.md,
-                  border:`1px solid ${colors.border}`, background: colors.bgCard,
-                  color: colors.textSecondary, fontSize: font.size.sm, fontWeight: font.weight.bold,
-                  display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-                  cursor:'pointer', fontFamily: font.family,
-                  opacity: uploadingPhoto ? 0.6 : 1,
-                }}>
-                  {uploadingPhoto
-                    ? <Icon icon="ph:circle-notch" width={16} height={16} color={colors.textSecondary} style={{ animation:'spin 0.8s linear infinite' }} />
-                    : <Icon icon="ph:camera" width={16} height={16} color={colors.textSecondary} />
-                  }
-                  {photos[idx] ? '변경' : '인증샷'}
-                </button>
+                {isChecked ? (
+                  <>
+                    {/* 방문완료 상태: 방문 취소 + 이미지 변경 */}
+                    <button onClick={handleToggle} style={{
+                      flex:2, height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
+                      background: colors.dangerLight, color: colors.danger,
+                      fontSize: font.size.md, fontWeight: font.weight.bold,
+                      display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
+                      fontFamily: font.family, transition:'all 0.15s',
+                    }}>
+                      <Icon icon="ph:x-circle" width={20} height={20} color={colors.danger} />
+                      방문 취소
+                    </button>
+                    <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
+                      flex:1, height:50, borderRadius: radius.md,
+                      border:`1px solid ${colors.border}`, background: colors.bgCard,
+                      color: colors.textSecondary, fontSize: font.size.sm, fontWeight: font.weight.bold,
+                      display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+                      cursor:'pointer', fontFamily: font.family,
+                      opacity: uploadingPhoto ? 0.6 : 1,
+                    }}>
+                      {uploadingPhoto
+                        ? <Icon icon="ph:circle-notch" width={16} height={16} color={colors.textSecondary} style={{ animation:'spin 0.8s linear infinite' }} />
+                        : <Icon icon="ph:camera" width={16} height={16} color={colors.textSecondary} />
+                      }
+                      이미지 변경
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {/* 미방문 상태: 방문하기 + 인증샷 */}
+                    <button onClick={handleVisitWithPhoto} style={{
+                      flex:2, height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
+                      background: colors.primary, color: '#fff',
+                      fontSize: font.size.md, fontWeight: font.weight.bold,
+                      display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
+                      fontFamily: font.family, transition:'all 0.15s',
+                    }}>
+                      <Icon icon="ph:check-circle" width={20} height={20} color="#fff" />
+                      방문하기
+                    </button>
+                    <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
+                      flex:1, height:50, borderRadius: radius.md,
+                      border:`1px solid ${colors.border}`, background: colors.bgCard,
+                      color: colors.textSecondary, fontSize: font.size.sm, fontWeight: font.weight.bold,
+                      display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+                      cursor:'pointer', fontFamily: font.family,
+                      opacity: uploadingPhoto ? 0.6 : 1,
+                    }}>
+                      {uploadingPhoto
+                        ? <Icon icon="ph:circle-notch" width={16} height={16} color={colors.textSecondary} style={{ animation:'spin 0.8s linear infinite' }} />
+                        : <Icon icon="ph:camera" width={16} height={16} color={colors.textSecondary} />
+                      }
+                      인증샷
+                    </button>
+                  </>
+                )}
               </div>
 
               {/* 숨겨진 파일 입력 */}
@@ -741,8 +776,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                     if (data.secure_url) {
                       const next = { ...photos, [idx]: data.secure_url }
                       setPhotos(next)
-                      // 방문완료도 자동으로
-                      if (!isChecked) handleCell(idx)
                     }
                   } catch { alert('업로드 실패') }
                   setUploadingPhoto(false)
