@@ -177,6 +177,11 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 : '찜한 상품을 체크하며 쇼핑하세요!'}
             </div>
           </div>
+          {/* 퍼센트 */}
+          <div style={{ textAlign:'center', flexShrink:0 }}>
+            <div style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: pct === 100 ? '#FF6B9D' : colors.textPrimary, lineHeight:1 }}>{pct}</div>
+            <div style={{ fontSize: font.size.lg, color: colors.textSecondary, fontWeight: font.weight.medium, marginTop:2 }}>%</div>
+          </div>
         </div>
         {/* ── 버튼 */}
         <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
