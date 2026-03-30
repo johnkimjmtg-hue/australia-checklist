@@ -159,7 +159,7 @@ export default function NearbyMap({ onBack }: Props) {
         center: { lat: -33.8688, lng: 151.2093 },
         zoom: 13,
         minZoom: 10,
-        maxZoom: 13,
+        maxZoom: 18,
         disableDefaultUI: true,
         zoomControl: false,
         styles: [{ featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }],
