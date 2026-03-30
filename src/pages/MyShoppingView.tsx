@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useImperativeHandle, forwardRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 import { getCachedShopping } from '../lib/dataCache'
@@ -50,12 +50,9 @@ type Props = {
   myChecked: Record<string, boolean>
   onMyListChange: (next: string[]) => void
   onMyCheckedChange: (next: Record<string, boolean>) => void
-  embedded?: boolean
 }
 
-export type MyShoppingRef = { triggerSave: () => void; triggerShare: () => void; triggerMoreMenu: () => void; triggerBack: () => void }
-
-const MyShoppingView = forwardRef<MyShoppingRef, Props>(function MyShoppingView({ onBack, onLanding, myList, myChecked, onMyListChange, onMyCheckedChange, embedded = false }: Props, ref) {
+export default function MyShoppingView({ onBack, onLanding, myList, myChecked, onMyListChange, onMyCheckedChange }: Props) {
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const [selProduct, setSelProduct]   = useState<Product | null>(null)
   const [loading, setLoading]         = useState(true)
@@ -75,13 +72,16 @@ const MyShoppingView = forwardRef<MyShoppingRef, Props>(function MyShoppingView(
     '오늘의 득템을 향해!',
   ]
   const pageRef = useRef<HTMLDivElement>(null)
+  const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
 
-  useImperativeHandle(ref, () => ({
-    triggerSave: () => setShowSaveConfirm(true),
-    triggerShare: () => { const el = document.querySelector('[data-share-btn]') as HTMLButtonElement; el?.click() },
-    triggerMoreMenu: () => setShowMoreMenu(true),
-    triggerBack: () => onBack(),
-  }))
+  useEffect(() => {
+    const updateWidth = () => {
+      if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
+    }
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [])
 
   useEffect(() => {
     const cached = getCachedShopping()
@@ -178,6 +178,39 @@ const MyShoppingView = forwardRef<MyShoppingRef, Props>(function MyShoppingView(
             </div>
           </div>
         </div>
+        {/* ── 버튼 */}
+        <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
+          <button onClick={onBack} style={{
+            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
+            border:`1px solid ${colors.border}`, background: colors.bgCard,
+            color: '#FF6B9D', fontSize: 11, fontWeight: font.weight.bold,
+            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+            cursor:'pointer', fontFamily: font.family,
+          }}>
+            <Icon icon="ph:shopping-bag" width={12} height={12} color="#FF6B9D" />
+            상품 추가하기
+          </button>
+          <button onClick={() => setShowReceipt(true)} style={{
+            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
+            border:`1px solid ${colors.border}`, background: colors.bgCard,
+            color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
+            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+            cursor:'pointer', fontFamily: font.family,
+          }}>
+            <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
+            공유하기
+          </button>
+          <button onClick={() => setShowDeleteAll(true)} style={{
+            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
+            border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
+            color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
+            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+            cursor:'pointer', fontFamily: font.family,
+          }}>
+            <Icon icon="ph:trash" width={12} height={12} color={colors.danger} />
+            리스트 비우기
+          </button>
+        </div>
       </div>
 
       {/* ── 필터 */}
@@ -188,7 +221,7 @@ const MyShoppingView = forwardRef<MyShoppingRef, Props>(function MyShoppingView(
       </div>
 
       {/* ── 리스트 */}
-      <div style={{ padding:'12px 16px 130px', display:'flex', flexDirection:'column', gap:20 }}>
+      <div style={{ padding:'12px 16px 20px', display:'flex', flexDirection:'column', gap:20 }}>
         {loading ? (
           <div style={{ textAlign:'center', padding:'40px 0', color:'#94A3B8', fontSize:14 }}>불러오는 중...</div>
         ) : total === 0 ? (
@@ -274,46 +307,7 @@ const MyShoppingView = forwardRef<MyShoppingRef, Props>(function MyShoppingView(
         {/* 전체 완료 축하 */}
       </div>
 
-      {/* ── 하단 버튼 (embedded 아닐 때만) */}
-      {!embedded && (
-      <div style={{
-        position:'fixed', bottom:62,
-        left:'50%', transform:'translateX(-50%)',
-        width:'100%', maxWidth:430,
-        padding:`${spacing[2]}px ${spacing[3]}px`,
-        background: colors.bgPage, zIndex:20, boxSizing:'border-box',
-        display:'flex', gap: spacing[2], borderTop:`1.5px solid ${colors.border}`,
-      }}>
-        <button onClick={onBack} style={{
-          flex:1, height:44, borderRadius: radius.sm, border:`1px solid ${colors.border}`,
-          background: colors.bgCard, color: '#FF6B9D',
-          fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
-          display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-          WebkitTapHighlightColor:'transparent', fontFamily: font.family,
-        }}>
-          <Icon icon="ph:shopping-bag" width={18} height={18} color="#FF6B9D" />
-          상품 추가하기
-        </button>
-        <button onClick={() => setShowSaveConfirm(true)} style={{
-          flex:1, height:44, borderRadius: radius.sm, border:'none',
-          background: '#FF6B9D', color: '#fff',
-          fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer',
-          display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-          WebkitTapHighlightColor:'transparent', fontFamily: font.family,
-        }}>
-          <Icon icon="ph:floppy-disk" width={18} height={18} color="#fff" />
-          저장하기
-        </button>
-        <button onClick={() => setShowMoreMenu(true)} style={{
-          width:44, height:44, borderRadius: radius.sm, flexShrink:0,
-          border:`1px solid ${colors.border}`, background: colors.bgCard,
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-          WebkitTapHighlightColor:'transparent',
-        }}>
-          <Icon icon="ph:dots-three-vertical" width={18} height={18} color={colors.textSecondary} />
-        </button>
-      </div>
-      )}
+
 
       {/* ══ 더보기 모달 (아래서 올라오는 시트) ══ */}
       {showMoreMenu && (
@@ -537,7 +531,7 @@ const MyShoppingView = forwardRef<MyShoppingRef, Props>(function MyShoppingView(
 
     </div>
   )
-})
+}
 interface Petal { id: number; x: number; color: string; size: number; duration: number; delay: number; shape: string }
 
 function PetalBurst({ trigger }: { trigger: number }) {
@@ -875,5 +869,3 @@ function MiniGiftGrid({ total, checkedCount }: { total: number; checkedCount: nu
     </div>
   )
 }
-
-export default MyShoppingView
