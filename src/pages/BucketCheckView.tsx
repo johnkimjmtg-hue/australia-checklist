@@ -368,11 +368,11 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           transition:'all 0.15s',
         }}
       >
-        {/* 동그란 이미지 — 체크리스트와 동일 */}
-        <div style={{ width:44, height:44, borderRadius:'50%', flexShrink:0, background:colors.gray100, border:`1px solid ${colors.border}`, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
+        {/* 이미지 — 체크리스트와 동일 */}
+        <div style={{ width:56, height:56, borderRadius:radius.sm, flexShrink:0, background:colors.gray100, border:`1px solid ${colors.border}`, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
           {db?.image_url
             ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-            : <Icon icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'} width={22} height={22} color={colors.gray400} />
+            : <Icon icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'} width={26} height={26} color={colors.gray400} />
           }
         </div>
 
@@ -381,11 +381,17 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color: isAchieved ? colors.success : colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
             {item.label}
           </div>
-          <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'wrap' }}>
+          <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, flexWrap:'nowrap', overflow:'hidden' }}>
             {db?.description && (
-              <span style={{ fontSize:font.size.xs, color:colors.textTertiary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', maxWidth:160 }}>{db.description}</span>
+              <span style={{ fontSize:font.size.xs, color:colors.textTertiary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', maxWidth:80 }}>{db.description}</span>
             )}
-            {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium, marginLeft:'auto' }}>📍 {region.label}</span>}
+            {day === undefined && (
+              <span
+                onClick={e => { e.stopPropagation(); setSheetItem({ id: item.id, label: item.label }) }}
+                style={{ fontSize:font.size.xs, color:colors.warning, fontWeight:font.weight.bold, cursor:'pointer', textDecoration:'underline', textUnderlineOffset:2, whiteSpace:'nowrap', flexShrink:0 }}
+              >일정 지정</span>
+            )}
+            {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium, marginLeft:'auto', whiteSpace:'nowrap', flexShrink:0 }}>📍 {region.label}</span>}
           </div>
         </div>
 
@@ -535,21 +541,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                 <span style={{ fontSize:font.size.sm, color:colors.textSecondary, fontWeight:font.weight.medium }}>{doneCount}/{items.length}</span>
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
-                {items.map(item => (
-                  <div key={item.id} style={{ position:'relative' }}>
-                    <CheckRow item={item}/>
-                    <button
-                      onClick={e => { e.stopPropagation(); setSheetItem({ id: item.id, label: item.label }) }}
-                      style={{
-                        position:'absolute', bottom:8, right:52,
-                        background:'none', border:'none', cursor:'pointer',
-                        fontSize:font.size.xs, color:colors.primary, fontWeight:font.weight.bold,
-                        padding:'2px 6px', fontFamily:font.family,
-                        textDecoration:'underline',
-                      }}
-                    >일정 지정</button>
-                  </div>
-                ))}
+                {items.map(item => <CheckRow key={item.id} item={item}/>)}
               </div>
             </div>
           )
