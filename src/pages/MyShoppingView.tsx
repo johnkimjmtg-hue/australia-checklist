@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useImperativeHandle, forwardRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 import { getCachedShopping } from '../lib/dataCache'
@@ -50,9 +50,12 @@ type Props = {
   myChecked: Record<string, boolean>
   onMyListChange: (next: string[]) => void
   onMyCheckedChange: (next: Record<string, boolean>) => void
+  embedded?: boolean
 }
 
-export default function MyShoppingView({ onBack, onLanding, myList, myChecked, onMyListChange, onMyCheckedChange }: Props) {
+export type MyShoppingRef = { triggerSave: () => void; triggerShare: () => void; triggerMoreMenu: () => void; triggerBack: () => void }
+
+const MyShoppingView = forwardRef<MyShoppingRef, Props>(function MyShoppingView({ onBack, onLanding, myList, myChecked, onMyListChange, onMyCheckedChange, embedded = false }: Props, ref) {
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const [selProduct, setSelProduct]   = useState<Product | null>(null)
   const [loading, setLoading]         = useState(true)
@@ -72,6 +75,22 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
     '오늘의 득템을 향해!',
   ]
   const pageRef = useRef<HTMLDivElement>(null)
+
+  useImperativeHandle(ref, () => ({
+    triggerSave: () => setShowSaveConfirm(true),
+    triggerShare: () => { const el = document.querySelector('[data-share-btn]') as HTMLButtonElement; el?.click() },
+    triggerMoreMenu: () => setShowMoreMenu(true),
+    triggerBack: () => onBack(),
+  }))
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
+    }
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [])
 
   useEffect(() => {
     const cached = getCachedShopping()
@@ -264,7 +283,8 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         {/* 전체 완료 축하 */}
       </div>
 
-      {/* ── 하단 버튼 */}
+      {/* ── 하단 버튼 (embedded 아닐 때만) */}
+      {!embedded && (
       <div style={{
         position:'fixed', bottom:62,
         left:'50%', transform:'translateX(-50%)',
@@ -302,6 +322,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           <Icon icon="ph:dots-three-vertical" width={18} height={18} color={colors.textSecondary} />
         </button>
       </div>
+      )}
 
       {/* ══ 더보기 모달 (아래서 올라오는 시트) ══ */}
       {showMoreMenu && (
@@ -863,3 +884,5 @@ function MiniGiftGrid({ total, checkedCount }: { total: number; checkedCount: nu
     </div>
   )
 }
+
+export default MyShoppingView

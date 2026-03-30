@@ -28,6 +28,7 @@ import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 import BingoPage from './BingoPage'
 import type { BingoRef } from './BingoPage'
+import type { MyShoppingRef } from './MyShoppingView'
 import { getCachedChecklist, getCachedShopping, getCachedBusinesses } from '../lib/dataCache'
 import TermsPage from './TermsPage'
 import logoImg from '../assets/logo.png'
@@ -87,6 +88,7 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [termsTab, setTermsTab]       = useState<'terms'|'privacy'|null>(null)
   const logoTapTimer = useRef<any>(null)
   const bingoRef = useRef<BingoRef>(null)
+  const myShoppingRef = useRef<MyShoppingRef>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [bizCount, setBizCount]       = useState(0)
@@ -233,7 +235,7 @@ export default function ChecklistPage({ state, setState }: Props) {
       ) : mainTab==='shopping' ? (
           <Shopping myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onGoToMyList={()=>setMainTab('myshoppinglist')} />
       ) : mainTab==='myshoppinglist' ? (
-          <MyShoppingView myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
+          <MyShoppingView ref={myShoppingRef} embedded={true} myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
       ) : mainTab==='nearby' ? (
         <div style={{ position:'fixed', top:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, height:'calc(100dvh - 62px)', display:'flex', flexDirection:'column', zIndex:5, background:colors.bgPage }}>
           <NearbyMap onBack={()=>setMainTab('bucketlist')} />
@@ -492,6 +494,36 @@ export default function ChecklistPage({ state, setState }: Props) {
               border:`1px solid ${colors.gray400}`, borderRadius:radius.sm, fontSize:font.size.sm, fontWeight:font.weight.bold,
               cursor:'pointer', fontFamily:ff,
             }}>초기화</button>
+          </div>
+        )}
+        {mainTab==='myshoppinglist'&&(
+          <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2], borderTop:`1.5px solid ${colors.border}`, background:colors.bgPage }}>
+            <button onClick={()=>myShoppingRef.current?.triggerBack()} style={{
+              flex:1, height:44, background:colors.bgCard, color:'#FF6B9D',
+              border:`1px solid ${colors.border}`, borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', fontFamily:ff,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+            }}>
+              <Icon icon="ph:shopping-bag" width={16} height={16} color="#FF6B9D" />
+              상품 추가하기
+            </button>
+            <button onClick={()=>myShoppingRef.current?.triggerSave()} style={{
+              flex:1, height:44, background:'#FF6B9D', color:'#fff',
+              border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
+              cursor:'pointer', fontFamily:ff,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+            }}>
+              <Icon icon="ph:floppy-disk" width={16} height={16} color="#fff" />
+              저장하기
+            </button>
+            <button onClick={()=>myShoppingRef.current?.triggerMoreMenu()} style={{
+              width:44, height:44, borderRadius:radius.sm, flexShrink:0,
+              border:`1px solid ${colors.border}`, background:colors.bgCard,
+              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+              fontFamily:ff,
+            }}>
+              <Icon icon="ph:dots-three-vertical" width={18} height={18} color={colors.textSecondary} />
+            </button>
           </div>
         )}
         {mainTab==='bingo'&&(
