@@ -174,7 +174,7 @@ export default function LandingPage({ onComplete }: Props) {
       )}
 
       {/* ── 달력 */}
-      <div style={{ margin:'12px 18px 0', background:'#fff', borderRadius:22, border:'0.5px solid #f0e8e0', overflow:'hidden', boxShadow:'0 2px 12px rgba(255,112,67,0.06)' }}>
+      <div style={{ margin:'12px 18px 0', background:'transparent', borderRadius:22, border:'none', overflow:'hidden' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 10px' }}>
           <button className="nav-hover" onClick={() => chgMo(-1)}
             style={{ background:'none', border:'none', fontSize:22, color:'#ccc', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
