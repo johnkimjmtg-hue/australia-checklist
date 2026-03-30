@@ -546,7 +546,7 @@ const MyShoppingView = forwardRef<MyShoppingRef, Props>(function MyShoppingView(
 
     </div>
   )
-}
+})
 interface Petal { id: number; x: number; color: string; size: number; duration: number; delay: number; shape: string }
 
 function PetalBurst({ trigger }: { trigger: number }) {
