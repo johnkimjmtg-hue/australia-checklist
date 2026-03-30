@@ -467,12 +467,12 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
           <button onClick={onEdit} style={{
             height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.primary}`, background: colors.bgCard,
-            color: colors.primary, fontSize: 11, fontWeight: font.weight.bold,
+            border:'none', background: colors.primary,
+            color: '#fff', fontSize: 11, fontWeight: font.weight.bold,
             display:'flex', alignItems:'center', justifyContent:'center', gap:3,
             cursor:'pointer', fontFamily: font.family,
           }}>
-            <Icon icon="ph:pencil-simple" width={12} height={12} color={colors.primary} />
+            <Icon icon="ph:pencil-simple" width={12} height={12} color="#fff" />
             리스트 수정하기
           </button>
           <button onClick={onShare} style={{
