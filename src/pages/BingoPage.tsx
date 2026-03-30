@@ -487,7 +487,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
           border: `1.5px solid ${colors.gray300}`,
           padding: `${spacing[4]}px`,
         }}>
-          <div style={{ display:'flex', alignItems:'stretch', gap: spacing[4] }}>
+          <div style={{ display:'flex', alignItems:'center', gap: spacing[4] }}>
             <MiniGrid count={checked.size} />
             <div style={{ flex:1, minWidth:0 }}>
               <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1], lineHeight:1.3 }}>
@@ -501,35 +501,34 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   : getStatusMsg(checked.size, bingoCount, city).sub}
               </div>
             </div>
-            {/* 카운터 + 버튼 — 세로로 쌓기 */}
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', justifyContent:'space-between', flexShrink:0 }}>
-              <div style={{ textAlign:'center' }}>
-                <div style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: colors.textPrimary, lineHeight:1 }}>{checked.size}</div>
-                <div style={{ fontSize: font.size.lg, color: colors.textSecondary, fontWeight: font.weight.medium, marginTop:2 }}>/25 카페</div>
-              </div>
-              <div style={{ display:'flex', gap: spacing[1], marginTop: spacing[2] }}>
-                <button onClick={handleShare} style={{
-                  height:26, paddingLeft:8, paddingRight:8, borderRadius: radius.sm,
-                  border:`1px solid ${colors.border}`, background: colors.bgPage,
-                  color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
-                  display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-                  cursor:'pointer', fontFamily: font.family,
-                }}>
-                  <Icon icon="ph:share-network" width={11} height={11} color={colors.textSecondary} />
-                  공유
-                </button>
-                <button onClick={() => setShowReset(true)} style={{
-                  height:26, paddingLeft:8, paddingRight:8, borderRadius: radius.sm,
-                  border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
-                  color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
-                  display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-                  cursor:'pointer', fontFamily: font.family,
-                }}>
-                  <Icon icon="ph:arrow-counter-clockwise" width={11} height={11} color={colors.danger} />
-                  리셋
-                </button>
-              </div>
+            {/* 카운터 */}
+            <div style={{ textAlign:'center', flexShrink:0 }}>
+              <div style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: colors.textPrimary, lineHeight:1 }}>{checked.size}</div>
+              <div style={{ fontSize: font.size.lg, color: colors.textSecondary, fontWeight: font.weight.medium, marginTop:2 }}>/25 카페</div>
             </div>
+          </div>
+          {/* 공유 / 리셋 버튼 — 오른쪽 하단 */}
+          <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], marginTop: spacing[2] }}>
+            <button onClick={handleShare} style={{
+              height:26, paddingLeft:8, paddingRight:8, borderRadius: radius.sm,
+              border:`1px solid ${colors.border}`, background: colors.bgPage,
+              color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+              cursor:'pointer', fontFamily: font.family,
+            }}>
+              <Icon icon="ph:share-network" width={11} height={11} color={colors.textSecondary} />
+              공유
+            </button>
+            <button onClick={() => setShowReset(true)} style={{
+              height:26, paddingLeft:8, paddingRight:8, borderRadius: radius.sm,
+              border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
+              color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+              cursor:'pointer', fontFamily: font.family,
+            }}>
+              <Icon icon="ph:arrow-counter-clockwise" width={11} height={11} color={colors.danger} />
+              리셋
+            </button>
           </div>
         </div>
       </div>
