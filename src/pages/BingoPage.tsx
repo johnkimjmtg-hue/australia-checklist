@@ -96,11 +96,11 @@ function getCompletedLines(checked: Set<number>): number[][] {
 // ── 25칸 미니 빙고판 진행바
 function MiniGrid({ count }: { count: number }) {
   return (
-    <div style={{ position:'relative', width:100, height:100, flexShrink:0 }}>
+    <div style={{ position:'relative', width:120, height:120, flexShrink:0 }}>
       {/* 5x5 미니칸 */}
       <div style={{
         display:'grid', gridTemplateColumns:'repeat(5,1fr)',
-        gap:2, width:100, height:100,
+        gap:2, width:120, height:120,
         borderRadius:8, overflow:'hidden',
       }}>
         {Array.from({ length: 25 }, (_, i) => (
