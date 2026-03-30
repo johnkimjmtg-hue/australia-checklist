@@ -84,15 +84,6 @@ const MyShoppingView = forwardRef<MyShoppingRef, Props>(function MyShoppingView(
   }))
 
   useEffect(() => {
-    const updateWidth = () => {
-      if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
-    }
-    updateWidth()
-    window.addEventListener('resize', updateWidth)
-    return () => window.removeEventListener('resize', updateWidth)
-  }, [])
-
-  useEffect(() => {
     const cached = getCachedShopping()
     if (cached) {
       setAllProducts(cached.products)
