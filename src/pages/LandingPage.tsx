@@ -90,7 +90,7 @@ export default function LandingPage({ onComplete }: Props) {
 
   return (
     <div style={{
-      minHeight: '100dvh', background: '#FFF8F3', fontFamily: ff,
+      minHeight: '100dvh', background: '#FFE8D6', fontFamily: ff,
       maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column',
     }}>
       <style>{`
@@ -139,7 +139,7 @@ export default function LandingPage({ onComplete }: Props) {
       </div>
 
       {/* ── 날짜 칩 */}
-      <div style={{ padding:'20px 18px 0', display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+      <div style={{ padding:'20px 18px 0', display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, background:'#FFE8D6' }}>
         {[
           { label:'✈️ 출발일', val: sDate ? fmt(sDate) : null },
           { label:'🏠 귀국일', val: eDate ? fmt(eDate) : null },
@@ -174,7 +174,7 @@ export default function LandingPage({ onComplete }: Props) {
       )}
 
       {/* ── 달력 */}
-      <div style={{ margin:'12px 18px 0', background:'transparent', borderRadius:22, border:'none', overflow:'hidden' }}>
+      <div style={{ margin:'12px 18px 0', background:'#fff', borderRadius:22, border:'0.5px solid #f0e8e0', overflow:'hidden', boxShadow:'0 2px 12px rgba(255,112,67,0.06)' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 10px' }}>
           <button className="nav-hover" onClick={() => chgMo(-1)}
             style={{ background:'none', border:'none', fontSize:22, color:'#ccc', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
@@ -201,7 +201,7 @@ export default function LandingPage({ onComplete }: Props) {
 
       {/* ── 하단 버튼 */}
       <div style={{ flex:1 }} />
-      <div style={{ padding:'20px 18px 48px' }}>
+      <div style={{ padding:'20px 18px 48px', background:'#FFE8D6' }}>
         <button className="main-btn" onClick={handleComplete} disabled={!canNext}
           style={{
             width:'100%', padding:18, border:'none', borderRadius:50,
