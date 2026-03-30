@@ -59,7 +59,7 @@ const STATE_MAP: Record<string, { label: string }> = {
 
 type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker' | 'calendar'
-type MainTab = 'bucketlist' | 'services' | 'shopping' | 'myshoppinglist' | 'nearby' | 'bingo'
+type MainTab = 'bucketlist' | 'bucketcheck' | 'services' | 'shopping' | 'myshoppinglist' | 'nearby' | 'bingo'
 
 export default function ChecklistPage({ state, setState }: Props) {
   const [searchParams] = useSearchParams()
@@ -78,6 +78,8 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [mainTab, setMainTab]         = useState<MainTab>(() => {
     const tab = searchParams.get('tab')
     if (tab === 'services' || tab === 'shopping' || tab === 'myshoppinglist' || tab === 'nearby' || tab === 'bingo') return tab as MainTab
+    const initState = loadState()
+    if (Object.keys(initState.selected).length > 0) return 'bucketcheck'
     return 'bucketlist'
   })
   const [logoTapCount, setLogoTapCount] = useState(0)
@@ -184,6 +186,7 @@ export default function ChecklistPage({ state, setState }: Props) {
     const at=fmt(new Date()); setIssuedAt(at)
     const next = issueReceipt(state,at)
     setState(next)
+    setMainTab('bucketcheck')
   }
   const triggerShake = () => { setShakeBtn(true); setTimeout(()=>setShakeBtn(false),600) }
   const handleAddCustom = () => { const label=customLabel.trim(); if(!label) return; setState(addCustom(state,label,activeCategory)); setCustomLabel('') }
@@ -206,9 +209,15 @@ export default function ChecklistPage({ state, setState }: Props) {
 
   const handleTabClick = (id:MainTab) => {
     if(id==='shopping'){ if(myListCount>0&&mainTab==='shopping'){setMainTab('myshoppinglist');return} if(mainTab==='myshoppinglist'){setMainTab('shopping');return} if(myListCount>0){setMainTab('myshoppinglist');return} }
+    if(id==='bucketlist'){
+      const hasList = Object.keys(state.selected).length > 0
+      if(hasList && mainTab==='bucketlist'){ setMainTab('bucketcheck'); return }
+      if(mainTab==='bucketcheck'){ setMainTab('bucketlist'); return }
+      if(hasList){ setMainTab('bucketcheck'); return }
+    }
     setMainTab(id)
   }
-  const activeTabId: MainTab = mainTab==='myshoppinglist'?'shopping':mainTab
+  const activeTabId: MainTab = mainTab==='myshoppinglist'?'shopping':mainTab==='bucketcheck'?'bucketlist':mainTab
 
   return (
     <div style={{ 
@@ -240,10 +249,10 @@ export default function ChecklistPage({ state, setState }: Props) {
         </div>
       ) : mainTab==='bingo' ? (
           <BingoPage ref={bingoRef} embedded={true} initialCity={(searchParams.get('city') as 'melbourne'|'sydney') ?? undefined} />
-      ) : (mainTab==='bucketlist'&&isIssued&&trip) ? (
+      ) : mainTab==='bucketcheck' ? (
         <>
           <BucketCheckView state={state} trip={trip} setState={setState} items={ITEMS} dbItems={dbItems} onAchievedChange={setAchieved}
-            onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{} }}
+            onEdit={()=>{ setShowReceipt(false); const next={...state,meta:{...state.meta,lastIssuedAt:undefined}}; setState(next); try{localStorage.setItem('korea-receipt',JSON.stringify(next))}catch{}; setMainTab('bucketlist') }}
             onDelete={doReset}
             onShare={()=>{ const at=state.meta.lastIssuedAt??issuedAt; setIssuedAt(at); setShowReceipt(true) }}
             onLanding={()=>navigate('/')} />
