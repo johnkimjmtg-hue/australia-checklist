@@ -364,27 +364,18 @@ export default function ChecklistPage({ state, setState }: Props) {
               {/* ── 내 버킷리스트 보기 + 초기화 버튼 */}
               {done > 0 && (
                 <div style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`0 ${spacing[3]}px ${spacing[2]}px` }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                    <div style={{
-                      minWidth:18, height:18, borderRadius:radius.full,
-                      background:colors.primary, color:'#fff',
-                      fontSize:10, fontWeight:font.weight.bold,
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      padding:'0 5px',
-                    }}>{done}</div>
-                    <span style={{ fontSize:font.size.xs, color:colors.textSecondary, fontWeight:font.weight.medium }}>개 선택</span>
-                  </div>
+                  <div style={{ flex:1 }} />
                   <button onClick={handleIssue} style={{
-                    flex:1, height:30, background:colors.primary, color:'#fff',
+                    height:28, paddingLeft:10, paddingRight:10, background:colors.primary, color:'#fff',
                     border:'none', borderRadius:radius.sm, fontSize:font.size.xs, fontWeight:font.weight.bold,
-                    cursor:'pointer', fontFamily:ff,
-                    display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+                    cursor:'pointer', fontFamily:ff, whiteSpace:'nowrap',
+                    display:'flex', alignItems:'center', gap:4,
                   }}>
                     <Icon icon="ph:list-checks" width={12} height={12} color="#fff" />
-                    나의 버킷리스트 보기
+                    {`내 버킷리스트 (${done})`}
                   </button>
                   <button onClick={()=>setModal('confirmReset')} style={{
-                    height:30, padding:`0 ${spacing[3]}px`, background:colors.bgCard, color:colors.gray600,
+                    height:28, paddingLeft:10, paddingRight:10, background:colors.bgCard, color:colors.gray600,
                     border:`1px solid ${colors.gray400}`, borderRadius:radius.sm, fontSize:font.size.xs, fontWeight:font.weight.bold,
                     cursor:'pointer', fontFamily:ff, whiteSpace:'nowrap',
                   }}>초기화</button>
