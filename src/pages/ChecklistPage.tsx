@@ -361,6 +361,26 @@ export default function ChecklistPage({ state, setState }: Props) {
                   })()}
                 </div>
               </div>
+              {/* ── 내 버킷리스트 보기 + 초기화 버튼 */}
+              {done > 0 && (
+                <div style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`0 ${spacing[3]}px ${spacing[2]}px` }}>
+                  <div style={{ flex:1 }} />
+                  <button onClick={handleIssue} style={{
+                    height:28, paddingLeft:10, paddingRight:10, background:colors.primary, color:'#fff',
+                    border:'none', borderRadius:radius.sm, fontSize:font.size.xs, fontWeight:font.weight.bold,
+                    cursor:'pointer', fontFamily:ff, whiteSpace:'nowrap',
+                    display:'flex', alignItems:'center', gap:4,
+                  }}>
+                    <Icon icon="ph:list-checks" width={12} height={12} color="#fff" />
+                    {`내 버킷리스트 (${done})`}
+                  </button>
+                  <button onClick={()=>setModal('confirmReset')} style={{
+                    height:28, paddingLeft:10, paddingRight:10, background:colors.bgCard, color:colors.gray600,
+                    border:`1px solid ${colors.gray400}`, borderRadius:radius.sm, fontSize:font.size.xs, fontWeight:font.weight.bold,
+                    cursor:'pointer', fontFamily:ff, whiteSpace:'nowrap',
+                  }}>초기화</button>
+                </div>
+              )}
             </div>
           )}
 
@@ -478,24 +498,7 @@ export default function ChecklistPage({ state, setState }: Props) {
 
       {/* ── 하단 고정 영역 ── */}
       <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, zIndex:40 }}>
-        {mainTab==='bucketlist'&&!isIssued&&(
-          <div style={{ padding:`${spacing[2]}px ${spacing[3]}px`, display:'flex', gap:spacing[2], borderTop:`1.5px solid ${colors.border}`, background:colors.bgPage }}>
-            <button onClick={handleIssue} style={{
-              flex:4, height:44, background:colors.primary, color:'#fff',
-              border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold,
-              cursor:'pointer', fontFamily:ff, animation:shakeBtn?'shake 0.5s ease':'none',
-              display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-            }}>
-              <Icon icon="ph:list-checks" width={16} height={16} color="#fff" />
-              나의 버킷리스트 보기
-            </button>
-            <button onClick={()=>setModal('confirmReset')} style={{
-              flex:1, height:44, background:colors.bgCard, color:colors.gray600,
-              border:`1px solid ${colors.gray400}`, borderRadius:radius.sm, fontSize:font.size.sm, fontWeight:font.weight.bold,
-              cursor:'pointer', fontFamily:ff,
-            }}>초기화</button>
-          </div>
-        )}
+
 
         <div style={{
           display:'flex', padding:`${spacing[1]}px ${spacing[3]}px 0`,
