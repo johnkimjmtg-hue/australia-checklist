@@ -509,7 +509,11 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       </div>
 
       {/* ── 공유 / 리셋 버튼 */}
-      <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
+        <div style={{ fontSize: font.size.xs, color: colors.textTertiary, fontWeight: font.weight.medium }}>
+          ☕ {city === 'melbourne' ? '멜번 카페 투어 25곳' : '시드니 카페 투어 25곳'}
+        </div>
+        <div style={{ display:'flex', gap: spacing[1] }}>
         <button onClick={handleShare} style={{
           height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
           border:`1px solid ${colors.border}`, background: colors.bgCard,
@@ -530,6 +534,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
           <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color={colors.danger} />
           전체 리셋
         </button>
+        </div>
       </div>
 
       {/* ── 5x5 빙고판 */}
