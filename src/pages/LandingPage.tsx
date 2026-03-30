@@ -90,7 +90,7 @@ export default function LandingPage({ onComplete }: Props) {
 
   return (
     <div style={{
-      minHeight: '100dvh', background: 'linear-gradient(180deg, #FFE8D6 0%, #FFCBA4 100%)', fontFamily: ff,
+      minHeight: '100dvh', background: 'linear-gradient(180deg, #FFF5EE 0%, #FFE8D6 30%, #FFB347 70%, #FF7043 100%)', fontFamily: ff,
       maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column',
     }}>
       <style>{`
