@@ -511,10 +511,25 @@ export default function ChecklistPage({ state, setState }: Props) {
         }}>
           {TABS.map(tab=>{
             const isActive = activeTabId===tab.id
+            const badge = tab.id==='bucketlist' ? Object.keys(state.selected).length
+                        : tab.id==='shopping'   ? myListCount
+                        : 0
             return (
               <button key={tab.id} className="nav-btn" onClick={()=>handleTabClick(tab.id)}
                 style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, height:54, background:'none', border:'none', cursor:'pointer', position:'relative', fontFamily:ff }}>
-                <Icon icon={tab.icon} width={22} height={22} color={isActive?colors.primary:colors.textTertiary} />
+                <div style={{ position:'relative', display:'inline-flex' }}>
+                  <Icon icon={tab.icon} width={22} height={22} color={isActive?colors.primary:colors.textTertiary} />
+                  {badge>0&&(
+                    <div style={{
+                      position:'absolute', top:-5, right:-8,
+                      minWidth:16, height:16, borderRadius:radius.full,
+                      background:colors.primary, color:'#fff',
+                      fontSize:10, fontWeight:font.weight.bold,
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      padding:'0 4px', lineHeight:1,
+                    }}>{badge}</div>
+                  )}
+                </div>
                 <span style={{ fontSize:12, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.textTertiary }}>{tab.label}</span>
                 {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:colors.primary, position:'absolute', bottom:4 }} />}
               </button>
