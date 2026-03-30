@@ -78,7 +78,9 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [mainTab, setMainTab]         = useState<MainTab>(() => {
     const tab = searchParams.get('tab')
     if (tab === 'services' || tab === 'shopping' || tab === 'myshoppinglist' || tab === 'nearby' || tab === 'bingo') return tab as MainTab
-    return 'bucketcheck'
+    const initState = loadState()
+    if (Object.keys(initState.selected).length > 0) return 'bucketcheck'
+    return 'bucketlist'
   })
   const [logoTapCount, setLogoTapCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
@@ -203,8 +205,13 @@ export default function ChecklistPage({ state, setState }: Props) {
   ] as {id:MainTab;icon:string;label:string}[]
 
   const handleTabClick = (id:MainTab) => {
-    if(id==='shopping'){ setMainTab('myshoppinglist'); return }
-    if(id==='bucketlist'){ setMainTab('bucketcheck'); return }
+    if(id==='shopping'){ if(myListCount>0&&mainTab==='shopping'){setMainTab('myshoppinglist');return} if(mainTab==='myshoppinglist'){setMainTab('shopping');return} if(myListCount>0){setMainTab('myshoppinglist');return} }
+    if(id==='bucketlist'){
+      const hasList = Object.keys(state.selected).length > 0
+      if(hasList && mainTab==='bucketlist'){ setMainTab('bucketcheck'); return }
+      if(mainTab==='bucketcheck'){ setMainTab('bucketlist'); return }
+      if(hasList){ setMainTab('bucketcheck'); return }
+    }
     setMainTab(id)
   }
   const activeTabId: MainTab = mainTab==='myshoppinglist'?'shopping':mainTab==='bucketcheck'?'bucketlist':mainTab
