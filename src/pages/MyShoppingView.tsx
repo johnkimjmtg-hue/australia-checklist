@@ -182,12 +182,12 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
           <button onClick={onBack} style={{
             height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.border}`, background: colors.bgCard,
-            color: '#FF6B9D', fontSize: 11, fontWeight: font.weight.bold,
+            border:'none', background: '#FF6B9D',
+            color: '#fff', fontSize: 11, fontWeight: font.weight.bold,
             display:'flex', alignItems:'center', justifyContent:'center', gap:3,
             cursor:'pointer', fontFamily: font.family,
           }}>
-            <Icon icon="ph:shopping-bag" width={12} height={12} color="#FF6B9D" />
+            <Icon icon="ph:shopping-bag" width={12} height={12} color="#fff" />
             상품 추가하기
           </button>
           <button onClick={() => setShowReceipt(true)} style={{
