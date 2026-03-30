@@ -72,16 +72,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
     '오늘의 득템을 향해!',
   ]
   const pageRef = useRef<HTMLDivElement>(null)
-  const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
-
-  useEffect(() => {
-    const updateWidth = () => {
-      if (pageRef.current) setFooterWidth(pageRef.current.getBoundingClientRect().width)
-    }
-    updateWidth()
-    window.addEventListener('resize', updateWidth)
-    return () => window.removeEventListener('resize', updateWidth)
-  }, [])
 
   useEffect(() => {
     const cached = getCachedShopping()
@@ -278,7 +268,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
       <div style={{
         position:'fixed', bottom:62,
         left:'50%', transform:'translateX(-50%)',
-        width: footerWidth ?? '100%',
+        width:'100%', maxWidth:430,
         padding:`${spacing[2]}px ${spacing[3]}px`,
         background: colors.bgPage, zIndex:20, boxSizing:'border-box',
         display:'flex', gap: spacing[2], borderTop:`1.5px solid ${colors.border}`,
