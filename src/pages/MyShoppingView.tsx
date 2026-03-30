@@ -229,10 +229,23 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         {loading ? (
           <div style={{ textAlign:'center', padding:'40px 0', color:'#94A3B8', fontSize:14 }}>불러오는 중...</div>
         ) : total === 0 ? (
-          <div style={{ textAlign:'center', padding:'60px 20px' }}>
+          <div style={{ textAlign:'center', padding:'60px 20px', display:'flex', flexDirection:'column', alignItems:'center', gap:16 }}>
             <Icon icon="ph:shopping-cart-simple" width={48} height={48} color="#C8C8C8" />
-            <div style={{ marginTop:12, fontSize:15, fontWeight:700, color:'#94A3B8' }}>찜한 상품이 없어요</div>
-            <div style={{ marginTop:6, fontSize:13, color:'#C8C8C8' }}>쇼핑리스트에서 상품을 찜해보세요!</div>
+            <div>
+              <div style={{ fontSize:15, fontWeight:700, color:'#94A3B8', marginBottom:6 }}>찜한 상품이 없어요</div>
+              <div style={{ fontSize:13, color:'#C8C8C8' }}>호주에서 꼭 사야 할 상품을 담아보세요!</div>
+            </div>
+            <button onClick={onBack} style={{
+              height:44, padding:'0 24px',
+              background:'#FF6B9D', color:'#fff',
+              border:'none', borderRadius:8,
+              fontSize:15, fontWeight:700,
+              cursor:'pointer', fontFamily:'inherit',
+              display:'flex', alignItems:'center', gap:8,
+            }}>
+              <Icon icon="ph:plus-circle" width={18} height={18} color="#fff" />
+              상품 추가하기
+            </button>
           </div>
         ) : (
           myProducts.map(p => {
