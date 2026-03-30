@@ -454,7 +454,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         }}>
           <CircleProgress pct={pct} />
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:font.size['2xl'], fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[1], lineHeight:1.2 }}>나의 버킷리스트</div>
+            <div style={{ fontSize:font.size['2xl'], fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[1], lineHeight:1.2 }}>내 버킷리스트</div>
             <div style={{ fontSize:font.size.sm, color:colors.textSecondary, fontWeight:font.weight.medium, marginBottom:spacing[2] }}>
               {trip ? `${trip.startDate.slice(5).replace('-','/')} ~ ${trip.endDate.slice(5).replace('-','/')}` : '일정 미설정'}
             </div>
