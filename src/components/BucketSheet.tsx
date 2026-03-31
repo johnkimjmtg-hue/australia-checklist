@@ -21,9 +21,10 @@ type Props = {
   setState: (s: AppState) => void
   trip: TripInfo
   onClose: () => void
+  onGoChecklist: () => void
 }
 
-export default function BucketSheet({ state, setState, trip, onClose }: Props) {
+export default function BucketSheet({ state, setState, trip, onClose, onGoChecklist }: Props) {
   const [dbItems, setDbItems] = useState<DBItem[]>([])
 
   useEffect(() => {
@@ -80,7 +81,7 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
             items={ITEMS}
             dbItems={dbItems}
             onAchievedChange={() => {}}
-            onEdit={() => {}}
+            onEdit={() => { onClose(); onGoChecklist() }}
             onDelete={() => {}}
             onShare={() => {}}
             onLanding={onClose}

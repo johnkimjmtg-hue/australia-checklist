@@ -190,6 +190,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
           setState={setState}
           trip={trip}
           onClose={() => setShowBucket(false)}
+          onGoChecklist={() => { setShowBucket(false); onNavigate('bucketlist') }}
         />
       )}
     </div>
