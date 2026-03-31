@@ -11,8 +11,8 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
   const [tab, setTab] = useState<Tab>(initialTab)
 
   return (
-    <div style={{ minHeight:'100dvh', background:'#FFFFFF', fontFamily:font.family, display:'flex', justifyContent:'center' }}>
-      <div style={{ width:'100%', maxWidth:430, minHeight:'100dvh', display:'flex', flexDirection:'column', background:'#FFFFFF', boxSizing:'border-box' }}>
+    <div style={{ minHeight:'100dvh', background:'rgba(255,255,255,0.95)', fontFamily:font.family, display:'flex', justifyContent:'center' }}>
+      <div style={{ width:'100%', maxWidth:430, minHeight:'100dvh', display:'flex', flexDirection:'column', background:'rgba(255,255,255,0.95)', boxSizing:'border-box' }}>
         {/* 헤더 */}
         <div style={{ flexShrink:0, height:56, background:colors.bgCard, borderBottom:`1px solid ${colors.border}`, padding:`0 ${spacing[4]}px`, display:'flex', alignItems:'center', gap:spacing[2] }}>
           <button onClick={onBack} style={{ background:'none', border:'none', cursor:'pointer', padding:spacing[1], margin:`-${spacing[1]}px`, display:'flex', alignItems:'center', WebkitTapHighlightColor:'transparent' }}>
