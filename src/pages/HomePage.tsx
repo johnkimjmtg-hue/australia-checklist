@@ -90,7 +90,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   return (
     <div style={{
       minHeight:'100dvh',
-      background:'linear-gradient(180deg, #E0F7FA 0%, #00BCD4 40%, #00897B 75%, #00695C 100%)',
+      background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)',
       fontFamily: ff, maxWidth:430, margin:'0 auto', display:'flex', flexDirection:'column',
     }}>
       <style>{`
