@@ -316,17 +316,27 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
       {/* 메뉴 바텀시트 */}
       {showMenu && (
         <>
-          <div onClick={() => setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', zIndex:800 }} />
+          <div onClick={() => setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
-            background:'rgba(255,255,255,0.95)', borderRadius:22,
+            background:'rgba(255,255,255,0.95)', borderRadius:20,
             zIndex:801, animation:'slideUpSheet 0.25s ease',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
             padding:'12px 20px 40px',
           }}>
-            <div style={{ width:36, height:4, borderRadius:999, background:'rgba(0,0,0,0.12)', margin:'0 auto 20px' }} />
-            <div style={{ fontSize:15, fontWeight:700, color:'#0D3349', marginBottom:12, paddingBottom:12, borderBottom:'1px solid rgba(0,0,0,0.08)' }}>호주가자</div>
+            {/* 헤더 (X버튼) */}
+            <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:16 }}>
+              <button onClick={() => setShowMenu(false)} style={{
+                width:28, height:28, borderRadius:'50%',
+                background:'rgba(0,0,0,0.08)', border:'none',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                cursor:'pointer', WebkitTapHighlightColor:'transparent',
+              }}>
+                <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
+              </button>
+            </div>
+            <div style={{ fontSize:15, color:'#0D3349', marginBottom:12, paddingBottom:12, borderBottom:'1px solid rgba(0,0,0,0.08)' }}>호주가자</div>
             {[
               { icon:'📄', label:'이용약관', tab:'terms' as const },
               { icon:'🔒', label:'개인정보처리방침', tab:'privacy' as const },
