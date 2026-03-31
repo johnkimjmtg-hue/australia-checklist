@@ -107,7 +107,7 @@ function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDe
             <div
               onClick={() => db && setDetailItem(db)}
               style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 10px 12px', background:'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%)', cursor: db ? 'pointer' : 'default', WebkitTapHighlightColor:'transparent' }}>
-              <div style={{ fontSize:13, fontWeight:700, color:'#fff', lineHeight:1.3, opacity: isAchieved ? 0.7 : 1, textDecoration: isAchieved ? 'line-through' : 'none' }}>{item.label}</div>
+              <div style={{ fontSize:14, fontWeight:400, color:'#fff', lineHeight:1.3 }}>{item.label}</div>
               {region && <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:3 }}>📍 {region.label}</div>}
             </div>
           </div>
