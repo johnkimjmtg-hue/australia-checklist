@@ -144,7 +144,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
       `}</style>
 
       {/* ── 도시 날씨/시간 */}
-      <div style={{ padding:'52px 18px 12px' }}>
+      <div style={{ padding:'26px 18px 12px' }}>
         {/* 도시 버튼 3개 - 오른쪽 정렬 */}
         <div style={{ display:'flex', gap:8, justifyContent:'flex-end' }}>
           {(Object.keys(CITIES) as (keyof typeof CITIES)[]).map(city => {
