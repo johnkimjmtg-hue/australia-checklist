@@ -1,10 +1,9 @@
 // ─────────────────────────────────────────────
 // BucketSheet.tsx
-// 버킷리스트 + 체크리스트를 한 바텀시트에서 전환
 // src/components/BucketSheet.tsx
 // ─────────────────────────────────────────────
 import { useState, useEffect } from 'react'
-import { AppState, TripInfo, loadState } from '../store/state'
+import { AppState, TripInfo, loadState, resetBucket } from '../store/state'
 import { getCachedChecklist } from '../lib/dataCache'
 import BucketCheckView from '../pages/BucketCheckView'
 import ChecklistPage from '../pages/ChecklistPage'
@@ -16,34 +15,31 @@ type DBItem = {
   image_url?: string | null; tips?: string | null; related_product_ids?: string[] | null
 }
 type CheckItem = { id: string; categoryId: string; label: string; emoji: string }
+type View = 'bucket' | 'checklist'
 
 type Props = {
-  state: AppState
-  setState: (s: AppState) => void
   trip: TripInfo
   onClose: () => void
 }
 
-type View = 'bucket' | 'checklist'
-
-export default function BucketSheet({ setState, trip, onClose }: Props) {
+export default function BucketSheet({ trip, onClose }: Props) {
   const [dbItems, setDbItems] = useState<DBItem[]>([])
   const [view, setView] = useState<View>('bucket')
-  // 항상 localStorage에서 최신 state 읽기
-  const [localState, setLocalState] = useState<AppState>(() => loadState())
+  // App.tsx 거치지 않고 localStorage 직접 관리
+  const [state, setState] = useState<AppState>(() => loadState())
 
   useEffect(() => {
     const cached = getCachedChecklist()
     if (cached?.length) setDbItems(cached)
   }, [])
 
-  const handleSetState = (s: AppState) => {
-    setState(s)      // App.tsx state 업데이트
-    setLocalState(s) // 로컬 state 업데이트
-  }
+  // 시트 열릴 때 최신 state 읽기
+  useEffect(() => {
+    setState(loadState())
+  }, [])
 
   const handleBackToBucket = () => {
-    setLocalState(loadState()) // localStorage에서 최신 state 읽기
+    setState(loadState()) // 체크리스트에서 변경된 내용 반영
     setView('bucket')
   }
 
@@ -53,10 +49,7 @@ export default function BucketSheet({ setState, trip, onClose }: Props) {
 
   return (
     <>
-      {/* 오버레이 */}
       <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
-
-      {/* 바텀시트 */}
       <div style={{
         position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
         width:'calc(100% - 32px)', maxWidth:398,
@@ -79,15 +72,8 @@ export default function BucketSheet({ setState, trip, onClose }: Props) {
               <span style={{ fontSize:16, color:'#0D3349' }}>‹</span>
               <span style={{ fontSize:13, color:'#0D3349', fontWeight:600 }}>버킷리스트</span>
             </button>
-          ) : (
-            <div />
-          )}
-          <button onClick={onClose} style={{
-            width:28, height:28, borderRadius:'50%',
-            background:'rgba(0,0,0,0.08)', border:'none',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            cursor:'pointer', WebkitTapHighlightColor:'transparent',
-          }}>
+          ) : <div />}
+          <button onClick={onClose} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
             <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
           </button>
         </div>
@@ -96,21 +82,21 @@ export default function BucketSheet({ setState, trip, onClose }: Props) {
         <div style={{ flex:1, overflowY:'auto' }}>
           {view === 'bucket' ? (
             <BucketCheckView
-              state={localState}
+              state={state}
               trip={trip}
-              setState={handleSetState}
+              setState={setState}
               items={ITEMS}
               dbItems={dbItems}
               onAchievedChange={() => {}}
               onEdit={() => setView('checklist')}
-              onDelete={() => {}}
+              onDelete={() => { const next = resetBucket(); setState(next) }}
               onShare={() => {}}
               onLanding={onClose}
             />
           ) : (
             <ChecklistPage
-              state={localState}
-              setState={handleSetState}
+              state={state}
+              setState={setState}
               initialTab="bucketlist"
               onGoHome={handleBackToBucket}
               embedded

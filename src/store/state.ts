@@ -72,6 +72,11 @@ export function resetAll(): AppState {
   return save(next)
 }
 
+export function resetBucket(): AppState {
+  const next = makeDefault()
+  return save(next)
+}
+
 // Trip
 export function loadTrip(): TripInfo | null { return gj<TripInfo|null>(KEY_TRIP, null) }
 export function saveTrip(t: TripInfo)       { sj(KEY_TRIP, t) }

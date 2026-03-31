@@ -197,8 +197,6 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       {/* 버킷리스트 바텀시트 */}
       {showBucket && (
         <BucketSheet
-          state={state}
-          setState={setState}
           trip={trip}
           onClose={() => setShowBucket(false)}
         />
