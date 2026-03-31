@@ -57,11 +57,11 @@ const STATE_MAP: Record<string, { label: string }> = {
   'ACT':{ label:'캔버라' },'NT':{ label:'다윈' },
 }
 
-type Props = { state: AppState; setState: (s: AppState) => void }
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker' | 'calendar'
 type MainTab = 'bucketlist' | 'bucketcheck' | 'services' | 'shopping' | 'myshoppinglist' | 'nearby' | 'bingo'
+type Props = { state: AppState; setState: (s: AppState) => void; initialTab?: MainTab; onGoHome?: () => void }
 
-export default function ChecklistPage({ state, setState }: Props) {
+export default function ChecklistPage({ state, setState, initialTab, onGoHome }: Props) {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
@@ -76,6 +76,7 @@ export default function ChecklistPage({ state, setState }: Props) {
   const [shakeBtn, setShakeBtn]       = useState(false)
   const [customLabel, setCustomLabel] = useState('')
   const [mainTab, setMainTab]         = useState<MainTab>(() => {
+    if (initialTab) return initialTab
     const tab = searchParams.get('tab')
     if (tab === 'services' || tab === 'shopping' || tab === 'myshoppinglist' || tab === 'nearby' || tab === 'bingo') return tab as MainTab
     return 'bucketcheck'
@@ -502,6 +503,13 @@ export default function ChecklistPage({ state, setState }: Props) {
           borderTop:`1.5px solid ${colors.border}`,
           paddingBottom:'env(safe-area-inset-bottom)',
         }}>
+          {onGoHome && (
+            <button className="nav-btn" onClick={onGoHome}
+              style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, height:54, background:'none', border:'none', cursor:'pointer', position:'relative', fontFamily:ff }}>
+              <Icon icon="ph:house" width={22} height={22} color={colors.textTertiary} />
+              <span style={{ fontSize:12, fontWeight:font.weight.medium, color:colors.textTertiary }}>홈</span>
+            </button>
+          )}
           {TABS.map(tab=>{
             const isActive = activeTabId===tab.id
             const badge = tab.id==='bucketlist' ? Object.keys(state.selected).reduce((acc, id) => {
