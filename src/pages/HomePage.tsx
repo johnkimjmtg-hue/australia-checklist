@@ -200,6 +200,8 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
     <div style={{
       minHeight:'100dvh',
       background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)',
+      backgroundSize: '100% 200%',
+      animation: 'bgMove 8s ease-in-out infinite',
       fontFamily: ff, maxWidth:430, margin:'0 auto', display:'flex', flexDirection:'column',
     }}>
       <style>{`
@@ -208,6 +210,16 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         .menu-card-hover:active { transform: scale(0.97); }
         .cal-nav-btn:hover { background: rgba(0,131,143,0.15) !important; }
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
+        @keyframes bgMove {
+          0%   { background-position: 0% 0%; }
+          50%  { background-position: 0% 60%; }
+          100% { background-position: 0% 0%; }
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .card-anim { animation: fadeUp 0.5s ease both; }
       `}</style>
 
       {/* 도시 날씨 + 메뉴 버튼 */}
@@ -281,17 +293,17 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         <div style={{ fontSize:16, fontWeight:700, color:'rgba(255,255,255,0.9)', margin:'8px 0 12px' }}>나의 호주 여행 리스트</div>
 
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-          {MENUS.map(m => (
-            <div key={m.id} className="menu-card-hover" onClick={() => onNavigate(m.id)}
-              style={{ background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer' }}>
+          {MENUS.map((m, i) => (
+            <div key={m.id} className="menu-card-hover card-anim" onClick={() => onNavigate(m.id)}
+              style={{ background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', animationDelay:`${i * 0.08}s` }}>
               <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
               <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
               <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>{m.sub}</div>
               {m.badge > 0 && <div style={{ display:'inline-block', background:'#00838F', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, marginTop:8 }}>{m.badge}개</div>}
             </div>
           ))}
-          <div className="menu-card-hover" onClick={() => onNavigate('bingo')}
-            style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+          <div className="menu-card-hover card-anim" onClick={() => onNavigate('bingo')}
+            style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${MENUS.length * 0.08}s` }}>
             <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
             <div>
               <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
