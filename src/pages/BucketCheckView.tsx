@@ -59,6 +59,63 @@ const stateMap: Record<string, {label:string; color:string; bg:string; icon:stri
 }
 
 interface Particle { id:number; x:number; color:string; size:number; duration:number; delay:number }
+
+const catColors: Record<string,string> = {
+  hospital:'#1a6b7a', food:'#2d7a5e', shopping:'#4a3f7a',
+  places:'#7a4a2a', schedule:'#1a4a6b', admin:'#5a5a7a',
+  people:'#3a6b4a', parenting:'#6b4a3a', custom:'#4a6b5a',
+}
+
+function PhotoCardGrid({ items, dayIdx, dbItems, achieved, isItemFullyAchieved, toggleAchieved, setDetailItem }: {
+  items: { id: string; categoryId: string; label: string; emoji: string }[]
+  dayIdx?: number
+  dbItems: DBItem[]
+  achieved: Record<string,boolean>
+  isItemFullyAchieved: (item: { id: string; categoryId: string; label: string; emoji: string }) => boolean
+  toggleAchieved: (id: string, day?: number) => void
+  setDetailItem: (item: DBItem) => void
+}) {
+  return (
+    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+      {items.map((item, idx) => {
+        const db = dbItems.find(d => d.id === item.id)
+        const isAchieved = isItemFullyAchieved(item)
+        const bgColor = catColors[item.categoryId] ?? '#1a4a6b'
+        const isWide = items.length % 2 !== 0 && idx === items.length - 1
+        const regionKey = db?.address ? Object.keys(stateMap).find(k => db.address!.toUpperCase().includes(k)) : null
+        const region = regionKey ? stateMap[regionKey] : null
+        return (
+          <div key={item.id}
+            onClick={() => db && setDetailItem(db)}
+            style={{
+              gridColumn: isWide ? 'span 2' : 'span 1',
+              borderRadius:16, overflow:'hidden', position:'relative',
+              aspectRatio: isWide ? '2/1' : '3/4',
+              background: bgColor, cursor: db ? 'pointer' : 'default',
+              WebkitTapHighlightColor:'transparent',
+            }}>
+            {db?.image_url && (
+              <img src={db.image_url} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
+            )}
+            <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.6) 100%)' }} />
+            <button
+              onClick={e => { e.stopPropagation(); toggleAchieved(item.id, dayIdx) }}
+              style={{ position:'absolute', top:10, right:10, width:26, height:26, borderRadius:'50%', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', background: isAchieved ? '#29B6D0' : 'rgba(255,255,255,0.25)', WebkitTapHighlightColor:'transparent' }}>
+              <svg width="12" height="12" viewBox="0 0 12 12">
+                <path d="M1.5 6L4.5 9L10.5 3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              </svg>
+            </button>
+            <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 10px 12px' }}>
+              <div style={{ fontSize:13, fontWeight:700, color:'#fff', lineHeight:1.3, opacity: isAchieved ? 0.7 : 1, textDecoration: isAchieved ? 'line-through' : 'none' }}>{item.label}</div>
+              {region && <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:3 }}>📍 {region.label}</div>}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function Confetti({ trigger }: { trigger:number }) {
   const [particles, setParticles] = useState<Particle[]>([])
   const prev = useRef(0)
@@ -494,46 +551,58 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             </button>
           </div>
         ) : (
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-            {checkedItems.map((item, idx) => {
-              const db = dbItems.find(d => d.id === item.id)
-              const isAchieved = isItemFullyAchieved(item)
-              const catColors: Record<string,string> = {
-                hospital:'#1a6b7a', food:'#2d7a5e', shopping:'#4a3f7a',
-                places:'#7a4a2a', schedule:'#1a4a6b', admin:'#5a5a7a',
-                people:'#3a6b4a', parenting:'#6b4a3a', custom:'#4a6b5a',
-              }
-              const bgColor = catColors[item.categoryId] ?? '#1a4a6b'
-              const isWide = checkedItems.length % 2 !== 0 && idx === checkedItems.length - 1
+          <>
+            {/* 날짜별 섹션 */}
+            {sortedDays.map(dayIdx => {
+              const dayItems = byDay.get(dayIdx) ?? []
+              if (!dayItems.length) return null
+              const date = tripDays[dayIdx]
+              const dayLabel = date ? `${fmtMD(date)}(${dow(date)})` : ''
+              const dayDone = dayItems.filter(i => !!achieved[`${i.id}_${dayIdx}`]).length
               return (
-                <div key={item.id}
-                  onClick={() => db && setDetailItem(db)}
-                  style={{
-                    gridColumn: isWide ? 'span 2' : 'span 1',
-                    borderRadius:16, overflow:'hidden', position:'relative',
-                    aspectRatio: isWide ? '2/1' : '3/4',
-                    background: bgColor, cursor: db ? 'pointer' : 'default',
-                    WebkitTapHighlightColor:'transparent',
-                  }}>
-                  {db?.image_url && (
-                    <img src={db.image_url} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
-                  )}
-                  <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.6) 100%)' }} />
-                  <button
-                    onClick={e => { e.stopPropagation(); toggleAchieved(item.id) }}
-                    style={{ position:'absolute', top:10, right:10, width:26, height:26, borderRadius:'50%', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', background: isAchieved ? '#29B6D0' : 'rgba(255,255,255,0.25)', WebkitTapHighlightColor:'transparent' }}>
-                    <svg width="12" height="12" viewBox="0 0 12 12">
-                      <path d="M1.5 6L4.5 9L10.5 3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                    </svg>
-                  </button>
-                  <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 10px 12px' }}>
-                    <div style={{ fontSize:13, fontWeight:700, color:'#fff', lineHeight:1.3, opacity: isAchieved ? 0.7 : 1, textDecoration: isAchieved ? 'line-through' : 'none' }}>{item.label}</div>
-                    {db?.address && <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:3 }}>📍 {db.address.split(' ').slice(0,2).join(' ')}</div>}
+                <div key={dayIdx} style={{ marginBottom:20 }}>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                      <span style={{ fontSize:14, fontWeight:700, color:'#0D3349' }}>{dayIdx+1}일차</span>
+                      <span style={{ fontSize:12, color:'#7BAAB5' }}>{dayLabel}</span>
+                    </div>
+                    <span style={{ fontSize:12, color:'#29B6D0', fontWeight:700 }}>{dayDone}/{dayItems.length}</span>
                   </div>
+                  <PhotoCardGrid
+                    items={dayItems}
+                    dayIdx={dayIdx}
+                    dbItems={dbItems}
+                    achieved={achieved}
+                    isItemFullyAchieved={isItemFullyAchieved}
+                    toggleAchieved={toggleAchieved}
+                    setDetailItem={setDetailItem}
+                  />
                 </div>
               )
             })}
-          </div>
+            {/* 날짜 미지정 섹션 */}
+            {(() => {
+              const items = checkedItems.filter(i => !(state.schedules[i.id]?.length))
+              if (!items.length) return null
+              const doneCount = items.filter(i => !!achieved[i.id]).length
+              return (
+                <div style={{ marginBottom:20 }}>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                    <span style={{ fontSize:14, fontWeight:700, color:'#7BAAB5' }}>날짜 미지정</span>
+                    <span style={{ fontSize:12, color:'#7BAAB5', fontWeight:700 }}>{doneCount}/{items.length}</span>
+                  </div>
+                  <PhotoCardGrid
+                    items={items}
+                    dbItems={dbItems}
+                    achieved={achieved}
+                    isItemFullyAchieved={isItemFullyAchieved}
+                    toggleAchieved={toggleAchieved}
+                    setDetailItem={setDetailItem}
+                  />
+                </div>
+              )
+            })()}
+          </>
         )}
       </div>
 
