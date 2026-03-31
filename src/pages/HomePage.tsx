@@ -129,19 +129,19 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         {/* D-day 카드 */}
         <div style={{ background:'rgba(255,255,255,0.82)', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.10)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
-            <div style={{ fontSize:48, fontWeight:900, color: ddayColor, lineHeight:1 }}>{ddayText}</div>
-            <div style={{ fontSize:13, color:'#1565A0', marginTop:4 }}>{ddayLabel}</div>
+            <div style={{ fontSize:52, fontWeight:900, color: ddayColor, lineHeight:1 }}>{ddayText}</div>
+            <div style={{ fontSize:15, color:'#1565A0', marginTop:6 }}>{ddayLabel}</div>
           </div>
-          <div style={{ textAlign:'right', fontSize:12, color:'#1565A0', lineHeight:1.8 }}>
+          <div style={{ textAlign:'right', fontSize:13, color:'#1565A0', lineHeight:2 }}>
             <div>✈️ {fmtDate(startDate)} 출발</div>
             <div>🏠 {fmtDate(endDate)} 귀국</div>
-            <div style={{ marginTop:6, fontSize:11, color:'#00838F', fontWeight:700 }}>{tripNights}박 {tripNights+1}일</div>
-            <button onClick={onChangeDates} style={{ marginTop:6, background:'none', border:'none', fontSize:11, color:'#00838F', cursor:'pointer', textDecoration:'underline', fontFamily:ff }}>날짜 변경</button>
+            <div style={{ marginTop:6, fontSize:13, color:'#00838F', fontWeight:700 }}>{tripNights}박 {tripNights+1}일</div>
+            <button onClick={onChangeDates} style={{ marginTop:6, background:'none', border:'none', fontSize:12, color:'#00838F', cursor:'pointer', textDecoration:'underline', fontFamily:ff }}>날짜 변경</button>
           </div>
         </div>
 
         {/* 섹션 라벨 */}
-        <div style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,0.85)', margin:'4px 0 10px', letterSpacing:'0.03em' }}>나의 여행 리스트</div>
+        <div style={{ fontSize:16, fontWeight:700, color:'rgba(255,255,255,0.9)', margin:'8px 0 12px', letterSpacing:'0.02em' }}>나의 여행 리스트</div>
 
         {/* 메뉴 그리드 */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
@@ -150,10 +150,10 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
               onClick={() => onNavigate(m.id)}
               style={{ background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer' }}>
               <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
-              <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
-              <div style={{ fontSize:12, color:'#1565A0', marginTop:3 }}>{m.sub}</div>
+              <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
+              <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>{m.sub}</div>
               {m.badge > 0 && (
-                <div style={{ display:'inline-block', background:'#00838F', color:'#fff', fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:20, marginTop:6 }}>{m.badge}개</div>
+                <div style={{ display:'inline-block', background:'#00838F', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, marginTop:8 }}>{m.badge}개</div>
               )}
             </div>
           ))}
@@ -164,8 +164,8 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
             <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
             <div>
-              <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
-              <div style={{ fontSize:12, color:'#1565A0', marginTop:3 }}>시드니·멜번 카페 25곳 투어</div>
+              <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
+              <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>시드니·멜번 카페 25곳 투어</div>
             </div>
           </div>
         </div>
