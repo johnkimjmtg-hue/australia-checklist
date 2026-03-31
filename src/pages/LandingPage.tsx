@@ -67,9 +67,9 @@ export default function LandingPage({ onComplete }: Props) {
       const isRange = sDate && eDate && dt > sDate && dt < eDate
       const isToday = dt.toDateString() === TODAY.toDateString()
 
-      let bg = 'transparent', color = isPast ? '#ddd' : '#3D1F0A', radius = '50%', fw = 400
-      if (isStart || isEnd) { bg = '#FF7043'; color = '#fff'; fw = 800 }
-      else if (isRange) { bg = '#FFE0D6'; color = '#c0440a'; radius = '0' }
+      let bg = 'transparent', color = isPast ? '#ddd' : '#0D3349', radius = '50%', fw = 400
+      if (isStart || isEnd) { bg = '#00838F'; color = '#fff'; fw = 800 }
+      else if (isRange) { bg = '#B2EBF2'; color = '#006064'; radius = '0' }
 
       cells.push(
         <div key={d} onClick={isPast ? undefined : () => pick(dt)}
@@ -77,7 +77,7 @@ export default function LandingPage({ onComplete }: Props) {
             aspectRatio: '1', display:'flex', alignItems:'center', justifyContent:'center',
             borderRadius: radius, background: bg, color, fontWeight: fw,
             fontSize: 13, cursor: isPast ? 'default' : 'pointer',
-            border: isToday && !isStart && !isEnd ? '1.5px solid #FF7043' : 'none',
+            border: isToday && !isStart && !isEnd ? '1.5px solid #00838F' : 'none',
             WebkitTapHighlightColor: 'transparent',
           }}
         >{d}</div>
@@ -90,7 +90,7 @@ export default function LandingPage({ onComplete }: Props) {
 
   return (
     <div style={{
-      minHeight: '100dvh', background: 'linear-gradient(180deg, #FFF5EE 0%, #FFE8D6 30%, #FFB347 70%, #FF7043 100%)', fontFamily: ff,
+      minHeight: '100dvh', background: 'linear-gradient(180deg, #E0F7FA 0%, #00BCD4 40%, #00897B 75%, #00695C 100%)', fontFamily: ff,
       maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column',
     }}>
       <style>{`
@@ -109,31 +109,31 @@ export default function LandingPage({ onComplete }: Props) {
         .ripple-anim { animation: ripple 2s ease-out infinite; }
         .title-anim { animation: slideUp 0.6s 0.2s both; }
         .sub-anim { animation: slideUp 0.6s 0.35s both; }
-        .cal-day-hover:hover { background: #FFF0EA !important; }
-        .nav-hover:hover { background: #FFF0EA; color: #FF7043 !important; }
-        .hdr-btn-hover:hover { background: #FFF0EA; }
+        .cal-day-hover:hover { background: #E0F7FA !important; }
+        .nav-hover:hover { background: #E0F7FA; color: #FF7043 !important; }
+        .hdr-btn-hover:hover { background: #E0F7FA; }
         .pick-item { padding:11px 6px; text-align:center; border-radius:12px; font-size:14px; font-weight:600; color:#555; cursor:pointer; border:1.5px solid transparent; transition:all 0.12s; }
-        .pick-item:hover { border-color:#FF7043; color:#FF7043; background:#FFF0EA; }
-        .pick-item.sel { background:#FF7043; color:#fff; border-color:#FF7043; }
+        .pick-item:hover { border-color:#00838F; color:#00838F; background:#FFF0EA; }
+        .pick-item.sel { background:#00838F; color:#fff; border-color:#00838F; }
         .main-btn { transition: transform 0.12s, opacity 0.12s; }
         .main-btn:active { transform: scale(0.97); opacity: 0.9; }
       `}</style>
 
       {/* ── 상단 히어로 */}
       <div style={{ position:'relative', overflow:'hidden', background:'transparent', padding:'52px 28px 36px', minHeight:280 }}>
-        <div className="blob1" style={{ position:'absolute', width:180, height:180, borderRadius:'50%', background:'#FFCC80', top:-40, right:-30 }} />
-        <div className="blob2" style={{ position:'absolute', width:120, height:120, borderRadius:'50%', background:'#FFB74D', top:60, left:-20 }} />
-        <div className="blob3" style={{ position:'absolute', width:90, height:90, borderRadius:'50%', background:'#FF8A65', bottom:40, right:30 }} />
+        <div className="blob1" style={{ position:'absolute', width:180, height:180, borderRadius:'50%', background:'#80DEEA', top:-40, right:-30 }} />
+        <div className="blob2" style={{ position:'absolute', width:120, height:120, borderRadius:'50%', background:'#26C6DA', top:60, left:-20 }} />
+        <div className="blob3" style={{ position:'absolute', width:90, height:90, borderRadius:'50%', background:'#00ACC1', bottom:40, right:30 }} />
 
         <div className="icon-bounce" style={{ position:'relative', display:'inline-block', marginBottom:20 }}>
-          <div className="ripple-anim" style={{ position:'absolute', inset:-8, borderRadius:'50%', background:'rgba(255,112,67,0.2)' }} />
+          <div className="ripple-anim" style={{ position:'absolute', inset:-8, borderRadius:'50%', background:'rgba(0,172,193,0.2)' }} />
           <div className="icon-pulse" style={{ width:72, height:72, borderRadius:24, background:'#FF7043', display:'flex', alignItems:'center', justifyContent:'center', fontSize:36, position:'relative', zIndex:1 }}>✈️</div>
         </div>
 
-        <h1 className="title-anim" style={{ fontSize:32, fontWeight:800, color:'#3D1F0A', lineHeight:1.3, margin:0 }}>
+        <h1 className="title-anim" style={{ fontSize:32, fontWeight:800, color:'#0D3349', lineHeight:1.3, margin:0 }}>
           호주 여행,<br />언제 떠나세요?
         </h1>
-        <p className="sub-anim" style={{ fontSize:16, color:'#5a3a1a', marginTop:10, lineHeight:1.65 }}>
+        <p className="sub-anim" style={{ fontSize:16, color:'#0D4F6E', marginTop:10, lineHeight:1.65 }}>
           출발일과 귀국일을 선택하면<br />맞춤 여행 리스트를 만들어드려요
         </p>
       </div>
@@ -145,8 +145,8 @@ export default function LandingPage({ onComplete }: Props) {
           { label:'🏠 귀국일', val: eDate ? fmt(eDate) : null },
         ].map((c, i) => (
           <div key={i} style={{ background:'#fff', borderRadius:16, padding:'12px 14px', border:'none', boxShadow:'0 2px 12px rgba(0,0,0,0.08)' }}>
-            <div style={{ fontSize:11, color:'#8B5E3C', marginBottom:3, fontWeight:600 }}>{c.label}</div>
-            <div style={{ fontSize:14, fontWeight: c.val ? 700 : 400, color: c.val ? '#3D1F0A' : '#8B5E3C' }}>
+            <div style={{ fontSize:11, color:'#1565A0', marginBottom:3, fontWeight:600 }}>{c.label}</div>
+            <div style={{ fontSize:14, fontWeight: c.val ? 700 : 400, color: c.val ? '#0D3349' : '#1565A0' }}>
               {c.val ?? '날짜 선택'}
             </div>
           </div>
@@ -177,21 +177,21 @@ export default function LandingPage({ onComplete }: Props) {
       <div style={{ margin:'12px 18px 0', background:'#fff', borderRadius:22, border:'none', overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 10px' }}>
           <button className="nav-hover" onClick={() => chgMo(-1)}
-            style={{ background:'none', border:'none', fontSize:22, color:'#8B5E3C', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
+            style={{ background:'none', border:'none', fontSize:22, color:'#1565A0', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
           <div style={{ display:'flex', gap:4, alignItems:'center' }}>
             <button className="hdr-btn-hover" onClick={() => setPicker(picker==='year'?'none':'year')}
-              style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#FF7043' }}>{vy}년</button>
-            <span style={{ fontSize:13, color:'#8B5E3C' }}>•</span>
+              style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#00838F' }}>{vy}년</button>
+            <span style={{ fontSize:13, color:'#1565A0' }}>•</span>
             <button className="hdr-btn-hover" onClick={() => setPicker(picker==='month'?'none':'month')}
-              style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#3D1F0A' }}>{MONTHS[vm]}</button>
+              style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#0D3349' }}>{MONTHS[vm]}</button>
           </div>
           <button className="nav-hover" onClick={() => chgMo(1)}
-            style={{ background:'none', border:'none', fontSize:22, color:'#8B5E3C', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>›</button>
+            style={{ background:'none', border:'none', fontSize:22, color:'#1565A0', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>›</button>
         </div>
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'0 10px' }}>
           {['일','월','화','수','목','금','토'].map(d => (
-            <div key={d} style={{ textAlign:'center', fontSize:11, color:'#8B5E3C', fontWeight:600, padding:'4px 0 6px' }}>{d}</div>
+            <div key={d} style={{ textAlign:'center', fontSize:11, color:'#1565A0', fontWeight:600, padding:'4px 0 6px' }}>{d}</div>
           ))}
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, padding:'0 10px 14px' }}>
@@ -207,7 +207,7 @@ export default function LandingPage({ onComplete }: Props) {
             width:'100%', padding:18, border:'none', borderRadius:50,
             fontSize:17, fontWeight: canNext ? 800 : 400, cursor: canNext ? 'pointer' : 'default',
             background: canNext ? '#fff' : '#e0e0e0',
-            color: canNext ? '#3D1F0A' : '#666',
+            color: canNext ? '#0D3349' : '#666',
           }}
         >
           {canNext ? '시작하기' : '출발일과 귀국일을 선택해주세요'}
