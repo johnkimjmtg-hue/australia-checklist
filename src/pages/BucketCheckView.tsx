@@ -363,7 +363,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           margin:`0 ${spacing[3]}px`,
           background: colors.bgCard,
           borderRadius: radius.md,
-          border: isAchieved ? `1px solid ${colors.success}` : `1px solid ${colors.gray300}`,
+          border: isAchieved ? `1px solid ${'#29B6D0'}` : `1px solid ${colors.gray300}`,
           cursor: db ? 'pointer' : 'default',
           transition:'all 0.15s',
         }}
@@ -378,7 +378,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
         {/* 텍스트 */}
         <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color: isAchieved ? colors.success : colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+          <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color: isAchieved ? '#29B6D0' : colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
             {item.label}
           </div>
           <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, overflow:'hidden' }}>
@@ -404,14 +404,14 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             style={{
               display:'flex', alignItems:'center', gap:3,
               padding:'4px 8px', borderRadius:radius.sm, cursor:'pointer',
-              background: isAchieved ? colors.success : colors.bgCard,
-              border: `1px solid ${colors.success}`,
+              background: isAchieved ? '#29B6D0' : colors.bgCard,
+              border: `1px solid ${'#29B6D0'}`,
               transition:'all 0.15s', whiteSpace:'nowrap',
             }}
           >
-            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color: isAchieved ? '#fff' : colors.success }}>완료</span>
+            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color: isAchieved ? '#fff' : '#29B6D0' }}>완료</span>
             <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
-              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : colors.success} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#29B6D0'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <button
