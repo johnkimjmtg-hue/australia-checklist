@@ -363,7 +363,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           margin:`0 ${spacing[3]}px`,
           background: colors.bgCard,
           borderRadius: radius.md,
-          border: isAchieved ? `1px solid ${colors.success}` : `1px solid ${colors.gray300}`,
+          border: isAchieved ? `1px solid ${'#F5A623'}` : `1px solid ${colors.gray300}`,
           cursor: db ? 'pointer' : 'default',
           transition:'all 0.15s',
         }}
@@ -378,7 +378,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
         {/* 텍스트 */}
         <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color: isAchieved ? colors.success : colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+          <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color: isAchieved ? '#F5A623' : colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
             {item.label}
           </div>
           <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, overflow:'hidden' }}>
@@ -404,14 +404,14 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             style={{
               display:'flex', alignItems:'center', gap:3,
               padding:'4px 8px', borderRadius:radius.sm, cursor:'pointer',
-              background: isAchieved ? colors.success : colors.bgCard,
-              border: `1px solid ${colors.success}`,
+              background: isAchieved ? '#F5A623' : colors.bgCard,
+              border: `1px solid ${'#F5A623'}`,
               transition:'all 0.15s', whiteSpace:'nowrap',
             }}
           >
-            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color: isAchieved ? '#fff' : colors.success }}>완료</span>
+            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color: isAchieved ? '#fff' : '#F5A623' }}>완료</span>
             <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
-              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : colors.success} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#F5A623'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <button
@@ -667,7 +667,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(0,0,0,0.45)', fontFamily:font.family }}>
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
+            width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC',
             borderRadius:20, maxHeight:'85vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
           }}>
