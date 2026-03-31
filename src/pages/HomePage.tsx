@@ -152,20 +152,18 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             return (
               <div key={city} style={{
                 background:'rgba(255,255,255,0.82)',
-                borderRadius:16, padding:'10px 14px',
+                borderRadius:12, padding:'6px 10px',
                 boxShadow:'0 4px 20px rgba(0,0,0,0.10)',
-                minWidth:80, textAlign:'center',
+                flex:1, textAlign:'center',
               }}>
-                <div style={{ fontSize:12, fontWeight:700, color:'#1565A0', marginBottom:4 }}>{CITIES[city].label}</div>
-                {d?.icon ? (
-                  <img src={`https://openweathermap.org/img/wn/${d.icon}.png`} width={28} height={28} style={{ display:'block', margin:'0 auto' }} />
-                ) : (
-                  <div style={{ height:28 }} />
-                )}
-                {d?.temp != null && (
-                  <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', marginTop:2 }}>{d.temp}°</div>
-                )}
-                <div style={{ fontSize:12, color:'#1565A0', marginTop:2, letterSpacing:0.5 }}>{d?.time ?? '--:--'}</div>
+                <div style={{ fontSize:11, fontWeight:700, color:'#1565A0', marginBottom:1 }}>{CITIES[city].label}</div>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:2 }}>
+                  {d?.icon
+                    ? <img src={`https://openweathermap.org/img/wn/${d.icon}.png`} width={24} height={24} />
+                    : <span style={{ fontSize:16 }}>🌤️</span>
+                  }
+                  <span style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>{d?.time ?? '--:--'}</span>
+                </div>
               </div>
             )
           })}
