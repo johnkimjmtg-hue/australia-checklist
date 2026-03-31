@@ -11,10 +11,10 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
   const [tab, setTab] = useState<Tab>(initialTab)
 
   return (
-    <div style={{ minHeight:'100dvh', background:'rgba(255,255,255,0.95)', fontFamily:font.family, display:'flex', justifyContent:'center' }}>
-      <div style={{ width:'100%', maxWidth:430, minHeight:'100dvh', display:'flex', flexDirection:'column', background:'rgba(255,255,255,0.95)', boxSizing:'border-box' }}>
+    <div style={{ minHeight:'100dvh', background:'#fff', fontFamily:font.family, display:'flex', justifyContent:'center' }}>
+      <div style={{ width:'100%', maxWidth:430, minHeight:'100dvh', display:'flex', flexDirection:'column', background:'#fff', boxSizing:'border-box' }}>
         {/* 헤더 */}
-        <div style={{ flexShrink:0, height:56, background:colors.bgCard, borderBottom:`1px solid ${colors.border}`, padding:`0 ${spacing[4]}px`, display:'flex', alignItems:'center', gap:spacing[2] }}>
+        <div style={{ flexShrink:0, height:56, background:'#fff', borderBottom:`1px solid ${'#E0F7FA'}`, padding:`0 ${spacing[4]}px`, display:'flex', alignItems:'center', gap:spacing[2] }}>
           <button onClick={onBack} style={{ background:'none', border:'none', cursor:'pointer', padding:spacing[1], margin:`-${spacing[1]}px`, display:'flex', alignItems:'center', WebkitTapHighlightColor:'transparent' }}>
             <svg width={20} height={20} viewBox="0 0 20 20" fill="none">
               <path d="M12.5 15L7.5 10L12.5 5" stroke={colors.textPrimary} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"/>
@@ -23,12 +23,12 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
           <div style={{ ...T.h4 }}>약관 및 정책</div>
         </div>
         {/* 탭 */}
-        <div style={{ display:'flex', borderBottom:`1px solid ${colors.border}`, background:colors.bgCard, flexShrink:0 }}>
+        <div style={{ display:'flex', borderBottom:`1px solid ${'#E0F7FA'}`, background:'#fff', flexShrink:0 }}>
           {(['terms','privacy'] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)} style={{
               flex:1, height:44, background:'none', border:'none',
-              borderBottom: tab===t ? `2px solid ${colors.primary}` : '2px solid transparent',
-              color: tab===t ? colors.primary : colors.textTertiary,
+              borderBottom: tab===t ? `2px solid ${'#00838F'}` : '2px solid transparent',
+              color: tab===t ? '#00838F' : colors.textTertiary,
               fontSize:font.size.sm, fontWeight: tab===t ? font.weight.bold : font.weight.regular,
               fontFamily:font.family, cursor:'pointer', transition:'all 0.15s', marginBottom:-1,
             }}>
@@ -48,7 +48,7 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom:spacing[6] }}>
-      <div style={{ ...T.h4, color:colors.primary, marginBottom:spacing[2], paddingBottom:spacing[2], borderBottom:`1px solid ${colors.border}` }}>{title}</div>
+      <div style={{ ...T.h4, color:'#00838F', marginBottom:spacing[2], paddingBottom:spacing[2], borderBottom:`1px solid ${'#E0F7FA'}` }}>{title}</div>
       {children}
     </div>
   )
@@ -76,13 +76,13 @@ function Table({ headers, rows }: { headers: string[]; rows: string[][] }) {
       <table style={{ width:'100%', borderCollapse:'collapse', fontSize:font.size.sm }}>
         <thead>
           <tr style={{ background:colors.bgInput }}>
-            {headers.map((h,i) => <th key={i} style={{ padding:`${spacing[2]}px ${spacing[3]}px`, textAlign:'left', fontWeight:font.weight.bold, color:colors.textPrimary, border:`1px solid ${colors.border}`, whiteSpace:'nowrap' }}>{h}</th>)}
+            {headers.map((h,i) => <th key={i} style={{ padding:`${spacing[2]}px ${spacing[3]}px`, textAlign:'left', fontWeight:font.weight.bold, color:colors.textPrimary, border:`1px solid ${'#E0F7FA'}`, whiteSpace:'nowrap' }}>{h}</th>)}
           </tr>
         </thead>
         <tbody>
           {rows.map((row,i) => (
             <tr key={i}>
-              {row.map((cell,j) => <td key={j} style={{ padding:`${spacing[2]}px ${spacing[3]}px`, color:colors.textSecondary, border:`1px solid ${colors.border}`, lineHeight:1.6 }}>{cell}</td>)}
+              {row.map((cell,j) => <td key={j} style={{ padding:`${spacing[2]}px ${spacing[3]}px`, color:colors.textSecondary, border:`1px solid ${'#E0F7FA'}`, lineHeight:1.6 }}>{cell}</td>)}
             </tr>
           ))}
         </tbody>
