@@ -265,7 +265,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
             <div style={{ position:'sticky', top:0, zIndex:30, background: '#ffffff', borderBottom:'1px solid rgba(0,131,143,0.15)' }}>
               {/* 멘트 + 일정설정 + 일정보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
-                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: '#0D3349' }}>
+                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? '#00838F' : '#0D3349' }}>
                   {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
                 </span>
                 <button onClick={handleOpenTripPicker} style={{
@@ -326,10 +326,10 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
           <div style={{ background:'transparent', padding:`${spacing[3]}px ${spacing[3]}px` }}>
             {!showSearch && (
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[2] }}>
-                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#0D3349' }}>
+                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#00838F' }}>
                   {CATEGORIES.find(c=>c.id===activeCategory)?.label}
                 </span>
-                <span style={{ fontSize:font.size.sm, color:'#0D3349', fontWeight:font.weight.bold }}>
+                <span style={{ fontSize:font.size.sm, color:'#00838F', fontWeight:font.weight.bold }}>
                   {catItems.filter(i=>state.selected[i.id]).length}/{catItems.length}
                 </span>
               </div>
