@@ -60,9 +60,9 @@ const STATE_MAP: Record<string, { label: string }> = {
 
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker' | 'calendar'
 type MainTab = 'bucketlist' | 'bucketcheck' | 'services' | 'shopping' | 'myshoppinglist' | 'nearby' | 'bingo'
-type Props = { state: AppState; setState: (s: AppState) => void; initialTab?: MainTab; onGoHome?: () => void; embedded?: boolean }
+type Props = { state: AppState; setState: (s: AppState) => void; initialTab?: MainTab; onGoHome?: () => void; embedded?: boolean; onDetailItem?: (item: DBItem | null) => void }
 
-export default function ChecklistPage({ state, setState, initialTab, onGoHome, embedded }: Props) {
+export default function ChecklistPage({ state, setState, initialTab, onGoHome, embedded, onDetailItem }: Props) {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
@@ -268,17 +268,12 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                 <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: '#0D3349' }}>
                   {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
                 </span>
-                <button onClick={handleOpenTripPicker} style={{
-                    height:30, padding:'0 12px', borderRadius:20,
-                    border: tripLabel ? '1.5px solid #29B6D0' : '1.5px solid #29B6D0',
-                    background: tripLabel ? 'rgba(0,131,143,0.12)' : 'rgba(0,131,143,0.12)',
-                    color: '#29B6D0',
-                    fontSize:11, fontWeight:700,
-                    cursor:'pointer', display:'flex', alignItems:'center', gap:4, fontFamily:ff,
-                  }}>
-                    <Icon icon="ph:airplane-takeoff" width={12} height={12} color="#29B6D0" />
-                    {tripLabel ?? '일정 설정'}
-                  </button>
+                {tripLabel && (
+                  <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                    <Icon icon="ph:airplane-takeoff" width={14} height={14} color="#29B6D0" />
+                    <span style={{ fontSize:15, fontWeight:700, color:'#29B6D0', fontFamily:ff }}>{tripLabel}</span>
+                  </div>
+                )}
               </div>
               {/* 카테고리 그리드 */}
               <div style={{ padding:`0 ${spacing[3]}px ${spacing[3]}px` }}>
@@ -369,6 +364,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                     onClick={()=>{
                       if(!db) return
                       setDetailItem(db)
+      onDetailItem?.(db)
                       if((db.related_business_ids?.length??0)>0){
                         const cached = getCachedBusinesses()
                         setDetailBizCards(cached?.filter(b => db.related_business_ids!.includes(b.id)) ?? [])
@@ -439,9 +435,9 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
         }}>
           {onGoHome && (
             <button className="nav-btn" onClick={onGoHome}
-              style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, height:54, background:'none', border:'none', cursor:'pointer', position:'relative', fontFamily:ff }}>
-              <Icon icon="ph:house" width={22} height={22} color={colors.textTertiary} />
-              <span style={{ fontSize:12, fontWeight:font.weight.medium, color:colors.textTertiary }}>홈</span>
+              style={{ display:'flex', alignItems:'center', gap:6, background:'rgba(0,0,0,0.06)', border:'none', borderRadius:20, padding:'6px 14px 6px 10px', cursor:'pointer', WebkitTapHighlightColor:'transparent', fontFamily:ff }}>
+              <Icon icon="ph:arrow-left" width={16} height={16} color="#0D3349" />
+              <span style={{ fontSize:16, fontWeight:600, color:'#0D3349' }}>내 버킷리스트</span>
             </button>
           )}
           {TABS.map(tab=>{
@@ -537,73 +533,6 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
         </>
       )}
 
-      {/* ── 버킷리스트 상세 팝업 ── */}
-      {detailItem&&(
-        <div onClick={()=>setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(0,0,0,0.45)', fontFamily:ff }}>
-          <div onClick={e=>e.stopPropagation()} style={{
-            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
-            borderRadius:20, maxHeight:'85vh', overflowY:'auto',
-            animation:'slideUpSheet 0.25s ease',
-            boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
-          }}>
-            <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
-              <button onClick={()=>setDetailItem(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
-                <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
-              </button>
-            </div>
-            {detailItem.image_url&&<div style={{ width:'100%', height:220, overflow:'hidden', marginTop:spacing[2] }}><img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /></div>}
-            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[4]}px` }}>
-              <div style={{ ...T.h2, lineHeight:1.4, marginBottom:spacing[3] }}>{detailItem.label}</div>
-              {detailItem.description&&<div style={{ fontSize:font.size.md, color:'#475569', lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
-              {detailItem.tips&&(
-                <div style={{ background:'rgba(0,131,143,0.10)', border:'1px solid rgba(0,131,143,0.2)', borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#29B6D0', marginBottom:spacing[1] }}>💡 현지인 팁</div>
-                  <div style={{ fontSize:font.size.sm, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
-                </div>
-              )}
-              {detailItem.address&&(
-                <button onClick={()=>window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')} style={{ display:'flex', alignItems:'center', gap:spacing[2], width:'100%', background:'rgba(0,131,143,0.10)', border:'1px solid rgba(0,131,143,0.2)', borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4], cursor:'pointer', textAlign:'left' }}>
-                  <Icon icon="ph:map-pin" width={16} height={16} color={'#29B6D0'} />
-                  <div>
-                    <div style={{ fontSize:font.size.xs, color:colors.textTertiary }}>여기서 할 수 있어요</div>
-                    <div style={{ fontSize:font.size.sm, color:'#29B6D0', fontWeight:font.weight.bold, textDecoration:'underline' }}>{detailItem.address}</div>
-                  </div>
-                  <Icon icon="ph:arrow-square-out" width={13} height={13} color={colors.textTertiary} style={{ marginLeft:'auto' }} />
-                </button>
-              )}
-              {detailBizCards.length>0&&(
-                <div style={{ marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>🏢 관련 업체</div>
-                  <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>{detailBizCards.map(biz=><BusinessCard key={biz.id} business={biz} />)}</div>
-                </div>
-              )}
-              {(detailItem.related_product_ids?.length??0)>0&&(()=>{
-                const cached = getCachedShopping()
-                const prods = cached?.products.filter(p => detailItem.related_product_ids!.includes(p.id)).slice(0,5) ?? []
-                return prods.length>0 ? (
-                  <div style={{ marginBottom:spacing[4] }}>
-                    <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>🛍️ 관련 상품</div>
-                    <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
-                      {prods.map(prod=>(
-                        <button key={prod.id} onClick={()=>setSelProduct(prod)} style={{ display:'flex', alignItems:'center', gap:spacing[3], background:colors.bgInput, border:'1px solid rgba(0,131,143,0.2)', borderRadius:radius.md, padding:`${spacing[3]}px`, cursor:'pointer', textAlign:'left', width:'100%' }}>
-                          {prod.image_url && <img src={prod.image_url} alt="" style={{ width:44, height:44, borderRadius:radius.sm, objectFit:'cover', flexShrink:0 }} />}
-                          <div style={{ flex:1, minWidth:0 }}>
-                            <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:2 }}>{prod.name}</div>
-                            <div style={{ fontSize:font.size.xs, color:colors.textTertiary }}>{prod.brand}</div>
-                          </div>
-                          <Icon icon="ph:arrow-right" width={16} height={16} color={colors.textTertiary} />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : null
-              })()}
-
-            </div>
-          </div>
-        </div>
-      )}
 
       {showReceipt&&trip&&(
         <ReceiptModal state={state} trip={trip} issuedAt={issuedAt} achieved={achieved} dbItems={dbItems}

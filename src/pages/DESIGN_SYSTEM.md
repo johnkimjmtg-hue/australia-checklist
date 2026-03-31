@@ -8,8 +8,7 @@
 
 ### 브랜드 색상 (기존 앱 - ChecklistPage 등)
 ```
-Primary:        #1B6EF3  (파란색 - 버튼, 강조)
-Success:        #16A34A  (초록 - 완료)
+Primary:        #29B6D0  (파란색 - 버튼, 강조, 완료 체크)
 Danger:         #DC2626  (빨강 - 삭제, 경고)
 Warning:        #F59E0B  (주황 - 일정 미지정)
 ```
@@ -26,7 +25,7 @@ Warning:        #F59E0B  (주황 - 일정 미지정)
 카드 테두리:    없음 (border: none)
 카드 radius:   22px (큰 카드), 16px (작은 카드/칩), 20px (메뉴 카드)
 
-팝업/바텀시트 배경: #EFFCFC  ← 카드와 동일
+팝업/바텀시트 배경: #ffffff  ← 흰색
 팝업 그림자:        0 8px 32px rgba(0,0,0,0.20)
 ```
 
@@ -114,37 +113,30 @@ padding: 18px
 /* 활성: font-weight 800 / 비활성: font-weight 400 */
 ```
 
-### 팝업 / 바텀시트 (공통)
+### 팝업 / 바텀시트 (공통) — AppHeader 날씨/메뉴/약관 팝업
 ```css
-/* 모든 팝업 동일 스타일 적용 - 날씨, 메뉴, 약관 모두 */
+/* 기본 팝업 - 여백 있는 스타일 */
 position: fixed
 bottom: 16px
 left: 50%
 transform: translateX(-50%)
 width: calc(100% - 32px)
 max-width: 398px
-background: #EFFCFC          ← 카드와 동일색, 반투명 절대 금지
+background: #ffffff
 border-radius: 20px
 box-shadow: 0 8px 32px rgba(0,0,0,0.20)
 animation: slideUpSheet 0.25s ease
 max-height: 85vh
 overflow-y: auto
 
-/* 핸들 바 */
-width: 36px
-height: 4px
-border-radius: 999px
-background: rgba(0,0,0,0.15)
-margin: 12px auto 0
-
-/* X 닫기 버튼 */
+/* X 닫기 버튼 (ph:x 아이콘 사용) */
 width: 28px
 height: 28px
 border-radius: 50%
 background: rgba(0,0,0,0.08)
 border: none
 color: #0D3349
-font-size: 14px
+/* Icon: ph:x, width:16, height:16 */
 
 /* 오버레이 (팝업 뒤 배경) */
 position: fixed
@@ -153,33 +145,101 @@ background: rgba(0,0,0,0.45)
 z-index: 800
 ```
 
-### 달력 날짜 선택 색상
-```
-출발일/귀국일:  bg #00838F, color #fff
-선택 범위:      bg #B2EBF2, color #006064, border-radius 0
-오늘:           border 1.5px solid #00838F
-지나간 날짜:    color #7BAAB5, 클릭 불가
-```
-
-### 도시 날씨 카드 (홈페이지 상단)
+### BucketSheet / ChecklistSheet (전체화면 바텀시트)
 ```css
-background: #EFFCFC
-border-radius: 12px
-padding: 6px 10px
-box-shadow: 0 4px 20px rgba(0,0,0,0.10)
-flex: 1
+/* 홈 → 버킷리스트, 홈 → 체크리스트 팝업 */
+position: fixed
+bottom: 0                    ← 하단 여백 없음
+left: 50%
+transform: translateX(-50%)
+width: 100%                  ← 양쪽 여백 없음
+max-width: 430px
+background: #ffffff
+border-radius: 20px 20px 0 0  ← 위쪽만 굴림, 아래 모서리 직각
+box-shadow: 0 8px 32px rgba(0,0,0,0.20)
+animation: slideUpSheet 0.25s ease
+max-height: 85vh
+overflow-y: auto
+display: flex
+flex-direction: column
 
-/* 내부 구성: 아이콘 + 도시명 + 온도 + 시간 한 줄 */
-아이콘: 20px
-도시명: 12px / 700 / #0D3349
-온도:   11px / 700 / #CC3300  ← 블러드 오렌지
-시간:   11px / 600 / #0D3349
+/* 헤더 구조 */
+헤더: padding 12px 12px 0, flex, space-between
+X 버튼: ph:x 아이콘 (width:16, height:16, color:#0D3349)
+         width:28, height:28, border-radius:50%, background:rgba(0,0,0,0.08)
+
+@keyframes slideUpSheet {
+  from { transform: translateX(-50%) translateY(100%); }
+  to   { transform: translateX(-50%) translateY(0); }
+}
 ```
 
-### 블롭 (히어로 배경 장식)
+### BucketCheckView 상세 팝업 (버킷리스트 카드 클릭 시)
+```css
+/* BucketSheet 안에서 별도 레이어로 렌더링 (zIndex: 1101) */
+/* BucketSheet보다 낮게 띄워서 "팝업 안 팝업" 느낌 유지 */
+position: fixed
+bottom: 0
+left: 50%
+transform: translateX(-50%)
+width: 100%
+max-width: 430px
+background: #ffffff
+border-radius: 20px 20px 0 0
+max-height: 72vh             ← BucketSheet(85vh)보다 낮게 — 뒤에 시트가 보임
+overflow-y: auto
+z-index: 1101
+animation: slideUpSheet 0.25s ease
+box-shadow: 0 8px 32px rgba(0,0,0,0.18)
+display: flex
+flex-direction: column
+
+/* 헤더: X 버튼만, 오른쪽 정렬 */
+헤더: padding 12px 12px 0, flex, justify-content: flex-end
+X 버튼: ph:x 아이콘 동일
+
+/* 오버레이 */
+position: fixed
+inset: 0
+background: rgba(0,0,0,0.5)
+z-index: 1100
 ```
-색상: #80DEEA, #26C6DA, #00ACC1
-애니메이션: floatA(7s), floatB(5.5s) ease-in-out infinite
+
+### BucketCheckView 진행 카드 (상황판)
+```css
+background: #ffffff
+border-radius: 16px
+padding: 14px 16px
+border: 1px solid rgba(0,131,143,0.20)  ← 그림자 없이 테두리만
+
+/* 내부 구성 */
+카운터:      achievedCount (18px/900/#29B6D0) / total 완료 (13px/#7BAAB5)
+프로그레스바: height 6px, border-radius 3px
+             배경: #E0F7FA
+             채움: #29B6D0, transition width 0.4s ease
+메시지:      12px / #7BAAB5
+버튼:        수정(#29B6D0 배경), 비우기(danger 계열) — height 26px, border-radius 20px
+```
+
+### BucketCheckView 포토카드 그리드
+```
+레이아웃: 2열 그리드, gap 10px
+카드 radius: 16px
+비율: 3/4 (일반), 2/1 (마지막 홀수 카드 — span 2)
+
+이미지 없을 때: 카테고리별 단색 배경 + 중앙에 아이콘 (rgba(255,255,255,0.4))
+오버레이: 하단만 — linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.82) 100%)
+          텍스트 영역에만 적용 (카드 전체 X)
+
+체크 버튼: 우상단, width/height 26px, border-radius 50%
+           미완료: rgba(255,255,255,0.25) 배경
+           완료:   #29B6D0 배경 + ph:check 흰색
+
+제목 텍스트: 14px / 400 (볼드 아님) / #fff
+지역 표시:  stateMap으로 주소→NSW/VIC/QLD→시드니/멜번/브리즈번 매핑
+            11px / rgba(255,255,255,0.7)
+
+클릭 영역: 카드 전체 X — 하단 텍스트 영역만 onClick → 상세 팝업
 ```
 
 ---
@@ -207,11 +267,30 @@ flex: 1
     ├── D-day 카드
     ├── 섹션 라벨 "나의 여행 리스트"
     └── 메뉴 그리드 (2열)
-        ├── 버킷리스트
+        ├── 버킷리스트 → BucketSheet 팝업
         ├── 쇼핑리스트
         ├── 업체정보
         ├── 내 주변
         └── 카페 빙고 (전체 너비)
+```
+
+### BucketSheet 구조
+```
+BucketSheet (전체화면 바텀시트)
+├── 오버레이 (rgba(0,0,0,0.45), zIndex:800)
+├── 시트 본체 (zIndex:801)
+│   ├── 헤더 (← 버킷리스트 | X 버튼)
+│   └── 내용
+│       ├── view='bucket' → BucketCheckView
+│       │   └── 포토카드 클릭 → onDetailItem 콜백
+│       └── view='checklist' → ChecklistPage (embedded)
+└── 상세 팝업 (BucketSheet 바깥, zIndex:1100~1101)
+    ├── 오버레이 (rgba(0,0,0,0.5))
+    └── 상세 시트 (max-height:72vh)
+        ├── 헤더 (X 버튼만)
+        ├── 이미지 (있을 때)
+        ├── 제목/설명/팁/주소
+        └── 관련 업체 (BusinessCard)
 ```
 
 ### App.tsx 라우팅
@@ -232,6 +311,7 @@ trip 있음 + activeTab 있음 → ChecklistPage(initialTab=activeTab)
 @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
 @keyframes ripple { 0%{transform:scale(0.8);opacity:0.6} 100%{transform:scale(2.2);opacity:0} }
 @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
 ```
 
 ---
@@ -239,4 +319,18 @@ trip 있음 + activeTab 있음 → ChecklistPage(initialTab=activeTab)
 ## 6. 기존 앱 토큰 (ChecklistPage 등)
 
 `src/styles/tokens.ts` 참조.
-Primary: #1B6EF3, 폰트: Pretendard, radius: sm/md/lg/xl/full
+Primary: #29B6D0 (변경됨), 폰트: Pretendard, radius: sm/md/lg/xl/full
+
+---
+
+## 7. 주요 변경 이력
+
+```
+- Primary 색상: #1B6EF3 → #29B6D0 (밝은 파란색)
+- Success 색상: #16A34A → #29B6D0 (완료 체크도 파란색으로 통일)
+- 팝업 배경: #EFFCFC → #ffffff (흰색)
+- BucketSheet: 여백 없는 전체화면 바텀시트로 변경
+- BucketCheckView: 리스트 → 포토카드 그리드로 변경
+- 상세 팝업: BucketSheet 바깥 레벨에서 별도 렌더링 (max-height 72vh)
+- X 닫기 버튼: span 텍스트 → ph:x 아이콘으로 변경
+```
