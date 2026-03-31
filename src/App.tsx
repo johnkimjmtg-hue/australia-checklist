@@ -7,7 +7,6 @@ import ChecklistPage from './pages/ChecklistPage'
 import AdminPage from './pages/AdminPage'
 import LandingPage from './pages/LandingPage'
 import HomePage from './pages/HomePage'
-import BucketListPage from './pages/BucketListPage'
 
 function MainApp() {
   const [state, setState] = useState<AppState>(() => loadState())
@@ -49,19 +48,6 @@ function MainApp() {
           setState={setState}
           onNavigate={(tab) => setActiveTab(tab)}
           onChangeDates={() => { setTrip(null); setActiveTab(null) }}
-        />
-      </div>
-    )
-  }
-
-  if (activeTab === 'bucketlist') {
-    return (
-      <div className="app-shell">
-        <BucketListPage
-          state={state}
-          trip={trip}
-          setState={setState}
-          onGoHome={() => setActiveTab(null)}
         />
       </div>
     )
