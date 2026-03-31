@@ -243,8 +243,6 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
       {/* ── 날씨 바텀시트 */}
       {weatherSheet && (() => {
