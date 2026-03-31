@@ -15,7 +15,7 @@ const CITIES = {
 } as const
 
 type CityKey = keyof typeof CITIES
-type Tab = 'bucketlist' | 'shopping' | 'services' | 'nearby' | 'bingo'
+type Tab = 'bucketlist' | 'shopping' | 'services' | 'nearby' | 'bingo' | 'checklist'
 type Props = { trip: TripInfo; onNavigate: (tab: Tab) => void; onChangeDates: () => void }
 type CityData = {
   temp: number | null
@@ -189,6 +189,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   const fmtDate = (d: Date) => `${d.getMonth()+1}월 ${d.getDate()}일`
 
   const MENUS = [
+    { id:'checklist' as Tab, icon:'✅', title:'준비 체크리스트', sub:'여행 준비 할 것들', badge: 0 },
     { id:'bucketlist' as Tab, icon:'🗺️', title:'버킷리스트', sub:'꼭 해볼 것들', badge: bucketCount },
     { id:'shopping' as Tab, icon:'🛍️', title:'쇼핑리스트', sub:'꼭 살 것들', badge: myShoppingCount },
     { id:'services' as Tab, icon:'🏢', title:'업체정보', sub:'한인 업체·병원', badge: 0 },
@@ -277,7 +278,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           </div>
         </div>
 
-        <div style={{ fontSize:16, fontWeight:700, color:'rgba(255,255,255,0.9)', margin:'8px 0 12px' }}>나의 여행 리스트</div>
+        <div style={{ fontSize:16, fontWeight:700, color:'rgba(255,255,255,0.9)', margin:'8px 0 12px' }}>나의 호주 여행 리스트</div>
 
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           {MENUS.map(m => (
