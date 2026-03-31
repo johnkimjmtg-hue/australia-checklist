@@ -67,13 +67,14 @@ const catColors: Record<string,string> = {
   people:'#3a6b4a', parenting:'#6b4a3a', custom:'#4a6b5a',
 }
 
-function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDetailItem }: {
+function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDetailItem, onDetailItem }: {
   items: { id: string; categoryId: string; label: string; emoji: string }[]
   dayIdx?: number
   dbItems: DBItem[]
   achieved: Record<string,boolean>
   toggleAchieved: (id: string, day?: number) => void
   setDetailItem: (item: DBItem) => void
+  onDetailItem?: (item: DBItem) => void
 }) {
   return (
     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
@@ -109,7 +110,7 @@ function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDe
               </svg>
             </button>
             <div
-              onClick={() => db && setDetailItem(db)}
+              onClick={() => { if(db) { setDetailItem(db); onDetailItem?.(db) } }}
               style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 10px 12px', background:'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.82) 100%)', cursor: db ? 'pointer' : 'default', WebkitTapHighlightColor:'transparent' }}>
               <div style={{ fontSize:14, fontWeight:400, color:'#fff', lineHeight:1.3 }}>{item.label}</div>
               {region && <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:3 }}>📍 {region.label}</div>}
@@ -580,6 +581,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                     achieved={achieved}
                     toggleAchieved={toggleAchieved}
                     setDetailItem={setDetailItem}
+                    onDetailItem={onDetailItem}
                   />
                 </div>
               )
@@ -601,6 +603,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                     achieved={achieved}
                     toggleAchieved={toggleAchieved}
                     setDetailItem={setDetailItem}
+                    onDetailItem={onDetailItem}
                   />
                 </div>
               )
