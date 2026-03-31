@@ -14,7 +14,7 @@ type DBItem = { id: string; category_id: string; label: string; icon: string | n
 import {
   AppState, TripInfo,
   toggleItem, setSchedule, setCategory, addCustom,
-  issueReceipt, resetAll, resetBucket, saveTrip, loadTrip, loadState, clearTrip,
+  issueReceipt, resetAll, saveTrip, loadTrip, loadState, clearTrip,
   fmt, getTripDays, fmtMD,
 } from '../store/state'
 import ScheduleSheet from '../components/ScheduleSheet'
@@ -188,8 +188,8 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
   const triggerShake = () => { setShakeBtn(true); setTimeout(()=>setShakeBtn(false),600) }
   const handleAddCustom = () => { const label=customLabel.trim(); if(!label) return; setState(addCustom(state,label,activeCategory)); setCustomLabel('') }
   const doReset = () => {
-    const next = resetBucket()
-    setState(next)
+    const next = resetAll()
+    setState(next); setTrip(null); setStartDate(''); setEndDate('')
     setShowReceipt(false); setModal('none')
     setAchieved({})
     try{localStorage.removeItem('bucket-achieved')}catch{}
@@ -312,26 +312,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                   })()}
                 </div>
               </div>
-              {/* ── 내 버킷리스트 보기 + 초기화 버튼 */}
-              {done > 0 && (
-                <div style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`0 ${spacing[3]}px ${spacing[2]}px` }}>
-                  <div style={{ flex:1 }} />
-                  <button onClick={handleIssue} style={{
-                    height:28, paddingLeft:10, paddingRight:10, background:'#00838F', color:'#fff',
-                    border:'none', borderRadius:radius.sm, fontSize:font.size.xs, fontWeight:font.weight.bold,
-                    cursor:'pointer', fontFamily:ff, whiteSpace:'nowrap',
-                    display:'flex', alignItems:'center', gap:4,
-                  }}>
-                    <Icon icon="ph:list-checks" width={12} height={12} color="#fff" />
-                    {`내 버킷리스트 (${bucketBadge})`}
-                  </button>
-                  <button onClick={()=>setModal('confirmReset')} style={{
-                    height:28, paddingLeft:10, paddingRight:10, background:colors.bgCard, color:colors.gray600,
-                    border:`1px solid ${colors.gray400}`, borderRadius:radius.sm, fontSize:font.size.xs, fontWeight:font.weight.bold,
-                    cursor:'pointer', fontFamily:ff, whiteSpace:'nowrap',
-                  }}>초기화</button>
-                </div>
-              )}
+
             </div>
           )}
 
@@ -509,7 +490,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
       )}
 
       {/* ── Alerts ── */}
-      {modal==='confirmReset'&&<AlertModal title="전체 초기화할까요?" message="선택한 버킷리스트가 모두 초기화됩니다." confirmLabel="삭제" confirmColor={colors.danger} onConfirm={doReset} onCancel={()=>setModal('none')} />}
+      {modal==='confirmReset'&&<AlertModal title="전체 초기화할까요?" message="체크 내용과 여행일정이 모두 삭제됩니다." confirmLabel="삭제" confirmColor={colors.danger} onConfirm={doReset} onCancel={()=>setModal('none')} />}
       {modal==='noTrip'&&<AlertModal title="여행일정을 먼저 설정해주세요" confirmLabel="날짜 입력하기" confirmFirst onConfirm={()=>{ setModal('none'); setTimeout(handleOpenTripPicker,100) }} onCancel={()=>setModal('none')} />}
       {modal==='noDate'&&<AlertModal title="출발일과 도착일을 모두 선택해주세요" confirmLabel="확인" onConfirm={()=>setModal('none')} onCancel={()=>setModal('none')} hideCancel />}
       {modal==='noItems'&&<AlertModal title="선택된 항목이 없어요" message="버킷리스트 항목을 하나 이상 선택해야 발행할 수 있어요." confirmLabel="확인" onConfirm={()=>setModal('none')} onCancel={()=>setModal('none')} hideCancel />}
