@@ -311,17 +311,18 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             maxHeight:'85vh', overflowY:'auto', zIndex:801,
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
-            {/* X 닫기 버튼 */}
-            <button onClick={() => setWeatherSheet(null)} style={{
-              position:'absolute', top:12, right:12,
-              width:28, height:28, borderRadius:'50%',
-              background:'rgba(0,0,0,0.08)', border:'none',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              cursor:'pointer', WebkitTapHighlightColor:'transparent',
-            }}>
-              <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
-            </button>
-            <div style={{ padding:'16px 20px 0', display:'flex', alignItems:'center', gap:10 }}>
+            {/* 헤더 (X버튼) */}
+            <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+              <button onClick={() => setWeatherSheet(null)} style={{
+                width:28, height:28, borderRadius:'50%',
+                background:'rgba(0,0,0,0.08)', border:'none',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                cursor:'pointer', WebkitTapHighlightColor:'transparent',
+              }}>
+                <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
+              </button>
+            </div>
+            <div style={{ padding:'8px 20px 0', display:'flex', alignItems:'center', gap:10 }}>
               {cityData[weatherSheet]?.icon
                 ? <span style={{ fontSize:52 }}>{getWeatherIcon(cityData[weatherSheet].icon)}</span>
                 : <span style={{ fontSize:52 }}>☀️</span>
@@ -377,17 +378,17 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             maxHeight:'85vh', overflowY:'auto', zIndex:1001,
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
-            {/* X 닫기 버튼 */}
-            <button onClick={() => setTermsTab(null)} style={{
-              position:'absolute', top:12, right:12,
-              width:28, height:28, borderRadius:'50%',
-              background:'rgba(0,0,0,0.08)', border:'none',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              cursor:'pointer', WebkitTapHighlightColor:'transparent',
-              zIndex:10,
-            }}>
-              <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
-            </button>
+            {/* 헤더 (X버튼) */}
+            <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+              <button onClick={() => setTermsTab(null)} style={{
+                width:28, height:28, borderRadius:'50%',
+                background:'rgba(0,0,0,0.08)', border:'none',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                cursor:'pointer', WebkitTapHighlightColor:'transparent',
+              }}>
+                <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
+              </button>
+            </div>
             <TermsPage initialTab={termsTab} onBack={() => setTermsTab(null)} />
           </div>
         </>
