@@ -146,31 +146,39 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
 
       {/* ── 도시 날씨/시간 */}
       <div style={{ padding:'52px 18px 12px' }}>
-        <div style={{ display:'flex', gap:8, marginBottom:10 }}>
-          {(Object.keys(CITIES) as (keyof typeof CITIES)[]).map(city => {
-            const isActive = selectedCity === city
-            return (
-              <button key={city} onClick={() => setSelectedCity(city)} style={{
-                padding:'6px 14px', borderRadius:50, border:'none', cursor:'pointer',
-                background: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.35)',
-                color: isActive ? '#0D3349' : 'rgba(255,255,255,0.85)',
-                fontSize:13, fontWeight: isActive ? 700 : 400, fontFamily:ff,
-                transition:'all 0.15s', WebkitTapHighlightColor:'transparent',
-              }}>{CITIES[city].label}</button>
-            )
-          })}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          {/* 도시 버튼 */}
+          <div style={{ display:'flex', gap:8 }}>
+            {(Object.keys(CITIES) as (keyof typeof CITIES)[]).map(city => {
+              const isActive = selectedCity === city
+              return (
+                <button key={city} onClick={() => setSelectedCity(city)} style={{
+                  padding:'6px 14px', borderRadius:50, border:'none', cursor:'pointer',
+                  background: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.35)',
+                  color: isActive ? '#0D3349' : 'rgba(255,255,255,0.7)',
+                  fontSize:13, fontWeight:700, fontFamily:ff,
+                  transition:'all 0.15s', WebkitTapHighlightColor:'transparent',
+                }}>{CITIES[city].label}</button>
+              )
+            })}
+          </div>
+          {/* 시간 풍선 */}
+          {time && (
+            <div style={{
+              background:'rgba(255,255,255,0.92)', borderRadius:50,
+              padding:'6px 14px', fontSize:15, fontWeight:700, color:'#0D3349',
+              letterSpacing:1,
+            }}>{time}</div>
+          )}
         </div>
-        {/* 날씨 + 시간 */}
-        <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+        {/* 날씨 */}
+        <div style={{ display:'flex', alignItems:'center', gap:10, marginTop:10 }}>
           {weather && (
             <>
               <img src={`https://openweathermap.org/img/wn/${weather.icon}.png`} width={36} height={36} style={{ filter:'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }} />
               <span style={{ fontSize:22, fontWeight:800, color:'#fff' }}>{weather.temp}°</span>
               <span style={{ fontSize:13, color:'rgba(255,255,255,0.85)' }}>{weather.desc}</span>
             </>
-          )}
-          {time && (
-            <span style={{ marginLeft:'auto', fontSize:20, fontWeight:700, color:'#fff', letterSpacing:1 }}>{time}</span>
           )}
         </div>
       </div>
