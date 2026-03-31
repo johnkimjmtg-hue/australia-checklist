@@ -7,29 +7,39 @@ import { TripInfo, loadState } from '../store/state'
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
 const TODAY = new Date()
 
+const CITIES = {
+  sydney:    { label:'시드니',   tz:'Australia/Sydney',    lat:-33.8688, lon:151.2093 },
+  melbourne: { label:'멜번',     tz:'Australia/Melbourne', lat:-37.8136, lon:144.9631 },
+  brisbane:  { label:'브리즈번', tz:'Australia/Brisbane',  lat:-27.4698, lon:153.0251 },
+} as const
+
+type CityKey = keyof typeof CITIES
 type Tab = 'bucketlist' | 'shopping' | 'services' | 'nearby' | 'bingo'
-type Props = {
-  trip: TripInfo
-  onNavigate: (tab: Tab) => void
-  onChangeDates: () => void
-}
+type Props = { trip: TripInfo; onNavigate: (tab: Tab) => void; onChangeDates: () => void }
+type CityData = { temp: number | null; icon: string; time: string }
+
+const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
 
 export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
-  const [cityData, setCityData] = useState<Record<string,{temp:number; icon:string; time:string}>>({})  
-  const [weatherSheet, setWeatherSheet] = useState<string|null>(null)
+  const [cityData, setCityData] = useState<Record<string, CityData>>({})
+  const [weatherSheet, setWeatherSheet] = useState<CityKey | null>(null)
+  const timerRef = useRef<any>(null)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
 
-  const CITIES = {
-    sydney:     { label:'시드니',   tz:'Australia/Sydney',    lat:-33.8688, lon:151.2093 },
-    melbourne:  { label:'멜번',     tz:'Australia/Melbourne', lat:-37.8136, lon:144.9631 },
-    brisbane:   { label:'브리즈번', tz:'Australia/Brisbane',  lat:-27.4698, lon:153.0251 },
-  } as const
+  const state = loadState()
+  const bucketCount = Object.keys(state.selected).length
+  const myShoppingCount = (() => {
+    try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]').length } catch { return 0 }
+  })()
 
-  const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
-  const timerRef = useRef<any>(null)
+  const startDate = new Date(trip.startDate)
+  const endDate = new Date(trip.endDate)
+  const todayMidnight = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate())
+  const diffDays = Math.ceil((startDate.getTime() - todayMidnight.getTime()) / (1000*60*60*24))
+  const tripNights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000*60*60*24))
 
   const getTime = (tz: string) => new Date().toLocaleTimeString('ko-KR', {
     timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false,
@@ -37,13 +47,13 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
 
   const fetchAllCities = async () => {
     const entries = await Promise.all(
-      (Object.entries(CITIES) as [string, typeof CITIES[keyof typeof CITIES]][]).map(async ([key, c]) => {
+      (Object.entries(CITIES) as [CityKey, typeof CITIES[CityKey]][]).map(async ([key, c]) => {
         try {
           const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${c.lat}&lon=${c.lon}&appid=${WEATHER_KEY}&units=metric&lang=kr`)
           const data = await res.json()
-          return [key, { temp: Math.round(data.main.temp), icon: data.weather[0].icon, time: getTime(c.tz) }]
+          return [key, { temp: Math.round(data.main.temp), icon: data.weather[0].icon, time: getTime(c.tz) }] as [string, CityData]
         } catch {
-          return [key, { temp: null, icon: '', time: getTime(c.tz) }]
+          return [key, { temp: null, icon: '', time: getTime(c.tz) }] as [string, CityData]
         }
       })
     )
@@ -64,18 +74,6 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
     return () => clearInterval(timerRef.current)
   }, [])
 
-  const state = loadState()
-  const bucketCount = Object.keys(state.selected).length
-  const myShoppingCount = (() => {
-    try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]').length } catch { return 0 }
-  })()
-
-  const startDate = new Date(trip.startDate)
-  const endDate = new Date(trip.endDate)
-  const todayMidnight = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate())
-  const diffDays = Math.ceil((startDate.getTime() - todayMidnight.getTime()) / (1000*60*60*24))
-  const tripNights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000*60*60*24))
-
   const chgMo = (d: number) => {
     let ny = vy, nm = vm + d
     if (nm > 11) { nm = 0; ny++ }
@@ -87,7 +85,6 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
     const first = new Date(vy, vm, 1).getDay()
     const days = new Date(vy, vm+1, 0).getDate()
     const cells = []
-
     for (let i = 0; i < first; i++) {
       cells.push(<div key={`e${i}`} style={{ aspectRatio:'1' }} />)
     }
@@ -98,15 +95,9 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
       const isEnd = dt.toDateString() === endDate.toDateString()
       const isRange = dt > startDate && dt < endDate
       const isToday = dt.toDateString() === TODAY.toDateString()
-
-      let bg = 'transparent'
-      let color = isPast ? '#7BAAB5' : '#0D3349'
-      let radius = '50%'
-      let fw: number = 400
-
+      let bg = 'transparent', color = isPast ? '#7BAAB5' : '#0D3349', radius = '50%', fw: number = 400
       if (isStart || isEnd) { bg = '#00838F'; color = '#fff'; fw = 800 }
       else if (isRange) { bg = '#B2EBF2'; color = '#006064'; radius = '0' }
-
       cells.push(
         <div key={d} style={{
           aspectRatio:'1', display:'flex', alignItems:'center', justifyContent:'center',
@@ -121,7 +112,6 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   const ddayText = diffDays > 0 ? `D-${diffDays}` : diffDays === 0 ? 'D-Day' : `D+${Math.abs(diffDays)}`
   const ddayLabel = diffDays > 0 ? '호주 출발까지' : diffDays === 0 ? '오늘 출발! 🎉' : '호주 여행 중! ✈️'
   const ddayColor = diffDays > 0 ? '#0D3349' : diffDays === 0 ? '#00838F' : '#00695C'
-
   const fmtDate = (d: Date) => `${d.getMonth()+1}월 ${d.getDate()}일`
 
   const MENUS = [
@@ -134,7 +124,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   return (
     <div style={{
       minHeight:'100dvh',
-      background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)',
+      background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #26C6DA 65%, #00E5CC 100%)',
       fontFamily: ff, maxWidth:430, margin:'0 auto', display:'flex', flexDirection:'column',
     }}>
       <style>{`
@@ -145,26 +135,20 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
       `}</style>
 
-      {/* ── 도시 날씨/시간 */}
+      {/* 도시 날씨/시간 */}
       <div style={{ padding:'26px 18px 12px' }}>
-        {/* 도시 버튼 3개 - 오른쪽 정렬 */}
-        <div style={{ display:'flex', gap:8, justifyContent:'flex-end' }}>
-          {(Object.keys(CITIES) as (keyof typeof CITIES)[]).map(city => {
+        <div style={{ display:'flex', gap:8 }}>
+          {(Object.keys(CITIES) as CityKey[]).map(city => {
             const d = cityData[city]
             return (
               <div key={city} onClick={() => setWeatherSheet(city)} style={{
-                background:'rgba(255,255,255,0.82)',
-                borderRadius:12, padding:'6px 10px',
-                boxShadow:'0 4px 20px rgba(0,0,0,0.10)',
-                flex:1, textAlign:'center', cursor:'pointer',
-                WebkitTapHighlightColor:'transparent',
+                background:'rgba(255,255,255,0.82)', borderRadius:12, padding:'6px 10px',
+                boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flex:1, textAlign:'center',
+                cursor:'pointer', WebkitTapHighlightColor:'transparent',
               }}>
                 <div style={{ fontSize:11, fontWeight:700, color:'#1565A0', marginBottom:1 }}>{CITIES[city].label}</div>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:2 }}>
-                  {d?.icon
-                    ? <img src={`https://openweathermap.org/img/wn/${d.icon}.png`} width={24} height={24} />
-                    : <span style={{ fontSize:16 }}>🌤️</span>
-                  }
+                  {d?.icon ? <img src={`https://openweathermap.org/img/wn/${d.icon}.png`} width={24} height={24} /> : <span style={{ fontSize:16 }}>🌤️</span>}
                   <span style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>{d?.time ?? '--:--'}</span>
                   {d?.temp != null && <span style={{ fontSize:11, color:'#1565A0', fontWeight:600 }}>{d.temp}°</span>}
                 </div>
@@ -174,17 +158,15 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         </div>
       </div>
 
-      {/* ── 달력 */}
+      {/* 달력 */}
       <div style={{ padding:'0 18px 14px' }}>
         <div style={{ background:'rgba(255,255,255,0.82)', borderRadius:22, overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 8px' }}>
-            <button className="cal-nav-btn" onClick={() => chgMo(-1)}
-              style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
+            <button className="cal-nav-btn" onClick={() => chgMo(-1)} style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
             <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>
               <span style={{ color:'#00838F' }}>{vy}년</span> · {MONTHS[vm]}
             </div>
-            <button className="cal-nav-btn" onClick={() => chgMo(1)}
-              style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>›</button>
+            <button className="cal-nav-btn" onClick={() => chgMo(1)} style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>›</button>
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'0 10px' }}>
             {['일','월','화','수','목','금','토'].map(d => (
@@ -197,10 +179,9 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         </div>
       </div>
 
-      {/* ── 스크롤 영역 */}
+      {/* 스크롤 영역 */}
       <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
-
-        {/* D-day 카드 */}
+        {/* D-day */}
         <div style={{ background:'rgba(255,255,255,0.82)', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.10)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
             <div style={{ fontSize:52, fontWeight:900, color: ddayColor, lineHeight:1 }}>{ddayText}</div>
@@ -214,27 +195,19 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           </div>
         </div>
 
-        {/* 섹션 라벨 */}
-        <div style={{ fontSize:16, fontWeight:700, color:'rgba(255,255,255,0.9)', margin:'8px 0 12px', letterSpacing:'0.02em' }}>나의 여행 리스트</div>
+        <div style={{ fontSize:16, fontWeight:700, color:'rgba(255,255,255,0.9)', margin:'8px 0 12px' }}>나의 여행 리스트</div>
 
-        {/* 메뉴 그리드 */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           {MENUS.map(m => (
-            <div key={m.id} className="menu-card-hover"
-              onClick={() => onNavigate(m.id)}
+            <div key={m.id} className="menu-card-hover" onClick={() => onNavigate(m.id)}
               style={{ background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer' }}>
               <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
               <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
               <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>{m.sub}</div>
-              {m.badge > 0 && (
-                <div style={{ display:'inline-block', background:'#00838F', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, marginTop:8 }}>{m.badge}개</div>
-              )}
+              {m.badge > 0 && <div style={{ display:'inline-block', background:'#00838F', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, marginTop:8 }}>{m.badge}개</div>}
             </div>
           ))}
-
-          {/* 카페빙고 - 전체 너비 */}
-          <div className="menu-card-hover"
-            onClick={() => onNavigate('bingo')}
+          <div className="menu-card-hover" onClick={() => onNavigate('bingo')}
             style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
             <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
             <div>
@@ -243,83 +216,64 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             </div>
           </div>
         </div>
+      </div>
 
-      {/* ── 날씨 바텀시트 */}
-      {weatherSheet && (() => {
-        const city = weatherSheet as keyof typeof CITIES
-        const d = cityData[city]
-        const cityInfo = CITIES[city]
-        return (
-          <>
-            <div onClick={() => setWeatherSheet(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
-            <div style={{
-              position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-              width:'calc(100% - 32px)', maxWidth:398,
-              background:'rgba(255,255,255,0.82)',
-              borderRadius:20, maxHeight:'85vh', overflowY:'auto',
-              zIndex:801, animation:'slideUpSheet 0.25s ease',
-              boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
-              backdropFilter:'blur(12px)',
-            }}>
-              {/* 핸들 */}
-              <div style={{ width:36, height:4, borderRadius:999, background:'rgba(0,0,0,0.15)', margin:'12px auto 0' }} />
-
-              {/* 헤더 */}
-              <div style={{ padding:'16px 20px 0' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:4 }}>
-                  {d?.icon && <img src={`https://openweathermap.org/img/wn/${d.icon}@2x.png`} width={48} height={48} />}
-                  <div>
-                    <div style={{ fontSize:22, fontWeight:800, color:'#0D3349' }}>{cityInfo.label}</div>
-                    <div style={{ fontSize:13, color:'#1565A0' }}>현지 시간 {d?.time ?? '--:--'}</div>
-                  </div>
-                  {d?.temp != null && (
-                    <div style={{ marginLeft:'auto', fontSize:40, fontWeight:900, color:'#0D3349' }}>{d.temp}°</div>
-                  )}
-                </div>
+      {/* 날씨 바텀시트 */}
+      {weatherSheet && (
+        <>
+          <div onClick={() => setWeatherSheet(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
+          <div style={{
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398,
+            background:'rgba(255,255,255,0.95)', borderRadius:20,
+            maxHeight:'85vh', overflowY:'auto', zIndex:801,
+            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+          }}>
+            <div style={{ width:36, height:4, borderRadius:999, background:'rgba(0,0,0,0.15)', margin:'12px auto 0' }} />
+            <div style={{ padding:'16px 20px 0', display:'flex', alignItems:'center', gap:10 }}>
+              {cityData[weatherSheet]?.icon
+                ? <img src={`https://openweathermap.org/img/wn/${cityData[weatherSheet].icon}@2x.png`} width={52} height={52} />
+                : <span style={{ fontSize:40 }}>🌤️</span>
+              }
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:22, fontWeight:800, color:'#0D3349' }}>{CITIES[weatherSheet].label}</div>
+                <div style={{ fontSize:13, color:'#1565A0' }}>현지 시간 {cityData[weatherSheet]?.time ?? '--:--'}</div>
               </div>
-
-              {/* 구분선 */}
-              <div style={{ height:1, background:'rgba(0,0,0,0.08)', margin:'12px 20px' }} />
-
-              {/* 정보 그리드 */}
-              <div style={{ padding:'0 20px 24px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-                {[
-                  { label:'🌅 일출', value: '06:12' },
-                  { label:'🌇 일몰', value: '19:48' },
-                  { label:'💧 습도', value: d ? '—' : '—' },
-                  { label:'🌬️ 바람', value: d ? '—' : '—' },
-                  { label:'🌡️ 체감', value: d?.temp != null ? `${d.temp}°` : '—' },
-                  { label:'☁️ 날씨', value: '—' },
-                ].map((item, i) => (
-                  <div key={i} style={{ background:'rgba(0,131,143,0.08)', borderRadius:12, padding:'12px 14px' }}>
-                    <div style={{ fontSize:12, color:'#1565A0', marginBottom:4 }}>{item.label}</div>
-                    <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>{item.value}</div>
+              {cityData[weatherSheet]?.temp != null && (
+                <div style={{ fontSize:40, fontWeight:900, color:'#0D3349' }}>{cityData[weatherSheet].temp}°</div>
+              )}
+            </div>
+            <div style={{ height:1, background:'rgba(0,0,0,0.08)', margin:'14px 20px' }} />
+            <div style={{ padding:'0 20px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+              {[
+                { label:'🌅 일출', value:'—' },
+                { label:'🌇 일몰', value:'—' },
+                { label:'💧 습도', value:'—' },
+                { label:'🌬️ 바람', value:'—' },
+                { label:'🌡️ 체감', value: cityData[weatherSheet]?.temp != null ? `${cityData[weatherSheet].temp}°` : '—' },
+                { label:'☁️ 날씨', value:'—' },
+              ].map((item, i) => (
+                <div key={i} style={{ background:'rgba(0,131,143,0.08)', borderRadius:12, padding:'12px 14px' }}>
+                  <div style={{ fontSize:12, color:'#1565A0', marginBottom:4 }}>{item.label}</div>
+                  <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding:'14px 20px 32px' }}>
+              <div style={{ fontSize:13, fontWeight:700, color:'#1565A0', marginBottom:10 }}>시간대별 예보</div>
+              <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:4 }}>
+                {['지금','3시간','6시간','9시간','12시간'].map((t, i) => (
+                  <div key={i} style={{ background:'rgba(0,131,143,0.08)', borderRadius:12, padding:'10px 14px', textAlign:'center', flexShrink:0, minWidth:70 }}>
+                    <div style={{ fontSize:11, color:'#1565A0', marginBottom:4 }}>{t}</div>
+                    <div style={{ fontSize:18 }}>🌤️</div>
+                    <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', marginTop:4 }}>—°</div>
                   </div>
                 ))}
               </div>
-
-              {/* 시간대별 예보 자리 */}
-              <div style={{ padding:'0 20px 32px' }}>
-                <div style={{ fontSize:13, fontWeight:700, color:'#1565A0', marginBottom:10 }}>시간대별 예보</div>
-                <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:4 }}>
-                  {['지금','3시간','6시간','9시간','12시간'].map((t, i) => (
-                    <div key={i} style={{ background:'rgba(0,131,143,0.08)', borderRadius:12, padding:'10px 14px', textAlign:'center', flexShrink:0, minWidth:70 }}>
-                      <div style={{ fontSize:11, color:'#1565A0', marginBottom:4 }}>{t}</div>
-                      <div style={{ fontSize:18 }}>🌤️</div>
-                      <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', marginTop:4 }}>—°</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
-          </>
-        )
-      })()}
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
