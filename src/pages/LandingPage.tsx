@@ -67,7 +67,7 @@ export default function LandingPage({ onComplete }: Props) {
       const isRange = sDate && eDate && dt > sDate && dt < eDate
       const isToday = dt.toDateString() === TODAY.toDateString()
 
-      let bg = 'transparent', color = isPast ? '#ddd' : '#0D3349', radius = '50%', fw = 400
+      let bg = 'transparent', color = isPast ? '#7BAAB5' : '#0D3349', radius = '50%', fw = 400
       if (isStart || isEnd) { bg = '#00838F'; color = '#fff'; fw = 800 }
       else if (isRange) { bg = '#B2EBF2'; color = '#006064'; radius = '0' }
 
