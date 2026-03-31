@@ -11,10 +11,10 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
   const [tab, setTab] = useState<Tab>(initialTab)
 
   return (
-    <div style={{ minHeight:'100dvh', background:'#fff', fontFamily:font.family, display:'flex', justifyContent:'center' }}>
-      <div style={{ width:'100%', maxWidth:430, minHeight:'100dvh', display:'flex', flexDirection:'column', background:'#fff', boxSizing:'border-box' }}>
+    <div style={{ minHeight:'100dvh', background:'#EFFCFC', fontFamily:font.family, display:'flex', justifyContent:'center' }}>
+      <div style={{ width:'100%', maxWidth:430, minHeight:'100dvh', display:'flex', flexDirection:'column', background:'#EFFCFC', boxSizing:'border-box' }}>
         {/* 헤더 */}
-        <div style={{ flexShrink:0, height:56, background:'#fff', borderBottom:`1px solid ${'#E0F7FA'}`, padding:`0 ${spacing[4]}px`, display:'flex', alignItems:'center', gap:spacing[2] }}>
+        <div style={{ flexShrink:0, height:56, background:'#EFFCFC', borderBottom:`1px solid ${'#E0F7FA'}`, padding:`0 ${spacing[4]}px`, display:'flex', alignItems:'center', gap:spacing[2] }}>
           <button onClick={onBack} style={{ background:'none', border:'none', cursor:'pointer', padding:spacing[1], margin:`-${spacing[1]}px`, display:'flex', alignItems:'center', WebkitTapHighlightColor:'transparent' }}>
             <svg width={20} height={20} viewBox="0 0 20 20" fill="none">
               <path d="M12.5 15L7.5 10L12.5 5" stroke={colors.textPrimary} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"/>
@@ -23,7 +23,7 @@ export default function TermsPage({ initialTab = 'terms', onBack }: Props) {
           <div style={{ ...T.h4 }}>약관 및 정책</div>
         </div>
         {/* 탭 */}
-        <div style={{ display:'flex', borderBottom:`1px solid ${'#E0F7FA'}`, background:'#fff', flexShrink:0 }}>
+        <div style={{ display:'flex', borderBottom:`1px solid ${'#E0F7FA'}`, background:'#EFFCFC', flexShrink:0 }}>
           {(['terms','privacy'] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)} style={{
               flex:1, height:44, background:'none', border:'none',

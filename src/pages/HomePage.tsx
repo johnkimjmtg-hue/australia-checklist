@@ -289,7 +289,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           </div>
         </div>
 
-        <div style={{ fontSize:16, fontWeight:700, color:'rgba(255,255,255,0.9)', margin:'8px 0 12px' }}>나의 호주 여행 리스트</div>
+        <div style={{ fontSize:16, fontWeight:700, color:'#0D4F6E', margin:'8px 0 12px' }}>나의 호주 여행 리스트</div>
 
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           {MENUS.map((m, i) => (
@@ -319,7 +319,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
-            background:'#fff', borderRadius:20,
+            background:'#EFFCFC', borderRadius:20,
             zIndex:801, animation:'slideUpSheet 0.25s ease',
             boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
             padding:'12px 20px 40px',
@@ -362,7 +362,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
-            background:'#fff', borderRadius:20,
+            background:'#EFFCFC', borderRadius:20,
             maxHeight:'85vh', overflowY:'auto', zIndex:801,
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
           }}>
@@ -429,7 +429,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
-            background:'#fff', borderRadius:20,
+            background:'#EFFCFC', borderRadius:20,
             maxHeight:'85vh', overflowY:'auto', zIndex:1001,
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
           }}>
