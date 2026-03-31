@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────
 // HomePage.tsx
 // ─────────────────────────────────────────────
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { TripInfo, loadState } from '../store/state'
 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
@@ -17,8 +17,52 @@ type Props = {
 export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
+  const [selectedCity, setSelectedCity] = useState<'sydney'|'melbourne'|'brisbane'>('sydney')
+  const [weather, setWeather] = useState<{temp:number; desc:string; icon:string}|null>(null)
+  const [time, setTime] = useState('')
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
+
+  const CITIES = {
+    sydney:     { label:'시드니',   tz:'Australia/Sydney',    lat:-33.8688, lon:151.2093 },
+    melbourne:  { label:'멜번',     tz:'Australia/Melbourne', lat:-37.8136, lon:144.9631 },
+    brisbane:   { label:'브리즈번', tz:'Australia/Brisbane',  lat:-27.4698, lon:153.0251 },
+  } as const
+
+  const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
+
+  const fetchWeather = async (city: keyof typeof CITIES) => {
+    try {
+      const { lat, lon } = CITIES[city]
+      const res = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_KEY}&units=metric&lang=kr`
+      )
+      const data = await res.json()
+      setWeather({
+        temp: Math.round(data.main.temp),
+        desc: data.weather[0].description,
+        icon: data.weather[0].icon,
+      })
+    } catch { setWeather(null) }
+  }
+
+  const updateTime = (city: keyof typeof CITIES) => {
+    const now = new Date()
+    const t = now.toLocaleTimeString('ko-KR', {
+      timeZone: CITIES[city].tz,
+      hour: '2-digit', minute: '2-digit', hour12: false,
+    })
+    setTime(t)
+  }
+
+  const timerRef = useRef<any>(null)
+
+  useEffect(() => {
+    fetchWeather(selectedCity)
+    updateTime(selectedCity)
+    timerRef.current = setInterval(() => updateTime(selectedCity), 30000)
+    return () => clearInterval(timerRef.current)
+  }, [selectedCity])
 
   const state = loadState()
   const bucketCount = Object.keys(state.selected).length
@@ -100,8 +144,39 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         .cal-nav-btn:hover { background: rgba(0,131,143,0.15) !important; }
       `}</style>
 
+      {/* ── 도시 날씨/시간 */}
+      <div style={{ padding:'52px 18px 12px' }}>
+        <div style={{ display:'flex', gap:8, marginBottom:10 }}>
+          {(Object.keys(CITIES) as (keyof typeof CITIES)[]).map(city => {
+            const isActive = selectedCity === city
+            return (
+              <button key={city} onClick={() => setSelectedCity(city)} style={{
+                padding:'6px 14px', borderRadius:50, border:'none', cursor:'pointer',
+                background: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.35)',
+                color: isActive ? '#0D3349' : 'rgba(255,255,255,0.85)',
+                fontSize:13, fontWeight: isActive ? 700 : 400, fontFamily:ff,
+                transition:'all 0.15s', WebkitTapHighlightColor:'transparent',
+              }}>{CITIES[city].label}</button>
+            )
+          })}
+        </div>
+        {/* 날씨 + 시간 */}
+        <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+          {weather && (
+            <>
+              <img src={`https://openweathermap.org/img/wn/${weather.icon}.png`} width={36} height={36} style={{ filter:'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }} />
+              <span style={{ fontSize:22, fontWeight:800, color:'#fff' }}>{weather.temp}°</span>
+              <span style={{ fontSize:13, color:'rgba(255,255,255,0.85)' }}>{weather.desc}</span>
+            </>
+          )}
+          {time && (
+            <span style={{ marginLeft:'auto', fontSize:20, fontWeight:700, color:'#fff', letterSpacing:1 }}>{time}</span>
+          )}
+        </div>
+      </div>
+
       {/* ── 달력 */}
-      <div style={{ padding:'52px 18px 14px' }}>
+      <div style={{ padding:'0 18px 14px' }}>
         <div style={{ background:'rgba(255,255,255,0.82)', borderRadius:22, overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 8px' }}>
             <button className="cal-nav-btn" onClick={() => chgMo(-1)}

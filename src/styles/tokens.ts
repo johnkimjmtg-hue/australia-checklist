@@ -135,3 +135,78 @@ export const T = {
     transition:   transition.fast,
   } as React.CSSProperties,
 } as const
+
+
+// ─────────────────────────────────────────────
+// 랜딩/홈 페이지 전용 토큰 (LandingPage, HomePage)
+// 그레이트 배리어 리프 테마
+// ─────────────────────────────────────────────
+
+export const landing = {
+  // 배경 그라데이션
+  gradient: 'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #26C6DA 65%, #00E5CC 100%)',
+
+  colors: {
+    // 텍스트
+    textTitle:    '#0D3349',   // 제목 - 진한 네이비
+    textBody:     '#0D4F6E',   // 본문 - 중간 네이비
+    textSub:      '#1565A0',   // 보조 - 연한 네이비
+    textAccent:   '#00838F',   // 액센트 - 청록 (링크, 뱃지, 년도)
+    textPast:     '#7BAAB5',   // 지나간 날짜
+    textOnBg:     'rgba(255,255,255,0.9)', // 그라데이션 위 흰 텍스트
+
+    // 카드
+    card:         'rgba(255,255,255,0.82)', // 반투명 흰색
+    cardShadow:   '0 4px 20px rgba(0,0,0,0.10)',
+    iconBg:       'rgba(0,131,143,0.15)',   // 메뉴 아이콘 박스
+
+    // 달력
+    calSelected:  '#00838F',   // 출발일/귀국일 bg
+    calRange:     '#B2EBF2',   // 선택 범위 bg
+    calRangeText: '#006064',   // 선택 범위 텍스트
+
+    // 히어로 블롭
+    blob1:        '#80DEEA',
+    blob2:        '#26C6DA',
+    blob3:        '#00ACC1',
+
+    // 히어로 아이콘
+    iconMain:     '#FF7043',   // 비행기 아이콘 주황
+  },
+
+  font: {
+    family: "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif",
+    size: {
+      hero:    32,  // 히어로 제목
+      section: 16,  // 섹션 라벨 ("나의 여행 리스트")
+      menu:    17,  // 메뉴 카드 제목 ("버킷리스트")
+      menuSub: 14,  // 메뉴 카드 설명 ("꼭 해볼 것들")
+      body:    16,  // 부제목/설명
+      calHdr:  15,  // 달력 헤더 년/월
+      calDay:  11,  // 달력 요일
+      calNum:  13,  // 달력 날짜 숫자
+      chip:    11,  // 칩 라벨 ("출발일")
+      chipVal: 14,  // 칩 값 ("날짜 선택")
+      dday:    52,  // D-day 숫자
+      ddaySub: 15,  // D-day 라벨
+      btn:     17,  // 버튼
+      badge:   11,  // 뱃지
+    },
+    weight: {
+      regular: 400,
+      semi:    600,
+      bold:    700,
+      heavy:   800,
+      black:   900,
+    },
+  },
+
+  radius: {
+    card:    22,  // 큰 카드 (달력, D-day)
+    menuCard:20,  // 메뉴 카드
+    chip:    16,  // 날짜 칩
+    icon:    14,  // 아이콘 박스
+    btn:     50,  // 버튼 (pill)
+    badge:   20,  // 뱃지
+  },
+} as const
