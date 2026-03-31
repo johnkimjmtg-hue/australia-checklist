@@ -15,16 +15,55 @@ const CITIES = {
 
 type CityKey = keyof typeof CITIES
 type Tab = 'bucketlist' | 'shopping' | 'services' | 'nearby' | 'bingo'
-type Props = { trip: TripInfo; onNavigate: (tab: Tab) => void; onChangeDates: () => void }
+type Props = { trip: TripInfo; onNavigate: (tab: Tab) => void; onChangeDates: () => void; onOpenTerms?: (tab: 'terms' | 'privacy') => void }
 type CityData = { temp: number | null; icon: string; time: string }
 
 const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
 
-export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
+function AnalogClock({ tz, size = 20 }: { tz: string; size?: number }) {
+  const now = new Date()
+  const timeStr = now.toLocaleTimeString('en-US', { timeZone: tz, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  const [h, m, s] = timeStr.split(':').map(Number)
+  const hours = (h % 12) + m / 60
+  const mins  = m + s / 60
+  const hAngle = (hours / 12) * 360 - 90
+  const mAngle = (mins  / 60) * 360 - 90
+  const r = size / 2
+  const toXY = (angle: number, len: number) => ({
+    x: r + Math.cos((angle * Math.PI) / 180) * len,
+    y: r + Math.sin((angle * Math.PI) / 180) * len,
+  })
+  const hEnd = toXY(hAngle, r * 0.55)
+  const mEnd = toXY(mAngle, r * 0.78)
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <circle cx={r} cy={r} r={r - 1} fill="none" stroke="#0D3349" strokeWidth={1.2} />
+      <line x1={r} y1={r} x2={hEnd.x} y2={hEnd.y} stroke="#0D3349" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1={r} y1={r} x2={mEnd.x} y2={mEnd.y} stroke="#0D3349" strokeWidth={1.2} strokeLinecap="round" />
+      <circle cx={r} cy={r} r={1} fill="#0D3349" />
+    </svg>
+  )
+}
+
+function getWeatherIcon(code: string): string {
+  const c = code.slice(0, 2)
+  if (code === '01d') return '☀️'
+  if (code === '01n') return '🌙'
+  if (c === '02')     return '⛅'
+  if (c === '03' || c === '04') return '☁️'
+  if (c === '09' || c === '10') return '🌧️'
+  if (c === '11')     return '⛈️'
+  if (c === '13')     return '❄️'
+  if (c === '50')     return '🌫️'
+  return '☀️'
+}
+
+export default function HomePage({ trip, onNavigate, onChangeDates, onOpenTerms }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
   const [cityData, setCityData] = useState<Record<string, CityData>>({})
   const [weatherSheet, setWeatherSheet] = useState<CityKey | null>(null)
+  const [showMenu, setShowMenu] = useState(false)
   const timerRef = useRef<any>(null)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
@@ -124,7 +163,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   return (
     <div style={{
       minHeight:'100dvh',
-      background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #26C6DA 65%, #00E5CC 100%)',
+      background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)',
       fontFamily: ff, maxWidth:430, margin:'0 auto', display:'flex', flexDirection:'column',
     }}>
       <style>{`
@@ -135,26 +174,34 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
       `}</style>
 
-      {/* 도시 날씨/시간 */}
+      {/* 도시 날씨 + 메뉴 버튼 */}
       <div style={{ padding:'26px 18px 12px' }}>
         <div style={{ display:'flex', gap:8 }}>
           {(Object.keys(CITIES) as CityKey[]).map(city => {
             const d = cityData[city]
             return (
               <div key={city} onClick={() => setWeatherSheet(city)} style={{
-                background:'rgba(255,255,255,0.82)', borderRadius:12, padding:'6px 10px',
+                background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'6px 10px',
                 boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flex:1, textAlign:'center',
                 cursor:'pointer', WebkitTapHighlightColor:'transparent',
               }}>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, flexWrap:'nowrap' }}>
-                  {d?.icon ? <img src={`https://openweathermap.org/img/wn/${d.icon}.png`} width={20} height={20} /> : <span style={{ fontSize:14 }}>🌤️</span>}
                   <span style={{ fontSize:12, fontWeight:700, color:'#0D3349', whiteSpace:'nowrap' }}>{CITIES[city].label}</span>
-                  {d?.temp != null && <span style={{ fontSize:11, color:'#CC3300', fontWeight:700, whiteSpace:'nowrap' }}>{d.temp}°</span>}
-                  <span style={{ fontSize:11, color:'#0D3349', fontWeight:600, whiteSpace:'nowrap' }}>{d?.time ?? '--:--'}</span>
+                  {d?.icon ? <span style={{ fontSize:16 }}>{getWeatherIcon(d.icon)}</span> : <span style={{ fontSize:16 }}>☀️</span>}
+                  {d?.temp != null && <span style={{ fontSize:11, color: d.temp < 15 ? '#60A5FA' : d.temp <= 25 ? '#34D399' : '#F97316', fontWeight:700, whiteSpace:'nowrap' }}>{d.temp}°</span>}
                 </div>
               </div>
             )
           })}
+          {/* 점 세 개 메뉴 버튼 */}
+          <div onClick={() => setShowMenu(true)} style={{
+            background:'rgba(255,255,255,0.82)', borderRadius:'50%', width:36, height:36,
+            boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flexShrink:0,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            cursor:'pointer', WebkitTapHighlightColor:'transparent', alignSelf:'center',
+          }}>
+            <span style={{ fontSize:18, color:'#0D3349', letterSpacing:1, lineHeight:1 }}>⋮</span>
+          </div>
         </div>
       </div>
 
@@ -218,6 +265,39 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         </div>
       </div>
 
+      {/* 메뉴 바텀시트 */}
+      {showMenu && (
+        <>
+          <div onClick={() => setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', zIndex:800 }} />
+          <div style={{
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398,
+            background:'rgba(255,255,255,0.95)', borderRadius:22,
+            zIndex:801, animation:'slideUpSheet 0.25s ease',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            padding:'12px 20px 40px',
+          }}>
+            <div style={{ width:36, height:4, borderRadius:999, background:'rgba(0,0,0,0.12)', margin:'0 auto 20px' }} />
+            <div style={{ fontSize:15, fontWeight:700, color:'#0D3349', marginBottom:12, paddingBottom:12, borderBottom:'1px solid rgba(0,0,0,0.08)' }}>호주가자</div>
+            {[
+              { icon:'📄', label:'이용약관', tab:'terms' as const },
+              { icon:'🔒', label:'개인정보처리방침', tab:'privacy' as const },
+            ].map(item => (
+              <button key={item.tab} onClick={() => { setShowMenu(false); onOpenTerms?.(item.tab) }} style={{
+                width:'100%', display:'flex', alignItems:'center', gap:14,
+                padding:'16px 4px',
+                background:'none', border:'none', borderBottom:'1px solid rgba(0,0,0,0.06)',
+                cursor:'pointer', fontFamily:ff, textAlign:'left',
+              }}>
+                <span style={{ fontSize:20 }}>{item.icon}</span>
+                <span style={{ fontSize:15, color:'#0D3349', fontWeight:500 }}>{item.label}</span>
+                <span style={{ marginLeft:'auto', fontSize:16, color:'#1565A0' }}>›</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
       {/* 날씨 바텀시트 */}
       {weatherSheet && (
         <>
@@ -232,8 +312,8 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             <div style={{ width:36, height:4, borderRadius:999, background:'rgba(0,0,0,0.15)', margin:'12px auto 0' }} />
             <div style={{ padding:'16px 20px 0', display:'flex', alignItems:'center', gap:10 }}>
               {cityData[weatherSheet]?.icon
-                ? <img src={`https://openweathermap.org/img/wn/${cityData[weatherSheet].icon}@2x.png`} width={52} height={52} />
-                : <span style={{ fontSize:40 }}>🌤️</span>
+                ? <span style={{ fontSize:52 }}>{getWeatherIcon(cityData[weatherSheet].icon)}</span>
+                : <span style={{ fontSize:52 }}>☀️</span>
               }
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:22, fontWeight:800, color:'#0D3349' }}>{CITIES[weatherSheet].label}</div>
