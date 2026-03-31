@@ -7,12 +7,14 @@ import ChecklistPage from './pages/ChecklistPage'
 import AdminPage from './pages/AdminPage'
 import LandingPage from './pages/LandingPage'
 import HomePage from './pages/HomePage'
+import TermsPage from './pages/TermsPage'
 
 function MainApp() {
   const [state, setState] = useState<AppState>(() => loadState())
   const [trip, setTrip] = useState<TripInfo|null>(() => loadTrip())
   const [cacheStamp, setCacheStamp] = useState(0)
   const [activeTab, setActiveTab] = useState<string|null>(null)
+  const [termsTab, setTermsTab] = useState<'terms'|'privacy'|null>(null)
 
   useEffect(() => {
     const sync = async () => {
@@ -45,21 +47,23 @@ function MainApp() {
         <HomePage
           trip={trip}
           onNavigate={(tab) => setActiveTab(tab)}
-          onChangeDates={() => { setTrip(null); setActiveTab(null) }}
+          onChangeDates={() => setTrip(null)}
+          onOpenTerms={(tab) => setTermsTab(tab)}
         />
+        {termsTab && (
+          <div style={{ position:'fixed', inset:0, zIndex:900, background:'#fff', overflowY:'auto', display:'flex', justifyContent:'center' }}>
+            <div style={{ width:'100%', maxWidth:430 }}>
+              <TermsPage initialTab={termsTab} onBack={() => setTermsTab(null)} />
+            </div>
+          </div>
+        )}
       </div>
     )
   }
 
   return (
     <div className="app-shell">
-      <ChecklistPage
-        key={cacheStamp}
-        state={state}
-        setState={setState}
-        initialTab={activeTab as any}
-        onGoHome={() => setActiveTab(null)}
-      />
+      <ChecklistPage key={cacheStamp} state={state} setState={setState} initialTab={activeTab} onGoHome={() => setActiveTab(null)} />
     </div>
   )
 }
