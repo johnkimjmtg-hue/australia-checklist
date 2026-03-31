@@ -17,7 +17,17 @@ const CITIES = {
 type CityKey = keyof typeof CITIES
 type Tab = 'bucketlist' | 'shopping' | 'services' | 'nearby' | 'bingo'
 type Props = { trip: TripInfo; onNavigate: (tab: Tab) => void; onChangeDates: () => void }
-type CityData = { temp: number | null; icon: string; time: string }
+type CityData = {
+  temp: number | null
+  feelsLike: number | null
+  humidity: number | null
+  windSpeed: number | null
+  description: string
+  sunrise: string
+  sunset: string
+  icon: string
+  time: string
+}
 
 const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
 
@@ -92,9 +102,20 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         try {
           const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${c.lat}&lon=${c.lon}&appid=${WEATHER_KEY}&units=metric&lang=kr`)
           const data = await res.json()
-          return [key, { temp: Math.round(data.main.temp), icon: data.weather[0].icon, time: getTime(c.tz) }] as [string, CityData]
+          const fmtTime = (unix: number) => new Date(unix * 1000).toLocaleTimeString('ko-KR', { timeZone: c.tz, hour: '2-digit', minute: '2-digit', hour12: false })
+          return [key, {
+            temp:        Math.round(data.main.temp),
+            feelsLike:   Math.round(data.main.feels_like),
+            humidity:    data.main.humidity,
+            windSpeed:   Math.round(data.wind.speed * 3.6), // m/s → km/h
+            description: data.weather[0].description,
+            sunrise:     fmtTime(data.sys.sunrise),
+            sunset:      fmtTime(data.sys.sunset),
+            icon:        data.weather[0].icon,
+            time:        getTime(c.tz),
+          }] as [string, CityData]
         } catch {
-          return [key, { temp: null, icon: '', time: getTime(c.tz) }] as [string, CityData]
+          return [key, { temp: null, feelsLike: null, humidity: null, windSpeed: null, description: '', sunrise: '—', sunset: '—', icon: '', time: getTime(c.tz) }] as [string, CityData]
         }
       })
     )
@@ -329,7 +350,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
               }
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:22, fontWeight:800, color:'#0D3349' }}>{CITIES[weatherSheet].label}</div>
-                <div style={{ fontSize:13, color:'#1565A0' }}>현지 시간 {cityData[weatherSheet]?.time ?? '--:--'}</div>
+                <div style={{ fontSize:13, color:'#1565A0' }}>현지 시간 {cityData[weatherSheet]?.time ?? '--:--'} · {cityData[weatherSheet]?.description || ''}</div>
               </div>
               {cityData[weatherSheet]?.temp != null && (
                 <div style={{ fontSize:40, fontWeight:900, color:'#0D3349' }}>{cityData[weatherSheet].temp}°</div>
@@ -338,12 +359,12 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             <div style={{ height:1, background:'rgba(0,0,0,0.08)', margin:'14px 20px' }} />
             <div style={{ padding:'0 20px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
               {[
-                { label:'🌅 일출', value:'—' },
-                { label:'🌇 일몰', value:'—' },
-                { label:'💧 습도', value:'—' },
-                { label:'🌬️ 바람', value:'—' },
-                { label:'🌡️ 체감', value: cityData[weatherSheet]?.temp != null ? `${cityData[weatherSheet].temp}°` : '—' },
-                { label:'☁️ 날씨', value:'—' },
+                { label:'🌅 일출', value: cityData[weatherSheet]?.sunrise ?? '—' },
+                { label:'🌇 일몰', value: cityData[weatherSheet]?.sunset ?? '—' },
+                { label:'💧 습도', value: cityData[weatherSheet]?.humidity != null ? `${cityData[weatherSheet].humidity}%` : '—' },
+                { label:'🌬️ 바람', value: cityData[weatherSheet]?.windSpeed != null ? `${cityData[weatherSheet].windSpeed}km/h` : '—' },
+                { label:'🌡️ 체감', value: cityData[weatherSheet]?.feelsLike != null ? `${cityData[weatherSheet].feelsLike}°` : '—' },
+                { label:'☁️ 날씨', value: cityData[weatherSheet]?.description || '—' },
               ].map((item, i) => (
                 <div key={i} style={{ background:'rgba(0,131,143,0.08)', borderRadius:12, padding:'12px 14px' }}>
                   <div style={{ fontSize:12, color:'#1565A0', marginBottom:4 }}>{item.label}</div>
