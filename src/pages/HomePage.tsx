@@ -108,9 +108,8 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           const data = await weatherRes.json()
           const forecast = await forecastRes.json()
           const fmtTime = (unix: number) => new Date(unix * 1000).toLocaleTimeString('ko-KR', { timeZone: c.tz, hour: '2-digit', minute: '2-digit', hour12: false })
-          const fmtHourTime = (dtTxt: string) => new Date(dtTxt + ' UTC').toLocaleTimeString('ko-KR', { timeZone: c.tz, hour: '2-digit', minute: '2-digit', hour12: false })
           const hourly = (forecast.list ?? []).slice(0, 5).map((item: any) => ({
-            time: fmtHourTime(item.dt_txt),
+            time: fmtTime(item.dt),
             icon: item.weather[0].icon,
             temp: Math.round(item.main.temp),
           }))
@@ -199,7 +198,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   return (
     <div style={{
       minHeight:'100dvh',
-      background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)',
+      background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #26C6DA 65%, #00E5CC 100%)',
       backgroundSize: '100% 200%',
       animation: 'bgMove 8s ease-in-out infinite',
       fontFamily: ff, maxWidth:430, margin:'0 auto', display:'flex', flexDirection:'column',
