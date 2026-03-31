@@ -3,7 +3,7 @@
 // src/components/BucketSheet.tsx
 // ─────────────────────────────────────────────
 import { useState, useEffect } from 'react'
-import { AppState, TripInfo, resetBucket } from '../store/state'
+import { AppState, TripInfo, loadState, resetBucket } from '../store/state'
 import { getCachedChecklist } from '../lib/dataCache'
 import BucketCheckView from '../pages/BucketCheckView'
 import ChecklistPage from '../pages/ChecklistPage'
@@ -19,23 +19,27 @@ type View = 'bucket' | 'checklist'
 
 type Props = {
   trip: TripInfo
-  // ✅ state/setState를 App.tsx에서 내려받아 동기화 유지
-  state: AppState
-  setState: (s: AppState) => void
   onClose: () => void
 }
 
-export default function BucketSheet({ trip, state, setState, onClose }: Props) {
+export default function BucketSheet({ trip, onClose }: Props) {
   const [dbItems, setDbItems] = useState<DBItem[]>([])
   const [view, setView] = useState<View>('bucket')
+  // App.tsx 거치지 않고 localStorage 직접 관리
+  const [state, setState] = useState<AppState>(() => loadState())
 
   useEffect(() => {
-    // ✅ getCachedChecklist()는 { categories, items } 객체를 반환 — .length가 아닌 .items로 접근
     const cached = getCachedChecklist()
-    if (cached?.items?.length) setDbItems(cached.items)
+    if (cached?.length) setDbItems(cached)
+  }, [])
+
+  // 시트 열릴 때 최신 state 읽기
+  useEffect(() => {
+    setState(loadState())
   }, [])
 
   const handleBackToBucket = () => {
+    setState(loadState()) // 체크리스트에서 변경된 내용 반영
     setView('bucket')
   }
 
@@ -49,7 +53,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
       <div style={{
         position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
         width:'calc(100% - 32px)', maxWidth:398,
-        background:'#EFFCFC', borderRadius:20,
+        background:'#ffffff', borderRadius:20,
         maxHeight:'85vh', overflowY:'auto', zIndex:801,
         animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
         display:'flex', flexDirection:'column',

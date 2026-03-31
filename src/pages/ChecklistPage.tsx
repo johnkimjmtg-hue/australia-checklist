@@ -214,7 +214,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
   return (
     <div style={{ 
       minHeight:'100dvh',
-      background: embedded ? '#EFFCFC' : 'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)', fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
+      background: embedded ? '#ffffff' : 'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)', fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
@@ -262,7 +262,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
 
           {/* ── 서브헤더 + 카테고리 (sticky 고정) ── */}
           {!showSearch && (
-            <div style={{ position:'sticky', top:0, zIndex:30, background: embedded ? '#EFFCFC' : 'rgba(224,247,250,0.95)', borderBottom:'1px solid rgba(0,131,143,0.15)' }}>
+            <div style={{ position:'sticky', top:0, zIndex:30, background: embedded ? '#ffffff' : 'rgba(224,247,250,0.95)', borderBottom:'1px solid rgba(0,131,143,0.15)' }}>
               {/* 멘트 + 일정설정 + 일정보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
                 <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? '#00838F' : '#0D3349' }}>
@@ -561,7 +561,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
         <div onClick={()=>setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(0,0,0,0.45)', fontFamily:ff }}>
           <div onClick={e=>e.stopPropagation()} style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC',
+            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
             borderRadius:20, maxHeight:'85vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease',
             boxShadow:'0 8px 32px rgba(0,0,0,0.20)',

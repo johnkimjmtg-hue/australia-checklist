@@ -667,7 +667,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(0,0,0,0.45)', fontFamily:font.family }}>
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC',
+            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
             borderRadius:20, maxHeight:'85vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
           }}>

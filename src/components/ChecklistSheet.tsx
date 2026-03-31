@@ -25,7 +25,7 @@ export default function ChecklistSheet({ state, setState, onClose }: Props) {
       <div style={{
         position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
         width:'calc(100% - 32px)', maxWidth:398,
-        background:'#EFFCFC', borderRadius:20,
+        background:'#ffffff', borderRadius:20,
         maxHeight:'85vh', overflowY:'auto', zIndex:801,
         animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
         display:'flex', flexDirection:'column',

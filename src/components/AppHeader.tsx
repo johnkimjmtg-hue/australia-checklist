@@ -139,7 +139,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
-            background:'#EFFCFC', borderRadius:20, zIndex:801,
+            background:'#ffffff', borderRadius:20, zIndex:801,
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
             padding:'12px 20px 40px',
           }}>
@@ -173,7 +173,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
           <div onClick={() => setWeatherSheet(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC', borderRadius:20,
+            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff', borderRadius:20,
             maxHeight:'85vh', overflowY:'auto', zIndex:801,
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
           }}>
@@ -232,7 +232,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
           <div onClick={() => setTermsTab(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:1000 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC', borderRadius:20,
+            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff', borderRadius:20,
             maxHeight:'85vh', overflowY:'auto', zIndex:1001,
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
           }}>
