@@ -4,7 +4,7 @@
 // src/components/BucketSheet.tsx
 // ─────────────────────────────────────────────
 import { useState, useEffect } from 'react'
-import { AppState, TripInfo } from '../store/state'
+import { AppState, TripInfo, loadState } from '../store/state'
 import { getCachedChecklist } from '../lib/dataCache'
 import BucketCheckView from '../pages/BucketCheckView'
 import ChecklistPage from '../pages/ChecklistPage'
@@ -29,11 +29,23 @@ type View = 'bucket' | 'checklist'
 export default function BucketSheet({ state, setState, trip, onClose }: Props) {
   const [dbItems, setDbItems] = useState<DBItem[]>([])
   const [view, setView] = useState<View>('bucket')
+  const [localState, setLocalState] = useState<AppState>(() => loadState())
 
   useEffect(() => {
     const cached = getCachedChecklist()
     if (cached?.length) setDbItems(cached)
   }, [])
+
+  const handleSetState = (s: AppState) => {
+    setState(s)
+    setLocalState(s)
+  }
+
+  // view가 bucket으로 돌아올 때 최신 state 반영
+  const handleBackToBucket = () => {
+    setLocalState(loadState())
+    setView('bucket')
+  }
 
   const ITEMS: CheckItem[] = dbItems.map(i => ({
     id: i.id, categoryId: i.category_id, label: i.label, emoji: '📌',
@@ -84,9 +96,9 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
         <div style={{ flex:1, overflowY:'auto' }}>
           {view === 'bucket' ? (
             <BucketCheckView
-              state={state}
+              state={localState}
               trip={trip}
-              setState={setState}
+              setState={handleSetState}
               items={ITEMS}
               dbItems={dbItems}
               onAchievedChange={() => {}}
@@ -97,10 +109,10 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
             />
           ) : (
             <ChecklistPage
-              state={state}
-              setState={setState}
+              state={localState}
+              setState={handleSetState}
               initialTab="bucketlist"
-              onGoHome={() => setView('bucket')}
+              onGoHome={handleBackToBucket}
               embedded
             />
           )}
