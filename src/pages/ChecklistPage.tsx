@@ -530,7 +530,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
             <div style={{ width:'100%', height:200, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,131,143,0.10)' }}>
               {selProduct.image_url ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <Icon icon="ph:shopping-bag" width={56} height={56} color={'#00838F'} />}
             </div>
-            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[10]}px` }}>
+            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[4]}px` }}>
               <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap', marginBottom:spacing[3], alignItems:'center' }}>
                 {(selProduct.tags??[]).map((tag:string)=>(
                   <span key={tag} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:TAG_COLOR[tag]?.bg??colors.primaryLight, color:TAG_COLOR[tag]?.color??colors.primary }}>{tag}</span>
@@ -558,17 +558,21 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
 
       {/* ── 버킷리스트 상세 팝업 ── */}
       {detailItem&&(
-        <div onClick={()=>setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', fontFamily:ff }}>
+        <div onClick={()=>setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(0,0,0,0.45)', fontFamily:ff }}>
           <div onClick={e=>e.stopPropagation()} style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
-            borderRadius:radius.xl, maxHeight:'85vh', overflowY:'auto',
+            width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC',
+            borderRadius:20, maxHeight:'85vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease',
-            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
           }}>
-            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
+            <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+              <button onClick={()=>setDetailItem(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
+              </button>
+            </div>
             {detailItem.image_url&&<div style={{ width:'100%', height:220, overflow:'hidden', marginTop:spacing[2] }}><img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /></div>}
-            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[10]}px` }}>
+            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[4]}px` }}>
               <div style={{ ...T.h2, lineHeight:1.4, marginBottom:spacing[3] }}>{detailItem.label}</div>
               {detailItem.description&&<div style={{ fontSize:font.size.md, color:'#475569', lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
               {detailItem.tips&&(
@@ -614,7 +618,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                   </div>
                 ) : null
               })()}
-              <button onClick={()=>setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>닫기</button>
+
             </div>
           </div>
         </div>
