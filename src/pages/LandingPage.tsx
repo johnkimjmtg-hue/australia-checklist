@@ -144,7 +144,7 @@ export default function LandingPage({ onComplete }: Props) {
           { label:'✈️ 출발일', val: sDate ? fmt(sDate) : null },
           { label:'🏠 귀국일', val: eDate ? fmt(eDate) : null },
         ].map((c, i) => (
-          <div key={i} style={{ background:'rgba(255,255,255,0.55)', borderRadius:16, padding:'12px 14px', border:'0.5px solid rgba(255,255,255,0.4)', backdropFilter:'blur(8px)' }}>
+          <div key={i} style={{ background:'#fff', borderRadius:16, padding:'12px 14px', border:'none', boxShadow:'0 2px 12px rgba(0,0,0,0.08)' }}>
             <div style={{ fontSize:11, color:'#bbb', marginBottom:3, fontWeight:500 }}>{c.label}</div>
             <div style={{ fontSize:14, fontWeight: c.val ? 700 : 400, color: c.val ? '#1a1a1a' : '#ccc' }}>
               {c.val ?? '날짜 선택'}
@@ -155,7 +155,7 @@ export default function LandingPage({ onComplete }: Props) {
 
       {/* ── 피커 시트 */}
       {picker === 'year' && (
-        <div style={{ margin:'12px 18px 0', background:'rgba(255,255,255,0.6)', borderRadius:16, padding:14, border:'0.5px solid rgba(255,255,255,0.4)', display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, backdropFilter:'blur(8px)' }}>
+        <div style={{ margin:'12px 18px 0', background:'#fff', borderRadius:16, padding:14, border:'none', display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
           {Array.from({ length: MAX_Y - MIN_Y + 1 }, (_, i) => MIN_Y + i).map(y => (
             <div key={y} className={`pick-item${y === vy ? ' sel' : ''}`}
               onClick={() => { setVy(y); setPicker('none') }}
@@ -164,7 +164,7 @@ export default function LandingPage({ onComplete }: Props) {
         </div>
       )}
       {picker === 'month' && (
-        <div style={{ margin:'12px 18px 0', background:'rgba(255,255,255,0.6)', borderRadius:16, padding:14, border:'0.5px solid rgba(255,255,255,0.4)', display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8, backdropFilter:'blur(8px)' }}>
+        <div style={{ margin:'12px 18px 0', background:'#fff', borderRadius:16, padding:14, border:'none', display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8, boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
           {MONTHS.map((m, i) => (
             <div key={i} className={`pick-item${i === vm ? ' sel' : ''}`}
               onClick={() => { setVm(i); setPicker('none') }}
@@ -174,7 +174,7 @@ export default function LandingPage({ onComplete }: Props) {
       )}
 
       {/* ── 달력 */}
-      <div style={{ margin:'12px 18px 0', background:'rgba(255,255,255,0.6)', borderRadius:22, border:'0.5px solid rgba(255,255,255,0.4)', overflow:'hidden', backdropFilter:'blur(8px)' }}>
+      <div style={{ margin:'12px 18px 0', background:'#fff', borderRadius:22, border:'none', overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 10px' }}>
           <button className="nav-hover" onClick={() => chgMo(-1)}
             style={{ background:'none', border:'none', fontSize:22, color:'#ccc', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
