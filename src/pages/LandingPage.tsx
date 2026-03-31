@@ -205,7 +205,7 @@ export default function LandingPage({ onComplete }: Props) {
         <button className="main-btn" onClick={handleComplete} disabled={!canNext}
           style={{
             width:'100%', padding:18, border:'none', borderRadius:50,
-            fontSize:17, fontWeight: canNext ? 800 : 400, cursor: canNext ? 'pointer' : 'default',
+            fontSize:17, fontWeight: 400, cursor: canNext ? 'pointer' : 'default',
             background: '#EFFCFC',
             color: '#0D3349',
           }}
