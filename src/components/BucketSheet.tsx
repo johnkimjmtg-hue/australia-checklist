@@ -48,12 +48,12 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
 
       {/* 바텀시트 */}
       <div style={{
-        position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+        position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'calc(100% - 32px)', maxWidth:430,
         height: sheetHeight,
         maxHeight: '90vh',
         background:'#EFFCFC',
-        borderRadius:20,
+        borderRadius:'20px 20px 0 0',
         zIndex:801,
         animation:'slideUpSheet 0.25s ease',
         boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
@@ -67,19 +67,14 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
           }
         `}</style>
 
-        {/* 핸들 + 닫기 */}
-        <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', padding:'12px 16px 0', position:'relative' }}>
-          <div style={{ width:40, height:4, borderRadius:999, background:'rgba(0,0,0,0.15)' }} />
-          <button
-            onClick={onClose}
-            style={{
-              position:'absolute', right:16, top:8,
-              width:28, height:28, borderRadius:'50%',
-              background:'rgba(255,255,255,0.6)', border:'none',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              cursor:'pointer', WebkitTapHighlightColor:'transparent',
-            }}
-          >
+        {/* X 닫기 버튼 */}
+        <div style={{ flexShrink:0, display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+          <button onClick={onClose} style={{
+            width:28, height:28, borderRadius:'50%',
+            background:'rgba(0,0,0,0.08)', border:'none',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            cursor:'pointer', WebkitTapHighlightColor:'transparent',
+          }}>
             <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
           </button>
         </div>
