@@ -1,12 +1,13 @@
 // ─────────────────────────────────────────────
 // BucketSheet.tsx
-// 홈페이지에서 버킷리스트를 바텀시트로 표시
+// 버킷리스트 + 체크리스트를 한 바텀시트에서 전환
 // src/components/BucketSheet.tsx
 // ─────────────────────────────────────────────
 import { useState, useEffect } from 'react'
 import { AppState, TripInfo } from '../store/state'
 import { getCachedChecklist } from '../lib/dataCache'
 import BucketCheckView from '../pages/BucketCheckView'
+import ChecklistPage from '../pages/ChecklistPage'
 
 type DBItem = {
   id: string; category_id: string; label: string; icon: string | null
@@ -21,11 +22,13 @@ type Props = {
   setState: (s: AppState) => void
   trip: TripInfo
   onClose: () => void
-  onGoChecklist: () => void
 }
 
-export default function BucketSheet({ state, setState, trip, onClose, onGoChecklist }: Props) {
+type View = 'bucket' | 'checklist'
+
+export default function BucketSheet({ state, setState, trip, onClose }: Props) {
   const [dbItems, setDbItems] = useState<DBItem[]>([])
+  const [view, setView] = useState<View>('bucket')
 
   useEffect(() => {
     const cached = getCachedChecklist()
@@ -39,12 +42,9 @@ export default function BucketSheet({ state, setState, trip, onClose, onGoCheckl
   return (
     <>
       {/* 오버레이 */}
-      <div
-        onClick={onClose}
-        style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }}
-      />
+      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
 
-      {/* 바텀시트 - 약관 팝업과 동일한 스타일 */}
+      {/* 바텀시트 */}
       <div style={{
         position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
         width:'calc(100% - 32px)', maxWidth:398,
@@ -60,8 +60,16 @@ export default function BucketSheet({ state, setState, trip, onClose, onGoCheckl
           }
         `}</style>
 
-        {/* X 닫기 버튼 */}
-        <div style={{ flexShrink:0, display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+        {/* 헤더 */}
+        <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 12px 0' }}>
+          {view === 'checklist' ? (
+            <button onClick={() => setView('bucket')} style={{ background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:4, padding:'4px 6px', borderRadius:8, WebkitTapHighlightColor:'transparent' }}>
+              <span style={{ fontSize:16, color:'#0D3349' }}>‹</span>
+              <span style={{ fontSize:13, color:'#0D3349', fontWeight:600 }}>버킷리스트</span>
+            </button>
+          ) : (
+            <div />
+          )}
           <button onClick={onClose} style={{
             width:28, height:28, borderRadius:'50%',
             background:'rgba(0,0,0,0.08)', border:'none',
@@ -72,20 +80,30 @@ export default function BucketSheet({ state, setState, trip, onClose, onGoCheckl
           </button>
         </div>
 
-        {/* BucketCheckView */}
+        {/* 내용 */}
         <div style={{ flex:1, overflowY:'auto' }}>
-          <BucketCheckView
-            state={state}
-            trip={trip}
-            setState={setState}
-            items={ITEMS}
-            dbItems={dbItems}
-            onAchievedChange={() => {}}
-            onEdit={() => { onClose(); onGoChecklist() }}
-            onDelete={() => {}}
-            onShare={() => {}}
-            onLanding={onClose}
-          />
+          {view === 'bucket' ? (
+            <BucketCheckView
+              state={state}
+              trip={trip}
+              setState={setState}
+              items={ITEMS}
+              dbItems={dbItems}
+              onAchievedChange={() => {}}
+              onEdit={() => setView('checklist')}
+              onDelete={() => {}}
+              onShare={() => {}}
+              onLanding={onClose}
+            />
+          ) : (
+            <ChecklistPage
+              state={state}
+              setState={setState}
+              initialTab="bucketlist"
+              onGoHome={() => setView('bucket')}
+              embedded
+            />
+          )}
         </div>
       </div>
     </>
