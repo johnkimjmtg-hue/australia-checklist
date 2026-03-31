@@ -2,6 +2,7 @@
 // HomePage.tsx
 // ─────────────────────────────────────────────
 import { useState, useEffect, useRef } from 'react'
+import { Icon } from '@iconify/react'
 import { TripInfo, loadState } from '../store/state'
 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
@@ -19,6 +20,19 @@ type Props = { trip: TripInfo; onNavigate: (tab: Tab) => void; onChangeDates: ()
 type CityData = { temp: number | null; icon: string; time: string }
 
 const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
+
+function getWeatherIcon(code: string): { icon: string; color: string } {
+  const c = code.slice(0, 2)
+  if (code === '01d') return { icon: 'ph:sun-fill',            color: '#F59E0B' }
+  if (code === '01n') return { icon: 'ph:moon-fill',           color: '#6366F1' }
+  if (c === '02')     return { icon: 'ph:cloud-sun-fill',      color: '#F59E0B' }
+  if (c === '03' || c === '04') return { icon: 'ph:cloud-fill', color: '#94A3B8' }
+  if (c === '09' || c === '10') return { icon: 'ph:cloud-rain-fill', color: '#3B82F6' }
+  if (c === '11')     return { icon: 'ph:cloud-lightning-fill', color: '#8B5CF6' }
+  if (c === '13')     return { icon: 'ph:snowflake-fill',       color: '#60A5FA' }
+  if (c === '50')     return { icon: 'ph:cloud-fog-fill',       color: '#94A3B8' }
+  return { icon: 'ph:sun-fill', color: '#F59E0B' }
+}
 
 export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
@@ -147,7 +161,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
                 cursor:'pointer', WebkitTapHighlightColor:'transparent',
               }}>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, flexWrap:'nowrap' }}>
-                  {d?.icon ? <img src={`https://openweathermap.org/img/wn/${d.icon}.png`} width={20} height={20} /> : <span style={{ fontSize:14 }}>🌤️</span>}
+                  {d?.icon ? <Icon icon={getWeatherIcon(d.icon).icon} width={20} height={20} color={getWeatherIcon(d.icon).color} /> : <Icon icon="ph:sun-fill" width={20} height={20} color="#F59E0B" />}
                   <span style={{ fontSize:12, fontWeight:700, color:'#0D3349', whiteSpace:'nowrap' }}>{CITIES[city].label}</span>
                   {d?.temp != null && <span style={{ fontSize:11, color: d.temp < 15 ? '#60A5FA' : d.temp <= 25 ? '#34D399' : '#F97316', fontWeight:700, whiteSpace:'nowrap' }}>{d.temp}°</span>}
                   <span style={{ fontSize:11, color:'#0D3349', fontWeight:600, whiteSpace:'nowrap' }}>{d?.time ?? '--:--'}</span>
@@ -232,8 +246,8 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             <div style={{ width:36, height:4, borderRadius:999, background:'rgba(0,0,0,0.15)', margin:'12px auto 0' }} />
             <div style={{ padding:'16px 20px 0', display:'flex', alignItems:'center', gap:10 }}>
               {cityData[weatherSheet]?.icon
-                ? <img src={`https://openweathermap.org/img/wn/${cityData[weatherSheet].icon}@2x.png`} width={52} height={52} />
-                : <span style={{ fontSize:40 }}>🌤️</span>
+                ? <Icon icon={getWeatherIcon(cityData[weatherSheet].icon).icon} width={52} height={52} color={getWeatherIcon(cityData[weatherSheet].icon).color} />
+                : <Icon icon="ph:sun-fill" width={52} height={52} color="#F59E0B" />
               }
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:22, fontWeight:800, color:'#0D3349' }}>{CITIES[weatherSheet].label}</div>
