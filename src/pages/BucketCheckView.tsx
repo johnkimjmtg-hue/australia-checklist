@@ -363,7 +363,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           margin:`0 ${spacing[3]}px`,
           background: colors.bgCard,
           borderRadius: radius.md,
-          border: isAchieved ? `1px solid ${colors.success}` : `1px solid ${colors.gray300}`,
+          border: isAchieved ? `1px solid ${'#29B6D0'}` : `1px solid ${colors.gray300}`,
           cursor: db ? 'pointer' : 'default',
           transition:'all 0.15s',
         }}
@@ -378,7 +378,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
         {/* 텍스트 */}
         <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color: isAchieved ? colors.success : colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+          <div style={{ fontSize:font.size.md, fontWeight:font.weight.medium, color: isAchieved ? '#29B6D0' : colors.gray800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
             {item.label}
           </div>
           <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, overflow:'hidden' }}>
@@ -404,14 +404,14 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             style={{
               display:'flex', alignItems:'center', gap:3,
               padding:'4px 8px', borderRadius:radius.sm, cursor:'pointer',
-              background: isAchieved ? colors.success : colors.bgCard,
-              border: `1px solid ${colors.success}`,
+              background: isAchieved ? '#29B6D0' : colors.bgCard,
+              border: `1px solid ${'#29B6D0'}`,
               transition:'all 0.15s', whiteSpace:'nowrap',
             }}
           >
-            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color: isAchieved ? '#fff' : colors.success }}>완료</span>
+            <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color: isAchieved ? '#fff' : '#29B6D0' }}>완료</span>
             <svg width="10" height="8" viewBox="0 0 11 8" fill="none">
-              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : colors.success} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M1 4L4 7L10 1" stroke={isAchieved ? '#fff' : '#29B6D0'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <button
@@ -444,68 +444,28 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       <Confetti trigger={confettiTrigger} />
 
-      {/* ══ 진행 카드 ══ */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgPage, padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
-        <div style={{
-          background:colors.bgCard,
-          borderRadius:radius.lg,
-          border:`1.5px solid ${colors.gray300}`,
-          padding:`${spacing[4]}px`, display:'flex', alignItems:'center', gap:spacing[4],
+      {/* ══ 상단 버튼 ══ */}
+      <div style={{ display:'flex', justifyContent:'flex-end', gap:8, padding:'12px 16px 8px' }}>
+        <button onClick={onEdit} style={{
+          height:30, paddingLeft:12, paddingRight:12, borderRadius:20,
+          border:'none', background:'#29B6D0',
+          color:'#fff', fontSize:12, fontWeight:700,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          cursor:'pointer', fontFamily:'inherit',
         }}>
-          <CircleProgress pct={pct} />
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:font.size['2xl'], fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[1], lineHeight:1.2 }}>내 버킷리스트</div>
-            <div style={{ fontSize:font.size.sm, color:colors.textSecondary, fontWeight:font.weight.medium, marginBottom:spacing[2] }}>
-              {trip ? `${trip.startDate.slice(5).replace('-','/')} ~ ${trip.endDate.slice(5).replace('-','/')}` : '일정 미설정'}
-            </div>
-            <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:spacing[1] }}>
-              <span style={{ fontSize:font.size['3xl'], fontWeight:font.weight.bold, color:colors.textPrimary, lineHeight:1 }}>{achievedCount}</span>
-              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.medium, color:colors.textSecondary }}>/{total}건 완료</span>
-            </div>
-            <div style={{ fontSize:font.size.sm, color:colors.textTertiary, lineHeight:1.5 }}>{
-              pct === 0 ? '첫 번째 항목을 완료해봐요! 🙌' :
-              pct < 25  ? '좋은 시작이에요! 계속 해봐요 💪' :
-              pct < 50  ? '절반을 향해 달려가고 있어요! 🏃' :
-              pct < 75  ? '절반을 넘었어요! 조금만 더! ⚡' :
-              pct < 100 ? '거의 다 왔어요! 마지막 스퍼트! 🔥' :
-                          '모든 항목을 완료했어요! 축하합니다 🎉'
-            }</div>
-          </div>
-          <CoinStack count={achievedCount} total={total} />
-        </div>
-        {/* ── 버튼 */}
-        <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
-          <button onClick={onEdit} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:'none', background: colors.primary,
-            color: '#fff', fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:pencil-simple" width={12} height={12} color="#fff" />
-            리스트 수정하기
-          </button>
-          <button onClick={onShare} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.border}`, background: colors.bgCard,
-            color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
-            공유하기
-          </button>
-          <button onClick={() => setShowDelete(true)} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
-            color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:trash" width={12} height={12} color={colors.danger} />
-            리스트 비우기
-          </button>
-        </div>
+          <Icon icon="ph:pencil-simple" width={12} height={12} color="#fff" />
+          리스트 수정하기
+        </button>
+        <button onClick={() => setShowDelete(true)} style={{
+          height:30, paddingLeft:12, paddingRight:12, borderRadius:20,
+          border:'1.5px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)',
+          color:'#DC2626', fontSize:12, fontWeight:700,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          cursor:'pointer', fontFamily:'inherit',
+        }}>
+          <Icon icon="ph:trash" width={12} height={12} color="#DC2626" />
+          리스트 비우기
+        </button>
       </div>
 
 
@@ -549,19 +509,19 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           )
         })()}
         {sortedDays.length===0 && checkedItems.filter(i => !(state.schedules[i.id]?.length)).length===0 && (
-          <div style={{ textAlign:'center', padding:'60px 20px', display:'flex', flexDirection:'column', alignItems:'center', gap:spacing[4] }}>
-            <Icon icon="ph:list-checks" width={48} height={48} color={colors.gray300} />
+          <div style={{ textAlign:'center', padding:'60px 20px', display:'flex', flexDirection:'column', alignItems:'center', gap:16 }}>
+            <div style={{ fontSize:48 }}>🗺️</div>
             <div>
-              <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[1] }}>아직 담긴 항목이 없어요</div>
-              <div style={{ fontSize:font.size.sm, color:colors.textTertiary }}>호주에서 꼭 해볼 것들을 담아보세요!</div>
+              <div style={{ fontSize:16, fontWeight:700, color:'#0D3349', marginBottom:6 }}>아직 담긴 항목이 없어요</div>
+              <div style={{ fontSize:13, color:'#1565A0' }}>호주에서 꼭 해볼 것들을 담아보세요!</div>
             </div>
             <button onClick={onEdit} style={{
-              height:44, padding:`0 ${spacing[6]}px`,
-              background:colors.primary, color:'#fff',
-              border:'none', borderRadius:radius.sm,
-              fontSize:font.size.md, fontWeight:font.weight.bold,
-              cursor:'pointer', fontFamily:font.family,
-              display:'flex', alignItems:'center', gap:spacing[2],
+              height:44, padding:'0 24px',
+              background:'#29B6D0', color:'#fff',
+              border:'none', borderRadius:50,
+              fontSize:15, fontWeight:700,
+              cursor:'pointer', fontFamily:'inherit',
+              display:'flex', alignItems:'center', gap:8,
             }}>
               <Icon icon="ph:plus-circle" width={18} height={18} color="#fff" />
               리스트 추가하기
@@ -704,14 +664,18 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       {/* ── 버킷리스트 상세 팝업 */}
       {detailItem && (
-        <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', fontFamily:font.family }}>
+        <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(0,0,0,0.45)', fontFamily:font.family }}>
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
-            borderRadius:radius.xl, maxHeight:'85vh', overflowY:'auto',
-            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC',
+            borderRadius:20, maxHeight:'85vh', overflowY:'auto',
+            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
           }}>
-            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
+            <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+              <button onClick={() => setDetailItem(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
+              </button>
+            </div>
             {detailItem.image_url && (
               <div style={{ width:'100%', height:220, overflow:'hidden', marginTop:spacing[2] }}>
                 <img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
@@ -721,8 +685,8 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
               <div style={{ ...T.h2, lineHeight:1.4, marginBottom:spacing[3] }}>{detailItem.label}</div>
               {detailItem.description && <div style={{ fontSize:font.size.md, color:'#475569', lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
               {detailItem.tips && (
-                <div style={{ background:colors.primaryLight, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:spacing[3], marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary, marginBottom:spacing[1] }}>💡 현지인 팁</div>
+                <div style={{ background:'rgba(0,131,143,0.10)', border:'1px solid rgba(0,131,143,0.2)', borderRadius:12, padding:12, marginBottom:16 }}>
+                  <div style={{ fontSize:12, fontWeight:700, color:'#00838F', marginBottom:4 }}>💡 현지인 팁</div>
                   <div style={{ fontSize:font.size.sm, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
                 </div>
               )}
@@ -744,7 +708,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                   </div>
                 </div>
               )}
-              <button onClick={() => setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${colors.border}`, background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family }}>닫기</button>
+
             </div>
           </div>
         </div>
