@@ -26,9 +26,10 @@ type Props = {
 
 type View = 'bucket' | 'checklist'
 
-export default function BucketSheet({ state, setState, trip, onClose }: Props) {
+export default function BucketSheet({ setState, trip, onClose }: Props) {
   const [dbItems, setDbItems] = useState<DBItem[]>([])
   const [view, setView] = useState<View>('bucket')
+  // 항상 localStorage에서 최신 state 읽기
   const [localState, setLocalState] = useState<AppState>(() => loadState())
 
   useEffect(() => {
@@ -37,13 +38,12 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
   }, [])
 
   const handleSetState = (s: AppState) => {
-    setState(s)
-    setLocalState(s)
+    setState(s)      // App.tsx state 업데이트
+    setLocalState(s) // 로컬 state 업데이트
   }
 
-  // view가 bucket으로 돌아올 때 최신 state 반영
   const handleBackToBucket = () => {
-    setLocalState(loadState())
+    setLocalState(loadState()) // localStorage에서 최신 state 읽기
     setView('bucket')
   }
 
@@ -75,7 +75,7 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
         {/* 헤더 */}
         <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 12px 0' }}>
           {view === 'checklist' ? (
-            <button onClick={() => setView('bucket')} style={{ background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:4, padding:'4px 6px', borderRadius:8, WebkitTapHighlightColor:'transparent' }}>
+            <button onClick={handleBackToBucket} style={{ background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:4, padding:'4px 6px', borderRadius:8, WebkitTapHighlightColor:'transparent' }}>
               <span style={{ fontSize:16, color:'#0D3349' }}>‹</span>
               <span style={{ fontSize:13, color:'#0D3349', fontWeight:600 }}>버킷리스트</span>
             </button>
