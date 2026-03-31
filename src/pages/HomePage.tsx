@@ -142,8 +142,8 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             const d = cityData[city]
             return (
               <div key={city} onClick={() => setWeatherSheet(city)} style={{
-                background:'rgba(255,255,255,0.82)', borderRadius:12, padding:'6px 10px',
-                boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flex:1, textAlign:'center',
+                background:'transparent', borderRadius:12, padding:'6px 10px',
+                border:'1px solid rgba(255,255,255,0.6)', flex:1, textAlign:'center',
                 cursor:'pointer', WebkitTapHighlightColor:'transparent',
               }}>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, flexWrap:'nowrap' }}>
