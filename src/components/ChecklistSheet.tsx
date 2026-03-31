@@ -56,6 +56,7 @@ export default function ChecklistSheet({ state, setState, onClose }: Props) {
             setState={setState}
             initialTab="bucketlist"
             onGoHome={onClose}
+            embedded
           />
         </div>
       </div>

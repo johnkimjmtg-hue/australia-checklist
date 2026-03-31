@@ -60,9 +60,9 @@ const STATE_MAP: Record<string, { label: string }> = {
 
 type Modal = 'none' | 'noTrip' | 'noDate' | 'noSchedule' | 'confirmReset' | 'tripPicker' | 'calendar'
 type MainTab = 'bucketlist' | 'bucketcheck' | 'services' | 'shopping' | 'myshoppinglist' | 'nearby' | 'bingo'
-type Props = { state: AppState; setState: (s: AppState) => void; initialTab?: MainTab; onGoHome?: () => void }
+type Props = { state: AppState; setState: (s: AppState) => void; initialTab?: MainTab; onGoHome?: () => void; embedded?: boolean }
 
-export default function ChecklistPage({ state, setState, initialTab, onGoHome }: Props) {
+export default function ChecklistPage({ state, setState, initialTab, onGoHome, embedded }: Props) {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [trip, setTrip]               = useState<TripInfo|null>(() => loadTrip())
@@ -214,7 +214,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome }:
   return (
     <div style={{ 
       minHeight:'100dvh',
-      background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)', fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
+      background: embedded ? '#EFFCFC' : 'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)', fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
@@ -255,9 +255,9 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome }:
         </>
       ) : (
         // ── 버킷리스트 선택 화면 (paddingBottom으로 하단 고정 영역 확보)
-        <div style={{ paddingBottom: 130, background: 'transparent', minHeight: '100dvh' }}>
+        <div style={{ paddingBottom: embedded ? 20 : 130, background: 'transparent', minHeight: '100dvh' }}>
 
-          <AppHeader />
+          {!embedded && <AppHeader />}
 
 
           {/* ── 서브헤더 + 카테고리 (sticky 고정) ── */}
@@ -448,7 +448,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome }:
       )}
 
       {/* ── 하단 고정 영역 ── */}
-      <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, zIndex:40 }}>
+      {!embedded && <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, background:colors.bgCard, zIndex:40 }}>
 
 
         <div style={{
@@ -493,7 +493,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome }:
             )
           })}
         </div>
-      </div>
+      </div>}
 
       {/* ── ScheduleSheet ── */}
       {sheetItem&&trip&&(
