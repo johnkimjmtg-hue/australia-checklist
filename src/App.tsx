@@ -45,6 +45,7 @@ function MainApp() {
         <HomePage
           trip={trip}
           state={state}
+          setState={setState}
           onNavigate={(tab) => setActiveTab(tab)}
           onChangeDates={() => { setTrip(null); setActiveTab(null) }}
         />

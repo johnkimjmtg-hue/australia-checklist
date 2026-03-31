@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { CheckItem, ITEM_ICONS } from '../data/checklist'
 import { supabase } from '../lib/supabase'
-import AppHeader from '../components/AppHeader'
 import { getCachedBusinesses, getCachedShopping } from '../lib/dataCache'
 import { colors, font, radius, spacing, shadow, T } from '../styles/tokens'
 import { AlertModal } from '../components/ui'
@@ -427,7 +426,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   }
 
   return (
-    <div ref={pageRef} style={{ minHeight:'100dvh', background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)', fontFamily:font.family, maxWidth:430, margin:'0 auto', position:'relative' }}>
+    <div ref={pageRef} style={{ minHeight:'100dvh', background:'transparent', fontFamily:font.family, maxWidth:430, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
@@ -443,7 +442,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         }
       `}</style>
 
-      <AppHeader />
       <Confetti trigger={confettiTrigger} />
 
       {/* ══ 진행 카드 ══ */}
