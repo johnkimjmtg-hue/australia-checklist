@@ -120,7 +120,7 @@ export default function LandingPage({ onComplete }: Props) {
       `}</style>
 
       {/* ── 상단 히어로 */}
-      <div style={{ position:'relative', overflow:'hidden', background:'#FFE8D6', padding:'52px 28px 36px', minHeight:280 }}>
+      <div style={{ position:'relative', overflow:'hidden', background:'transparent', padding:'52px 28px 36px', minHeight:280 }}>
         <div className="blob1" style={{ position:'absolute', width:180, height:180, borderRadius:'50%', background:'#FFCC80', top:-40, right:-30 }} />
         <div className="blob2" style={{ position:'absolute', width:120, height:120, borderRadius:'50%', background:'#FFB74D', top:60, left:-20 }} />
         <div className="blob3" style={{ position:'absolute', width:90, height:90, borderRadius:'50%', background:'#FF8A65', bottom:40, right:30 }} />
