@@ -173,6 +173,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
                 </div>
               )}
             </div>
+            </div>
           </div>
         </>
       )}
