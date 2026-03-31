@@ -163,6 +163,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
                     : <span style={{ fontSize:16 }}>🌤️</span>
                   }
                   <span style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>{d?.time ?? '--:--'}</span>
+                  {d?.temp != null && <span style={{ fontSize:11, color:'#1565A0', fontWeight:600 }}>{d.temp}°</span>}
                 </div>
               </div>
             )
