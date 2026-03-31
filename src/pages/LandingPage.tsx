@@ -133,7 +133,7 @@ export default function LandingPage({ onComplete }: Props) {
         <h1 className="title-anim" style={{ fontSize:32, fontWeight:800, color:'#1a1a1a', lineHeight:1.3, margin:0 }}>
           호주 여행,<br />언제 떠나세요?
         </h1>
-        <p className="sub-anim" style={{ fontSize:16, color:'#999', marginTop:10, lineHeight:1.65 }}>
+        <p className="sub-anim" style={{ fontSize:16, color:'#5a3a1a', marginTop:10, lineHeight:1.65 }}>
           출발일과 귀국일을 선택하면<br />맞춤 여행 리스트를 만들어드려요
         </p>
       </div>
@@ -145,8 +145,8 @@ export default function LandingPage({ onComplete }: Props) {
           { label:'🏠 귀국일', val: eDate ? fmt(eDate) : null },
         ].map((c, i) => (
           <div key={i} style={{ background:'#fff', borderRadius:16, padding:'12px 14px', border:'none', boxShadow:'0 2px 12px rgba(0,0,0,0.08)' }}>
-            <div style={{ fontSize:11, color:'#bbb', marginBottom:3, fontWeight:500 }}>{c.label}</div>
-            <div style={{ fontSize:14, fontWeight: c.val ? 700 : 400, color: c.val ? '#1a1a1a' : '#ccc' }}>
+            <div style={{ fontSize:11, color:'#8B5E3C', marginBottom:3, fontWeight:600 }}>{c.label}</div>
+            <div style={{ fontSize:14, fontWeight: c.val ? 700 : 400, color: c.val ? '#1a1a1a' : '#8B5E3C' }}>
               {c.val ?? '날짜 선택'}
             </div>
           </div>
@@ -177,21 +177,21 @@ export default function LandingPage({ onComplete }: Props) {
       <div style={{ margin:'12px 18px 0', background:'#fff', borderRadius:22, border:'none', overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 10px' }}>
           <button className="nav-hover" onClick={() => chgMo(-1)}
-            style={{ background:'none', border:'none', fontSize:22, color:'#ccc', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
+            style={{ background:'none', border:'none', fontSize:22, color:'#8B5E3C', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
           <div style={{ display:'flex', gap:4, alignItems:'center' }}>
             <button className="hdr-btn-hover" onClick={() => setPicker(picker==='year'?'none':'year')}
               style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#FF7043' }}>{vy}년</button>
-            <span style={{ fontSize:13, color:'#ccc' }}>•</span>
+            <span style={{ fontSize:13, color:'#8B5E3C' }}>•</span>
             <button className="hdr-btn-hover" onClick={() => setPicker(picker==='month'?'none':'month')}
               style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#1a1a1a' }}>{MONTHS[vm]}</button>
           </div>
           <button className="nav-hover" onClick={() => chgMo(1)}
-            style={{ background:'none', border:'none', fontSize:22, color:'#ccc', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>›</button>
+            style={{ background:'none', border:'none', fontSize:22, color:'#8B5E3C', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>›</button>
         </div>
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'0 10px' }}>
           {['일','월','화','수','목','금','토'].map(d => (
-            <div key={d} style={{ textAlign:'center', fontSize:11, color:'#ccc', padding:'4px 0 6px' }}>{d}</div>
+            <div key={d} style={{ textAlign:'center', fontSize:11, color:'#8B5E3C', fontWeight:600, padding:'4px 0 6px' }}>{d}</div>
           ))}
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, padding:'0 10px 14px' }}>
@@ -206,8 +206,8 @@ export default function LandingPage({ onComplete }: Props) {
           style={{
             width:'100%', padding:18, border:'none', borderRadius:50,
             fontSize:18, fontWeight:800, cursor: canNext ? 'pointer' : 'default',
-            background: canNext ? 'linear-gradient(135deg,#FF7043,#FF8A65)' : '#e5e5e5',
-            color: canNext ? '#fff' : '#bbb',
+            background: canNext ? 'linear-gradient(135deg,#FF7043,#FF8A65)' : 'rgba(255,255,255,0.7)',
+            color: canNext ? '#fff' : '#5a3a1a',
           }}
         >
           {canNext ? '시작하기 →' : '출발일과 귀국일을 선택해주세요'}
