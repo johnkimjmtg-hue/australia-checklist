@@ -67,7 +67,7 @@ export default function LandingPage({ onComplete }: Props) {
       const isRange = sDate && eDate && dt > sDate && dt < eDate
       const isToday = dt.toDateString() === TODAY.toDateString()
 
-      let bg = 'transparent', color = isPast ? '#ddd' : '#1a1a1a', radius = '50%', fw = 400
+      let bg = 'transparent', color = isPast ? '#ddd' : '#3D1F0A', radius = '50%', fw = 400
       if (isStart || isEnd) { bg = '#FF7043'; color = '#fff'; fw = 800 }
       else if (isRange) { bg = '#FFE0D6'; color = '#c0440a'; radius = '0' }
 
@@ -130,7 +130,7 @@ export default function LandingPage({ onComplete }: Props) {
           <div className="icon-pulse" style={{ width:72, height:72, borderRadius:24, background:'#FF7043', display:'flex', alignItems:'center', justifyContent:'center', fontSize:36, position:'relative', zIndex:1 }}>✈️</div>
         </div>
 
-        <h1 className="title-anim" style={{ fontSize:32, fontWeight:800, color:'#1a1a1a', lineHeight:1.3, margin:0 }}>
+        <h1 className="title-anim" style={{ fontSize:32, fontWeight:800, color:'#3D1F0A', lineHeight:1.3, margin:0 }}>
           호주 여행,<br />언제 떠나세요?
         </h1>
         <p className="sub-anim" style={{ fontSize:16, color:'#5a3a1a', marginTop:10, lineHeight:1.65 }}>
@@ -146,7 +146,7 @@ export default function LandingPage({ onComplete }: Props) {
         ].map((c, i) => (
           <div key={i} style={{ background:'#fff', borderRadius:16, padding:'12px 14px', border:'none', boxShadow:'0 2px 12px rgba(0,0,0,0.08)' }}>
             <div style={{ fontSize:11, color:'#8B5E3C', marginBottom:3, fontWeight:600 }}>{c.label}</div>
-            <div style={{ fontSize:14, fontWeight: c.val ? 700 : 400, color: c.val ? '#1a1a1a' : '#8B5E3C' }}>
+            <div style={{ fontSize:14, fontWeight: c.val ? 700 : 400, color: c.val ? '#3D1F0A' : '#8B5E3C' }}>
               {c.val ?? '날짜 선택'}
             </div>
           </div>
@@ -183,7 +183,7 @@ export default function LandingPage({ onComplete }: Props) {
               style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#FF7043' }}>{vy}년</button>
             <span style={{ fontSize:13, color:'#8B5E3C' }}>•</span>
             <button className="hdr-btn-hover" onClick={() => setPicker(picker==='month'?'none':'month')}
-              style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#1a1a1a' }}>{MONTHS[vm]}</button>
+              style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#3D1F0A' }}>{MONTHS[vm]}</button>
           </div>
           <button className="nav-hover" onClick={() => chgMo(1)}
             style={{ background:'none', border:'none', fontSize:22, color:'#8B5E3C', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>›</button>
@@ -205,12 +205,12 @@ export default function LandingPage({ onComplete }: Props) {
         <button className="main-btn" onClick={handleComplete} disabled={!canNext}
           style={{
             width:'100%', padding:18, border:'none', borderRadius:50,
-            fontSize:18, fontWeight:800, cursor: canNext ? 'pointer' : 'default',
-            background: canNext ? 'linear-gradient(135deg,#FF7043,#FF8A65)' : '#fff',
-            color: canNext ? '#fff' : '#1a1a1a',
+            fontSize:17, fontWeight: canNext ? 800 : 400, cursor: canNext ? 'pointer' : 'default',
+            background: canNext ? '#fff' : '#e0e0e0',
+            color: canNext ? '#3D1F0A' : '#666',
           }}
         >
-          {canNext ? '시작하기 →' : '출발일과 귀국일을 선택해주세요'}
+          {canNext ? '시작하기' : '출발일과 귀국일을 선택해주세요'}
         </button>
       </div>
     </div>
