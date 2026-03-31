@@ -44,6 +44,8 @@ function AnalogClock({ tz, size = 20 }: { tz: string; size?: number }) {
     </svg>
   )
 }
+
+function getWeatherIcon(code: string): string {
   const c = code.slice(0, 2)
   if (code === '01d') return '☀️'
   if (code === '01n') return '🌙'
