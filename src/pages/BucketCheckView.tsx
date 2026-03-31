@@ -444,68 +444,28 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       <Confetti trigger={confettiTrigger} />
 
-      {/* ══ 진행 카드 ══ */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background:colors.bgPage, padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
-        <div style={{
-          background:colors.bgCard,
-          borderRadius:radius.lg,
-          border:`1.5px solid ${colors.gray300}`,
-          padding:`${spacing[4]}px`, display:'flex', alignItems:'center', gap:spacing[4],
+      {/* ══ 상단 버튼 ══ */}
+      <div style={{ display:'flex', justifyContent:'flex-end', gap:8, padding:'12px 16px 8px' }}>
+        <button onClick={onEdit} style={{
+          height:30, paddingLeft:12, paddingRight:12, borderRadius:20,
+          border:'none', background:'#00838F',
+          color:'#fff', fontSize:12, fontWeight:700,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          cursor:'pointer', fontFamily:'inherit',
         }}>
-          <CircleProgress pct={pct} />
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:font.size['2xl'], fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[1], lineHeight:1.2 }}>내 버킷리스트</div>
-            <div style={{ fontSize:font.size.sm, color:colors.textSecondary, fontWeight:font.weight.medium, marginBottom:spacing[2] }}>
-              {trip ? `${trip.startDate.slice(5).replace('-','/')} ~ ${trip.endDate.slice(5).replace('-','/')}` : '일정 미설정'}
-            </div>
-            <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:spacing[1] }}>
-              <span style={{ fontSize:font.size['3xl'], fontWeight:font.weight.bold, color:colors.textPrimary, lineHeight:1 }}>{achievedCount}</span>
-              <span style={{ fontSize:font.size.xl, fontWeight:font.weight.medium, color:colors.textSecondary }}>/{total}건 완료</span>
-            </div>
-            <div style={{ fontSize:font.size.sm, color:colors.textTertiary, lineHeight:1.5 }}>{
-              pct === 0 ? '첫 번째 항목을 완료해봐요! 🙌' :
-              pct < 25  ? '좋은 시작이에요! 계속 해봐요 💪' :
-              pct < 50  ? '절반을 향해 달려가고 있어요! 🏃' :
-              pct < 75  ? '절반을 넘었어요! 조금만 더! ⚡' :
-              pct < 100 ? '거의 다 왔어요! 마지막 스퍼트! 🔥' :
-                          '모든 항목을 완료했어요! 축하합니다 🎉'
-            }</div>
-          </div>
-          <CoinStack count={achievedCount} total={total} />
-        </div>
-        {/* ── 버튼 */}
-        <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
-          <button onClick={onEdit} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:'none', background: colors.primary,
-            color: '#fff', fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:pencil-simple" width={12} height={12} color="#fff" />
-            리스트 수정하기
-          </button>
-          <button onClick={onShare} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.border}`, background: colors.bgCard,
-            color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
-            공유하기
-          </button>
-          <button onClick={() => setShowDelete(true)} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
-            color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:trash" width={12} height={12} color={colors.danger} />
-            리스트 비우기
-          </button>
-        </div>
+          <Icon icon="ph:pencil-simple" width={12} height={12} color="#fff" />
+          리스트 수정하기
+        </button>
+        <button onClick={() => setShowDelete(true)} style={{
+          height:30, paddingLeft:12, paddingRight:12, borderRadius:20,
+          border:'1.5px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)',
+          color:'#DC2626', fontSize:12, fontWeight:700,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          cursor:'pointer', fontFamily:'inherit',
+        }}>
+          <Icon icon="ph:trash" width={12} height={12} color="#DC2626" />
+          리스트 비우기
+        </button>
       </div>
 
 
@@ -549,19 +509,19 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           )
         })()}
         {sortedDays.length===0 && checkedItems.filter(i => !(state.schedules[i.id]?.length)).length===0 && (
-          <div style={{ textAlign:'center', padding:'60px 20px', display:'flex', flexDirection:'column', alignItems:'center', gap:spacing[4] }}>
-            <Icon icon="ph:list-checks" width={48} height={48} color={colors.gray300} />
+          <div style={{ textAlign:'center', padding:'60px 20px', display:'flex', flexDirection:'column', alignItems:'center', gap:16 }}>
+            <div style={{ fontSize:48 }}>🗺️</div>
             <div>
-              <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[1] }}>아직 담긴 항목이 없어요</div>
-              <div style={{ fontSize:font.size.sm, color:colors.textTertiary }}>호주에서 꼭 해볼 것들을 담아보세요!</div>
+              <div style={{ fontSize:16, fontWeight:700, color:'#0D3349', marginBottom:6 }}>아직 담긴 항목이 없어요</div>
+              <div style={{ fontSize:13, color:'#1565A0' }}>호주에서 꼭 해볼 것들을 담아보세요!</div>
             </div>
             <button onClick={onEdit} style={{
-              height:44, padding:`0 ${spacing[6]}px`,
-              background:colors.primary, color:'#fff',
-              border:'none', borderRadius:radius.sm,
-              fontSize:font.size.md, fontWeight:font.weight.bold,
-              cursor:'pointer', fontFamily:font.family,
-              display:'flex', alignItems:'center', gap:spacing[2],
+              height:44, padding:'0 24px',
+              background:'#00838F', color:'#fff',
+              border:'none', borderRadius:50,
+              fontSize:15, fontWeight:700,
+              cursor:'pointer', fontFamily:'inherit',
+              display:'flex', alignItems:'center', gap:8,
             }}>
               <Icon icon="ph:plus-circle" width={18} height={18} color="#fff" />
               리스트 추가하기
