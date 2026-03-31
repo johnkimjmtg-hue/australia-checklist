@@ -48,19 +48,20 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
 
       {/* 바텀시트 */}
       <div style={{
-        position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-        width:'100%', maxWidth:430,
+        position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+        width:'calc(100% - 32px)', maxWidth:430,
         height: sheetHeight,
         maxHeight: '90vh',
-        background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)',
-        borderRadius:'24px 24px 0 0',
+        background:'#EFFCFC',
+        borderRadius:20,
         zIndex:801,
-        animation:'slideUpFull 0.3s cubic-bezier(.4,0,.2,1)',
+        animation:'slideUpSheet 0.25s ease',
+        boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
         display:'flex', flexDirection:'column',
         overflowY:'auto',
       }}>
         <style>{`
-          @keyframes slideUpFull {
+          @keyframes slideUpSheet {
             from { transform: translateX(-50%) translateY(100%); }
             to   { transform: translateX(-50%) translateY(0); }
           }
