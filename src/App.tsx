@@ -6,11 +6,13 @@ import { syncDataCache } from './lib/dataCache'
 import ChecklistPage from './pages/ChecklistPage'
 import AdminPage from './pages/AdminPage'
 import LandingPage from './pages/LandingPage'
+import HomePage from './pages/HomePage'
 
 function MainApp() {
   const [state, setState] = useState<AppState>(() => loadState())
   const [trip, setTrip] = useState<TripInfo|null>(() => loadTrip())
   const [cacheStamp, setCacheStamp] = useState(0)
+  const [activeTab, setActiveTab] = useState<string|null>(null)
 
   useEffect(() => {
     const sync = async () => {
@@ -32,14 +34,26 @@ function MainApp() {
   if (!trip) {
     return (
       <div className="app-shell">
-        <LandingPage onComplete={(t) => setTrip(t)} />
+        <LandingPage onComplete={(t) => { setTrip(t); setActiveTab(null) }} />
+      </div>
+    )
+  }
+
+  if (!activeTab) {
+    return (
+      <div className="app-shell">
+        <HomePage
+          trip={trip}
+          onNavigate={(tab) => setActiveTab(tab)}
+          onChangeDates={() => setTrip(null)}
+        />
       </div>
     )
   }
 
   return (
     <div className="app-shell">
-      <ChecklistPage key={cacheStamp} state={state} setState={setState} />
+      <ChecklistPage key={cacheStamp} state={state} setState={setState} initialTab={activeTab} onGoHome={() => setActiveTab(null)} />
     </div>
   )
 }
