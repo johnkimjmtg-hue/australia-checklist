@@ -198,6 +198,8 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       {showBucket && (
         <BucketSheet
           trip={trip}
+          state={state}
+          setState={setState}
           onClose={() => setShowBucket(false)}
         />
       )}
