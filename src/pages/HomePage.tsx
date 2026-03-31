@@ -27,6 +27,7 @@ type CityData = {
   sunset: string
   icon: string
   time: string
+  hourly: { time: string; icon: string; temp: number }[]
 }
 
 const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
@@ -100,22 +101,33 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
     const entries = await Promise.all(
       (Object.entries(CITIES) as [CityKey, typeof CITIES[CityKey]][]).map(async ([key, c]) => {
         try {
-          const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${c.lat}&lon=${c.lon}&appid=${WEATHER_KEY}&units=metric&lang=kr`)
-          const data = await res.json()
+          const [weatherRes, forecastRes] = await Promise.all([
+            fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${c.lat}&lon=${c.lon}&appid=${WEATHER_KEY}&units=metric&lang=kr`),
+            fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${c.lat}&lon=${c.lon}&appid=${WEATHER_KEY}&units=metric&lang=kr&cnt=6`),
+          ])
+          const data = await weatherRes.json()
+          const forecast = await forecastRes.json()
           const fmtTime = (unix: number) => new Date(unix * 1000).toLocaleTimeString('ko-KR', { timeZone: c.tz, hour: '2-digit', minute: '2-digit', hour12: false })
+          const fmtHourTime = (dtTxt: string) => new Date(dtTxt + ' UTC').toLocaleTimeString('ko-KR', { timeZone: c.tz, hour: '2-digit', minute: '2-digit', hour12: false })
+          const hourly = (forecast.list ?? []).slice(0, 5).map((item: any) => ({
+            time: fmtHourTime(item.dt_txt),
+            icon: item.weather[0].icon,
+            temp: Math.round(item.main.temp),
+          }))
           return [key, {
             temp:        Math.round(data.main.temp),
             feelsLike:   Math.round(data.main.feels_like),
             humidity:    data.main.humidity,
-            windSpeed:   Math.round(data.wind.speed * 3.6), // m/s → km/h
+            windSpeed:   Math.round(data.wind.speed * 3.6),
             description: data.weather[0].description,
             sunrise:     fmtTime(data.sys.sunrise),
             sunset:      fmtTime(data.sys.sunset),
             icon:        data.weather[0].icon,
             time:        getTime(c.tz),
+            hourly,
           }] as [string, CityData]
         } catch {
-          return [key, { temp: null, feelsLike: null, humidity: null, windSpeed: null, description: '', sunrise: '—', sunset: '—', icon: '', time: getTime(c.tz) }] as [string, CityData]
+          return [key, { temp: null, feelsLike: null, humidity: null, windSpeed: null, description: '', sunrise: '—', sunset: '—', icon: '', time: getTime(c.tz), hourly: [] }] as [string, CityData]
         }
       })
     )
@@ -375,11 +387,11 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             <div style={{ padding:'14px 20px 32px' }}>
               <div style={{ fontSize:13, fontWeight:700, color:'#1565A0', marginBottom:10 }}>시간대별 예보</div>
               <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:4 }}>
-                {['지금','3시간','6시간','9시간','12시간'].map((t, i) => (
+                {(cityData[weatherSheet]?.hourly ?? []).map((h, i) => (
                   <div key={i} style={{ background:'rgba(0,131,143,0.08)', borderRadius:12, padding:'10px 14px', textAlign:'center', flexShrink:0, minWidth:70 }}>
-                    <div style={{ fontSize:11, color:'#1565A0', marginBottom:4 }}>{t}</div>
-                    <div style={{ fontSize:18 }}>🌤️</div>
-                    <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', marginTop:4 }}>—°</div>
+                    <div style={{ fontSize:11, color:'#1565A0', marginBottom:4 }}>{h.time}</div>
+                    <div style={{ fontSize:18 }}>{getWeatherIcon(h.icon)}</div>
+                    <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', marginTop:4 }}>{h.temp}°</div>
                   </div>
                 ))}
               </div>
