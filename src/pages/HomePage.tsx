@@ -320,9 +320,9 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
-            background:'rgba(255,255,255,0.95)', borderRadius:20,
+            background:'rgba(255,255,255,0.82)', borderRadius:20,
             zIndex:801, animation:'slideUpSheet 0.25s ease',
-            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            boxShadow:'0 4px 20px rgba(0,0,0,0.10)',
             padding:'12px 20px 40px',
           }}>
             {/* 헤더 (X버튼) */}
@@ -363,9 +363,9 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
-            background:'rgba(255,255,255,0.95)', borderRadius:20,
+            background:'rgba(255,255,255,0.82)', borderRadius:20,
             maxHeight:'85vh', overflowY:'auto', zIndex:801,
-            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            animation:'slideUpSheet 0.25s ease', boxShadow:'0 4px 20px rgba(0,0,0,0.10)',
           }}>
             {/* 헤더 (X버튼) */}
             <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
@@ -430,9 +430,9 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
-            background:'rgba(255,255,255,0.95)', borderRadius:20,
+            background:'rgba(255,255,255,0.82)', borderRadius:20,
             maxHeight:'85vh', overflowY:'auto', zIndex:1001,
-            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            animation:'slideUpSheet 0.25s ease', boxShadow:'0 4px 20px rgba(0,0,0,0.10)',
           }}>
             {/* 헤더 (X버튼) */}
             <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
