@@ -149,7 +149,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, flexWrap:'nowrap' }}>
                   {d?.icon ? <img src={`https://openweathermap.org/img/wn/${d.icon}.png`} width={20} height={20} /> : <span style={{ fontSize:14 }}>🌤️</span>}
                   <span style={{ fontSize:12, fontWeight:700, color:'#0D3349', whiteSpace:'nowrap' }}>{CITIES[city].label}</span>
-                  {d?.temp != null && <span style={{ fontSize:11, color:'#1565A0', fontWeight:600, whiteSpace:'nowrap' }}>{d.temp}°</span>}
+                  {d?.temp != null && <span style={{ fontSize:11, color:'#CC3300', fontWeight:700, whiteSpace:'nowrap' }}>{d.temp}°</span>}
                   <span style={{ fontSize:11, color:'#0D3349', fontWeight:600, whiteSpace:'nowrap' }}>{d?.time ?? '--:--'}</span>
                 </div>
               </div>
