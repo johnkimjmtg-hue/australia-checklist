@@ -142,8 +142,8 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             const d = cityData[city]
             return (
               <div key={city} onClick={() => setWeatherSheet(city)} style={{
-                background:'rgba(255,255,255,0.82)', borderRadius:12, padding:'6px 10px',
-                boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flex:1, textAlign:'center',
+                background:'#fff', borderRadius:12, padding:'6px 10px',
+                boxShadow:'0 4px 16px rgba(0,0,0,0.18)', flex:1, textAlign:'center',
                 cursor:'pointer', WebkitTapHighlightColor:'transparent',
               }}>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, flexWrap:'nowrap' }}>
@@ -160,7 +160,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
 
       {/* 달력 */}
       <div style={{ padding:'0 18px 14px' }}>
-        <div style={{ background:'rgba(255,255,255,0.82)', borderRadius:22, overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
+        <div style={{ background:'#fff', borderRadius:22, overflow:'hidden', boxShadow:'0 4px 16px rgba(0,0,0,0.18)' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 8px' }}>
             <button className="cal-nav-btn" onClick={() => chgMo(-1)} style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
             <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>
@@ -182,7 +182,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
       {/* 스크롤 영역 */}
       <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
         {/* D-day */}
-        <div style={{ background:'rgba(255,255,255,0.82)', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.10)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <div style={{ background:'#fff', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 4px 16px rgba(0,0,0,0.18)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
             <div style={{ fontSize:52, fontWeight:900, color: ddayColor, lineHeight:1 }}>{ddayText}</div>
             <div style={{ fontSize:15, color:'#1565A0', marginTop:6 }}>{ddayLabel}</div>
@@ -200,7 +200,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           {MENUS.map(m => (
             <div key={m.id} className="menu-card-hover" onClick={() => onNavigate(m.id)}
-              style={{ background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer' }}>
+              style={{ background:'#fff', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 16px rgba(0,0,0,0.18)', cursor:'pointer' }}>
               <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
               <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
               <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>{m.sub}</div>
@@ -208,7 +208,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             </div>
           ))}
           <div className="menu-card-hover" onClick={() => onNavigate('bingo')}
-            style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+            style={{ gridColumn:'span 2', background:'#fff', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 16px rgba(0,0,0,0.18)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
             <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
             <div>
               <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
@@ -225,9 +225,9 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
-            background:'rgba(255,255,255,0.95)', borderRadius:20,
+            background:'#fff', borderRadius:20,
             maxHeight:'85vh', overflowY:'auto', zIndex:801,
-            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
           }}>
             <div style={{ width:36, height:4, borderRadius:999, background:'rgba(0,0,0,0.15)', margin:'12px auto 0' }} />
             <div style={{ padding:'16px 20px 0', display:'flex', alignItems:'center', gap:10 }}>
