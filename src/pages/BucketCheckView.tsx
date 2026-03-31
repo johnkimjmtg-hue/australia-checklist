@@ -99,13 +99,13 @@ function CoinStack({ count, total }: { count:number; total:number }) {
             width: 28, height: 14, borderRadius: '50%',
             background: isGold
               ? 'radial-gradient(ellipse at 35% 35%, #FFE566, #FFCD00 60%, #C8960C)'
-              : colors.gray200,
+              : 'rgba(0,0,0,0.10)',
             transition: `all 0.3s ease ${i * 0.06}s`,
             animation: isGold ? `coinPop 0.3s ease ${i * 0.06}s both` : 'none',
           }}/>
         )
       })}
-      <div style={{ fontSize:font.size.sm, color:colors.textTertiary, fontWeight:font.weight.medium, marginTop:4 }}>
+      <div style={{ fontSize:font.size.sm, color:'#7BAAB5', fontWeight:font.weight.medium, marginTop:4 }}>
         {count}/{total}
       </div>
     </div>
@@ -117,14 +117,14 @@ function CircleProgress({ pct }: { pct:number }) {
   return (
     <div style={{ position:'relative', width:116, height:116, flexShrink:0 }}>
       <svg width={116} height={116} viewBox="0 0 116 116" style={{ transform:'rotate(-90deg)' }}>
-        <circle cx={58} cy={58} r={R} fill="none" stroke={colors.gray200} strokeWidth={14}/>
+        <circle cx={58} cy={58} r={R} fill="none" stroke={'rgba(0,0,0,0.10)'} strokeWidth={14}/>
         <circle cx={58} cy={58} r={R} fill="none" stroke="#FFCD00" strokeWidth={14}
           strokeDasharray={C} strokeDashoffset={C-(pct/100)*C} strokeLinecap="round"
           style={{ transition:'stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)' }}
         />
       </svg>
       <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:colors.textPrimary }}>{pct}%</span>
+        <span style={{ fontSize:font.size.xl, fontWeight:font.weight.bold, color:'#0D3349' }}>{pct}%</span>
       </div>
     </div>
   )
@@ -137,23 +137,23 @@ function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>v
       <div style={{
         position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
         width:'calc(100% - 48px)',maxWidth:300,
-        background:colors.bgCard,borderRadius:radius.lg,padding:`${spacing[6]}px ${spacing[5]}px`,
+        background:'#ffffff',borderRadius:radius.lg,padding:`${spacing[6]}px ${spacing[5]}px`,
         zIndex:701,textAlign:'center',boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
       }}>
         <div style={{ fontSize:48,marginBottom:spacing[2] }}>🎉</div>
-        <div style={{ fontSize:font.size.xl,fontWeight:font.weight.bold,color:colors.primary,marginBottom:spacing[2] }}>축하합니다!</div>
-        <div style={{ fontSize:font.size.md,color:colors.textSecondary,lineHeight:1.6,marginBottom:spacing[5] }}>
+        <div style={{ fontSize:font.size.xl,fontWeight:font.weight.bold,color:'#29B6D0',marginBottom:spacing[2] }}>축하합니다!</div>
+        <div style={{ fontSize:font.size.md,color:'#1565A0',lineHeight:1.6,marginBottom:spacing[5] }}>
           모든 리스트를 완료했습니다.<br/>
           <span style={{ fontWeight:font.weight.bold,color:'#FFCD00',fontSize:font.size.lg }}>{total}개</span>를 모두 달성했어요 🥳
         </div>
         <div style={{ display:'flex',gap:spacing[2] }}>
           <button onClick={onClose} style={{
-            flex:1,height:48,borderRadius:radius.sm,border:`1px solid ${colors.border}`,
-            background:colors.bgCard,color:colors.textSecondary,fontSize:font.size.md,fontWeight:font.weight.medium,cursor:'pointer',
+            flex:1,height:48,borderRadius:radius.sm,border:`1px solid ${'rgba(0,131,143,0.15)'}`,
+            background:'#ffffff',color:'#1565A0',fontSize:font.size.md,fontWeight:font.weight.medium,cursor:'pointer',
           }}>닫기</button>
           <button onClick={onReset} style={{
             flex:2,height:48,borderRadius:radius.sm,border:'none',
-            background:colors.primaryLight,color:colors.primary,fontSize:font.size.md,fontWeight:font.weight.bold,cursor:'pointer',
+            background:'rgba(41,182,208,0.12)',color:'#29B6D0',fontSize:font.size.md,fontWeight:font.weight.bold,cursor:'pointer',
           }}>다시 시작하기</button>
         </div>
       </div>
@@ -168,13 +168,13 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=
       <div style={{
         position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
         width:'calc(100% - 48px)',maxWidth:300,
-        background:colors.bgCard,borderRadius:radius.lg,padding:`${spacing[6]}px ${spacing[5]}px`,
+        background:'#ffffff',borderRadius:radius.lg,padding:`${spacing[6]}px ${spacing[5]}px`,
         zIndex:601,textAlign:'center',boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
       }}>
-        <p style={{ fontSize:font.size.lg,fontWeight:font.weight.bold,color:colors.textPrimary,marginBottom:spacing[2] }}>버킷리스트를 삭제할까요?</p>
-        <p style={{ fontSize:font.size.md,color:colors.textSecondary,lineHeight:1.6,marginBottom:spacing[5] }}>모든 체크 내용과 일정이 삭제됩니다.</p>
+        <p style={{ fontSize:font.size.lg,fontWeight:font.weight.bold,color:'#0D3349',marginBottom:spacing[2] }}>버킷리스트를 삭제할까요?</p>
+        <p style={{ fontSize:font.size.md,color:'#1565A0',lineHeight:1.6,marginBottom:spacing[5] }}>모든 체크 내용과 일정이 삭제됩니다.</p>
         <div style={{ display:'flex',gap:spacing[2] }}>
-          <button onClick={onCancel} style={{ flex:1,height:48,borderRadius:radius.sm,border:`1px solid ${colors.border}`,background:colors.bgCard,color:colors.textSecondary,fontSize:font.size.md,fontWeight:font.weight.medium,cursor:'pointer' }}>취소</button>
+          <button onClick={onCancel} style={{ flex:1,height:48,borderRadius:radius.sm,border:`1px solid ${'rgba(0,131,143,0.15)'}`,background:'#ffffff',color:'#1565A0',fontSize:font.size.md,fontWeight:font.weight.medium,cursor:'pointer' }}>취소</button>
           <button onClick={onConfirm} style={{ flex:2,height:48,borderRadius:radius.sm,border:'none',background:colors.dangerLight,color:colors.danger,fontSize:font.size.md,fontWeight:font.weight.bold,cursor:'pointer' }}>삭제하기</button>
         </div>
       </div>
@@ -361,18 +361,18 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           display:'flex', alignItems:'center', gap:spacing[3],
           padding:`${spacing[3]}px ${spacing[3]}px`,
           margin:`0 ${spacing[3]}px`,
-          background: colors.bgCard,
+          background: '#ffffff',
           borderRadius: radius.md,
-          border: isAchieved ? `1px solid ${'#29B6D0'}` : `1px solid ${colors.gray300}`,
+          border: isAchieved ? `1px solid ${'#29B6D0'}` : `1px solid ${'rgba(0,131,143,0.15)'}`,
           cursor: db ? 'pointer' : 'default',
           transition:'all 0.15s',
         }}
       >
         {/* 이미지 — 체크리스트와 동일 */}
-        <div style={{ width:56, height:56, borderRadius:radius.sm, flexShrink:0, background:colors.gray100, border:`1px solid ${colors.border}`, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ width:56, height:56, borderRadius:radius.sm, flexShrink:0, background:'rgba(0,131,143,0.08)', border:`1px solid ${'rgba(0,131,143,0.15)'}`, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
           {db?.image_url
             ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-            : <Icon icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'} width={26} height={26} color={colors.gray400} />
+            : <Icon icon={db?.icon ?? CAT_ICONS[(item as any).categoryId] ?? 'ph:star'} width={26} height={26} color={'#7BAAB5'} />
           }
         </div>
 
@@ -383,7 +383,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           </div>
           <div style={{ display:'flex', gap:spacing[1], alignItems:'center', marginTop:3, overflow:'hidden' }}>
             {db?.description && (
-              <span style={{ fontSize:font.size.xs, color:colors.textTertiary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', flex:1, minWidth:0 }}>{db.description}</span>
+              <span style={{ fontSize:font.size.xs, color:'#7BAAB5', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', flex:1, minWidth:0 }}>{db.description}</span>
             )}
             <div style={{ display:'flex', alignItems:'center', gap:spacing[1], marginLeft:'auto', flexShrink:0 }}>
               {day === undefined && (
@@ -404,7 +404,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             style={{
               display:'flex', alignItems:'center', gap:3,
               padding:'4px 8px', borderRadius:radius.sm, cursor:'pointer',
-              background: isAchieved ? '#29B6D0' : colors.bgCard,
+              background: isAchieved ? '#29B6D0' : '#ffffff',
               border: `1px solid ${'#29B6D0'}`,
               transition:'all 0.15s', whiteSpace:'nowrap',
             }}
@@ -418,7 +418,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             onClick={e => { e.stopPropagation(); setDeleteItemId({ id: item.id, day }) }}
             style={{ background:'none', border:'none', cursor:'pointer', padding:2, display:'flex', alignItems:'center' }}
           >
-            <Icon icon="ph:trash" width={15} height={15} color={colors.gray400} />
+            <Icon icon="ph:trash" width={15} height={15} color={'#7BAAB5'} />
           </button>
         </div>
       </div>
@@ -444,88 +444,95 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       <Confetti trigger={confettiTrigger} />
 
-      {/* ══ 상단 버튼 ══ */}
-      <div style={{ display:'flex', justifyContent:'flex-end', gap:8, padding:'12px 16px 8px' }}>
-        <button onClick={onEdit} style={{
-          height:30, paddingLeft:12, paddingRight:12, borderRadius:20,
-          border:'none', background:'#29B6D0',
-          color:'#fff', fontSize:12, fontWeight:700,
-          display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-          cursor:'pointer', fontFamily:'inherit',
-        }}>
-          <Icon icon="ph:pencil-simple" width={12} height={12} color="#fff" />
-          리스트 수정하기
-        </button>
-        <button onClick={() => setShowDelete(true)} style={{
-          height:30, paddingLeft:12, paddingRight:12, borderRadius:20,
-          border:'1.5px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)',
-          color:'#DC2626', fontSize:12, fontWeight:700,
-          display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-          cursor:'pointer', fontFamily:'inherit',
-        }}>
-          <Icon icon="ph:trash" width={12} height={12} color="#DC2626" />
-          리스트 비우기
-        </button>
+      {/* ══ 상단 진행 카드 ══ */}
+      <div style={{ padding:'16px 16px 0' }}>
+        <div style={{ background:'#ffffff', borderRadius:16, padding:'14px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.08)' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+            <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>내 버킷리스트</div>
+            <div style={{ fontSize:13, color:'#1565A0' }}>
+              <span style={{ fontSize:18, fontWeight:900, color:'#29B6D0' }}>{achievedCount}</span>
+              <span style={{ color:'#7BAAB5' }}> / {total} 완료</span>
+            </div>
+          </div>
+          <div style={{ height:6, borderRadius:3, background:'#E0F7FA', overflow:'hidden' }}>
+            <div style={{ width:`${pct}%`, height:'100%', background:'#29B6D0', borderRadius:3, transition:'width 0.4s ease' }} />
+          </div>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:10 }}>
+            <div style={{ fontSize:12, color:'#7BAAB5' }}>{
+              pct === 0 ? '첫 번째 항목을 완료해봐요! 🙌' :
+              pct < 25  ? '좋은 시작이에요! 계속 해봐요 💪' :
+              pct < 50  ? '절반을 향해 달려가고 있어요! 🏃' :
+              pct < 75  ? '절반을 넘었어요! 조금만 더! ⚡' :
+              pct < 100 ? '거의 다 왔어요! 마지막 스퍼트! 🔥' :
+                          '모든 항목을 완료했어요! 축하합니다 🎉'
+            }</div>
+            <div style={{ display:'flex', gap:6 }}>
+              <button onClick={onEdit} style={{ height:26, paddingLeft:10, paddingRight:10, borderRadius:20, border:'none', background:'#29B6D0', color:'#fff', fontSize:11, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
+                <Icon icon="ph:pencil-simple" width={11} height={11} color="#fff" />수정
+              </button>
+              <button onClick={() => setShowDelete(true)} style={{ height:26, paddingLeft:10, paddingRight:10, borderRadius:20, border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)', color:'#DC2626', fontSize:11, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
+                <Icon icon="ph:trash" width={11} height={11} color="#DC2626" />비우기
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
 
-      {/* ══ 리스트 ══ */}
-      <div style={{ padding:`${spacing[2]}px 0 80px`, display:'flex', flexDirection:'column', gap:spacing[4] }}>
-        {sortedDays.map(dayIdx => {
-          const dayItems = (byDay.get(dayIdx) ?? []).filter(item => filterRow(item.id, dayIdx))
-          if (!dayItems.length) return null
-          const date     = tripDays[dayIdx]
-          const dayLabel = date ? `${fmtMD(date)}(${dow(date)})` : ''
-          const dayDone  = dayItems.filter(i => !!achieved[`${i.id}_${dayIdx}`]).length
-          return (
-            <div key={dayIdx}>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`0 ${spacing[3]}px ${spacing[2]}px` }}>
-                <div style={{ display:'flex', alignItems:'center', gap:spacing[2] }}>
-                  <span style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:colors.textPrimary }}>{dayIdx+1}일차</span>
-                  <span style={{ fontSize:font.size.sm, color:colors.textSecondary }}>{dayLabel}</span>
-                </div>
-                <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>{dayDone}/{dayItems.length}</span>
-              </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
-                {dayItems.map(item => <CheckRow key={`${item.id}_${dayIdx}`} item={item} day={dayIdx}/>)}
-              </div>
-            </div>
-          )
-        })}
-        {(() => {
-          const items = checkedItems.filter(i => !(state.schedules[i.id]?.length)).filter(i => filterRow(i.id))
-          if (!items.length) return null
-          const doneCount = items.filter(i => !!achieved[i.id]).length
-          return (
-            <div>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`0 ${spacing[3]}px ${spacing[2]}px` }}>
-                <span style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:colors.textTertiary }}>날짜 미지정</span>
-                <span style={{ fontSize:font.size.sm, color:colors.textSecondary, fontWeight:font.weight.medium }}>{doneCount}/{items.length}</span>
-              </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
-                {items.map(item => <CheckRow key={item.id} item={item}/>)}
-              </div>
-            </div>
-          )
-        })()}
-        {sortedDays.length===0 && checkedItems.filter(i => !(state.schedules[i.id]?.length)).length===0 && (
+      {/* ══ 포토카드 그리드 ══ */}
+      <div style={{ padding:'12px 16px 80px' }}>
+        {checkedItems.length === 0 ? (
           <div style={{ textAlign:'center', padding:'60px 20px', display:'flex', flexDirection:'column', alignItems:'center', gap:16 }}>
-            <div style={{ fontSize:48 }}>🗺️</div>
+            <Icon icon="ph:list-checks" width={48} height={48} color="#B2EBF2" />
             <div>
               <div style={{ fontSize:16, fontWeight:700, color:'#0D3349', marginBottom:6 }}>아직 담긴 항목이 없어요</div>
-              <div style={{ fontSize:13, color:'#1565A0' }}>호주에서 꼭 해볼 것들을 담아보세요!</div>
+              <div style={{ fontSize:13, color:'#7BAAB5' }}>호주에서 꼭 해볼 것들을 담아보세요!</div>
             </div>
-            <button onClick={onEdit} style={{
-              height:44, padding:'0 24px',
-              background:'#29B6D0', color:'#fff',
-              border:'none', borderRadius:50,
-              fontSize:15, fontWeight:700,
-              cursor:'pointer', fontFamily:'inherit',
-              display:'flex', alignItems:'center', gap:8,
-            }}>
+            <button onClick={onEdit} style={{ height:44, padding:'0 24px', background:'#29B6D0', color:'#fff', border:'none', borderRadius:50, fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:8 }}>
               <Icon icon="ph:plus-circle" width={18} height={18} color="#fff" />
               리스트 추가하기
             </button>
+          </div>
+        ) : (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+            {checkedItems.map((item, idx) => {
+              const db = dbItems.find(d => d.id === item.id)
+              const isAchieved = isItemFullyAchieved(item)
+              const catColors: Record<string,string> = {
+                hospital:'#1a6b7a', food:'#2d7a5e', shopping:'#4a3f7a',
+                places:'#7a4a2a', schedule:'#1a4a6b', admin:'#5a5a7a',
+                people:'#3a6b4a', parenting:'#6b4a3a', custom:'#4a6b5a',
+              }
+              const bgColor = catColors[item.categoryId] ?? '#1a4a6b'
+              const isWide = checkedItems.length % 2 !== 0 && idx === checkedItems.length - 1
+              return (
+                <div key={item.id}
+                  onClick={() => db && setDetailItem(db)}
+                  style={{
+                    gridColumn: isWide ? 'span 2' : 'span 1',
+                    borderRadius:16, overflow:'hidden', position:'relative',
+                    aspectRatio: isWide ? '2/1' : '3/4',
+                    background: bgColor, cursor: db ? 'pointer' : 'default',
+                    WebkitTapHighlightColor:'transparent',
+                  }}>
+                  {db?.image_url && (
+                    <img src={db.image_url} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
+                  )}
+                  <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.6) 100%)' }} />
+                  <button
+                    onClick={e => { e.stopPropagation(); toggleAchieved(item.id) }}
+                    style={{ position:'absolute', top:10, right:10, width:26, height:26, borderRadius:'50%', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', background: isAchieved ? '#29B6D0' : 'rgba(255,255,255,0.25)', WebkitTapHighlightColor:'transparent' }}>
+                    <svg width="12" height="12" viewBox="0 0 12 12">
+                      <path d="M1.5 6L4.5 9L10.5 3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                    </svg>
+                  </button>
+                  <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 10px 12px' }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:'#fff', lineHeight:1.3, opacity: isAchieved ? 0.7 : 1, textDecoration: isAchieved ? 'line-through' : 'none' }}>{item.label}</div>
+                    {db?.address && <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:3 }}>📍 {db.address.split(' ').slice(0,2).join(' ')}</div>}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         )}
       </div>
@@ -551,21 +558,21 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
-            background:colors.bgCard, borderRadius:radius.xl,
+            background:'#ffffff', borderRadius:radius.xl,
             padding:`${spacing[4]}px ${spacing[3]}px ${spacing[8]}px`,
             zIndex:101, animation:'slideUpSheet 0.25s ease',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }} onClick={e => e.stopPropagation()}>
-            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
-            <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textTertiary, marginBottom:spacing[3], letterSpacing:0.5 }}>더보기</div>
+            <div style={{ width:36, height:4, borderRadius:radius.full, background:'rgba(0,0,0,0.10)', margin:`0 auto ${spacing[4]}px` }} />
+            <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:'#7BAAB5', marginBottom:spacing[3], letterSpacing:0.5 }}>더보기</div>
             <button onClick={() => { setShowMoreMenu(false); onShare() }} style={{
               width:'100%', height:52, borderRadius:radius.md,
-              border:`1px solid ${colors.border}`, background:colors.bgCard,
-              color:colors.primary, fontSize:font.size.md, fontWeight:font.weight.bold,
+              border:`1px solid ${'rgba(0,131,143,0.15)'}`, background:'#ffffff',
+              color:'#29B6D0', fontSize:font.size.md, fontWeight:font.weight.bold,
               cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[2],
               padding:`0 ${spacing[4]}px`, marginBottom:spacing[2], fontFamily:font.family,
             }}>
-              <Icon icon="ph:share-network" width={18} height={18} color={colors.primary} />공유하기
+              <Icon icon="ph:share-network" width={18} height={18} color={'#29B6D0'} />공유하기
             </button>
             <button onClick={() => { setShowMoreMenu(false); setShowDelete(true) }} style={{
               width:'100%', height:52, borderRadius:radius.md,
@@ -588,20 +595,20 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             <div onClick={() => setDeleteItemId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:700 }} />
             <div style={{
               position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-              background:colors.bgCard, borderRadius:radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,
+              background:'#ffffff', borderRadius:radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,
               zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
               boxShadow:'0 8px 32px rgba(0,0,0,0.15)',
             }}>
-              <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[2] }}>항목을 삭제할까요?</div>
+              <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:'#0D3349', marginBottom:spacing[2] }}>항목을 삭제할까요?</div>
               {item && (
-                <div style={{ fontSize:font.size.sm, color:colors.textSecondary, marginBottom:spacing[5], lineHeight:1.5 }}>
-                  <span style={{ fontWeight:font.weight.bold, color:colors.primary }}>{item.label}</span>을<br/>버킷리스트에서 삭제합니다.
+                <div style={{ fontSize:font.size.sm, color:'#1565A0', marginBottom:spacing[5], lineHeight:1.5 }}>
+                  <span style={{ fontWeight:font.weight.bold, color:'#29B6D0' }}>{item.label}</span>을<br/>버킷리스트에서 삭제합니다.
                 </div>
               )}
               <div style={{ display:'flex', gap:spacing[2] }}>
                 <button onClick={() => setDeleteItemId(null)} style={{
-                  flex:1, height:48, borderRadius:radius.sm, border:`1px solid ${colors.border}`,
-                  background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.medium, cursor:'pointer', fontFamily:font.family,
+                  flex:1, height:48, borderRadius:radius.sm, border:`1px solid ${'rgba(0,131,143,0.15)'}`,
+                  background:'#ffffff', color:'#1565A0', fontSize:font.size.md, fontWeight:font.weight.medium, cursor:'pointer', fontFamily:font.family,
                 }}>취소</button>
                 <button onClick={() => { deleteItem(deleteItemId.id, deleteItemId.day); setDeleteItemId(null) }} style={{
                   flex:2, height:48, borderRadius:radius.sm, border:'none',
@@ -622,41 +629,41 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
           <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
+            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
             borderRadius:radius.xl, zIndex:601,
             animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
-            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
-            <div style={{ width:'100%', height:200, overflow:'hidden', background:colors.primaryLight, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <div style={{ width:36, height:4, borderRadius:radius.full, background:'rgba(0,0,0,0.10)', margin:`${spacing[3]}px auto 0` }} />
+            <div style={{ width:'100%', height:200, overflow:'hidden', background:'rgba(41,182,208,0.12)', display:'flex', alignItems:'center', justifyContent:'center' }}>
               {selProduct.image_url
                 ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                : <Icon icon="ph:shopping-bag" width={56} height={56} color={colors.primary} />
+                : <Icon icon="ph:shopping-bag" width={56} height={56} color={'#29B6D0'} />
               }
             </div>
             <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[8]}px` }}>
               <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap', marginBottom:spacing[3], alignItems:'center' }}>
                 {(selProduct.tags ?? []).map((tag: string) => (
-                  <span key={tag} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:TAG_COLOR[tag]?.bg??colors.primaryLight, color:TAG_COLOR[tag]?.color??colors.primary }}>{tag}</span>
+                  <span key={tag} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:TAG_COLOR[tag]?.bg??'rgba(41,182,208,0.12)', color:TAG_COLOR[tag]?.color??'#29B6D0' }}>{tag}</span>
                 ))}
                 {selProduct.price_range && (
-                  <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:colors.primaryLight, color:PRICE_COLOR[selProduct.price_range]??colors.primary, border:`1px solid ${colors.border}`, marginLeft:'auto' }}>{selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}</span>
+                  <span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:'rgba(41,182,208,0.12)', color:PRICE_COLOR[selProduct.price_range]??'#29B6D0', border:`1px solid ${'rgba(0,131,143,0.15)'}`, marginLeft:'auto' }}>{selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}</span>
                 )}
               </div>
               <div style={{ ...T.h2, marginBottom:spacing[1] }}>{selProduct.name}</div>
               {selProduct.brand && <div style={{ ...T.sm, marginBottom:spacing[3] }}>{selProduct.brand}</div>}
-              {selProduct.description && <div style={{ fontSize:font.size.sm, color:colors.textSecondary, lineHeight:1.7, marginBottom:spacing[4] }}>{selProduct.description}</div>}
+              {selProduct.description && <div style={{ fontSize:font.size.sm, color:'#1565A0', lineHeight:1.7, marginBottom:spacing[4] }}>{selProduct.description}</div>}
               {(selProduct.where_to_buy ?? []).length > 0 && (
                 <div style={{ marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>어디서 살 수 있어요?</div>
+                  <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:'#1565A0', marginBottom:spacing[2] }}>어디서 살 수 있어요?</div>
                   <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap' }}>
                     {selProduct.where_to_buy.map((store: string) => (
-                      <span key={store} style={{ fontSize:font.size.sm, padding:`4px ${spacing[2]}px`, borderRadius:radius.sm, background:colors.primaryLight, color:colors.primary, border:`1px solid ${colors.border}` }}>🏪 {store}</span>
+                      <span key={store} style={{ fontSize:font.size.sm, padding:`4px ${spacing[2]}px`, borderRadius:radius.sm, background:'rgba(41,182,208,0.12)', color:'#29B6D0', border:`1px solid ${'rgba(0,131,143,0.15)'}` }}>🏪 {store}</span>
                     ))}
                   </div>
                 </div>
               )}
-              <button onClick={() => setSelProduct(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${colors.border}`, background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family }}>닫기</button>
+              <button onClick={() => setSelProduct(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${'rgba(0,131,143,0.15)'}`, background:'#ffffff', color:'#1565A0', fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family }}>닫기</button>
             </div>
           </div>
         </>
@@ -664,18 +671,14 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       {/* ── 버킷리스트 상세 팝업 */}
       {detailItem && (
-        <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(0,0,0,0.45)', fontFamily:font.family }}>
+        <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', fontFamily:font.family }}>
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC',
-            borderRadius:20, maxHeight:'85vh', overflowY:'auto',
-            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
+            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
+            borderRadius:radius.xl, maxHeight:'85vh', overflowY:'auto',
+            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
-            <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
-              <button onClick={() => setDetailItem(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
-                <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
-              </button>
-            </div>
+            <div style={{ width:36, height:4, borderRadius:radius.full, background:'rgba(0,0,0,0.10)', margin:`${spacing[3]}px auto 0` }} />
             {detailItem.image_url && (
               <div style={{ width:'100%', height:220, overflow:'hidden', marginTop:spacing[2] }}>
                 <img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
@@ -685,30 +688,30 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
               <div style={{ ...T.h2, lineHeight:1.4, marginBottom:spacing[3] }}>{detailItem.label}</div>
               {detailItem.description && <div style={{ fontSize:font.size.md, color:'#475569', lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
               {detailItem.tips && (
-                <div style={{ background:'rgba(0,131,143,0.10)', border:'1px solid rgba(0,131,143,0.2)', borderRadius:12, padding:12, marginBottom:16 }}>
-                  <div style={{ fontSize:12, fontWeight:700, color:'#00838F', marginBottom:4 }}>💡 현지인 팁</div>
+                <div style={{ background:'rgba(41,182,208,0.12)', border:`1px solid ${'rgba(0,131,143,0.15)'}`, borderRadius:radius.md, padding:spacing[3], marginBottom:spacing[4] }}>
+                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#29B6D0', marginBottom:spacing[1] }}>💡 현지인 팁</div>
                   <div style={{ fontSize:font.size.sm, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
                 </div>
               )}
               {detailItem.address && (
-                <button onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')} style={{ display:'flex', alignItems:'center', gap:spacing[2], width:'100%', background:colors.primaryLight, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:spacing[3], marginBottom:spacing[4], cursor:'pointer', textAlign:'left' }}>
-                  <Icon icon="ph:map-pin" width={16} height={16} color={colors.primary} />
+                <button onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')} style={{ display:'flex', alignItems:'center', gap:spacing[2], width:'100%', background:'rgba(41,182,208,0.12)', border:`1px solid ${'rgba(0,131,143,0.15)'}`, borderRadius:radius.md, padding:spacing[3], marginBottom:spacing[4], cursor:'pointer', textAlign:'left' }}>
+                  <Icon icon="ph:map-pin" width={16} height={16} color={'#29B6D0'} />
                   <div>
-                    <div style={{ fontSize:font.size.xs, color:colors.textTertiary }}>여기서 할 수 있어요</div>
-                    <div style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold, textDecoration:'underline' }}>{detailItem.address}</div>
+                    <div style={{ fontSize:font.size.xs, color:'#7BAAB5' }}>여기서 할 수 있어요</div>
+                    <div style={{ fontSize:font.size.sm, color:'#29B6D0', fontWeight:font.weight.bold, textDecoration:'underline' }}>{detailItem.address}</div>
                   </div>
-                  <Icon icon="ph:arrow-square-out" width={13} height={13} color={colors.textTertiary} style={{ marginLeft:'auto' }} />
+                  <Icon icon="ph:arrow-square-out" width={13} height={13} color={'#7BAAB5'} style={{ marginLeft:'auto' }} />
                 </button>
               )}
               {detailBizCards.length > 0 && (
                 <div style={{ marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>🏢 관련 업체</div>
+                  <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:'#1565A0', marginBottom:spacing[2] }}>🏢 관련 업체</div>
                   <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
                     {detailBizCards.map(biz => <BusinessCard key={biz.id} business={biz} />)}
                   </div>
                 </div>
               )}
-
+              <button onClick={() => setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${'rgba(0,131,143,0.15)'}`, background:'#ffffff', color:'#1565A0', fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family }}>닫기</button>
             </div>
           </div>
         </div>
@@ -722,17 +725,17 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, zIndex:801,
             maxHeight:'85vh', overflowY:'auto', borderRadius:radius.xl,
-            background:colors.bgCard, padding:`${spacing[3]}px ${spacing[3]}px ${spacing[6]}px`,
+            background:'#ffffff', padding:`${spacing[3]}px ${spacing[3]}px ${spacing[6]}px`,
             boxSizing:'border-box', animation:'slideUpSheet 0.3s cubic-bezier(0.32,0.72,0,1)',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
             <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:spacing[2] }}>
               <button onClick={() => { setDetailBizId(null); setDetailBiz(null) }}
-                style={{ background:'none', border:'none', fontSize:18, cursor:'pointer', color:colors.textTertiary }}>✕</button>
+                style={{ background:'none', border:'none', fontSize:18, cursor:'pointer', color:'#7BAAB5' }}>✕</button>
             </div>
             {detailBiz
               ? <BusinessCard business={detailBiz} />
-              : <div style={{ textAlign:'center', padding:spacing[6], color:colors.textTertiary, fontSize:font.size.md }}>불러오는 중...</div>
+              : <div style={{ textAlign:'center', padding:spacing[6], color:'#7BAAB5', fontSize:font.size.md }}>불러오는 중...</div>
             }
           </div>
         </div>
