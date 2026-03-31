@@ -262,7 +262,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
 
           {/* ── 서브헤더 + 카테고리 (sticky 고정) ── */}
           {!showSearch && (
-            <div style={{ position:'sticky', top:0, zIndex:30, background:'rgba(224,247,250,0.95)', borderBottom:'1px solid rgba(0,131,143,0.15)' }}>
+            <div style={{ position:'sticky', top:0, zIndex:30, background: embedded ? '#EFFCFC' : 'rgba(224,247,250,0.95)', borderBottom:'1px solid rgba(0,131,143,0.15)' }}>
               {/* 멘트 + 일정설정 + 일정보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
                 <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? '#00838F' : '#0D3349' }}>
@@ -317,7 +317,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                 <div style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`0 ${spacing[3]}px ${spacing[2]}px` }}>
                   <div style={{ flex:1 }} />
                   <button onClick={handleIssue} style={{
-                    height:28, paddingLeft:10, paddingRight:10, background:colors.primary, color:'#fff',
+                    height:28, paddingLeft:10, paddingRight:10, background:'#00838F', color:'#fff',
                     border:'none', borderRadius:radius.sm, fontSize:font.size.xs, fontWeight:font.weight.bold,
                     cursor:'pointer', fontFamily:ff, whiteSpace:'nowrap',
                     display:'flex', alignItems:'center', gap:4,
@@ -345,22 +345,22 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
           <div style={{ background:'transparent', padding:`${spacing[3]}px ${spacing[3]}px` }}>
             {!showSearch && (
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[2] }}>
-                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary }}>
+                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#00838F' }}>
                   {CATEGORIES.find(c=>c.id===activeCategory)?.label}
                 </span>
-                <span style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold }}>
+                <span style={{ fontSize:font.size.sm, color:'#00838F', fontWeight:font.weight.bold }}>
                   {catItems.filter(i=>state.selected[i.id]).length}/{catItems.length}
                 </span>
               </div>
             )}
             {activeCategory==='custom'&&!showSearch&&(
               <div style={{ display:'flex', gap:spacing[2], marginBottom:spacing[3], alignItems:'center' }}>
-                <div style={{ flex:1, display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, border:`1px solid ${colors.border}`, height:44 }}>
-                  <Icon icon="ph:plus-circle" width={16} height={16} color={colors.primary} />
+                <div style={{ flex:1, display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, border:'1px solid rgba(0,131,143,0.2)', height:44 }}>
+                  <Icon icon="ph:plus-circle" width={16} height={16} color={'#00838F'} />
                   <input ref={inputRef} value={customLabel} onChange={e=>setCustomLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleAddCustom()} placeholder="직접 추가"
                     style={{ flex:1, border:'none', outline:'none', fontSize:font.size.md, color:colors.textPrimary, background:'transparent', fontFamily:ff }} />
                 </div>
-                <button onClick={handleAddCustom} style={{ height:44, padding:`0 ${spacing[4]}px`, background:colors.primary, color:'#fff', border:'none', borderRadius:radius.sm, fontWeight:font.weight.bold, fontSize:font.size.sm, cursor:'pointer', fontFamily:ff }}>추가</button>
+                <button onClick={handleAddCustom} style={{ height:44, padding:`0 ${spacing[4]}px`, background:'#00838F', color:'#fff', border:'none', borderRadius:radius.sm, fontWeight:font.weight.bold, fontSize:font.size.sm, cursor:'pointer', fontFamily:ff }}>추가</button>
               </div>
             )}
             {searchResults!==null&&searchResults.length===0&&(
@@ -382,7 +382,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                       padding:`${spacing[3]}px ${spacing[3]}px`,
                       background: colors.bgCard,
                       borderRadius:radius.md,
-                      border: checked ? `1px solid ${colors.success}` : isHighlight ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                      border: checked ? `1px solid ${colors.success}` : isHighlight ? '1.5px solid #00838F' : `1px solid ${colors.gray300}`,
                       cursor:'pointer', transition:'all 0.15s',
                     }}
                     onClick={()=>{
@@ -395,7 +395,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                     }}
                   >
                     {/* 이미지 */}
-                    <div style={{ width:56, height:56, borderRadius:radius.sm, flexShrink:0, background:colors.gray100, border:`1px solid ${colors.border}`, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <div style={{ width:56, height:56, borderRadius:radius.sm, flexShrink:0, background:colors.gray100, border:'1px solid rgba(0,131,143,0.2)', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
                       {db?.image_url
                         ? <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                         : <Icon icon={db?.icon ?? CAT_ICON_MAP[item.categoryId] ?? 'ph:star'} width={26} height={26} color={colors.gray400} />
@@ -480,7 +480,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                     <div style={{
                       position:'absolute', top:-5, right:-8,
                       minWidth:16, height:16, borderRadius:radius.full,
-                      background:colors.primary, color:'#fff',
+                      background:'#00838F', color:'#fff',
                       fontSize:10, fontWeight:font.weight.bold,
                       display:'flex', alignItems:'center', justifyContent:'center',
                       padding:'0 4px', lineHeight:1,
@@ -488,7 +488,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                   )}
                 </div>
                 <span style={{ fontSize:12, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.textTertiary }}>{tab.label}</span>
-                {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:colors.primary, position:'absolute', bottom:4 }} />}
+                {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:'#00838F', position:'absolute', bottom:4 }} />}
               </button>
             )
           })}
@@ -527,15 +527,15 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
           }}>
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
-            <div style={{ width:'100%', height:200, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', background:colors.primaryLight }}>
-              {selProduct.image_url ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <Icon icon="ph:shopping-bag" width={56} height={56} color={colors.primary} />}
+            <div style={{ width:'100%', height:200, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,131,143,0.10)' }}>
+              {selProduct.image_url ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <Icon icon="ph:shopping-bag" width={56} height={56} color={'#00838F'} />}
             </div>
             <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[10]}px` }}>
               <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap', marginBottom:spacing[3], alignItems:'center' }}>
                 {(selProduct.tags??[]).map((tag:string)=>(
                   <span key={tag} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:TAG_COLOR[tag]?.bg??colors.primaryLight, color:TAG_COLOR[tag]?.color??colors.primary }}>{tag}</span>
                 ))}
-                {selProduct.price_range&&<span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:colors.primaryLight, color:PRICE_COLOR[selProduct.price_range]??colors.primary, border:`1px solid ${colors.border}`, marginLeft:'auto' }}>{selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}</span>}
+                {selProduct.price_range&&<span style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, padding:`2px ${spacing[2]}px`, borderRadius:radius.sm, background:'rgba(0,131,143,0.10)', color:PRICE_COLOR[selProduct.price_range]??colors.primary, border:'1px solid rgba(0,131,143,0.2)', marginLeft:'auto' }}>{selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}</span>}
               </div>
               <div style={{ ...T.h2, marginBottom:spacing[1] }}>{selProduct.name}</div>
               {selProduct.brand&&<div style={{ ...T.sm, marginBottom:spacing[3] }}>{selProduct.brand}</div>}
@@ -545,12 +545,12 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                   <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>어디서 살 수 있어요?</div>
                   <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap' }}>
                     {selProduct.where_to_buy.map((store:string)=>(
-                      <span key={store} style={{ fontSize:font.size.sm, padding:`4px ${spacing[2]}px`, borderRadius:radius.sm, background:colors.primaryLight, color:colors.primary, border:`1px solid ${colors.border}` }}>🏪 {store}</span>
+                      <span key={store} style={{ fontSize:font.size.sm, padding:`4px ${spacing[2]}px`, borderRadius:radius.sm, background:'rgba(0,131,143,0.10)', color:'#00838F', border:'1px solid rgba(0,131,143,0.2)' }}>🏪 {store}</span>
                     ))}
                   </div>
                 </div>
               )}
-              <button onClick={()=>setSelProduct(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${colors.border}`, background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>닫기</button>
+              <button onClick={()=>setSelProduct(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>닫기</button>
             </div>
           </div>
         </>
@@ -572,17 +572,17 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
               <div style={{ ...T.h2, lineHeight:1.4, marginBottom:spacing[3] }}>{detailItem.label}</div>
               {detailItem.description&&<div style={{ fontSize:font.size.md, color:'#475569', lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
               {detailItem.tips&&(
-                <div style={{ background:colors.primaryLight, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary, marginBottom:spacing[1] }}>💡 현지인 팁</div>
+                <div style={{ background:'rgba(0,131,143,0.10)', border:'1px solid rgba(0,131,143,0.2)', borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4] }}>
+                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#00838F', marginBottom:spacing[1] }}>💡 현지인 팁</div>
                   <div style={{ fontSize:font.size.sm, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
                 </div>
               )}
               {detailItem.address&&(
-                <button onClick={()=>window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')} style={{ display:'flex', alignItems:'center', gap:spacing[2], width:'100%', background:colors.primaryLight, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4], cursor:'pointer', textAlign:'left' }}>
-                  <Icon icon="ph:map-pin" width={16} height={16} color={colors.primary} />
+                <button onClick={()=>window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')} style={{ display:'flex', alignItems:'center', gap:spacing[2], width:'100%', background:'rgba(0,131,143,0.10)', border:'1px solid rgba(0,131,143,0.2)', borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4], cursor:'pointer', textAlign:'left' }}>
+                  <Icon icon="ph:map-pin" width={16} height={16} color={'#00838F'} />
                   <div>
                     <div style={{ fontSize:font.size.xs, color:colors.textTertiary }}>여기서 할 수 있어요</div>
-                    <div style={{ fontSize:font.size.sm, color:colors.primary, fontWeight:font.weight.bold, textDecoration:'underline' }}>{detailItem.address}</div>
+                    <div style={{ fontSize:font.size.sm, color:'#00838F', fontWeight:font.weight.bold, textDecoration:'underline' }}>{detailItem.address}</div>
                   </div>
                   <Icon icon="ph:arrow-square-out" width={13} height={13} color={colors.textTertiary} style={{ marginLeft:'auto' }} />
                 </button>
@@ -601,7 +601,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                     <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>🛍️ 관련 상품</div>
                     <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
                       {prods.map(prod=>(
-                        <button key={prod.id} onClick={()=>setSelProduct(prod)} style={{ display:'flex', alignItems:'center', gap:spacing[3], background:colors.bgInput, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:`${spacing[3]}px`, cursor:'pointer', textAlign:'left', width:'100%' }}>
+                        <button key={prod.id} onClick={()=>setSelProduct(prod)} style={{ display:'flex', alignItems:'center', gap:spacing[3], background:colors.bgInput, border:'1px solid rgba(0,131,143,0.2)', borderRadius:radius.md, padding:`${spacing[3]}px`, cursor:'pointer', textAlign:'left', width:'100%' }}>
                           {prod.image_url && <img src={prod.image_url} alt="" style={{ width:44, height:44, borderRadius:radius.sm, objectFit:'cover', flexShrink:0 }} />}
                           <div style={{ flex:1, minWidth:0 }}>
                             <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:2 }}>{prod.name}</div>
@@ -614,7 +614,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                   </div>
                 ) : null
               })()}
-              <button onClick={()=>setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${colors.border}`, background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>닫기</button>
+              <button onClick={()=>setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>닫기</button>
             </div>
           </div>
         </div>
@@ -639,7 +639,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
           }}>
             {/* 핸들 */}
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
-            <div style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[3], paddingBottom:spacing[3], borderBottom:`1px solid ${colors.border}` }}>호주가자</div>
+            <div style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:spacing[3], paddingBottom:spacing[3], borderBottom:'1px solid rgba(0,131,143,0.2)' }}>호주가자</div>
             {[
               { icon:'ph:file-text', label:'이용약관', tab:'terms' as const },
               { icon:'ph:shield-check', label:'개인정보처리방침', tab:'privacy' as const },
@@ -647,7 +647,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
               <button key={item.tab} onClick={()=>{ setTermsTab(item.tab); setShowMenu(false) }} style={{
                 width:'100%', display:'flex', alignItems:'center', gap:spacing[3],
                 padding:`${spacing[4]}px ${spacing[2]}px`,
-                background:'none', border:'none', borderBottom:`1px solid ${colors.border}`,
+                background:'none', border:'none', borderBottom:'1px solid rgba(0,131,143,0.2)',
                 cursor:'pointer', fontFamily:font.family, textAlign:'left',
               }}>
                 <Icon icon={item.icon} width={20} height={20} color={colors.textSecondary} />
@@ -729,7 +729,7 @@ function CalendarModal({ state, trip, allItems, onClose }: { state:AppState; tri
           return (
             <button key={ci} onClick={()=>setActiveDayIdx(isActive?null:dayIdx)} style={{
               aspectRatio:'1', borderRadius:radius.sm,
-              border: isActive ? `1.5px solid ${colors.primary}` : `1px solid ${colors.gray200}`,
+              border: isActive ? '1.5px solid #00838F' : `1px solid ${colors.gray200}`,
               background: bg,
               color: isActive ? '#fff' : colors.textPrimary,
               cursor:'pointer', fontFamily:font.family,
@@ -764,8 +764,8 @@ function CalendarModal({ state, trip, allItems, onClose }: { state:AppState; tri
               {activeDayIdx+1}일차 · {fmtMD(days[activeDayIdx])} ({dayItems.length}개)
             </div>
             {dayItems.map(item=>(
-              <div key={item.id} style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, background:colors.bgCard, borderRadius:radius.sm, border:`1px solid ${colors.border}` }}>
-                <Icon icon="ph:check-circle-fill" width={13} height={13} color={colors.primary} />
+              <div key={item.id} style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, background:colors.bgCard, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)' }}>
+                <Icon icon="ph:check-circle-fill" width={13} height={13} color={'#00838F'} />
                 <span style={{ fontSize:font.size.sm, color:colors.textPrimary, fontWeight:font.weight.medium }}>
                   {item.label.includes(',')?item.label.split(',')[0].trim():item.label}
                 </span>
@@ -793,8 +793,8 @@ function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onC
         <p style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:message?spacing[2]:spacing[5], lineHeight:1.5 }}>{title}</p>
         {message&&<p style={{ fontSize:font.size.sm, color:colors.textSecondary, marginBottom:spacing[5], lineHeight:1.6 }}>{message}</p>}
         <div style={{ display:'flex', gap:spacing[2] }}>
-          {confirmFirst&&<button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:radius.sm, background:colors.primaryLight, color:confirmColor??colors.primary, fontWeight:font.weight.bold, fontSize:font.size.md, cursor:'pointer', fontFamily:font.family }}>{confirmLabel}</button>}
-          {!hideCancel&&<button onClick={onCancel} style={{ flex:1, height:48, border:`1px solid ${colors.border}`, borderRadius:radius.sm, background:colors.bgCard, color:colors.textSecondary, fontWeight:font.weight.medium, fontSize:font.size.sm, cursor:'pointer', fontFamily:font.family }}>취소</button>}
+          {confirmFirst&&<button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:radius.sm, background:'rgba(0,131,143,0.10)', color:confirmColor??colors.primary, fontWeight:font.weight.bold, fontSize:font.size.md, cursor:'pointer', fontFamily:font.family }}>{confirmLabel}</button>}
+          {!hideCancel&&<button onClick={onCancel} style={{ flex:1, height:48, border:'1px solid rgba(0,131,143,0.2)', borderRadius:radius.sm, background:colors.bgCard, color:colors.textSecondary, fontWeight:font.weight.medium, fontSize:font.size.sm, cursor:'pointer', fontFamily:font.family }}>취소</button>}
           {!confirmFirst&&<button onClick={onConfirm} style={{ flex:2, height:48, border:'none', borderRadius:radius.sm, background:confirmColor===colors.danger?colors.dangerLight:colors.primaryLight, color:confirmColor??colors.primary, fontWeight:font.weight.bold, fontSize:font.size.md, cursor:'pointer', fontFamily:font.family }}>{confirmLabel}</button>}
         </div>
       </div>
@@ -823,7 +823,7 @@ function MiniCalendar({ year, month, selected, minDate, onSelect }: { year:numbe
           const isSelected=dateStr===selected; const isDisabled=!!minDate&&dateStr<minDate
           const dayOfWeek=(firstDay+day-1)%7; const isToday=dateStr===new Date().toISOString().slice(0,10)
           return (
-            <div key={idx} onClick={()=>!isDisabled&&onSelect(dateStr)} style={{ textAlign:'center', padding:'6px 0', borderRadius:radius.sm, cursor:isDisabled?'default':'pointer', background:isSelected?colors.primary:'transparent', color:isDisabled?colors.gray200:isSelected?'#fff':dayOfWeek===0?'#E05050':dayOfWeek===6?'#4477CC':colors.textPrimary, fontSize:font.size.sm, fontWeight:isSelected||isToday?font.weight.bold:font.weight.regular, border:isToday&&!isSelected?`1.5px solid ${colors.primary}`:'1.5px solid transparent', boxSizing:'border-box' }}>{day}</div>
+            <div key={idx} onClick={()=>!isDisabled&&onSelect(dateStr)} style={{ textAlign:'center', padding:'6px 0', borderRadius:radius.sm, cursor:isDisabled?'default':'pointer', background:isSelected?colors.primary:'transparent', color:isDisabled?colors.gray200:isSelected?'#fff':dayOfWeek===0?'#E05050':dayOfWeek===6?'#4477CC':colors.textPrimary, fontSize:font.size.sm, fontWeight:isSelected||isToday?font.weight.bold:font.weight.regular, border:isToday&&!isSelected?'1.5px solid #00838F':'1.5px solid transparent', boxSizing:'border-box' }}>{day}</div>
           )
         })}
       </div>
@@ -842,13 +842,13 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }: { step
       <div style={{ position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'calc(100% - 32px)', maxWidth:340, background:colors.bgCard, borderRadius:radius.lg, padding:`${spacing[5]}px`, zIndex:501, animation:'scaleIn 0.2s ease', maxHeight:'90vh', overflowY:'auto', fontFamily:font.family }}>
         <div style={{ textAlign:'center', marginBottom:spacing[4] }}>
           <div style={{ ...T.xs, letterSpacing:1, marginBottom:spacing[1] }}>{isStart?'STEP 1 / 2':'STEP 2 / 2'}</div>
-          <div style={{ ...T.h4, color:colors.primary }}>{isStart?'✈️ 출발일을 선택해주세요':'🏠 도착일을 선택해주세요'}</div>
+          <div style={{ ...T.h4, color:'#00838F' }}>{isStart?'✈️ 출발일을 선택해주세요':'🏠 도착일을 선택해주세요'}</div>
           {!isStart&&startDate&&<div style={{ ...T.xs, marginTop:spacing[1] }}>출발일: {startDate}</div>}
         </div>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:spacing[3] }}>
-          <button onClick={()=>{ if(month===1){setYear(y=>y-1);setMonth(12)} else setMonth(m=>m-1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:`1px solid ${colors.border}`, background:colors.bgCard, cursor:'pointer', fontSize:14, color:colors.primary, fontWeight:font.weight.bold }}>‹</button>
+          <button onClick={()=>{ if(month===1){setYear(y=>y-1);setMonth(12)} else setMonth(m=>m-1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, cursor:'pointer', fontSize:14, color:'#00838F', fontWeight:font.weight.bold }}>‹</button>
           <div style={{ ...T.h4 }}>{year}년 {month}월</div>
-          <button onClick={()=>{ if(month===12){setYear(y=>y+1);setMonth(1)} else setMonth(m=>m+1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:`1px solid ${colors.border}`, background:colors.bgCard, cursor:'pointer', fontSize:14, color:colors.primary, fontWeight:font.weight.bold }}>›</button>
+          <button onClick={()=>{ if(month===12){setYear(y=>y+1);setMonth(1)} else setMonth(m=>m+1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, cursor:'pointer', fontSize:14, color:'#00838F', fontWeight:font.weight.bold }}>›</button>
         </div>
         <MiniCalendar year={year} month={month} selected={selected} minDate={minDate} onSelect={d=>setSelected(d)} />
         <div style={{ marginTop:spacing[3], padding:`${spacing[3]}px`, borderRadius:radius.sm, background:selected?colors.primaryLight:colors.gray100, textAlign:'center', fontSize:font.size.sm, fontWeight:font.weight.bold, color:selected?colors.primary:colors.textTertiary }}>
