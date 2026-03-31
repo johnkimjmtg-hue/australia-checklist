@@ -21,20 +21,28 @@ Warning:        #F59E0B  (주황 - 일정 미지정)
   - 중: #80DEEA  (밝은 청록)
   - 하: #00E5CC  (형광 옥색 - 옥반지 느낌)
 
-카드/창 배경:   rgba(255,255,255,0.82)  ← 반투명 흰색, 그라데이션 살짝 비침
+카드/창 배경:   #EFFCFC  ← 연한 민트 (반투명 절대 사용 금지)
 카드 그림자:    0 4px 20px rgba(0,0,0,0.10)
 카드 테두리:    없음 (border: none)
 카드 radius:   22px (큰 카드), 16px (작은 카드/칩), 20px (메뉴 카드)
+
+팝업/바텀시트 배경: #EFFCFC  ← 카드와 동일
+팝업 그림자:        0 8px 32px rgba(0,0,0,0.20)
 ```
 
 ### 텍스트 색상 (랜딩/홈)
 ```
-제목 (강조):    #0D3349  (진한 네이비)
-본문:           #0D4F6E  (중간 네이비)
-보조:           #1565A0  (연한 네이비)
-액센트:         #00838F  (청록 - 링크, 뱃지, 년도 표시)
-지나간 날짜:    #7BAAB5  (흐린 청록회색)
-흰색 위 텍스트: rgba(255,255,255,0.9)
+제목 (강조):      #0D3349  (진한 네이비)
+본문:             #0D4F6E  (중간 네이비)
+보조:             #1565A0  (연한 네이비)
+액센트:           #00838F  (청록 - 링크, 뱃지, 년도 표시)
+온도:             #CC3300  (블러드 오렌지 - 날씨 온도 전용)
+지나간 날짜:      #7BAAB5  (흐린 청록회색)
+섹션 라벨:        #0D4F6E  (그라데이션 배경 위)
+
+⚠️ 반투명 색상 절대 사용 금지:
+  - rgba(255,255,255,0.82) → #EFFCFC 사용
+  - rgba(255,255,255,0.9) → #0D4F6E (텍스트인 경우) 사용
 ```
 
 ---
@@ -70,7 +78,7 @@ font-family: -apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif
 
 ### 카드 (공통)
 ```css
-background: rgba(255,255,255,0.82)
+background: #EFFCFC
 border-radius: 22px
 border: none
 box-shadow: 0 4px 20px rgba(0,0,0,0.10)
@@ -81,7 +89,7 @@ box-shadow: 0 4px 20px rgba(0,0,0,0.10)
 width: 44px
 height: 44px
 border-radius: 14px
-background: rgba(0,131,143,0.15)  /* 청록 반투명 */
+background: rgba(0,131,143,0.15)
 font-size: 22px
 ```
 
@@ -97,7 +105,7 @@ border-radius: 20px
 
 ### 버튼 (랜딩 메인 버튼)
 ```css
-background: rgba(255,255,255,0.82)
+background: #EFFCFC
 color: #0D3349
 border: none
 border-radius: 50px
@@ -106,12 +114,66 @@ padding: 18px
 /* 활성: font-weight 800 / 비활성: font-weight 400 */
 ```
 
+### 팝업 / 바텀시트 (공통)
+```css
+/* 모든 팝업 동일 스타일 적용 - 날씨, 메뉴, 약관 모두 */
+position: fixed
+bottom: 16px
+left: 50%
+transform: translateX(-50%)
+width: calc(100% - 32px)
+max-width: 398px
+background: #EFFCFC          ← 카드와 동일색, 반투명 절대 금지
+border-radius: 20px
+box-shadow: 0 8px 32px rgba(0,0,0,0.20)
+animation: slideUpSheet 0.25s ease
+max-height: 85vh
+overflow-y: auto
+
+/* 핸들 바 */
+width: 36px
+height: 4px
+border-radius: 999px
+background: rgba(0,0,0,0.15)
+margin: 12px auto 0
+
+/* X 닫기 버튼 */
+width: 28px
+height: 28px
+border-radius: 50%
+background: rgba(0,0,0,0.08)
+border: none
+color: #0D3349
+font-size: 14px
+
+/* 오버레이 (팝업 뒤 배경) */
+position: fixed
+inset: 0
+background: rgba(0,0,0,0.45)
+z-index: 800
+```
+
 ### 달력 날짜 선택 색상
 ```
 출발일/귀국일:  bg #00838F, color #fff
 선택 범위:      bg #B2EBF2, color #006064, border-radius 0
 오늘:           border 1.5px solid #00838F
 지나간 날짜:    color #7BAAB5, 클릭 불가
+```
+
+### 도시 날씨 카드 (홈페이지 상단)
+```css
+background: #EFFCFC
+border-radius: 12px
+padding: 6px 10px
+box-shadow: 0 4px 20px rgba(0,0,0,0.10)
+flex: 1
+
+/* 내부 구성: 아이콘 + 도시명 + 온도 + 시간 한 줄 */
+아이콘: 20px
+도시명: 12px / 700 / #0D3349
+온도:   11px / 700 / #CC3300  ← 블러드 오렌지
+시간:   11px / 600 / #0D3349
 ```
 
 ### 블롭 (히어로 배경 장식)
