@@ -3,8 +3,8 @@
 // src/components/home/BucketView.tsx
 // ─────────────────────────────────────────────
 import { useState } from 'react'
-import { AppState, TripInfo, getTripDays, toggleItem, setSchedule } from '../../store/state'
-import { ITEMS, CATEGORIES } from '../../data/checklist'
+import { AppState, TripInfo, getTripDays, toggleItem, setSchedule } from '../store/state'
+import { ITEMS, CATEGORIES } from '../data/checklist'
 
 const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
 
