@@ -87,18 +87,16 @@ function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDe
         const region = regionKey ? stateMap[regionKey] : null
         return (
           <div key={item.id}
-            onClick={() => db && setDetailItem(db)}
             style={{
               gridColumn: isWide ? 'span 2' : 'span 1',
               borderRadius:16, overflow:'hidden', position:'relative',
               aspectRatio: isWide ? '2/1' : '3/4',
-              background: bgColor, cursor: db ? 'pointer' : 'default',
+              background: bgColor,
               WebkitTapHighlightColor:'transparent',
             }}>
             {db?.image_url && (
               <img src={db.image_url} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
             )}
-            <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.6) 100%)' }} />
             <button
               onClick={e => { e.stopPropagation(); toggleAchieved(item.id, dayIdx) }}
               style={{ position:'absolute', top:10, right:10, width:26, height:26, borderRadius:'50%', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', background: isAchieved ? '#29B6D0' : 'rgba(255,255,255,0.25)', WebkitTapHighlightColor:'transparent' }}>
@@ -106,7 +104,9 @@ function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDe
                 <path d="M1.5 6L4.5 9L10.5 3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
               </svg>
             </button>
-            <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 10px 12px' }}>
+            <div
+              onClick={() => db && setDetailItem(db)}
+              style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 10px 12px', background:'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%)', cursor: db ? 'pointer' : 'default', WebkitTapHighlightColor:'transparent' }}>
               <div style={{ fontSize:13, fontWeight:700, color:'#fff', lineHeight:1.3, opacity: isAchieved ? 0.7 : 1, textDecoration: isAchieved ? 'line-through' : 'none' }}>{item.label}</div>
               {region && <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:3 }}>📍 {region.label}</div>}
             </div>
