@@ -206,8 +206,8 @@ export default function LandingPage({ onComplete }: Props) {
           style={{
             width:'100%', padding:18, border:'none', borderRadius:50,
             fontSize:18, fontWeight:800, cursor: canNext ? 'pointer' : 'default',
-            background: canNext ? 'linear-gradient(135deg,#FF7043,#FF8A65)' : 'rgba(255,255,255,0.7)',
-            color: canNext ? '#fff' : '#5a3a1a',
+            background: canNext ? 'linear-gradient(135deg,#FF7043,#FF8A65)' : '#fff',
+            color: canNext ? '#fff' : '#1a1a1a',
           }}
         >
           {canNext ? '시작하기 →' : '출발일과 귀국일을 선택해주세요'}
