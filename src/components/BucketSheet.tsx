@@ -47,7 +47,8 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
     <>
       <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
       <div style={{
-        position:'fixed', bottom:0, left:0, right:0,
+        position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+        width:'100%', maxWidth:430,
         background:'#ffffff', borderRadius:20,
         maxHeight:'85vh', overflowY:'auto', zIndex:801,
         animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
@@ -55,8 +56,8 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
       }}>
         <style>{`
           @keyframes slideUpSheet {
-            from { transform: translateY(100%); }
-            to   { transform: translateY(0); }
+            from { transform: translateX(-50%) translateY(100%); }
+            to   { transform: translateX(-50%) translateY(0); }
           }
         `}</style>
 
