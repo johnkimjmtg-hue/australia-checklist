@@ -31,6 +31,7 @@ import type { BingoRef } from './BingoPage'
 import { getCachedChecklist, getCachedShopping, getCachedBusinesses } from '../lib/dataCache'
 import TermsPage from './TermsPage'
 import logoImg from '../assets/logo.png'
+import AppHeader from '../components/AppHeader'
 
 const ff = font.family
 
@@ -256,6 +257,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome }:
         // ── 버킷리스트 선택 화면 (paddingBottom으로 하단 고정 영역 확보)
         <div style={{ paddingBottom: 130, background: colors.bgPage, minHeight: '100dvh' }}>
 
+          <AppHeader />
           {/* ── 헤더 (스크롤 시 올라감) ── */}
           <div style={{ background:colors.bgCard, borderBottom:`1.5px solid ${colors.border}` }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px` }}>

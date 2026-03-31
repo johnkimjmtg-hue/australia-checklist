@@ -45,7 +45,6 @@ function MainApp() {
         <HomePage
           trip={trip}
           state={state}
-          setState={setState}
           onNavigate={(tab) => setActiveTab(tab)}
           onChangeDates={() => { setTrip(null); setActiveTab(null) }}
         />
@@ -59,7 +58,7 @@ function MainApp() {
         key={cacheStamp}
         state={state}
         setState={setState}
-        initialTab={activeTab as any}
+        initialTab={(activeTab === 'bucketlist' ? 'bucketcheck' : activeTab) as any}
         onGoHome={() => setActiveTab(null)}
       />
     </div>

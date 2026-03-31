@@ -2,10 +2,9 @@
 // HomePage.tsx — 달력 중심 홈
 // ─────────────────────────────────────────────
 import { useState } from 'react'
-import { TripInfo, AppState, getTripDays, setSchedule, toggleItem } from '../store/state'
-import { ITEMS, CATEGORIES } from '../data/checklist'
+import { TripInfo, AppState, getTripDays } from '../store/state'
+import { ITEMS } from '../data/checklist'
 import AppHeader from '../components/AppHeader'
-import BucketView from '../components/BucketView'
 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
 const TODAY = new Date()
@@ -14,15 +13,13 @@ type Tab = 'bucketlist' | 'shopping' | 'services' | 'nearby' | 'bingo' | 'checkl
 type Props = {
   trip: TripInfo
   state: AppState
-  setState: (s: AppState) => void
   onNavigate: (tab: Tab) => void
   onChangeDates: () => void
 }
 
-export default function HomePage({ trip, state, setState, onNavigate, onChangeDates }: Props) {
+export default function HomePage({ trip, state, onNavigate, onChangeDates }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
-  const [activeView, setActiveView] = useState<'home' | 'bucket'>('home')
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
@@ -96,7 +93,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
   const MENUS = [
     { id:'checklist' as Tab, icon:'✅', title:'준비 체크리스트', sub:'여행 준비 할 것들', badge: 0, local: false },
-    { id:'bucketlist' as Tab, icon:'🗺️', title:'버킷리스트', sub:'꼭 해볼 것들', badge: bucketCount, local: true },
+    { id:'bucketlist' as Tab, icon:'🗺️', title:'버킷리스트', sub:'꼭 해볼 것들', badge: bucketCount, local: false },
     { id:'shopping' as Tab, icon:'🛍️', title:'쇼핑리스트', sub:'꼭 살 것들', badge: myShoppingCount, local: false },
     { id:'services' as Tab, icon:'🏢', title:'업체정보', sub:'한인 업체·병원', badge: 0, local: false },
     { id:'nearby' as Tab, icon:'📍', title:'내 주변', sub:'주변 업체 지도', badge: 0, local: false },
@@ -144,14 +141,6 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
       {/* 스크롤 영역 */}
       <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
-        {activeView === 'bucket' ? (
-          <BucketView
-            state={state} setState={setState} trip={trip}
-            selectedDay={selectedDay}
-            onGoHome={() => setActiveView('home')}
-            onGoChecklist={() => onNavigate('checklist')}
-          />
-        ) : (
           <>
             {/* D-day */}
             <div style={{ background:'#EFFCFC', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.10)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -172,7 +161,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               {MENUS.map((m, i) => (
                 <div key={m.id} className="menu-card-hover card-anim"
-                  onClick={() => m.local ? setActiveView('bucket') : onNavigate(m.id)}
+                  onClick={() => onNavigate(m.id)}
                   style={{ background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', animationDelay:`${i * 0.08}s` }}>
                   <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
@@ -190,7 +179,6 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
               </div>
             </div>
           </>
-        )}
       </div>
     </div>
   )
