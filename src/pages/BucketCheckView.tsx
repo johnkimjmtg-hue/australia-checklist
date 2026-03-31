@@ -66,12 +66,11 @@ const catColors: Record<string,string> = {
   people:'#3a6b4a', parenting:'#6b4a3a', custom:'#4a6b5a',
 }
 
-function PhotoCardGrid({ items, dayIdx, dbItems, achieved, isItemFullyAchieved, toggleAchieved, setDetailItem }: {
+function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDetailItem }: {
   items: { id: string; categoryId: string; label: string; emoji: string }[]
   dayIdx?: number
   dbItems: DBItem[]
   achieved: Record<string,boolean>
-  isItemFullyAchieved: (item: { id: string; categoryId: string; label: string; emoji: string }) => boolean
   toggleAchieved: (id: string, day?: number) => void
   setDetailItem: (item: DBItem) => void
 }) {
@@ -79,7 +78,9 @@ function PhotoCardGrid({ items, dayIdx, dbItems, achieved, isItemFullyAchieved, 
     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
       {items.map((item, idx) => {
         const db = dbItems.find(d => d.id === item.id)
-        const isAchieved = isItemFullyAchieved(item)
+        const isAchieved = dayIdx !== undefined
+          ? !!achieved[`${item.id}_${dayIdx}`]
+          : !!achieved[item.id]
         const bgColor = catColors[item.categoryId] ?? '#1a4a6b'
         const isWide = items.length % 2 !== 0 && idx === items.length - 1
         const regionKey = db?.address ? Object.keys(stateMap).find(k => db.address!.toUpperCase().includes(k)) : null
@@ -573,7 +574,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                     dayIdx={dayIdx}
                     dbItems={dbItems}
                     achieved={achieved}
-                    isItemFullyAchieved={isItemFullyAchieved}
                     toggleAchieved={toggleAchieved}
                     setDetailItem={setDetailItem}
                   />
@@ -595,7 +595,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                     items={items}
                     dbItems={dbItems}
                     achieved={achieved}
-                    isItemFullyAchieved={isItemFullyAchieved}
                     toggleAchieved={toggleAchieved}
                     setDetailItem={setDetailItem}
                   />
