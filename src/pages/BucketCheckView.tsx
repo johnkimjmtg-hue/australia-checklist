@@ -664,14 +664,18 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       {/* ── 버킷리스트 상세 팝업 */}
       {detailItem && (
-        <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', fontFamily:font.family }}>
+        <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(0,0,0,0.45)', fontFamily:font.family }}>
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
-            borderRadius:radius.xl, maxHeight:'85vh', overflowY:'auto',
-            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC',
+            borderRadius:20, maxHeight:'85vh', overflowY:'auto',
+            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
           }}>
-            <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
+            <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+              <button onClick={() => setDetailItem(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
+              </button>
+            </div>
             {detailItem.image_url && (
               <div style={{ width:'100%', height:220, overflow:'hidden', marginTop:spacing[2] }}>
                 <img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
@@ -681,8 +685,8 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
               <div style={{ ...T.h2, lineHeight:1.4, marginBottom:spacing[3] }}>{detailItem.label}</div>
               {detailItem.description && <div style={{ fontSize:font.size.md, color:'#475569', lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
               {detailItem.tips && (
-                <div style={{ background:colors.primaryLight, border:`1px solid ${colors.border}`, borderRadius:radius.md, padding:spacing[3], marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:colors.primary, marginBottom:spacing[1] }}>💡 현지인 팁</div>
+                <div style={{ background:'rgba(0,131,143,0.10)', border:'1px solid rgba(0,131,143,0.2)', borderRadius:12, padding:12, marginBottom:16 }}>
+                  <div style={{ fontSize:12, fontWeight:700, color:'#00838F', marginBottom:4 }}>💡 현지인 팁</div>
                   <div style={{ fontSize:font.size.sm, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
                 </div>
               )}
@@ -704,7 +708,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                   </div>
                 </div>
               )}
-              <button onClick={() => setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${colors.border}`, background:colors.bgCard, color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family }}>닫기</button>
+
             </div>
           </div>
         </div>
