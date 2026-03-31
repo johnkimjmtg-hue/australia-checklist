@@ -3,6 +3,7 @@
 // ─────────────────────────────────────────────
 import { useState, useEffect, useRef } from 'react'
 import { TripInfo, loadState } from '../store/state'
+import TermsPage from './TermsPage'
 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
 const TODAY = new Date()
@@ -15,7 +16,7 @@ const CITIES = {
 
 type CityKey = keyof typeof CITIES
 type Tab = 'bucketlist' | 'shopping' | 'services' | 'nearby' | 'bingo'
-type Props = { trip: TripInfo; onNavigate: (tab: Tab) => void; onChangeDates: () => void; onOpenTerms?: (tab: 'terms' | 'privacy') => void }
+type Props = { trip: TripInfo; onNavigate: (tab: Tab) => void; onChangeDates: () => void }
 type CityData = { temp: number | null; icon: string; time: string }
 
 const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
@@ -58,12 +59,13 @@ function getWeatherIcon(code: string): string {
   return '☀️'
 }
 
-export default function HomePage({ trip, onNavigate, onChangeDates, onOpenTerms }: Props) {
+export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
   const [cityData, setCityData] = useState<Record<string, CityData>>({})
   const [weatherSheet, setWeatherSheet] = useState<CityKey | null>(null)
   const [showMenu, setShowMenu] = useState(false)
+  const [termsTab, setTermsTab] = useState<'terms'|'privacy'|null>(null)
   const timerRef = useRef<any>(null)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
@@ -283,7 +285,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates, onOpenTerms 
               { icon:'📄', label:'이용약관', tab:'terms' as const },
               { icon:'🔒', label:'개인정보처리방침', tab:'privacy' as const },
             ].map(item => (
-              <button key={item.tab} onClick={() => { setShowMenu(false); setTimeout(() => onOpenTerms?.(item.tab), 50) }} style={{
+              <button key={item.tab} onClick={() => { setShowMenu(false); setTimeout(() => setTermsTab(item.tab), 50) }} style={{
                 width:'100%', display:'flex', alignItems:'center', gap:14,
                 padding:'16px 4px',
                 background:'none', border:'none', borderBottom:'1px solid rgba(0,0,0,0.06)',
@@ -353,6 +355,13 @@ export default function HomePage({ trip, onNavigate, onChangeDates, onOpenTerms 
             </div>
           </div>
         </>
+      )}
+
+      {/* 약관 페이지 */}
+      {termsTab && (
+        <div style={{ position:'fixed', inset:0, zIndex:1000, background:'#fff', overflowY:'auto' }}>
+          <TermsPage initialTab={termsTab} onBack={() => setTermsTab(null)} />
+        </div>
       )}
     </div>
   )
