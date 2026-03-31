@@ -15,7 +15,7 @@ const CITIES = {
 
 type CityKey = keyof typeof CITIES
 type Tab = 'bucketlist' | 'shopping' | 'services' | 'nearby' | 'bingo'
-type Props = { trip: TripInfo; onNavigate: (tab: Tab) => void; onChangeDates: () => void }
+type Props = { trip: TripInfo; onNavigate: (tab: Tab) => void; onChangeDates: () => void; onOpenTerms?: (tab: 'terms' | 'privacy') => void }
 type CityData = { temp: number | null; icon: string; time: string }
 
 const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
@@ -58,11 +58,12 @@ function getWeatherIcon(code: string): string {
   return '☀️'
 }
 
-export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
+export default function HomePage({ trip, onNavigate, onChangeDates, onOpenTerms }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
   const [cityData, setCityData] = useState<Record<string, CityData>>({})
   const [weatherSheet, setWeatherSheet] = useState<CityKey | null>(null)
+  const [showMenu, setShowMenu] = useState(false)
   const timerRef = useRef<any>(null)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
@@ -173,7 +174,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
       `}</style>
 
-      {/* 도시 날씨/시간 */}
+      {/* 도시 날씨 + 메뉴 버튼 */}
       <div style={{ padding:'26px 18px 12px' }}>
         <div style={{ display:'flex', gap:8 }}>
           {(Object.keys(CITIES) as CityKey[]).map(city => {
@@ -192,6 +193,15 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
               </div>
             )
           })}
+          {/* 점 세 개 메뉴 버튼 */}
+          <div onClick={() => setShowMenu(true)} style={{
+            background:'rgba(255,255,255,0.82)', borderRadius:'50%', width:36, height:36,
+            boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flexShrink:0,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            cursor:'pointer', WebkitTapHighlightColor:'transparent', alignSelf:'center',
+          }}>
+            <span style={{ fontSize:18, color:'#0D3349', letterSpacing:1, lineHeight:1 }}>⋮</span>
+          </div>
         </div>
       </div>
 
@@ -254,6 +264,39 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           </div>
         </div>
       </div>
+
+      {/* 메뉴 바텀시트 */}
+      {showMenu && (
+        <>
+          <div onClick={() => setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', zIndex:800 }} />
+          <div style={{
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398,
+            background:'rgba(255,255,255,0.95)', borderRadius:22,
+            zIndex:801, animation:'slideUpSheet 0.25s ease',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            padding:'12px 20px 40px',
+          }}>
+            <div style={{ width:36, height:4, borderRadius:999, background:'rgba(0,0,0,0.12)', margin:'0 auto 20px' }} />
+            <div style={{ fontSize:15, fontWeight:700, color:'#0D3349', marginBottom:12, paddingBottom:12, borderBottom:'1px solid rgba(0,0,0,0.08)' }}>호주가자</div>
+            {[
+              { icon:'📄', label:'이용약관', tab:'terms' as const },
+              { icon:'🔒', label:'개인정보처리방침', tab:'privacy' as const },
+            ].map(item => (
+              <button key={item.tab} onClick={() => { setShowMenu(false); onOpenTerms?.(item.tab) }} style={{
+                width:'100%', display:'flex', alignItems:'center', gap:14,
+                padding:'16px 4px',
+                background:'none', border:'none', borderBottom:'1px solid rgba(0,0,0,0.06)',
+                cursor:'pointer', fontFamily:ff, textAlign:'left',
+              }}>
+                <span style={{ fontSize:20 }}>{item.icon}</span>
+                <span style={{ fontSize:15, color:'#0D3349', fontWeight:500 }}>{item.label}</span>
+                <span style={{ marginLeft:'auto', fontSize:16, color:'#1565A0' }}>›</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* 날씨 바텀시트 */}
       {weatherSheet && (
