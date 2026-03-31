@@ -35,9 +35,6 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
     id: i.id, categoryId: i.category_id, label: i.label, emoji: '📌',
   }))
 
-  const hasItems = Object.keys(state.selected).length > 0
-  const sheetHeight = hasItems ? '90vh' : 'auto'
-
   return (
     <>
       {/* 오버레이 */}
@@ -48,13 +45,12 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
 
       {/* 바텀시트 */}
       <div style={{
-        position:'fixed', bottom:0, left:0, right:0,
-        width:'100%',
-        height: sheetHeight,
-        maxHeight: 'calc(90vh - env(safe-area-inset-top, 44px) - 20px)',
+        position:'fixed',
+        top:'calc(env(safe-area-inset-top, 44px) + 74px)',
+        bottom:0, left:'50%', transform:'translateX(-50%)',
+        width:'100vw', maxWidth:430,
         background:'#EFFCFC',
         borderRadius:'20px 20px 0 0',
-        paddingTop:'calc(env(safe-area-inset-top, 44px) + 12px)',
         zIndex:801,
         animation:'slideUpSheet 0.25s ease',
         boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
@@ -63,7 +59,7 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
       }}>
         <style>{`
           @keyframes slideUpSheet {
-            from { transform: translateX(-50%) translateY(100%); }
+            from { transform: translateX(-50%) translateY(110%); }
             to   { transform: translateX(-50%) translateY(0); }
           }
         `}</style>
