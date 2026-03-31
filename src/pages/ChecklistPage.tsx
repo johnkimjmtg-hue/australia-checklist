@@ -236,7 +236,8 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome }:
       ) : mainTab==='myshoppinglist' ? (
           <MyShoppingView myList={myList} myChecked={myChecked} onMyListChange={handleMyListChange} onMyCheckedChange={handleMyCheckedChange} onBack={()=>setMainTab('shopping')} onLanding={()=>navigate('/')} />
       ) : mainTab==='nearby' ? (
-        <div style={{ position:'fixed', top:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, height:'calc(100dvh - 62px)', display:'flex', flexDirection:'column', zIndex:5, background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)' }>\n          <NearbyMap onBack={()=>setMainTab('bucketlist')} />
+        <div style={{ position:'fixed', top:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:430, height:'calc(100dvh - 62px)', display:'flex', flexDirection:'column', zIndex:5, background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)' }}>
+          <NearbyMap onBack={()=>setMainTab('bucketlist')} />
         </div>
       ) : mainTab==='bingo' ? (
           <BingoPage ref={bingoRef} embedded={true} initialCity={(searchParams.get('city') as 'melbourne'|'sydney') ?? undefined} />
