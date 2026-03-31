@@ -14,7 +14,7 @@ type DBItem = { id: string; category_id: string; label: string; icon: string | n
 import {
   AppState, TripInfo,
   toggleItem, setSchedule, setCategory, addCustom,
-  issueReceipt, resetAll, saveTrip, loadTrip, loadState, clearTrip,
+  issueReceipt, resetAll, resetBucket, saveTrip, loadTrip, loadState, clearTrip,
   fmt, getTripDays, fmtMD,
 } from '../store/state'
 import ScheduleSheet from '../components/ScheduleSheet'
@@ -188,8 +188,8 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
   const triggerShake = () => { setShakeBtn(true); setTimeout(()=>setShakeBtn(false),600) }
   const handleAddCustom = () => { const label=customLabel.trim(); if(!label) return; setState(addCustom(state,label,activeCategory)); setCustomLabel('') }
   const doReset = () => {
-    const next = resetAll()
-    setState(next); setTrip(null); setStartDate(''); setEndDate('')
+    const next = resetBucket()
+    setState(next)
     setShowReceipt(false); setModal('none')
     setAchieved({})
     try{localStorage.removeItem('bucket-achieved')}catch{}
@@ -214,7 +214,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
   return (
     <div style={{ 
       minHeight:'100dvh',
-      background: embedded ? '#ffffff' : 'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)', fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
+      background: embedded ? '#EFFCFC' : 'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)', fontFamily:ff, maxWidth:430, margin:'0 auto', position:'relative' }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
@@ -262,7 +262,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
 
           {/* ── 서브헤더 + 카테고리 (sticky 고정) ── */}
           {!showSearch && (
-            <div style={{ position:'sticky', top:0, zIndex:30, background: embedded ? '#ffffff' : 'rgba(224,247,250,0.95)', borderBottom:'1px solid rgba(0,131,143,0.15)' }}>
+            <div style={{ position:'sticky', top:0, zIndex:30, background: embedded ? '#EFFCFC' : 'rgba(224,247,250,0.95)', borderBottom:'1px solid rgba(0,131,143,0.15)' }}>
               {/* 멘트 + 일정설정 + 일정보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
                 <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? '#00838F' : '#0D3349' }}>
@@ -509,7 +509,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
       )}
 
       {/* ── Alerts ── */}
-      {modal==='confirmReset'&&<AlertModal title="전체 초기화할까요?" message="체크 내용과 여행일정이 모두 삭제됩니다." confirmLabel="삭제" confirmColor={colors.danger} onConfirm={doReset} onCancel={()=>setModal('none')} />}
+      {modal==='confirmReset'&&<AlertModal title="전체 초기화할까요?" message="선택한 버킷리스트가 모두 초기화됩니다." confirmLabel="삭제" confirmColor={colors.danger} onConfirm={doReset} onCancel={()=>setModal('none')} />}
       {modal==='noTrip'&&<AlertModal title="여행일정을 먼저 설정해주세요" confirmLabel="날짜 입력하기" confirmFirst onConfirm={()=>{ setModal('none'); setTimeout(handleOpenTripPicker,100) }} onCancel={()=>setModal('none')} />}
       {modal==='noDate'&&<AlertModal title="출발일과 도착일을 모두 선택해주세요" confirmLabel="확인" onConfirm={()=>setModal('none')} onCancel={()=>setModal('none')} hideCancel />}
       {modal==='noItems'&&<AlertModal title="선택된 항목이 없어요" message="버킷리스트 항목을 하나 이상 선택해야 발행할 수 있어요." confirmLabel="확인" onConfirm={()=>setModal('none')} onCancel={()=>setModal('none')} hideCancel />}
@@ -561,7 +561,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
         <div onClick={()=>setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:900, background:'rgba(0,0,0,0.45)', fontFamily:ff }}>
           <div onClick={e=>e.stopPropagation()} style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
+            width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC',
             borderRadius:20, maxHeight:'85vh', overflowY:'auto',
             animation:'slideUpSheet 0.25s ease',
             boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
