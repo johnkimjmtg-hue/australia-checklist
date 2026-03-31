@@ -509,7 +509,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       {/* ══ 상단 진행 카드 ══ */}
       <div style={{ padding:'16px 16px 0' }}>
-        <div style={{ background:'#ffffff', borderRadius:16, padding:'14px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.08)' }}>
+        <div style={{ background:'#ffffff', borderRadius:16, padding:'14px 16px', border:'1px solid rgba(0,131,143,0.20)' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
             <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>내 버킷리스트</div>
             <div style={{ fontSize:13, color:'#1565A0' }}>
