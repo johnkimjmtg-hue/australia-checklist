@@ -102,7 +102,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
 
       {/* ── 달력 */}
       <div style={{ padding:'52px 18px 14px' }}>
-        <div style={{ background:'rgba(224,247,250,0.85)', borderRadius:22, overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
+        <div style={{ background:'rgba(255,255,255,0.82)', borderRadius:22, overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 8px' }}>
             <button className="cal-nav-btn" onClick={() => chgMo(-1)}
               style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
@@ -127,7 +127,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
       <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
 
         {/* D-day 카드 */}
-        <div style={{ background:'rgba(224,247,250,0.85)', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.10)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <div style={{ background:'rgba(255,255,255,0.82)', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.10)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
             <div style={{ fontSize:48, fontWeight:900, color: ddayColor, lineHeight:1 }}>{ddayText}</div>
             <div style={{ fontSize:13, color:'#1565A0', marginTop:4 }}>{ddayLabel}</div>
@@ -148,7 +148,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           {MENUS.map(m => (
             <div key={m.id} className="menu-card-hover"
               onClick={() => onNavigate(m.id)}
-              style={{ background:'rgba(224,247,250,0.85)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer' }}>
+              style={{ background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer' }}>
               <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
               <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
               <div style={{ fontSize:12, color:'#1565A0', marginTop:3 }}>{m.sub}</div>
@@ -161,7 +161,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           {/* 카페빙고 - 전체 너비 */}
           <div className="menu-card-hover"
             onClick={() => onNavigate('bingo')}
-            style={{ gridColumn:'span 2', background:'rgba(224,247,250,0.85)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+            style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
             <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
             <div>
               <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
