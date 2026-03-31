@@ -185,10 +185,9 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
                 cursor:'pointer', WebkitTapHighlightColor:'transparent',
               }}>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, flexWrap:'nowrap' }}>
-                  {d?.icon ? <span style={{ fontSize:16 }}>{getWeatherIcon(d.icon)}</span> : <span style={{ fontSize:16 }}>☀️</span>}
                   <span style={{ fontSize:12, fontWeight:700, color:'#0D3349', whiteSpace:'nowrap' }}>{CITIES[city].label}</span>
+                  {d?.icon ? <span style={{ fontSize:16 }}>{getWeatherIcon(d.icon)}</span> : <span style={{ fontSize:16 }}>☀️</span>}
                   {d?.temp != null && <span style={{ fontSize:11, color: d.temp < 15 ? '#60A5FA' : d.temp <= 25 ? '#34D399' : '#F97316', fontWeight:700, whiteSpace:'nowrap' }}>{d.temp}°</span>}
-                  <AnalogClock tz={CITIES[city].tz} size={18} />
                 </div>
               </div>
             )
