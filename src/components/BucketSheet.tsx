@@ -84,7 +84,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
             </button>
           ) : <div />}
           <button onClick={onClose} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
-            <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
+            <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
           </button>
         </div>
 
@@ -131,8 +131,15 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
             borderRadius:'20px 20px 0 0', maxHeight:'85vh', overflowY:'auto',
             zIndex:1101, animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
             fontFamily:"-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif",
+            display:'flex', flexDirection:'column',
           }}>
-            <div style={{ width:36, height:4, borderRadius:999, background:'rgba(0,0,0,0.10)', margin:'12px auto 0' }} />
+            {/* 헤더 */}
+            <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+              <button onClick={() => setDetailItem(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
+              </button>
+            </div>
+            <div style={{ flex:1, overflowY:'auto' }}>
             {detailItem.image_url && (
               <div style={{ width:'100%', height:220, overflow:'hidden', marginTop:8 }}>
                 <img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
@@ -165,7 +172,6 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
                   </div>
                 </div>
               )}
-              <button onClick={() => setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:12, border:'1px solid rgba(0,131,143,0.15)', background:'#ffffff', color:'#1565A0', fontSize:15, fontWeight:700, cursor:'pointer' }}>닫기</button>
             </div>
           </div>
         </>

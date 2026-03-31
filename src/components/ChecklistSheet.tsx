@@ -4,6 +4,7 @@
 // src/components/ChecklistSheet.tsx
 // ─────────────────────────────────────────────
 import { AppState } from '../store/state'
+import { Icon } from '@iconify/react'
 import ChecklistPage from '../pages/ChecklistPage'
 
 type Props = {
@@ -45,7 +46,7 @@ export default function ChecklistSheet({ state, setState, onClose }: Props) {
             display:'flex', alignItems:'center', justifyContent:'center',
             cursor:'pointer', WebkitTapHighlightColor:'transparent',
           }}>
-            <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
+            <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
           </button>
         </div>
 
