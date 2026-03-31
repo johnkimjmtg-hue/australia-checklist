@@ -146,34 +146,31 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
       {/* 날씨 + 햄버거 */}
       <div style={{ padding:'26px 18px 12px' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <div style={{ display:'flex', gap:6, flex:1 }}>
-            {(Object.keys(CITIES) as CityKey[]).map(city => {
+        <div style={{ display:'flex', gap:8 }}>
+          {(Object.keys(CITIES) as CityKey[]).map(city => {
               const d = cityData[city]
               return (
                 <div key={city} onClick={() => setWeatherSheet(city)} style={{
-                  background:'#EFFCFC', borderRadius:12, padding:'6px 10px',
-                  boxShadow:'0 4px 16px rgba(0,0,0,0.10)', flex:1, textAlign:'center',
+                  background:'#EFFCFC', borderRadius:20, padding:'6px 10px',
+                  boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flex:1, textAlign:'center',
                   cursor:'pointer', WebkitTapHighlightColor:'transparent',
                 }}>
-                  <div style={{ fontSize:11, fontWeight:700, color:'#1565A0', marginBottom:1 }}>{CITIES[city].label}</div>
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:2 }}>
-                    <span style={{ fontSize:14 }}>{d?.icon ? getWeatherIcon(d.icon) : '🌤️'}</span>
-                    <span style={{ fontSize:11, fontWeight:700, color:'#0D3349', whiteSpace:'nowrap' }}>{d?.time ?? '--:--'}</span>
-                    {d?.temp != null && <span style={{ fontSize:11, color:'#CC3300', fontWeight:700 }}>{d.temp}°</span>}
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, flexWrap:'nowrap' }}>
+                    <span style={{ fontSize:12, fontWeight:700, color:'#0D3349', whiteSpace:'nowrap' }}>{CITIES[city].label}</span>
+                    {d?.icon ? <span style={{ fontSize:16 }}>{getWeatherIcon(d.icon)}</span> : <span style={{ fontSize:16 }}>☀️</span>}
+                    {d?.temp != null && <span style={{ fontSize:11, color: d.temp < 15 ? '#60A5FA' : d.temp <= 25 ? '#34D399' : '#F97316', fontWeight:700, whiteSpace:'nowrap' }}>{d.temp}°</span>}
                   </div>
                 </div>
               )
             })}
-          </div>
-          <button onClick={() => setShowMenu(true)} style={{
-            width:36, height:36, borderRadius:12, background:'#EFFCFC', border:'none',
-            cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center',
-            justifyContent:'center', gap:4, boxShadow:'0 4px 16px rgba(0,0,0,0.10)',
-            flexShrink:0, WebkitTapHighlightColor:'transparent',
+          <div onClick={() => setShowMenu(true)} style={{
+            background:'#EFFCFC', borderRadius:'50%', width:36, height:36,
+            boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flexShrink:0,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            cursor:'pointer', WebkitTapHighlightColor:'transparent', alignSelf:'center',
           }}>
-            {[0,1,2].map(i => <div key={i} style={{ width:14, height:1.5, background:'#0D3349', borderRadius:2 }} />)}
-          </button>
+            <span style={{ fontSize:18, color:'#0D3349', letterSpacing:1, lineHeight:1 }}>⋮</span>
+          </div>
         </div>
       </div>
 
