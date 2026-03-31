@@ -25,6 +25,7 @@ type Props = {
   onDelete:   () => void
   onShare:    () => void
   onLanding:   () => void
+  onDetailItem?: (item: DBItem | null) => void
 }
 
 const CAT_ICONS: Record<string,string> = {
@@ -243,7 +244,7 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=
   )
 }
 
-export default function BucketCheckView({ state, trip, setState, items, dbItems, onAchievedChange, onEdit, onDelete, onShare, onLanding }: Props) {
+export default function BucketCheckView({ state, trip, setState, items, dbItems, onAchievedChange, onEdit, onDelete, onShare, onLanding, onDetailItem }: Props) {
   const navigate = useNavigate()
   const [filter, setFilter]           = useState<Filter>('all')
   const [showDelete, setShowDelete]   = useState(false)
@@ -741,52 +742,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       )}
 
       {/* ── 버킷리스트 상세 팝업 */}
-      {detailItem && (
-        <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', fontFamily:font.family }}>
-          <div onClick={e => e.stopPropagation()} style={{
-            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
-            borderRadius:radius.xl, maxHeight:'85vh', overflowY:'auto',
-            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
-          }}>
-            <div style={{ width:36, height:4, borderRadius:radius.full, background:'rgba(0,0,0,0.10)', margin:`${spacing[3]}px auto 0` }} />
-            {detailItem.image_url && (
-              <div style={{ width:'100%', height:220, overflow:'hidden', marginTop:spacing[2] }}>
-                <img src={detailItem.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-              </div>
-            )}
-            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[8]}px` }}>
-              <div style={{ ...T.h2, lineHeight:1.4, marginBottom:spacing[3] }}>{detailItem.label}</div>
-              {detailItem.description && <div style={{ fontSize:font.size.md, color:'#475569', lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
-              {detailItem.tips && (
-                <div style={{ background:'rgba(41,182,208,0.12)', border:`1px solid ${'rgba(0,131,143,0.15)'}`, borderRadius:radius.md, padding:spacing[3], marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#29B6D0', marginBottom:spacing[1] }}>💡 현지인 팁</div>
-                  <div style={{ fontSize:font.size.sm, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
-                </div>
-              )}
-              {detailItem.address && (
-                <button onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')} style={{ display:'flex', alignItems:'center', gap:spacing[2], width:'100%', background:'rgba(41,182,208,0.12)', border:`1px solid ${'rgba(0,131,143,0.15)'}`, borderRadius:radius.md, padding:spacing[3], marginBottom:spacing[4], cursor:'pointer', textAlign:'left' }}>
-                  <Icon icon="ph:map-pin" width={16} height={16} color={'#29B6D0'} />
-                  <div>
-                    <div style={{ fontSize:font.size.xs, color:'#7BAAB5' }}>여기서 할 수 있어요</div>
-                    <div style={{ fontSize:font.size.sm, color:'#29B6D0', fontWeight:font.weight.bold, textDecoration:'underline' }}>{detailItem.address}</div>
-                  </div>
-                  <Icon icon="ph:arrow-square-out" width={13} height={13} color={'#7BAAB5'} style={{ marginLeft:'auto' }} />
-                </button>
-              )}
-              {detailBizCards.length > 0 && (
-                <div style={{ marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:'#1565A0', marginBottom:spacing[2] }}>🏢 관련 업체</div>
-                  <div style={{ display:'flex', flexDirection:'column', gap:spacing[2] }}>
-                    {detailBizCards.map(biz => <BusinessCard key={biz.id} business={biz} />)}
-                  </div>
-                </div>
-              )}
-              <button onClick={() => setDetailItem(null)} style={{ width:'100%', height:48, borderRadius:radius.md, border:`1px solid ${'rgba(0,131,143,0.15)'}`, background:'#ffffff', color:'#1565A0', fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:font.family }}>닫기</button>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* ── 관련업체 팝업 */}
       {detailBizId && (
