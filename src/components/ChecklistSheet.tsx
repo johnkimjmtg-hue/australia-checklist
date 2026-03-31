@@ -23,8 +23,8 @@ export default function ChecklistSheet({ state, setState, onClose }: Props) {
 
       {/* 바텀시트 - 약관 팝업과 동일한 스타일 */}
       <div style={{
-        position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-        width:'calc(100% - 32px)', maxWidth:398,
+        position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+        width:'100%', maxWidth:430,
         background:'#ffffff', borderRadius:20,
         maxHeight:'85vh', overflowY:'auto', zIndex:801,
         animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
