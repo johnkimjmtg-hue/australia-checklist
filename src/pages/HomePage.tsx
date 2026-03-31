@@ -17,9 +17,7 @@ type Props = {
 export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
-  const [selectedCity, setSelectedCity] = useState<'sydney'|'melbourne'|'brisbane'>('sydney')
-  const [weather, setWeather] = useState<{temp:number; desc:string; icon:string}|null>(null)
-  const [time, setTime] = useState('')
+  const [cityData, setCityData] = useState<Record<string,{temp:number; icon:string; time:string}>>({})  
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
 
@@ -30,39 +28,40 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
   } as const
 
   const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
-
-  const fetchWeather = async (city: keyof typeof CITIES) => {
-    try {
-      const { lat, lon } = CITIES[city]
-      const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_KEY}&units=metric&lang=kr`
-      )
-      const data = await res.json()
-      setWeather({
-        temp: Math.round(data.main.temp),
-        desc: data.weather[0].description,
-        icon: data.weather[0].icon,
-      })
-    } catch { setWeather(null) }
-  }
-
-  const updateTime = (city: keyof typeof CITIES) => {
-    const now = new Date()
-    const t = now.toLocaleTimeString('ko-KR', {
-      timeZone: CITIES[city].tz,
-      hour: '2-digit', minute: '2-digit', hour12: false,
-    })
-    setTime(t)
-  }
-
   const timerRef = useRef<any>(null)
 
+  const getTime = (tz: string) => new Date().toLocaleTimeString('ko-KR', {
+    timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false,
+  })
+
+  const fetchAllCities = async () => {
+    const entries = await Promise.all(
+      (Object.entries(CITIES) as [string, typeof CITIES[keyof typeof CITIES]][]).map(async ([key, c]) => {
+        try {
+          const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${c.lat}&lon=${c.lon}&appid=${WEATHER_KEY}&units=metric&lang=kr`)
+          const data = await res.json()
+          return [key, { temp: Math.round(data.main.temp), icon: data.weather[0].icon, time: getTime(c.tz) }]
+        } catch {
+          return [key, { temp: null, icon: '', time: getTime(c.tz) }]
+        }
+      })
+    )
+    setCityData(Object.fromEntries(entries))
+  }
+
   useEffect(() => {
-    fetchWeather(selectedCity)
-    updateTime(selectedCity)
-    timerRef.current = setInterval(() => updateTime(selectedCity), 30000)
+    fetchAllCities()
+    timerRef.current = setInterval(() => {
+      setCityData(prev => {
+        const next = { ...prev }
+        Object.entries(CITIES).forEach(([key, c]) => {
+          if (next[key]) next[key] = { ...next[key], time: getTime(c.tz) }
+        })
+        return next
+      })
+    }, 30000)
     return () => clearInterval(timerRef.current)
-  }, [selectedCity])
+  }, [])
 
   const state = loadState()
   const bucketCount = Object.keys(state.selected).length
@@ -146,40 +145,30 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
 
       {/* ── 도시 날씨/시간 */}
       <div style={{ padding:'52px 18px 12px' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          {/* 도시 버튼 */}
-          <div style={{ display:'flex', gap:8 }}>
-            {(Object.keys(CITIES) as (keyof typeof CITIES)[]).map(city => {
-              const isActive = selectedCity === city
-              return (
-                <button key={city} onClick={() => setSelectedCity(city)} style={{
-                  padding:'6px 14px', borderRadius:50, border:'none', cursor:'pointer',
-                  background: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.35)',
-                  color: isActive ? '#0D3349' : 'rgba(255,255,255,0.7)',
-                  fontSize:13, fontWeight:700, fontFamily:ff,
-                  transition:'all 0.15s', WebkitTapHighlightColor:'transparent',
-                }}>{CITIES[city].label}</button>
-              )
-            })}
-          </div>
-          {/* 시간 풍선 */}
-          {time && (
-            <div style={{
-              background:'rgba(255,255,255,0.92)', borderRadius:50,
-              padding:'6px 14px', fontSize:15, fontWeight:700, color:'#0D3349',
-              letterSpacing:1,
-            }}>{time}</div>
-          )}
-        </div>
-        {/* 날씨 */}
-        <div style={{ display:'flex', alignItems:'center', gap:10, marginTop:10 }}>
-          {weather && (
-            <>
-              <img src={`https://openweathermap.org/img/wn/${weather.icon}.png`} width={36} height={36} style={{ filter:'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }} />
-              <span style={{ fontSize:22, fontWeight:800, color:'#fff' }}>{weather.temp}°</span>
-              <span style={{ fontSize:13, color:'rgba(255,255,255,0.85)' }}>{weather.desc}</span>
-            </>
-          )}
+        {/* 도시 버튼 3개 - 오른쪽 정렬 */}
+        <div style={{ display:'flex', gap:8, justifyContent:'flex-end' }}>
+          {(Object.keys(CITIES) as (keyof typeof CITIES)[]).map(city => {
+            const d = cityData[city]
+            return (
+              <div key={city} style={{
+                background:'rgba(255,255,255,0.82)',
+                borderRadius:16, padding:'10px 14px',
+                boxShadow:'0 4px 20px rgba(0,0,0,0.10)',
+                minWidth:80, textAlign:'center',
+              }}>
+                <div style={{ fontSize:12, fontWeight:700, color:'#1565A0', marginBottom:4 }}>{CITIES[city].label}</div>
+                {d?.icon ? (
+                  <img src={`https://openweathermap.org/img/wn/${d.icon}.png`} width={28} height={28} style={{ display:'block', margin:'0 auto' }} />
+                ) : (
+                  <div style={{ height:28 }} />
+                )}
+                {d?.temp != null && (
+                  <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', marginTop:2 }}>{d.temp}°</div>
+                )}
+                <div style={{ fontSize:12, color:'#1565A0', marginTop:2, letterSpacing:0.5 }}>{d?.time ?? '--:--'}</div>
+              </div>
+            )
+          })}
         </div>
       </div>
 
