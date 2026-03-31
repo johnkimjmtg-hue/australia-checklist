@@ -228,7 +228,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             const d = cityData[city]
             return (
               <div key={city} onClick={() => setWeatherSheet(city)} style={{
-                background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'6px 10px',
+                background:'#EFFCFC', borderRadius:20, padding:'6px 10px',
                 boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flex:1, textAlign:'center',
                 cursor:'pointer', WebkitTapHighlightColor:'transparent',
               }}>
@@ -242,7 +242,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
           })}
           {/* 점 세 개 메뉴 버튼 */}
           <div onClick={() => setShowMenu(true)} style={{
-            background:'rgba(255,255,255,0.82)', borderRadius:'50%', width:36, height:36,
+            background:'#EFFCFC', borderRadius:'50%', width:36, height:36,
             boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flexShrink:0,
             display:'flex', alignItems:'center', justifyContent:'center',
             cursor:'pointer', WebkitTapHighlightColor:'transparent', alignSelf:'center',
@@ -254,7 +254,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
 
       {/* 달력 */}
       <div style={{ padding:'0 18px 14px' }}>
-        <div style={{ background:'rgba(255,255,255,0.82)', borderRadius:22, overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
+        <div style={{ background:'#EFFCFC', borderRadius:22, overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 8px' }}>
             <button className="cal-nav-btn" onClick={() => chgMo(-1)} style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
             <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>
@@ -276,7 +276,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
       {/* 스크롤 영역 */}
       <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
         {/* D-day */}
-        <div style={{ background:'rgba(255,255,255,0.82)', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.10)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <div style={{ background:'#EFFCFC', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.10)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
             <div style={{ fontSize:52, fontWeight:900, color: ddayColor, lineHeight:1 }}>{ddayText}</div>
             <div style={{ fontSize:15, color:'#1565A0', marginTop:6 }}>{ddayLabel}</div>
@@ -294,7 +294,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           {MENUS.map((m, i) => (
             <div key={m.id} className="menu-card-hover card-anim" onClick={() => onNavigate(m.id)}
-              style={{ background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', animationDelay:`${i * 0.08}s` }}>
+              style={{ background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', animationDelay:`${i * 0.08}s` }}>
               <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
               <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
               <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>{m.sub}</div>
@@ -302,7 +302,7 @@ export default function HomePage({ trip, onNavigate, onChangeDates }: Props) {
             </div>
           ))}
           <div className="menu-card-hover card-anim" onClick={() => onNavigate('bingo')}
-            style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.82)', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${MENUS.length * 0.08}s` }}>
+            style={{ gridColumn:'span 2', background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${MENUS.length * 0.08}s` }}>
             <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
             <div>
               <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
