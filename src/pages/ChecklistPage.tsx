@@ -265,18 +265,18 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
             <div style={{ position:'sticky', top:0, zIndex:30, background: '#ffffff', borderBottom:'1px solid rgba(0,131,143,0.15)' }}>
               {/* 멘트 + 일정설정 + 일정보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
-                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: '#0D3349' }}>
+                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: done>0 ? '#00838F' : '#0D3349' }}>
                   {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
                 </span>
                 <button onClick={handleOpenTripPicker} style={{
                     height:30, padding:'0 12px', borderRadius:20,
-                    border: tripLabel ? '1.5px solid #29B6D0' : '1.5px solid #29B6D0',
+                    border: tripLabel ? '1.5px solid #00838F' : '1.5px solid #00838F',
                     background: tripLabel ? 'rgba(0,131,143,0.12)' : 'rgba(0,131,143,0.12)',
-                    color: '#29B6D0',
+                    color: '#00838F',
                     fontSize:11, fontWeight:700,
                     cursor:'pointer', display:'flex', alignItems:'center', gap:4, fontFamily:ff,
                   }}>
-                    <Icon icon="ph:airplane-takeoff" width={12} height={12} color="#29B6D0" />
+                    <Icon icon="ph:airplane-takeoff" width={12} height={12} color="#00838F" />
                     {tripLabel ?? '일정 설정'}
                   </button>
               </div>
@@ -295,8 +295,8 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                           onClick={()=>{ setState(setCategory(state,cat.id)); setShowSearch(false) }}
                           style={{
                             height:36, borderRadius:radius.sm, position:'relative',
-                            border: isActive ? '2px solid #29B6D0' : '1px solid rgba(0,131,143,0.2)',
-                            background: isActive ? '#29B6D0' : 'rgba(255,255,255,0.7)',
+                            border: isActive ? '2px solid #00838F' : '1px solid rgba(0,131,143,0.2)',
+                            background: isActive ? '#00838F' : 'rgba(255,255,255,0.7)',
                             cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:ff,
                             WebkitTapHighlightColor:'transparent',
                           }}>
@@ -326,10 +326,10 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
           <div style={{ background:'transparent', padding:`${spacing[3]}px ${spacing[3]}px` }}>
             {!showSearch && (
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:spacing[2] }}>
-                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#0D3349' }}>
+                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#00838F' }}>
                   {CATEGORIES.find(c=>c.id===activeCategory)?.label}
                 </span>
-                <span style={{ fontSize:font.size.sm, color:'#0D3349', fontWeight:font.weight.bold }}>
+                <span style={{ fontSize:font.size.sm, color:'#00838F', fontWeight:font.weight.bold }}>
                   {catItems.filter(i=>state.selected[i.id]).length}/{catItems.length}
                 </span>
               </div>
@@ -337,11 +337,11 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
             {activeCategory==='custom'&&!showSearch&&(
               <div style={{ display:'flex', gap:spacing[2], marginBottom:spacing[3], alignItems:'center' }}>
                 <div style={{ flex:1, display:'flex', alignItems:'center', gap:spacing[2], background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`, border:'1px solid rgba(0,131,143,0.2)', height:44 }}>
-                  <Icon icon="ph:plus-circle" width={16} height={16} color={'#29B6D0'} />
+                  <Icon icon="ph:plus-circle" width={16} height={16} color={'#00838F'} />
                   <input ref={inputRef} value={customLabel} onChange={e=>setCustomLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleAddCustom()} placeholder="직접 추가"
                     style={{ flex:1, border:'none', outline:'none', fontSize:font.size.md, color:colors.textPrimary, background:'transparent', fontFamily:ff }} />
                 </div>
-                <button onClick={handleAddCustom} style={{ height:44, padding:`0 ${spacing[4]}px`, background:'#29B6D0', color:'#fff', border:'none', borderRadius:radius.sm, fontWeight:font.weight.bold, fontSize:font.size.sm, cursor:'pointer', fontFamily:ff }}>추가</button>
+                <button onClick={handleAddCustom} style={{ height:44, padding:`0 ${spacing[4]}px`, background:'#00838F', color:'#fff', border:'none', borderRadius:radius.sm, fontWeight:font.weight.bold, fontSize:font.size.sm, cursor:'pointer', fontFamily:ff }}>추가</button>
               </div>
             )}
             {searchResults!==null&&searchResults.length===0&&(
@@ -363,7 +363,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                       padding:`${spacing[3]}px ${spacing[3]}px`,
                       background: colors.bgCard,
                       borderRadius:radius.md,
-                      border: checked ? `1px solid ${'#29B6D0'}` : isHighlight ? '1.5px solid #29B6D0' : `1px solid ${colors.gray300}`,
+                      border: checked ? `1px solid ${colors.success}` : isHighlight ? '1.5px solid #00838F' : `1px solid ${colors.gray300}`,
                       cursor:'pointer', transition:'all 0.15s',
                     }}
                     onClick={()=>{
@@ -385,7 +385,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                     {/* 텍스트 */}
                     <div style={{ flex:1, minWidth:0 }}>
                       <div style={{
-                        fontSize:font.size.md, fontWeight:font.weight.medium, color:checked?'#29B6D0':colors.gray800,
+                        fontSize:font.size.md, fontWeight:font.weight.medium, color:checked?colors.success:colors.gray800,
                         display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', lineHeight:1.4,
                       }}>
                         {item.label}
@@ -398,7 +398,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                           >일정 미지정</span>
                         )}
                         {checked && dayCount>0 && (state.schedules[item.id]??[]).map(dayIdx=>(
-                          <span key={dayIdx} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:'#29B6D0', color:'#fff', borderRadius:radius.full, padding:`1px ${spacing[2]}px` }}>{dayIdx+1}일차</span>
+                          <span key={dayIdx} style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, background:colors.success, color:'#fff', borderRadius:radius.full, padding:`1px ${spacing[2]}px` }}>{dayIdx+1}일차</span>
                         ))}
                         {region && <span style={{ fontSize:font.size.xs, color:colors.gray500, fontWeight:font.weight.medium, marginLeft:'auto' }}>📍 {region.label}</span>}
                       </div>
@@ -413,7 +413,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                     }} style={{
                       width:24, height:24, borderRadius:6, flexShrink:0,
                       border: checked ? 'none' : `1.5px solid ${colors.gray300}`,
-                      background: checked ? '#29B6D0' : colors.bgCard,
+                      background: checked ? colors.success : colors.bgCard,
                       display:'flex', alignItems:'center', justifyContent:'center',
                       cursor:'pointer', padding:0, transition:'all 0.15s',
                     }}>
@@ -461,7 +461,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                     <div style={{
                       position:'absolute', top:-5, right:-8,
                       minWidth:16, height:16, borderRadius:radius.full,
-                      background:'#29B6D0', color:'#fff',
+                      background:'#00838F', color:'#fff',
                       fontSize:10, fontWeight:font.weight.bold,
                       display:'flex', alignItems:'center', justifyContent:'center',
                       padding:'0 4px', lineHeight:1,
@@ -469,7 +469,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                   )}
                 </div>
                 <span style={{ fontSize:12, fontWeight:isActive?font.weight.bold:font.weight.medium, color:isActive?colors.primary:colors.textTertiary }}>{tab.label}</span>
-                {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:'#29B6D0', position:'absolute', bottom:4 }} />}
+                {isActive&&<div style={{ width:4, height:4, borderRadius:radius.full, background:'#00838F', position:'absolute', bottom:4 }} />}
               </button>
             )
           })}
@@ -509,7 +509,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
           }}>
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`${spacing[3]}px auto 0` }} />
             <div style={{ width:'100%', height:200, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,131,143,0.10)' }}>
-              {selProduct.image_url ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <Icon icon="ph:shopping-bag" width={56} height={56} color={'#29B6D0'} />}
+              {selProduct.image_url ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <Icon icon="ph:shopping-bag" width={56} height={56} color={'#00838F'} />}
             </div>
             <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[4]}px` }}>
               <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap', marginBottom:spacing[3], alignItems:'center' }}>
@@ -526,7 +526,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                   <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textSecondary, marginBottom:spacing[2] }}>어디서 살 수 있어요?</div>
                   <div style={{ display:'flex', gap:spacing[1], flexWrap:'wrap' }}>
                     {selProduct.where_to_buy.map((store:string)=>(
-                      <span key={store} style={{ fontSize:font.size.sm, padding:`4px ${spacing[2]}px`, borderRadius:radius.sm, background:'rgba(0,131,143,0.10)', color:'#29B6D0', border:'1px solid rgba(0,131,143,0.2)' }}>🏪 {store}</span>
+                      <span key={store} style={{ fontSize:font.size.sm, padding:`4px ${spacing[2]}px`, borderRadius:radius.sm, background:'rgba(0,131,143,0.10)', color:'#00838F', border:'1px solid rgba(0,131,143,0.2)' }}>🏪 {store}</span>
                     ))}
                   </div>
                 </div>
@@ -558,16 +558,16 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
               {detailItem.description&&<div style={{ fontSize:font.size.md, color:'#475569', lineHeight:1.7, marginBottom:spacing[4], whiteSpace:'pre-wrap' }}>{detailItem.description}</div>}
               {detailItem.tips&&(
                 <div style={{ background:'rgba(0,131,143,0.10)', border:'1px solid rgba(0,131,143,0.2)', borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4] }}>
-                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#29B6D0', marginBottom:spacing[1] }}>💡 현지인 팁</div>
+                  <div style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:'#00838F', marginBottom:spacing[1] }}>💡 현지인 팁</div>
                   <div style={{ fontSize:font.size.sm, color:'#475569', lineHeight:1.6 }}>{detailItem.tips}</div>
                 </div>
               )}
               {detailItem.address&&(
                 <button onClick={()=>window.open(`https://maps.google.com/?q=${encodeURIComponent(detailItem.address!)}`, '_blank')} style={{ display:'flex', alignItems:'center', gap:spacing[2], width:'100%', background:'rgba(0,131,143,0.10)', border:'1px solid rgba(0,131,143,0.2)', borderRadius:radius.md, padding:`${spacing[3]}px`, marginBottom:spacing[4], cursor:'pointer', textAlign:'left' }}>
-                  <Icon icon="ph:map-pin" width={16} height={16} color={'#29B6D0'} />
+                  <Icon icon="ph:map-pin" width={16} height={16} color={'#00838F'} />
                   <div>
                     <div style={{ fontSize:font.size.xs, color:colors.textTertiary }}>여기서 할 수 있어요</div>
-                    <div style={{ fontSize:font.size.sm, color:'#29B6D0', fontWeight:font.weight.bold, textDecoration:'underline' }}>{detailItem.address}</div>
+                    <div style={{ fontSize:font.size.sm, color:'#00838F', fontWeight:font.weight.bold, textDecoration:'underline' }}>{detailItem.address}</div>
                   </div>
                   <Icon icon="ph:arrow-square-out" width={13} height={13} color={colors.textTertiary} style={{ marginLeft:'auto' }} />
                 </button>
@@ -714,7 +714,7 @@ function CalendarModal({ state, trip, allItems, onClose }: { state:AppState; tri
           return (
             <button key={ci} onClick={()=>setActiveDayIdx(isActive?null:dayIdx)} style={{
               aspectRatio:'1', borderRadius:radius.sm,
-              border: isActive ? '1.5px solid #29B6D0' : `1px solid ${colors.gray200}`,
+              border: isActive ? '1.5px solid #00838F' : `1px solid ${colors.gray200}`,
               background: bg,
               color: isActive ? '#fff' : colors.textPrimary,
               cursor:'pointer', fontFamily:font.family,
@@ -750,7 +750,7 @@ function CalendarModal({ state, trip, allItems, onClose }: { state:AppState; tri
             </div>
             {dayItems.map(item=>(
               <div key={item.id} style={{ display:'flex', alignItems:'center', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, background:colors.bgCard, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)' }}>
-                <Icon icon="ph:check-circle-fill" width={13} height={13} color={'#29B6D0'} />
+                <Icon icon="ph:check-circle-fill" width={13} height={13} color={'#00838F'} />
                 <span style={{ fontSize:font.size.sm, color:colors.textPrimary, fontWeight:font.weight.medium }}>
                   {item.label.includes(',')?item.label.split(',')[0].trim():item.label}
                 </span>
@@ -808,7 +808,7 @@ function MiniCalendar({ year, month, selected, minDate, onSelect }: { year:numbe
           const isSelected=dateStr===selected; const isDisabled=!!minDate&&dateStr<minDate
           const dayOfWeek=(firstDay+day-1)%7; const isToday=dateStr===new Date().toISOString().slice(0,10)
           return (
-            <div key={idx} onClick={()=>!isDisabled&&onSelect(dateStr)} style={{ textAlign:'center', padding:'6px 0', borderRadius:radius.sm, cursor:isDisabled?'default':'pointer', background:isSelected?colors.primary:'transparent', color:isDisabled?colors.gray200:isSelected?'#fff':dayOfWeek===0?'#E05050':dayOfWeek===6?'#4477CC':colors.textPrimary, fontSize:font.size.sm, fontWeight:isSelected||isToday?font.weight.bold:font.weight.regular, border:isToday&&!isSelected?'1.5px solid #29B6D0':'1.5px solid transparent', boxSizing:'border-box' }}>{day}</div>
+            <div key={idx} onClick={()=>!isDisabled&&onSelect(dateStr)} style={{ textAlign:'center', padding:'6px 0', borderRadius:radius.sm, cursor:isDisabled?'default':'pointer', background:isSelected?colors.primary:'transparent', color:isDisabled?colors.gray200:isSelected?'#fff':dayOfWeek===0?'#E05050':dayOfWeek===6?'#4477CC':colors.textPrimary, fontSize:font.size.sm, fontWeight:isSelected||isToday?font.weight.bold:font.weight.regular, border:isToday&&!isSelected?'1.5px solid #00838F':'1.5px solid transparent', boxSizing:'border-box' }}>{day}</div>
           )
         })}
       </div>
@@ -827,13 +827,13 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }: { step
       <div style={{ position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'calc(100% - 32px)', maxWidth:340, background:colors.bgCard, borderRadius:radius.lg, padding:`${spacing[5]}px`, zIndex:501, animation:'scaleIn 0.2s ease', maxHeight:'90vh', overflowY:'auto', fontFamily:font.family }}>
         <div style={{ textAlign:'center', marginBottom:spacing[4] }}>
           <div style={{ ...T.xs, letterSpacing:1, marginBottom:spacing[1] }}>{isStart?'STEP 1 / 2':'STEP 2 / 2'}</div>
-          <div style={{ ...T.h4, color:'#29B6D0' }}>{isStart?'✈️ 출발일을 선택해주세요':'🏠 도착일을 선택해주세요'}</div>
+          <div style={{ ...T.h4, color:'#00838F' }}>{isStart?'✈️ 출발일을 선택해주세요':'🏠 도착일을 선택해주세요'}</div>
           {!isStart&&startDate&&<div style={{ ...T.xs, marginTop:spacing[1] }}>출발일: {startDate}</div>}
         </div>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:spacing[3] }}>
-          <button onClick={()=>{ if(month===1){setYear(y=>y-1);setMonth(12)} else setMonth(m=>m-1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, cursor:'pointer', fontSize:14, color:'#29B6D0', fontWeight:font.weight.bold }}>‹</button>
+          <button onClick={()=>{ if(month===1){setYear(y=>y-1);setMonth(12)} else setMonth(m=>m-1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, cursor:'pointer', fontSize:14, color:'#00838F', fontWeight:font.weight.bold }}>‹</button>
           <div style={{ ...T.h4 }}>{year}년 {month}월</div>
-          <button onClick={()=>{ if(month===12){setYear(y=>y+1);setMonth(1)} else setMonth(m=>m+1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, cursor:'pointer', fontSize:14, color:'#29B6D0', fontWeight:font.weight.bold }}>›</button>
+          <button onClick={()=>{ if(month===12){setYear(y=>y+1);setMonth(1)} else setMonth(m=>m+1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, cursor:'pointer', fontSize:14, color:'#00838F', fontWeight:font.weight.bold }}>›</button>
         </div>
         <MiniCalendar year={year} month={month} selected={selected} minDate={minDate} onSelect={d=>setSelected(d)} />
         <div style={{ marginTop:spacing[3], padding:`${spacing[3]}px`, borderRadius:radius.sm, background:selected?colors.primaryLight:colors.gray100, textAlign:'center', fontSize:font.size.sm, fontWeight:font.weight.bold, color:selected?colors.primary:colors.textTertiary }}>
