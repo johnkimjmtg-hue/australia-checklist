@@ -48,12 +48,13 @@ export default function BucketSheet({ state, setState, trip, onClose }: Props) {
 
       {/* 바텀시트 */}
       <div style={{
-        position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-        width:'calc(100% - 32px)', maxWidth:430,
+        position:'fixed', bottom:0, left:0, right:0,
+        width:'100%',
         height: sheetHeight,
-        maxHeight: '90vh',
+        maxHeight: 'calc(90vh - env(safe-area-inset-top, 44px) - 20px)',
         background:'#EFFCFC',
         borderRadius:'20px 20px 0 0',
+        paddingTop:'calc(env(safe-area-inset-top, 44px) + 12px)',
         zIndex:801,
         animation:'slideUpSheet 0.25s ease',
         boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
