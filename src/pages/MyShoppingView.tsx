@@ -711,7 +711,6 @@ function GiftBoxProgress({ total, checkedCount, myList, myChecked }: {
 
   const rows = slotCount > 12 ? 2 : 1
   // 한 행 12개, 박스 크기 고정
-  const BOX_SIZE = 18
   const GAP = 4
 
   return (
@@ -730,47 +729,44 @@ function GiftBoxProgress({ total, checkedCount, myList, myChecked }: {
       `}</style>
       <div style={{
         display:'grid',
-        gridTemplateColumns:`repeat(12, ${BOX_SIZE}px)`,
+        gridTemplateColumns:'repeat(12, 1fr)',
         gap: GAP,
         rowGap: GAP,
       }}>
         {Array.from({ length: slotCount }).map((_, i) => {
-          const isFilled = i < filledCount   // 담긴 상품
-          const isDone   = i < doneCount     // 구매 완료
+          const isFilled = i < filledCount
+          const isDone   = i < doneCount
 
           if (isDone) {
-            // 3단계: 핑크 선물박스
             return (
-              <svg key={i} viewBox="0 0 100 115" width={BOX_SIZE} height={Math.round(BOX_SIZE * 1.05)}
-                style={{ animation:'giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both', flexShrink:0 }}>
-                <rect x="10" y="42" width="80" height="62" rx="5" fill="#FF6B9D"/>
-                <rect x="6" y="24" width="88" height="22" rx="5" fill="#FF8FB3"/>
-                <rect x="43" y="24" width="14" height="80" fill="#ffffff"/>
-                <rect x="6" y="29" width="88" height="12" fill="#ffffff"/>
-                <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z" fill="#ffffff"/>
-                <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z" fill="#ffffff"/>
-                <circle cx="50" cy="19" r="7" fill="#FF6B9D"/>
-              </svg>
+              <div key={i} style={{ aspectRatio:'1', width:'100%' }}>
+                <svg viewBox="0 0 100 115" width="100%" height="100%"
+                  style={{ display:'block', animation:'giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both' }}>
+                  <rect x="10" y="42" width="80" height="62" rx="5" fill="#FF6B9D"/>
+                  <rect x="6" y="24" width="88" height="22" rx="5" fill="#FF8FB3"/>
+                  <rect x="43" y="24" width="14" height="80" fill="#ffffff"/>
+                  <rect x="6" y="29" width="88" height="12" fill="#ffffff"/>
+                  <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z" fill="#ffffff"/>
+                  <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z" fill="#ffffff"/>
+                  <circle cx="50" cy="19" r="7" fill="#FF6B9D"/>
+                </svg>
+              </div>
             )
           } else if (isFilled) {
-            // 2단계: 연한 핑크 정사각형
             return (
               <div key={i} style={{
-                width: BOX_SIZE, height: BOX_SIZE,
+                aspectRatio:'1', width:'100%',
                 borderRadius: 3,
                 background: '#FFD6E7',
-                flexShrink: 0,
                 animation: 'squarePop 0.25s cubic-bezier(.36,.07,.19,.97) both',
               }} />
             )
           } else {
-            // 1단계: 연한 회색 정사각형
             return (
               <div key={i} style={{
-                width: BOX_SIZE, height: BOX_SIZE,
+                aspectRatio:'1', width:'100%',
                 borderRadius: 3,
                 background: '#E2E8F0',
-                flexShrink: 0,
               }} />
             )
           }
