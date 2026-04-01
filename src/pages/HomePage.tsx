@@ -194,7 +194,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
         />
       )}
 
-      {/* 체크리스트 바텀시트 */}}
+      {/* 체크리스트 바텀시트 */}
       {showChecklist && (
         <ChecklistSheet
           state={state}
