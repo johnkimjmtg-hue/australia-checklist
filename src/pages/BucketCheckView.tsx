@@ -532,7 +532,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
             }</div>
             <div style={{ display:'flex', gap:6 }}>
               <button onClick={onEdit} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'none', background:'#29B6D0', color:'#fff', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
-                <Icon icon="ph:pencil-simple" width={13} height={13} color="#fff" />수정
+                <Icon icon="ph:pencil-simple" width={13} height={13} color="#fff" />수정하기
               </button>
               <button onClick={() => setShowDelete(true)} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)', color:'#DC2626', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
                 <Icon icon="ph:trash" width={13} height={13} color="#DC2626" />비우기
