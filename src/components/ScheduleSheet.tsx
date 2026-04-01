@@ -26,12 +26,7 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
         fontFamily:"-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif",
       }}>
 
-        {/* X 닫기 버튼 */}
-        <div style={{ display:'flex', justifyContent:'flex-end' }}>
-          <button onClick={onClose} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
-            <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
-          </button>
-        </div>
+
 
         {/* 제목 */}
         <div style={{ textAlign:'center', flexShrink:0 }}>
@@ -74,16 +69,17 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
         )}
 
         {/* 확인 버튼 */}
-        <button onClick={onClose} style={{
-          width:'100%', height:48, flexShrink:0,
-          background: currentDays.length > 0 ? '#29B6D0' : 'rgba(0,131,143,0.08)',
-          color: currentDays.length > 0 ? '#fff' : '#7BAAB5',
-          border:'none', borderRadius:12,
-          fontSize:15, fontWeight:700, cursor:'pointer',
-          fontFamily:'inherit', WebkitTapHighlightColor:'transparent', transition:'all 0.15s',
-        }}>
-          {currentDays.length > 0 ? `${currentDays.length}일 추가하기 ✓` : '닫기'}
-        </button>
+        {currentDays.length > 0 && (
+          <button onClick={onClose} style={{
+            width:'100%', height:48, flexShrink:0,
+            background:'#29B6D0', color:'#fff',
+            border:'none', borderRadius:12,
+            fontSize:15, fontWeight:700, cursor:'pointer',
+            fontFamily:'inherit', WebkitTapHighlightColor:'transparent', transition:'all 0.15s',
+          }}>
+            {`${currentDays.length}일 추가하기 ✓`}
+          </button>
+        )}
       </div>
     </>
   )
