@@ -152,33 +152,15 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
 
   return (
     <div style={{
-      background: colors.bgPage, minHeight:'100vh',
+      background: '#ffffff', minHeight:'100vh',
       fontFamily: font.family,
       paddingBottom: 80,
     }}>
-      {/* ── 히어로 배너 */}
-      <div style={{
-        position:'relative', overflow:'hidden',
-        height:120, marginBottom:0,
-      }}>
-        <div style={{
-          position:'absolute', inset:0,
-          backgroundImage:`url(${imgShopping})`,
-          backgroundSize:'cover', backgroundPosition:'center',
-        }}/>
-        <div style={{ position:'absolute', inset:0, padding:'12px 16px', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
-          <div style={{
-            fontSize:11, fontWeight:400, color:'rgba(255,255,255,0.85)',
-            textShadow:'0 1px 3px rgba(0,0,0,0.5)',
-          }}>
-            호주에서 꼭 사야하는 아이템을 모았어요.
-          </div>
-        </div>
-      </div>
+
 
       {/* ── 카테고리 탭 */}
       <div style={{
-        background: colors.bgCard, borderBottom: `1.5px solid ${colors.border}`,
+        background: '#ffffff', borderBottom: `1.5px solid ${colors.border}`,
         position:'sticky', top:0, zIndex:20,
         display:'flex', alignItems:'flex-start',
       }}>
@@ -186,18 +168,14 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
         {myList.length > 0 && onGoToMyList && (
           <div style={{ paddingLeft:14, paddingTop:10, paddingBottom:10, flexShrink:0 }}>
             <button className="cat-btn" onClick={onGoToMyList} style={{
-              height:34, padding:'0 12px', borderRadius:radius.full, cursor:'pointer',
+              height:34, padding:'0 14px', borderRadius:radius.full, cursor:'pointer',
               background: '#FF6B9D', border: 'none',
               color: '#fff',
               fontSize: font.size.sm, fontWeight: font.weight.bold, whiteSpace:'nowrap',
               boxShadow:'0 3px 8px rgba(255,107,157,0.4)',
               WebkitTapHighlightColor: 'transparent',
-              display:'flex', alignItems:'center', gap:5,
             }}>
-              <svg width="14" height="14" viewBox="0 0 256 256" fill="none">
-                <path fill="#fff" d="M224,56H175.4A48,48,0,0,0,80.6,56H32A16,16,0,0,0,16,72V200a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V72A16,16,0,0,0,224,56ZM128,32a32,32,0,0,1,30.86,24H97.14A32,32,0,0,1,128,32Zm0,120a48,48,0,0,1-48-48,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0A48,48,0,0,1,128,152Z"/>
-              </svg>
-              {myList.length}
+              내 쇼핑리스트
             </button>
           </div>
         )}
@@ -230,7 +208,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
         {/* ── 검색창 */}
         <div style={{
           display:'flex', alignItems:'center', gap:spacing[2],
-          background: colors.bgCard, border:`1.5px solid ${colors.border}`, borderRadius:radius.sm,
+          background: '#ffffff', border:`1.5px solid ${colors.border}`, borderRadius:radius.sm,
           padding:`0 ${spacing[3]}px`, height:42, marginBottom: spacing[3],
         }}>
           <Icon icon="ph:magnifying-glass" width={16} height={16} color={colors.textTertiary} />
@@ -260,7 +238,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
             </div>
             <div className="featured-scroll" style={{ display:'flex', gap: spacing[2], paddingBottom: spacing[2], overflowX:'auto' }}>
               {featured.map(p => (
-                <div key={p.id} style={{ flexShrink:0, width:160, background: colors.bgCard, borderRadius: radius.md, overflow:'hidden', border:`1px solid ${colors.border}`, position:'relative', boxShadow: shadow.card }}>
+                <div key={p.id} style={{ flexShrink:0, width:160, background: '#ffffff', borderRadius: radius.md, overflow:'hidden', border:`1px solid ${colors.border}`, position:'relative', boxShadow: shadow.card }}>
                   <div className="prod-card" onClick={() => setSelProduct(p)} style={{ cursor:'pointer' }}>
                   <div style={{
                     width:'100%', height:120,
@@ -336,7 +314,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap: spacing[2] }}>
           {filtered.slice(0, displayCount).map((p, i) => (
             <div key={p.id} style={{
-              background: colors.bgCard, borderRadius: radius.md,
+              background: '#ffffff', borderRadius: radius.md,
               border:`1px solid ${colors.border}`,
               overflow:'hidden',
               animation:`fadeUp 0.25s ease ${i * 0.04}s both`,
@@ -413,101 +391,61 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
       {/* ── 상품 상세 바텀시트 */}
       {selProduct && (
         <>
-          <div onClick={() => setSelProduct(null)} style={{
-            position:'fixed', inset:0, background:'rgba(0,0,0,0.5)',
-            zIndex:500, animation:'fadeIn 0.2s ease',
-          }} />
-          <div style={{
-            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background: colors.bgCard,
-            borderRadius:radius.xl, zIndex:501,
-            animation:'slideUp 0.3s ease',
-            maxHeight:'85vh', overflowY:'auto',
-            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1100 }} />
+          <div onClick={e => e.stopPropagation()} style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, background:'#ffffff',
+            borderRadius:'20px 20px 0 0', maxHeight:'72vh', overflowY:'auto',
+            zIndex:1101, animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            fontFamily:"inherit", display:'flex', flexDirection:'column',
           }}>
-            <style>{`@keyframes slideUp{from{transform:translateX(-50%) translateY(100%)}to{transform:translateX(-50%) translateY(0)}}
-            @keyframes fadeIn{from{opacity:0}to{opacity:1}}`}</style>
-
-            {/* 드래그 핸들 */}
-            <div style={{ width:40, height:4, borderRadius:2, background: colors.border, margin:'12px auto 0' }} />
-
-            <div style={{
-              width:'100%', height:220,
-              background: selProduct.image_url ? 'none' : colors.gray100,
-              display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden',
-            }}>
-              {selProduct.image_url
-                ? <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                : <Icon icon="ph:shopping-bag" width={60} height={60} color={colors.gray300} />
-              }
-            </div>
-
-            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px 40px` }}>
-              <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom: spacing[2], alignItems:'center' }}>
-                {selProduct.tags.map(tag => (
-                  <span key={tag} style={{
-                    fontSize: font.size.xs, fontWeight: font.weight.bold, padding:'3px 8px', borderRadius: radius.sm,
-                    background: TAG_COLOR[tag]?.bg ?? colors.gray100,
-                    color: TAG_COLOR[tag]?.color ?? colors.textSecondary,
-                  }}>{tag}</span>
-                ))}
-                <span style={{
-                  fontSize: font.size.xs, fontWeight: font.weight.bold, padding:'3px 8px', borderRadius: radius.sm,
-                  background: colors.bgPage,
-                  color: PRICE_COLOR[selProduct.price_range] ?? colors.textSecondary,
-                  border:`1px solid ${PRICE_COLOR[selProduct.price_range] ?? colors.border}`,
-                  marginLeft:'auto',
-                }}>
-                  {selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}
-                </span>
-              </div>
-
-              <div style={{ fontSize: font.size.xl, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom:4 }}>{selProduct.name}</div>
-              <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[3] }}>{selProduct.brand}</div>
-
-              {selProduct.description && (
-                <div style={{ fontSize: font.size.sm, color: colors.textPrimary, lineHeight:1.7, marginBottom: spacing[4] }}>
-                  {selProduct.description}
-                </div>
-              )}
-
-              {selProduct.where_to_buy.length > 0 && (
-                <div style={{ marginBottom: spacing[4] }}>
-                  <div style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.textTertiary, letterSpacing:0.5, marginBottom: spacing[2] }}>
-                    어디서 살 수 있어요?
-                  </div>
-                  <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
-                    {selProduct.where_to_buy.map(store => (
-                      <span key={store} style={{
-                        fontSize: font.size.sm, fontWeight: font.weight.medium, padding:'5px 10px', borderRadius: radius.sm,
-                        background: colors.bgPage, color: colors.textSecondary,
-                        border:`1px solid ${colors.border}`,
-                      }}>🏪 {store}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <button onClick={() => { myList.includes(selProduct.id) ? removeFromMyList(selProduct.id) : addToMyList(selProduct.id) }} style={{
-                width:'100%', height:50, borderRadius: radius.md, border: '1.5px solid #FF6B9D', cursor:'pointer',
-                background: myList.includes(selProduct.id) ? '#FF6B9D' : colors.bgCard,
-                color: myList.includes(selProduct.id) ? '#fff' : '#FF6B9D',
-                fontSize: font.size.md, fontWeight: font.weight.bold,
-                display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-                marginBottom: spacing[2],
-                WebkitTapHighlightColor:'transparent',
-                fontFamily: font.family,
-              }}>
-                <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color={myList.includes(selProduct.id) ? '#fff' : '#FF6B9D'} />
-                {myList.includes(selProduct.id) ? '찜 취소하기' : '내 쇼핑리스트에 찜하기'}
+            <div style={{ flexShrink:0, display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+              <button onClick={() => setSelProduct(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
               </button>
-
-              <button onClick={() => setSelProduct(null)} style={{
-                width:'100%', height:50, borderRadius: radius.md,
-                border:`1.5px solid ${colors.border}`, background: colors.bgCard,
-                color: colors.textTertiary, fontSize: font.size.md, fontWeight: font.weight.bold,
-                cursor:'pointer', WebkitTapHighlightColor:'transparent', fontFamily: font.family,
-              }}>닫기</button>
+            </div>
+            <div style={{ flex:1, overflowY:'auto' }}>
+              {selProduct.image_url && (
+                <div style={{ width:'100%', height:220, overflow:'hidden' }}>
+                  <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                </div>
+              )}
+              <div style={{ padding:'16px 16px 40px' }}>
+                <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, alignItems:'center' }}>
+                  {selProduct.tags.map(tag => (
+                    <span key={tag} style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:6, background: TAG_COLOR[tag]?.bg ?? '#f5f5f5', color: TAG_COLOR[tag]?.color ?? '#666' }}>{tag}</span>
+                  ))}
+                  <span style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:6, background:'#fff0f5', color: PRICE_COLOR[selProduct.price_range] ?? '#666', border:`1px solid ${PRICE_COLOR[selProduct.price_range] ?? '#ccc'}`, marginLeft:'auto' }}>
+                    {selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}
+                  </span>
+                </div>
+                <div style={{ fontSize:18, fontWeight:700, color:'#0D3349', marginBottom:4, lineHeight:1.4 }}>{selProduct.name}</div>
+                <div style={{ fontSize:13, color:'#7BAAB5', marginBottom:12 }}>{selProduct.brand}</div>
+                {selProduct.description && (
+                  <div style={{ fontSize:14, color:'#475569', lineHeight:1.7, marginBottom:16 }}>{selProduct.description}</div>
+                )}
+                {selProduct.where_to_buy.length > 0 && (
+                  <div style={{ marginBottom:16 }}>
+                    <div style={{ fontSize:11, fontWeight:700, color:'#1565A0', marginBottom:8 }}>어디서 살 수 있어요?</div>
+                    <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                      {selProduct.where_to_buy.map(store => (
+                        <span key={store} style={{ fontSize:12, fontWeight:600, padding:'5px 10px', borderRadius:8, background:'rgba(255,107,157,0.08)', color:'#FF6B9D', border:'1px solid rgba(255,107,157,0.2)' }}>🏪 {store}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <button onClick={() => { myList.includes(selProduct.id) ? removeFromMyList(selProduct.id) : addToMyList(selProduct.id) }} style={{
+                  width:'100%', height:48, borderRadius:12, border:'1.5px solid #FF6B9D', cursor:'pointer',
+                  background: myList.includes(selProduct.id) ? '#FF6B9D' : '#ffffff',
+                  color: myList.includes(selProduct.id) ? '#fff' : '#FF6B9D',
+                  fontSize:15, fontWeight:700,
+                  display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+                  WebkitTapHighlightColor:'transparent',
+                }}>
+                  <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color={myList.includes(selProduct.id) ? '#fff' : '#FF6B9D'} />
+                  {myList.includes(selProduct.id) ? '찜 취소하기' : '내 쇼핑리스트에 찜하기'}
+                </button>
+              </div>
             </div>
           </div>
         </>
