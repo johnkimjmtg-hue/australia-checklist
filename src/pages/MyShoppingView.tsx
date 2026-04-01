@@ -258,7 +258,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                     <span style={{ fontSize:11, fontWeight:700, color: PRICE_COLOR[p.price_range] ?? '#666' }}>{p.price_range} · {PRICE_LABEL[p.price_range]}</span>
                     <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(p.id) }} style={{ background:'none', border:'none', cursor:'pointer', padding:2, display:'flex', alignItems:'center' }}>
-                      <Icon icon="ph:trash" width={14} height={14} color="#ccc" />
+                      <Icon icon="ph:trash" width={14} height={14} color="#94A3B8" />
                     </button>
                   </div>
                 </div>
