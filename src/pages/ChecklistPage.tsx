@@ -389,7 +389,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                         {checked && dayCount===0 && (
                           <span
                             onClick={e=>{ e.stopPropagation(); if(trip) setSheetItem(item as CheckItem) }}
-                            style={{ fontSize:font.size.xs, color:colors.warning, fontWeight:font.weight.bold, cursor:'pointer', textDecoration:'underline', textUnderlineOffset:2 }}
+                            style={{ fontSize:font.size.xs, color:'#CC3300', fontWeight:font.weight.bold, cursor:'pointer', textDecoration:'underline', textUnderlineOffset:2 }}
                           >일정 미지정</span>
                         )}
                         {checked && dayCount>0 && (state.schedules[item.id]??[]).map(dayIdx=>(
@@ -752,25 +752,31 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }: { step
   return (
     <>
       <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:500, animation:'fadeIn 0.2s ease' }} />
-      <div style={{ position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'calc(100% - 32px)', maxWidth:340, background:colors.bgCard, borderRadius:radius.lg, padding:`${spacing[5]}px`, zIndex:501, animation:'scaleIn 0.2s ease', maxHeight:'90vh', overflowY:'auto', fontFamily:font.family }}>
+      <div style={{ position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'calc(100% - 32px)', maxWidth:340, background:'#ffffff', borderRadius:radius.lg, padding:`${spacing[5]}px`, zIndex:501, animation:'scaleIn 0.2s ease', maxHeight:'90vh', overflowY:'auto', fontFamily:font.family }}>
+        {/* X 닫기 버튼 */}
+        <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:spacing[2] }}>
+          <button onClick={onClose} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+            <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
+          </button>
+        </div>
         <div style={{ textAlign:'center', marginBottom:spacing[4] }}>
-          <div style={{ ...T.xs, letterSpacing:1, marginBottom:spacing[1] }}>{isStart?'STEP 1 / 2':'STEP 2 / 2'}</div>
-          <div style={{ ...T.h4, color:'#29B6D0' }}>{isStart?'✈️ 출발일을 선택해주세요':'🏠 도착일을 선택해주세요'}</div>
-          {!isStart&&startDate&&<div style={{ ...T.xs, marginTop:spacing[1] }}>출발일: {startDate}</div>}
+          <div style={{ fontSize:font.size.xs, color:'#7BAAB5', letterSpacing:1, marginBottom:spacing[1] }}>{isStart?'STEP 1 / 2':'STEP 2 / 2'}</div>
+          <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:'#0D3349' }}>{isStart?'✈️ 출발일을 선택해주세요':'🏠 도착일을 선택해주세요'}</div>
+          {!isStart&&startDate&&<div style={{ fontSize:font.size.xs, color:'#7BAAB5', marginTop:spacing[1] }}>출발일: {startDate}</div>}
         </div>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:spacing[3] }}>
-          <button onClick={()=>{ if(month===1){setYear(y=>y-1);setMonth(12)} else setMonth(m=>m-1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, cursor:'pointer', fontSize:14, color:'#29B6D0', fontWeight:font.weight.bold }}>‹</button>
-          <div style={{ ...T.h4 }}>{year}년 {month}월</div>
-          <button onClick={()=>{ if(month===12){setYear(y=>y+1);setMonth(1)} else setMonth(m=>m+1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)', background:colors.bgCard, cursor:'pointer', fontSize:14, color:'#29B6D0', fontWeight:font.weight.bold }}>›</button>
+          <button onClick={()=>{ if(month===1){setYear(y=>y-1);setMonth(12)} else setMonth(m=>m-1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)', background:'#ffffff', cursor:'pointer', fontSize:14, color:'#29B6D0', fontWeight:font.weight.bold }}>‹</button>
+          <div style={{ fontSize:font.size.md, fontWeight:font.weight.bold, color:'#0D3349' }}>{year}년 {month}월</div>
+          <button onClick={()=>{ if(month===12){setYear(y=>y+1);setMonth(1)} else setMonth(m=>m+1) }} style={{ width:32, height:32, borderRadius:radius.sm, border:'1px solid rgba(0,131,143,0.2)', background:'#ffffff', cursor:'pointer', fontSize:14, color:'#29B6D0', fontWeight:font.weight.bold }}>›</button>
         </div>
         <MiniCalendar year={year} month={month} selected={selected} minDate={minDate} onSelect={d=>setSelected(d)} />
-        <div style={{ marginTop:spacing[3], padding:`${spacing[3]}px`, borderRadius:radius.sm, background:selected?colors.primaryLight:colors.gray100, textAlign:'center', fontSize:font.size.sm, fontWeight:font.weight.bold, color:selected?colors.primary:colors.textTertiary }}>
+        <div style={{ marginTop:spacing[3], padding:`${spacing[3]}px`, borderRadius:radius.sm, background:selected?'rgba(41,182,208,0.12)':'rgba(0,131,143,0.06)', textAlign:'center', fontSize:font.size.sm, fontWeight:font.weight.bold, color:selected?'#29B6D0':'#7BAAB5' }}>
           {selected?`📅 ${selected}`:'날짜를 선택해주세요'}
         </div>
-        <button onClick={()=>selected&&onSelect(selected)} style={{ width:'100%', height:48, borderRadius:radius.sm, border:'none', cursor:selected?'pointer':'default', background:selected?colors.primary:colors.gray100, color:selected?'#fff':colors.textTertiary, fontSize:font.size.md, fontWeight:font.weight.bold, marginTop:spacing[3], fontFamily:font.family }}>
+        <button onClick={()=>selected&&onSelect(selected)} style={{ width:'100%', height:48, borderRadius:radius.sm, border:'none', cursor:selected?'pointer':'default', background:selected?'#29B6D0':'rgba(0,131,143,0.08)', color:selected?'#fff':'#7BAAB5', fontSize:font.size.md, fontWeight:font.weight.bold, marginTop:spacing[3], fontFamily:font.family }}>
           {isStart?'다음 →':'완료'}
         </button>
-        {isStart&&<button onClick={onReset} style={{ width:'100%', marginTop:spacing[2], background:'none', border:'none', color:colors.textTertiary, fontSize:font.size.sm, cursor:'pointer', fontFamily:font.family }}>일정 초기화</button>}
+        {isStart&&<button onClick={onReset} style={{ width:'100%', marginTop:spacing[2], background:'none', border:'none', color:'#7BAAB5', fontSize:font.size.sm, cursor:'pointer', fontFamily:font.family }}>일정 초기화</button>}
       </div>
     </>
   )
