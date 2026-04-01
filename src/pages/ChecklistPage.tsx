@@ -363,7 +363,6 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                     }}
                     onClick={()=>{
                       if(!db) return
-                      setDetailItem(db)
                       onDetailItem?.(db)
                       if((db.related_business_ids?.length??0)>0){
                         const cached = getCachedBusinesses()
