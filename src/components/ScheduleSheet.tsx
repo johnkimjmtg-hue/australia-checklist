@@ -28,6 +28,13 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
 
 
 
+        {/* X 닫기 버튼 */}
+        <div style={{ display:'flex', justifyContent:'flex-end' }}>
+          <button onClick={onClose} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+            <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
+          </button>
+        </div>
+
         {/* 제목 */}
         <div style={{ textAlign:'center', flexShrink:0 }}>
           <div style={{ fontSize:11, color:'#7BAAB5', fontWeight:500, marginBottom:4 }}>일정 추가</div>
