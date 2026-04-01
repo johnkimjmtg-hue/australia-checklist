@@ -301,7 +301,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           })
         )}
 
-        {/* 전체 완료 축하 */}}
+        {/* 전체 완료 축하 */}
       </div>
 
 
