@@ -154,66 +154,71 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
       <PetalBurst trigger={petalTrigger} />
 
       {/* ── 진행 카드 */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background: '#ffffff', padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
+      <div style={{ background: '#ffffff', padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
         <div style={{
           background: '#ffffff',
           borderRadius: radius.lg,
-          border: `1.5px solid ${colors.gray300}`,
-          padding: `${spacing[4]}px`, display:'flex', alignItems:'center', gap: spacing[4],
+          border: `1px solid #FF6B9D`,
+          padding: `14px 16px`,
         }}>
+          {/* 상단: 제목 + 카운터 */}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+            <div style={{ fontSize:18, fontWeight:700, color:'#0D3349' }}>내 쇼핑리스트</div>
+            <div>
+              <span style={{ fontSize:22, fontWeight:900, color:'#29B6D0' }}>{checkedCount}</span>
+              <span style={{ fontSize:15, color:'#7BAAB5' }}> / {total} 완료</span>
+            </div>
+          </div>
           {/* 선물박스 그리드 */}
           <GiftBoxProgress total={total} checkedCount={checkedCount} myList={myList} myChecked={myChecked} />
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize: font.size['2xl'], fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1], lineHeight:1.2 }}>내 쇼핑리스트</div>
-            <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom: spacing[1] }}>
-              <span style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: colors.textPrimary, lineHeight:1 }}>{checkedCount}</span>
-              <span style={{ fontSize: font.size.xl, fontWeight: font.weight.medium, color: colors.textSecondary }}>/{total}개 구매 완료</span>
+          {/* 프로그레스바 */}
+          <div style={{ height:6, borderRadius:3, background:'#E0F7FA', overflow:'hidden', marginTop:10 }}>
+            <div style={{ width:`${pct}%`, height:'100%', background:'#29B6D0', borderRadius:3, transition:'width 0.4s ease' }} />
+          </div>
+          {/* 하단: 메시지 + 버튼 */}
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:10 }}>
+            <div style={{ fontSize:12, color:'#7BAAB5' }}>
+              {pct === 0
+                ? '찜한 상품을 체크하며 쇼핑하세요! 🙌'
+                : pct < 25  ? '좋은 시작이에요! 계속 담아봐요 💪'
+                : pct < 50  ? '절반을 향해 달려가고 있어요! 🏃'
+                : pct < 75  ? '절반을 넘었어요! 조금만 더! ⚡'
+                : pct < 100 ? '거의 다 왔어요! 마지막 스퍼트! 🔥'
+                :             '쇼핑 완료! 모든 상품을 구매했어요 🎉'}
             </div>
-            <div style={{ fontSize: font.size.sm, color: colors.textTertiary, lineHeight:1.5 }}>
-              {pct === 100
-                ? '쇼핑 완료! 모든 상품을 구매했어요 🎉'
-                : pct > 0
-                ? SHOPPING_MSGS[msgIndex]
-                : '찜한 상품을 체크하며 쇼핑하세요!'}
+            <div style={{ display:'flex', gap:6 }}>
+              <button onClick={onBack} style={{
+                height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
+                border:'none', background:'rgba(0,0,0,0.08)',
+                color:'#0D3349', fontSize:11, fontWeight:font.weight.bold,
+                display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+                cursor:'pointer', fontFamily: font.family,
+              }}>
+                <Icon icon="ph:shopping-bag" width={12} height={12} color="#0D3349" />
+                추가하기
+              </button>
+              <button onClick={() => setShowReceipt(true)} style={{
+                height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
+                border:`1px solid ${colors.border}`, background: '#ffffff',
+                color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
+                display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+                cursor:'pointer', fontFamily: font.family,
+              }}>
+                <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
+                공유하기
+              </button>
+              <button onClick={() => setShowDeleteAll(true)} style={{
+                height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
+                border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
+                color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
+                display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+                cursor:'pointer', fontFamily: font.family,
+              }}>
+                <Icon icon="ph:trash" width={12} height={12} color={colors.danger} />
+                비우기
+              </button>
             </div>
           </div>
-          {/* 퍼센트 */}
-          <div style={{ textAlign:'center', flexShrink:0 }}>
-            <div style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: pct === 100 ? '#FF6B9D' : colors.textPrimary, lineHeight:1 }}>{pct}%</div>
-          </div>
-        </div>
-        {/* ── 버튼 */}
-        <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
-          <button onClick={onBack} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:'none', background: '#FF6B9D',
-            color: '#fff', fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:shopping-bag" width={12} height={12} color="#fff" />
-            추가하기
-          </button>
-          <button onClick={() => setShowReceipt(true)} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.border}`, background: '#ffffff',
-            color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
-            공유하기
-          </button>
-          <button onClick={() => setShowDeleteAll(true)} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
-            color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:trash" width={12} height={12} color={colors.danger} />
-            리스트 비우기
-          </button>
         </div>
       </div>
 
@@ -288,7 +293,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 <button onClick={e => { e.stopPropagation(); toggleChecked(p.id) }} style={{
                   position:'absolute', top:8, right:8,
                   width:32, height:32, borderRadius:'50%', border:'none', cursor:'pointer',
-                  background: checked ? '#FF6B9D' : 'rgba(0,0,0,0.06)',
+                  background: checked ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.06)',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   WebkitTapHighlightColor:'transparent', transition:'all 0.2s',
                 }}>
@@ -301,7 +306,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           })
         )}
 
-        {/* 전체 완료 축하 */}}
+        {/* 전체 완료 축하 */}
       </div>
 
 
@@ -718,87 +723,93 @@ function ShoppingReceiptModal({ myProducts, myChecked, onClose }: {
 }
 
 
-// ── 선물박스 프로그래스
-function GiftBoxProgress({ total, checkedCount }: {
+// ── 선물박스 프로그래스 (3단계: 회색 정사각형 → 핑크 정사각형 → 핑크 선물박스)
+function GiftBoxProgress({ total, checkedCount, myList, myChecked }: {
   total: number
   checkedCount: number
   myList: string[]
   myChecked: Record<string, boolean>
 }) {
-  const displayCount = Math.min(total, 16)
+  // 12개 기본, 13개 이상이면 24칸
+  const slotCount = total > 12 ? 24 : 12
+  // 실제 담긴 상품 수 (최대 슬롯 수까지)
+  const filledCount = Math.min(total, slotCount)
+  // 구매 완료 수 (최대 슬롯 수까지)
+  const doneCount = Math.min(checkedCount, slotCount)
 
-  // 고정 영역 110x110 안에서 박스 크기/레이아웃 결정
-  const AREA = 110
-  const cols = displayCount === 1 ? 1 : displayCount <= 4 ? 2 : displayCount <= 9 ? 3 : displayCount <= 16 ? 4 : 4
-  const rows = Math.ceil(displayCount / cols)
-  const gap = 4
-  const boxSize = Math.min(
-    Math.floor((AREA - gap * (cols - 1)) / cols),
-    Math.floor((AREA - gap * (rows - 1)) / rows),
-  )
+  const rows = slotCount > 12 ? 2 : 1
+  // 한 행 12개, 박스 크기 고정
+  const BOX_SIZE = 18
+  const GAP = 4
 
   return (
-    <div style={{
-      flexShrink: 0,
-      width: AREA, height: AREA,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}>
+    <div style={{ width:'100%' }}>
       <style>{`
         @keyframes giftPop {
+          0%   { transform: scale(0.5); opacity:0.5; }
+          65%  { transform: scale(1.3); }
+          100% { transform: scale(1); opacity:1; }
+        }
+        @keyframes squarePop {
           0%   { transform: scale(0.5); opacity:0.5; }
           65%  { transform: scale(1.2); }
           100% { transform: scale(1); opacity:1; }
         }
       `}</style>
       <div style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: gap,
-        width: cols * (boxSize + gap) - gap,
-        justifyContent: 'center',
-        alignContent: 'center',
+        display:'grid',
+        gridTemplateColumns:`repeat(12, ${BOX_SIZE}px)`,
+        gap: GAP,
+        rowGap: GAP,
       }}>
-        {Array.from({ length: displayCount }).map((_, i) => {
-          const filled = i < checkedCount
-          const body = filled ? '#FF6B9D' : '#CBD5E1'
-          const lid  = filled ? '#FF8FB3' : '#E2E8F0'
-          const rib  = filled ? '#ffffff' : '#F8FAFC'
-          const knot = filled ? '#FF6B9D' : '#CBD5E1'
+        {Array.from({ length: slotCount }).map((_, i) => {
+          const isFilled = i < filledCount   // 담긴 상품
+          const isDone   = i < doneCount     // 구매 완료
 
-          return (
-            <svg key={i} viewBox="0 0 100 115" width={boxSize} height={Math.round(boxSize * 1.05)}
-              style={{
-                animation: filled ? `giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both` : 'none',
-              }}>
-              {/* 박스 본체 */}
-              <rect x="10" y="42" width="80" height="62" rx="5" fill={body}/>
-              {/* 뚜껑 */}
-              <rect x="6" y="24" width="88" height="22" rx="5" fill={lid}/>
-              {/* 리본 세로 */}
-              <rect x="43" y="24" width="14" height="80" fill={rib}/>
-              {/* 리본 가로 */}
-              <rect x="6" y="29" width="88" height="12" fill={rib}/>
-              {/* 나비매듭 왼쪽 */}
-              <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z" fill={rib}/>
-              {/* 나비매듭 오른쪽 */}
-              <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z" fill={rib}/>
-              {/* 매듭 중앙 */}
-              <circle cx="50" cy="19" r="7" fill={knot}/>
-            </svg>
-          )
+          if (isDone) {
+            // 3단계: 핑크 선물박스
+            return (
+              <svg key={i} viewBox="0 0 100 115" width={BOX_SIZE} height={Math.round(BOX_SIZE * 1.05)}
+                style={{ animation:'giftPop 0.35s cubic-bezier(.36,.07,.19,.97) both', flexShrink:0 }}>
+                <rect x="10" y="42" width="80" height="62" rx="5" fill="#FF6B9D"/>
+                <rect x="6" y="24" width="88" height="22" rx="5" fill="#FF8FB3"/>
+                <rect x="43" y="24" width="14" height="80" fill="#ffffff"/>
+                <rect x="6" y="29" width="88" height="12" fill="#ffffff"/>
+                <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z" fill="#ffffff"/>
+                <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z" fill="#ffffff"/>
+                <circle cx="50" cy="19" r="7" fill="#FF6B9D"/>
+              </svg>
+            )
+          } else if (isFilled) {
+            // 2단계: 연한 핑크 정사각형
+            return (
+              <div key={i} style={{
+                width: BOX_SIZE, height: BOX_SIZE,
+                borderRadius: 3,
+                background: '#FFD6E7',
+                flexShrink: 0,
+                animation: 'squarePop 0.25s cubic-bezier(.36,.07,.19,.97) both',
+              }} />
+            )
+          } else {
+            // 1단계: 연한 회색 정사각형
+            return (
+              <div key={i} style={{
+                width: BOX_SIZE, height: BOX_SIZE,
+                borderRadius: 3,
+                background: '#E2E8F0',
+                flexShrink: 0,
+              }} />
+            )
+          }
         })}
       </div>
-      {total > 16 && (
-        <div style={{ fontSize:10, color:'#5a3a5a', fontWeight:700, textAlign:'center', marginTop:2 }}>
-          +{total - 16}개
-        </div>
+      {total > 24 && (
+        <div style={{ fontSize:10, color:'#7BAAB5', marginTop:4 }}>+{total - 24}개 더</div>
       )}
     </div>
   )
 }
-
 // ── 공유 카드용 미니 선물박스 그리드
 function MiniGiftGrid({ total, checkedCount }: { total: number; checkedCount: number }) {
   const displayCount = Math.min(total, 16)
