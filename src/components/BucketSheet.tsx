@@ -8,17 +8,10 @@ import { getCachedBusinesses } from '../lib/dataCache'
 import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 import { Icon } from '@iconify/react'
-import { font, radius, spacing, T } from '../styles/tokens'
 import { getCachedChecklist } from '../lib/dataCache'
 import BucketCheckView from '../pages/BucketCheckView'
 import ChecklistPage from '../pages/ChecklistPage'
 
-type DBItem = {
-  id: string; category_id: string; label: string; icon: string | null
-  sort_order: number; address?: string | null; description?: string | null
-  related_business_id?: string | null; related_business_ids?: string[] | null
-  image_url?: string | null; tips?: string | null; related_product_ids?: string[] | null
-}
 type DBItem = {
   id: string; category_id: string; label: string; icon: string | null
   sort_order: number; address?: string | null; description?: string | null
@@ -117,6 +110,13 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
               initialTab="bucketlist"
               onGoHome={handleBackToBucket}
               embedded
+              onDetailItem={(item) => {
+                setDetailItem(item)
+                if (item?.related_business_ids?.length) {
+                  const cached = getCachedBusinesses()
+                  setDetailBizCards(cached?.filter((b: Business) => item.related_business_ids!.includes(b.id)) ?? [])
+                } else setDetailBizCards([])
+              }}
             />
           )}
         </div>
