@@ -411,6 +411,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         return
       }
       setDetailItem(db)
+      onDetailItem?.(db)
       if ((db.related_business_ids?.length ?? 0) > 0) {
         const cached = getCachedBusinesses()
         setDetailBizCards(cached?.filter(b => db.related_business_ids!.includes(b.id)) ?? [])
@@ -511,10 +512,10 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       <div style={{ padding:'16px 16px 0' }}>
         <div style={{ background:'#ffffff', borderRadius:16, padding:'14px 16px', border:'1px solid rgba(0,131,143,0.20)' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
-            <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>내 버킷리스트</div>
+            <div style={{ fontSize:18, fontWeight:700, color:'#0D3349' }}>내 버킷리스트</div>
             <div style={{ fontSize:13, color:'#1565A0' }}>
-              <span style={{ fontSize:18, fontWeight:900, color:'#29B6D0' }}>{achievedCount}</span>
-              <span style={{ color:'#7BAAB5' }}> / {total} 완료</span>
+              <span style={{ fontSize:22, fontWeight:900, color:'#29B6D0' }}>{achievedCount}</span>
+              <span style={{ fontSize:15, color:'#7BAAB5' }}> / {total} 완료</span>
             </div>
           </div>
           <div style={{ height:6, borderRadius:3, background:'#E0F7FA', overflow:'hidden' }}>
