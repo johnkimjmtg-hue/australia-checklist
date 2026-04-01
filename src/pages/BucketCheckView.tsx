@@ -531,11 +531,11 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                           '모든 항목을 완료했어요! 축하합니다 🎉'
             }</div>
             <div style={{ display:'flex', gap:6 }}>
-              <button onClick={onEdit} style={{ height:26, paddingLeft:10, paddingRight:10, borderRadius:20, border:'none', background:'#29B6D0', color:'#fff', fontSize:11, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
-                <Icon icon="ph:pencil-simple" width={11} height={11} color="#fff" />수정
+              <button onClick={onEdit} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'none', background:'#29B6D0', color:'#fff', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
+                <Icon icon="ph:pencil-simple" width={13} height={13} color="#fff" />수정
               </button>
-              <button onClick={() => setShowDelete(true)} style={{ height:26, paddingLeft:10, paddingRight:10, borderRadius:20, border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)', color:'#DC2626', fontSize:11, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
-                <Icon icon="ph:trash" width={11} height={11} color="#DC2626" />비우기
+              <button onClick={() => setShowDelete(true)} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)', color:'#DC2626', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
+                <Icon icon="ph:trash" width={13} height={13} color="#DC2626" />비우기
               </button>
             </div>
           </div>
