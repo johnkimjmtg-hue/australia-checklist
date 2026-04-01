@@ -165,20 +165,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
         display:'flex', alignItems:'flex-start',
       }}>
         {/* 찜 버튼 - 고정 */}
-        {myList.length > 0 && onGoToMyList && (
-          <div style={{ paddingLeft:14, paddingTop:10, paddingBottom:10, flexShrink:0 }}>
-            <button className="cat-btn" onClick={onGoToMyList} style={{
-              height:34, padding:'0 14px', borderRadius:radius.full, cursor:'pointer',
-              background: '#FF6B9D', border: 'none',
-              color: '#fff',
-              fontSize: font.size.sm, fontWeight: font.weight.bold, whiteSpace:'nowrap',
-              boxShadow:'0 3px 8px rgba(255,107,157,0.4)',
-              WebkitTapHighlightColor: 'transparent',
-            }}>
-              내 쇼핑리스트
-            </button>
-          </div>
-        )}
+
         {/* 카테고리 스크롤 */}
         <div className="cat-scroll" style={{ display:'flex', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, overflowX:'auto', flex:1 }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{
@@ -225,6 +212,17 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
           {search && (
             <button onClick={() => setSearch('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex', alignItems:'center' }}>
               <Icon icon="ph:x" width={14} height={14} color={colors.textTertiary} />
+            </button>
+          )}
+          {myList.length > 0 && onGoToMyList && (
+            <button onClick={onGoToMyList} style={{
+              flexShrink:0, height:28, padding:'0 10px', borderRadius:20, cursor:'pointer',
+              background: '#FF6B9D', border: 'none',
+              color: '#fff', fontSize: 12, fontWeight: 700, whiteSpace:'nowrap',
+              WebkitTapHighlightColor: 'transparent',
+              display:'flex', alignItems:'center', gap:4,
+            }}>
+              <Icon icon="ph:door-open" width={12} height={12} color="#fff" />내 쇼핑리스트
             </button>
           )}
         </div>
