@@ -408,7 +408,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   return (
     <div ref={pageRef} style={{
       height: embedded ? 'auto' : '100vh',
-      background: colors.bgPage,
+      background: '#ffffff',
       fontFamily: font.family,
       display: 'flex', flexDirection: 'column',
       overflow: embedded ? 'visible' : 'hidden',
@@ -455,7 +455,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       {/* ── 도시 탭 (헤더 역할) */}
       <div style={{
         position:'sticky', top:0, zIndex:30,
-        background: colors.bgCard, borderBottom:`1.5px solid ${colors.border}`,
+        background: '#ffffff', borderBottom:`1.5px solid ${colors.border}`,
       }}>
         <div style={{ display:'flex' }}>
           {([
@@ -466,9 +466,9 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
               flex:1, height:44, border:'none', cursor:'pointer',
               fontWeight: city===c.id ? font.weight.bold : font.weight.regular,
               fontSize: font.size.md,
-              color: city===c.id ? colors.primary : colors.textTertiary,
+              color: city===c.id ? '#8B5E3C' : colors.textTertiary,
               background: 'none',
-              borderBottom: city===c.id ? `2px solid ${colors.primary}` : '2px solid transparent',
+              borderBottom: city===c.id ? `2px solid ${'#8B5E3C'}` : '2px solid transparent',
               transition:'all 0.15s',
               WebkitTapHighlightColor: 'transparent',
               fontFamily: font.family,
@@ -480,9 +480,9 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       </div>
 
       {/* ── 상황판 */}
-      <div style={{ background: colors.bgPage, padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
+      <div style={{ background: '#ffffff', padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
         <div style={{
-          background: colors.bgCard,
+          background: '#ffffff',
           borderRadius: radius.lg,
           border: `1.5px solid ${colors.gray300}`,
           padding: `${spacing[4]}px`, display:'flex', alignItems:'center', gap: spacing[4],
@@ -514,16 +514,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
           ☕ {city === 'melbourne' ? '멜번 카페 투어 25곳' : '시드니 카페 투어 25곳'}
         </div>
         <div style={{ display:'flex', gap: spacing[1] }}>
-        <button onClick={handleShare} style={{
-          height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-          border:`1px solid ${colors.border}`, background: colors.bgCard,
-          color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
-          display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-          cursor:'pointer', fontFamily: font.family,
-        }}>
-          <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
-          공유하기
-        </button>
+
         <button onClick={() => setShowReset(true)} style={{
           height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
           border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
@@ -586,7 +577,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   {isChecked && !photos[idx] && (
                     <div style={{
                       position:'absolute', inset:0,
-                      background:'rgba(27,110,243,0.55)',
+                      background:'rgba(139,94,60,0.65)',
                       display:'flex', alignItems:'center', justifyContent:'center',
                       animation: isStamping ? 'stampIn 0.5s ease both' : 'none',
                     }}>
@@ -597,7 +588,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   {photos[idx] && (
                     <div style={{
                       position:'absolute', bottom:3, right:3,
-                      background: colors.primary, borderRadius:'50%',
+                      background: '#8B5E3C', borderRadius:'50%',
                       width:20, height:20, display:'flex', alignItems:'center', justifyContent:'center',
                       boxShadow:'0 1px 4px rgba(0,0,0,0.3)',
                     }}>
@@ -610,7 +601,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                 <div style={{
                   width:'100%', padding:'3px 4px',
                   fontSize:9, fontWeight:700, textAlign:'center',
-                  color: isChecked ? colors.primary : colors.textSecondary,
+                  color: isChecked ? '#8B5E3C' : colors.textSecondary,
                   lineHeight:1.2, background: colors.bgCard,
                   whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
                 }}>{c.name}</div>
@@ -655,7 +646,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
               width:'calc(100% - 32px)', maxWidth:398,
               maxHeight:'85vh', overflowY:'auto',
               borderRadius:radius.xl,
-              background: colors.bgPage,
+              background: '#ffffff',
               padding:`${spacing[3]}px ${spacing[3]}px ${spacing[8]}px`,
               boxSizing:'border-box',
               boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
@@ -740,7 +731,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                     {/* 미방문 상태: 방문하기 + 인증샷 */}
                     <button onClick={handleVisitWithPhoto} style={{
                       flex:2, height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
-                      background: colors.primary, color: '#fff',
+                      background: '#8B5E3C', color: '#fff',
                       fontSize: font.size.md, fontWeight: font.weight.bold,
                       display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
                       fontFamily: font.family, transition:'all 0.15s',
@@ -843,7 +834,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                 onBack?.()
               }} style={{
                 flex:2, height:48, borderRadius: radius.sm, border:'none',
-                background: colors.primary, color:'#fff',
+                background: '#8B5E3C', color:'#fff',
                 fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer', fontFamily: font.family,
               }}>저장하기</button>
             </div>
@@ -907,5 +898,5 @@ function CafeBusinessInfo({ businessId }: { businessId: string }) {
     <div style={{ textAlign:'center', padding:'24px 0', color:'#94A3B8', fontSize:14 }}>업체 정보를 찾을 수 없어요</div>
   )
 
-  return <BusinessCard business={biz} />
+  return <BusinessCard business={biz} accentColor="#8B5E3C" />
 }

@@ -128,7 +128,8 @@ export default function NearbyMap({ onBack }: Props) {
 
   useEffect(() => {
     if (loading) return
-    initMap()
+    const timer = setTimeout(() => { initMap() }, 350)
+    return () => clearTimeout(timer)
   }, [loading])
 
   useEffect(() => {
@@ -206,7 +207,7 @@ export default function NearbyMap({ onBack }: Props) {
     markersRef.current = []
 
     const list = getFiltered()
-    const color = category === 'all' ? '#1B6EF3' : getCatColor(category)
+    const color = category === 'all' ? '#F59E0B' : getCatColor(category)
 
     list.forEach(biz => {
       const lat = (biz as any).latitude
@@ -237,7 +238,7 @@ export default function NearbyMap({ onBack }: Props) {
               <div style="display:flex;gap:6px">
                 <button
                   onclick="window.__nearbySelectBiz('${biz.id}')"
-                  style="flex:1;padding:6px 0;background:#1B6EF3;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit"
+                  style="flex:1;padding:6px 0;background:#F59E0B;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit"
                 >자세히 보기 →</button>
                 <button
                   onclick="window.__nearbyCloseInfo()"
@@ -262,13 +263,13 @@ export default function NearbyMap({ onBack }: Props) {
   const filtered = getFiltered()
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100%', fontFamily:ff, background:colors.bgPage, position:'relative' }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'100%', minHeight:400, fontFamily:ff, background:'#ffffff', position:'relative' }}>
 
       <style>{`
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
-        .cat-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:${colors.gray300} ${colors.bgPage}; }
+        .cat-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:${colors.gray300} #ffffff; }
         .cat-scroll::-webkit-scrollbar { height:4px; }
-        .cat-scroll::-webkit-scrollbar-track { background:${colors.bgPage}; border-radius:2px; }
+        .cat-scroll::-webkit-scrollbar-track { background:#ffffff; border-radius:2px; }
         .cat-scroll::-webkit-scrollbar-thumb { background:${colors.gray300}; border-radius:2px; }
         .map-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
       `}</style>
@@ -276,7 +277,7 @@ export default function NearbyMap({ onBack }: Props) {
       {/* 스티키 필터 — 카테고리 + 거리 */}
       <div style={{
         position:'sticky', top:0, zIndex:24,
-        background:colors.bgPage,
+        background:'#ffffff',
         borderBottom:`1px solid ${colors.border}`,
         padding:`${spacing[2]}px ${spacing[3]}px`,
       }}>
@@ -290,9 +291,9 @@ export default function NearbyMap({ onBack }: Props) {
                 className="map-btn"
                 style={{
                   height:36, borderRadius:8,
-                  background: isActive ? colors.primary : colors.bgCard,
+                  background: isActive ? '#F59E0B' : colors.bgCard,
                   color: isActive ? '#fff' : colors.gray600,
-                  border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                  border: isActive ? `2px solid ${'#F59E0B'}` : `1px solid ${colors.gray300}`,
                   cursor:'pointer', flexShrink:0,
                   padding:`0 ${spacing[3]}px`,
                   fontSize:font.size.sm, fontWeight:font.weight.bold,
@@ -318,9 +319,9 @@ export default function NearbyMap({ onBack }: Props) {
                 className="map-btn"
                 style={{
                   flex:1, height:28, borderRadius:20,
-                  background: isActive ? colors.primaryLight : colors.bgCard,
+                  background: isActive ? 'rgba(245,158,11,0.12)' : colors.bgCard,
                   color: disabled ? colors.gray300 : colors.gray600,
-                  border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                  border: isActive ? `2px solid ${'#F59E0B'}` : `1px solid ${colors.gray300}`,
                   cursor: disabled ? 'default' : 'pointer',
                   fontSize:font.size.xs, fontWeight:font.weight.bold,
                   fontFamily:ff,
@@ -393,7 +394,7 @@ export default function NearbyMap({ onBack }: Props) {
             background:colors.bgCard, border:`1px solid ${colors.border}`, cursor:'pointer',
             display:'flex', alignItems:'center', justifyContent:'center',
           }}>
-            <Icon icon="ph:crosshair" width={18} height={18} color={colors.primary} />
+            <Icon icon="ph:crosshair" width={18} height={18} color={'#F59E0B'} />
           </button>
         )}
       </div>
@@ -401,32 +402,28 @@ export default function NearbyMap({ onBack }: Props) {
       {/* 업체 바텀시트 */}
       {selBiz && (
         <>
-          <div
-            onClick={() => setSelBiz(null)}
-            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.35)', zIndex:500 }}
-          />
-          <div style={{
-            position:'fixed', bottom:16,
-            left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398,
-            background:colors.bgCard,
-            borderRadius:20,
-            zIndex:501,
-            animation:'slideUpSheet 0.25s ease',
-            maxHeight:'75vh',
-            overflowY:'auto',
-            boxSizing:'border-box',
-            paddingBottom:32,
+          <div onClick={() => setSelBiz(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1100 }} />
+          <div onClick={e => e.stopPropagation()} style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, background:'#ffffff',
+            borderRadius:'20px 20px 0 0', zIndex:1101,
+            animation:'slideUpSheet 0.25s ease', maxHeight:'72vh', overflowY:'auto',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            display:'flex', flexDirection:'column',
           }}>
-            <div style={{ width:40, height:4, borderRadius:2, background:colors.gray300, margin:'12px auto 16px' }} />
-            {myPos && (
-              <div style={{ textAlign:'center', fontSize:font.size.sm, color:colors.textTertiary, fontWeight:font.weight.bold, marginBottom:spacing[2] }}>
-                📍 내 위치에서 {getDistanceKm(myPos.lat, myPos.lng, (selBiz as any).latitude, (selBiz as any).longitude).toFixed(1)}km
-              </div>
-            )}
-            <div style={{ padding:`0 ${spacing[3]}px` }}>
-              <BusinessCard business={selBiz} />
+            {/* 헤더 - X 버튼 */}
+            <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+              <button onClick={() => setSelBiz(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
+              </button>
+            </div>
+            <div style={{ flex:1, overflowY:'auto', padding:`8px ${spacing[3]}px ${spacing[8]}px` }}>
+              {myPos && (
+                <div style={{ textAlign:'center', fontSize:font.size.sm, color:colors.textTertiary, fontWeight:font.weight.bold, marginBottom:spacing[2] }}>
+                  📍 내 위치에서 {getDistanceKm(myPos.lat, myPos.lng, (selBiz as any).latitude, (selBiz as any).longitude).toFixed(1)}km
+                </div>
+              )}
+              <BusinessCard business={selBiz} accentColor="#F59E0B" />
             </div>
           </div>
         </>

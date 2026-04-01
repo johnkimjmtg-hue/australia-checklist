@@ -1,14 +1,17 @@
 // ─────────────────────────────────────────────
 // HomePage.tsx — 달력 중심 홈
 // ─────────────────────────────────────────────
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { TripInfo, AppState, getTripDays } from '../store/state'
 import { ITEMS } from '../data/checklist'
+import { getCachedChecklist } from '../lib/dataCache'
 import AppHeader from '../components/AppHeader'
 import BucketSheet from '../components/BucketSheet'
 import ShoppingSheet from '../components/ShoppingSheet'
 import ChecklistSheet from '../components/ChecklistSheet'
 import ServicesSheet from '../components/ServicesSheet'
+import NearbySheet from '../components/NearbySheet'
+import BingoSheet from '../components/BingoSheet'
 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
 const TODAY = new Date()
@@ -26,10 +29,23 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null)
+  const [dbItems, setDbItems] = useState<any[]>([])
+  const [achieved, setAchieved] = useState<Record<string,boolean>>(() => {
+    try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} }
+  })
+  const [memos, setMemos] = useState<Record<string,string>>({})
+
+  useEffect(() => {
+    const cached = getCachedChecklist()
+    if (cached?.items?.length) setDbItems(cached.items)
+  }, [])
   const [showBucket, setShowBucket] = useState(false)
   const [showChecklist, setShowChecklist] = useState(false)
   const [showShopping, setShowShopping] = useState(false)
   const [showServices, setShowServices] = useState(false)
+  const [showNearby, setShowNearby] = useState(false)
+  const [showBingo, setShowBingo] = useState(false)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
 
@@ -69,6 +85,8 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       const dayIdx = tripDays.findIndex(td => td.toDateString() === dt.toDateString())
       const isSelected = selectedDay === dayIdx && dayIdx >= 0
       const hasBucket = dayIdx >= 0 && [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])].some(item => (state.schedules[item.id] ?? []).includes(dayIdx))
+      const memoKey = `memo_${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
+      const hasMemo = dayIdx >= 0 && !!(localStorage.getItem(memoKey) ?? '').trim()
 
       let bg = 'transparent', color = isPast ? '#7BAAB5' : '#0D3349', radius = '50%', fw: number = 400
       if (isSelected) { bg = '#00838F'; color = '#fff'; fw = 800 }
@@ -76,7 +94,11 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       else if (isInTrip) { bg = '#B2EBF2'; color = '#006064'; radius = '0' }
 
       cells.push(
-        <div key={d} onClick={() => dayIdx >= 0 && setSelectedDay(selectedDay === dayIdx ? null : dayIdx)}
+        <div key={d} onClick={() => {
+            if (dayIdx < 0) return
+            setSelectedDay(dayIdx)
+            setSelectedDayDate(dt)
+          }}
           style={{
             aspectRatio:'1', display:'flex', flexDirection:'column',
             alignItems:'center', justifyContent:'center',
@@ -86,8 +108,11 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             WebkitTapHighlightColor:'transparent',
           }}>
           {d}
-          {hasBucket && !isSelected && (
-            <div style={{ width:4, height:4, borderRadius:'50%', background:'#00838F', position:'absolute', bottom:3 }} />
+          {(hasBucket || hasMemo) && (
+            <div style={{ position:'absolute', bottom:3, display:'flex', gap:2 }}>
+              {hasBucket && <div style={{ width:4, height:4, borderRadius:'50%', background:'#29B6D0' }} />}
+              {hasMemo && <div style={{ width:4, height:4, borderRadius:'50%', background:'#FF6B9D' }} />}
+            </div>
           )}
         </div>
       )
@@ -104,7 +129,6 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
     { id:'checklist' as Tab, icon:'✅', title:'준비 체크리스트', sub:'여행 준비 할 것들', badge: 0, local: false },
     { id:'bucketlist' as Tab, icon:'🗺️', title:'버킷리스트', sub:'꼭 해볼 것들', badge: bucketCount, local: false },
     { id:'shopping' as Tab, icon:'🛍️', title:'쇼핑리스트', sub:'꼭 살 것들', badge: myShoppingCount, local: false },
-    { id:'services' as Tab, icon:'🏢', title:'업체정보', sub:'한인 업체·병원', badge: 0, local: false },
     { id:'nearby' as Tab, icon:'📍', title:'내 주변', sub:'주변 업체 지도', badge: 0, local: false },
   ]
 
@@ -120,6 +144,12 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
         .menu-card-hover:active { transform: scale(0.97); }
         .cal-nav-btn:hover { background: rgba(0,131,143,0.15) !important; }
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
+        @keyframes slideOutLeft { from{transform:translateX(0);opacity:1} to{transform:translateX(-100%);opacity:0} }
+        @keyframes slideInRight { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+        @keyframes slideOutRight { from{transform:translateX(0);opacity:1} to{transform:translateX(100%);opacity:0} }
+        @keyframes slideInLeft { from{transform:translateX(-100%);opacity:0} to{transform:translateX(0);opacity:1} }
+        .cal-view { animation: slideInLeft 0.28s ease both; }
+        .day-view { animation: slideInRight 0.28s ease both; }
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         .card-anim { animation: fadeUp 0.5s ease both; }
       `}</style>
@@ -127,24 +157,131 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       {/* 공통 헤더 (날씨 + 메뉴) */}
       <AppHeader />
 
-      {/* 달력 */}
+      {/* 달력 / 일별뷰 */}
       <div style={{ padding:'0 18px 14px' }}>
         <div style={{ background:'#EFFCFC', borderRadius:22, overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 8px' }}>
-            <button className="cal-nav-btn" onClick={() => chgMo(-1)} style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
-            <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>
-              <span style={{ color:'#00838F' }}>{vy}년</span> · {MONTHS[vm]}
+          {selectedDayDate && selectedDay !== null ? (
+            /* ── 일별 뷰 */
+            <div className="day-view" style={{ overflow:'hidden' }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 8px' }}>
+                <button onClick={() => { setSelectedDay(null); setSelectedDayDate(null) }}
+                  style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
+                <div style={{ textAlign:'center' }}>
+                  <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>
+                    <span style={{ color:'#00838F' }}>{selectedDayDate.getFullYear()}년</span> · {selectedDayDate.getMonth()+1}월 {selectedDayDate.getDate()}일
+                  </div>
+                  <div style={{ fontSize:11, color:'#00838F', fontWeight:600 }}>여행 {selectedDay+1}일차 · {['일','월','화','수','목','금','토'][selectedDayDate.getDay()]}요일</div>
+                </div>
+                <div style={{ width:36 }} />
+              </div>
+              {/* 일별 내용 */}
+              <div style={{ padding:'0 14px 16px', height:280, overflowY:'auto' }}>
+                {/* 버킷리스트 */}
+                {(() => {
+                  const allItems = [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])]
+                  const dayBucket = allItems.filter(item => (state.schedules[item.id] ?? []).includes(selectedDay!))
+                  return (
+                    <div style={{ marginBottom:14 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                        <div style={{ width:7, height:7, borderRadius:'50%', background:'#29B6D0' }} />
+                        <div style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>버킷리스트 ({dayBucket.length})</div>
+                      </div>
+                      {dayBucket.length === 0 ? (
+                        <div style={{ fontSize:12, color:'#7BAAB5', padding:'8px 0' }}>배정된 항목이 없어요</div>
+                      ) : (
+                        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                          {dayBucket.map(item => {
+                            const key = `${item.id}_${selectedDay}`
+                            const isDone = !!achieved[key]
+                            const db = dbItems.find((d:any) => d.id === item.id)
+                            return (
+                              <div key={item.id} style={{
+                                display:'flex', alignItems:'center', gap:10,
+                                background: isDone ? 'rgba(41,182,208,0.08)' : 'rgba(0,0,0,0.03)',
+                                borderRadius:10, padding:'9px 12px',
+                                border: isDone ? '1px solid rgba(41,182,208,0.25)' : '1px solid transparent',
+                              }}>
+                                {db?.image_url && (
+                                  <div style={{ width:36, height:36, borderRadius:6, overflow:'hidden', flexShrink:0 }}>
+                                    <img src={db.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                                  </div>
+                                )}
+                                <div style={{ flex:1, fontSize:13, fontWeight:600, color: isDone ? '#7BAAB5' : '#0D3349', textDecoration: isDone ? 'line-through' : 'none' }}>{item.label}</div>
+                                <button onClick={() => {
+                                  const next = { ...achieved, [key]: !achieved[key] }
+                                  if (!next[key]) delete next[key]
+                                  setAchieved(next)
+                                  try { localStorage.setItem('bucket-achieved', JSON.stringify(next)) } catch {}
+                                }} style={{
+                                  height:26, padding:'0 8px', borderRadius:20, border:'none', cursor:'pointer', flexShrink:0,
+                                  background: isDone ? '#29B6D0' : 'rgba(0,0,0,0.08)',
+                                  display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+                                  WebkitTapHighlightColor:'transparent',
+                                }}>
+                                  <svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 6L4.5 9L10.5 3" stroke={isDone ? '#fff' : '#aaa'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+                                  <span style={{ fontSize:11, fontWeight:700, color: isDone ? '#fff' : '#aaa' }}>완료</span>
+                                </button>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
+                {/* 메모 */}
+                {(() => {
+                  const memoKey = `memo_${selectedDayDate.getFullYear()}-${String(selectedDayDate.getMonth()+1).padStart(2,'0')}-${String(selectedDayDate.getDate()).padStart(2,'0')}`
+                  const memoVal = memos[memoKey] ?? localStorage.getItem(memoKey) ?? ''
+                  return (
+                    <div>
+                      <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                        <div style={{ width:7, height:7, borderRadius:'50%', background:'#F59E0B' }} />
+                        <div style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>메모</div>
+                      </div>
+                      <textarea
+                        value={memoVal}
+                        onChange={e => {
+                          const next = { ...memos, [memoKey]: e.target.value }
+                          setMemos(next)
+                          localStorage.setItem(memoKey, e.target.value)
+                        }}
+                        placeholder="이 날의 메모를 남겨보세요..."
+                        style={{
+                          width:'100%', minHeight:80, borderRadius:10,
+                          border: memoVal ? '1.5px solid rgba(245,158,11,0.4)' : '1.5px dashed #CBD5E1',
+                          outline:'none', padding:'10px 12px',
+                          fontSize:13, color:'#0D3349',
+                          background: memoVal ? '#FFFBEB' : '#F8FAFC',
+                          fontFamily: ff, resize:'none', lineHeight:1.6,
+                          boxSizing:'border-box',
+                        }}
+                      />
+                    </div>
+                  )
+                })()}
+              </div>
             </div>
-            <button className="cal-nav-btn" onClick={() => chgMo(1)} style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>›</button>
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'0 10px' }}>
-            {['일','월','화','수','목','금','토'].map(d => (
-              <div key={d} style={{ textAlign:'center', fontSize:11, color:'#1565A0', fontWeight:600, padding:'4px 0 6px' }}>{d}</div>
-            ))}
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, padding:'0 10px 12px' }}>
-            {renderCal()}
-          </div>
+          ) : (
+            /* ── 달력 뷰 */
+            <div className="cal-view" style={{ overflow:'hidden' }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 8px' }}>
+                <button className="cal-nav-btn" onClick={() => chgMo(-1)} style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
+                <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>
+                  <span style={{ color:'#00838F' }}>{vy}년</span> · {MONTHS[vm]}
+                </div>
+                <button className="cal-nav-btn" onClick={() => chgMo(1)} style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>›</button>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'0 10px' }}>
+                {['일','월','화','수','목','금','토'].map(d => (
+                  <div key={d} style={{ textAlign:'center', fontSize:11, color:'#1565A0', fontWeight:600, padding:'4px 0 6px' }}>{d}</div>
+                ))}
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, padding:'0 10px 12px' }}>
+                {renderCal()}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -170,7 +307,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               {MENUS.map((m, i) => (
                 <div key={m.id} className="menu-card-hover card-anim"
-                  onClick={() => m.id === 'bucketlist' ? setShowBucket(true) : m.id === 'checklist' ? setShowChecklist(true) : m.id === 'shopping' ? setShowShopping(true) : m.id === 'services' ? setShowServices(true) : onNavigate(m.id)}
+                  onClick={() => m.id === 'bucketlist' ? setShowBucket(true) : m.id === 'checklist' ? setShowChecklist(true) : m.id === 'shopping' ? setShowShopping(true) : m.id === 'services' ? setShowServices(true) : m.id === 'nearby' ? setShowNearby(true) : onNavigate(m.id)}
                   style={{ background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', animationDelay:`${i * 0.08}s` }}>
                   <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
@@ -178,8 +315,16 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                   {m.badge > 0 && <div style={{ display:'inline-block', background:'#00838F', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, marginTop:8 }}>{m.badge}개</div>}
                 </div>
               ))}
-              <div className="menu-card-hover card-anim" onClick={() => onNavigate('bingo')}
+              <div className="menu-card-hover card-anim" onClick={() => setShowServices(true)}
                 style={{ gridColumn:'span 2', background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${MENUS.length * 0.08}s` }}>
+                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🏢</div>
+                <div>
+                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>업체정보</div>
+                  <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>한인 업체·병원</div>
+                </div>
+              </div>
+              <div className="menu-card-hover card-anim" onClick={() => setShowBingo(true)}
+                style={{ gridColumn:'span 2', background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${(MENUS.length + 1) * 0.08}s` }}>
                 <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
                 <div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
@@ -189,6 +334,16 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             </div>
           </>
       </div>
+      {/* 카페 빙고 바텀시트 */}
+      {showBingo && (
+        <BingoSheet onClose={() => setShowBingo(false)} />
+      )}
+
+      {/* 내 주변 바텀시트 */}
+      {showNearby && (
+        <NearbySheet onClose={() => setShowNearby(false)} />
+      )}
+
       {/* 업체정보 바텀시트 */}
       {showServices && (
         <ServicesSheet onClose={() => setShowServices(false)} />

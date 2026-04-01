@@ -4,11 +4,11 @@ import { Business } from '../lib/businessService'
 import { isBookmarked, toggleBookmark } from '../lib/businessBookmarks'
 import BusinessShareModal from './BusinessShareModal'
 
-type Props = { business: Business }
+type Props = { business: Business; accentColor?: string }
 
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
-export default function BusinessCard({ business }: Props) {
+export default function BusinessCard({ business, accentColor = '#10B981' }: Props) {
   const { name, description, phone, website, kakao, address, city, is_featured, tags } = business
   const fullAddress = address || ''
   const mapsUrl = fullAddress
@@ -31,7 +31,7 @@ export default function BusinessCard({ business }: Props) {
 
   const btnBlue: React.CSSProperties = {
     ...btnBase,
-    background:'#10B981', color:'#fff', border:'none',
+    background:accentColor, color:'#fff', border:'none',
     
   }
 
@@ -90,9 +90,9 @@ export default function BusinessCard({ business }: Props) {
       <div style={{
         background:'#fff', borderRadius:14,
         overflow:'hidden',
-        borderLeft: is_featured ? '4px solid #1B6EF3' : '4px solid #CBD5E1',
+        borderLeft: is_featured ? `4px solid ${accentColor}` : '4px solid #CBD5E1',
         border: '1px solid #C8C8C8',
-        borderLeft: is_featured ? '4px solid #1B6EF3' : '4px solid #CBD5E1',
+        borderLeft: is_featured ? `4px solid ${accentColor}` : '4px solid #CBD5E1',
       }}>
         <div style={{ padding:'16px' }}>
 
@@ -169,7 +169,7 @@ export default function BusinessCard({ business }: Props) {
                 </span>
               )}
               {tags && tags.map(tag => (
-                <span key={tag} style={{ background:'#ECFDF5', color:'#10B981', fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:'1px solid #BFDBFE' }}>{tag}</span>
+                <span key={tag} style={{ background:`rgba(${accentColor === '#F59E0B' ? '245,158,11' : '16,185,129'},0.1)`, color:accentColor, fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:`1px solid ${accentColor === '#F59E0B' ? 'rgba(245,158,11,0.3)' : '#A7F3D0'}` }}>{tag}</span>
               ))}
             </div>
           )}
