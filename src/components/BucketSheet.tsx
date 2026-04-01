@@ -70,12 +70,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
 
         {/* 헤더 */}
         <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 12px 0' }}>
-          {view === 'checklist' ? (
-            <button onClick={handleBackToBucket} style={{ background:'#CC3300', border:'none', borderRadius:20, padding:'6px 14px 6px 10px', cursor:'pointer', display:'flex', alignItems:'center', gap:6, WebkitTapHighlightColor:'transparent' }}>
-              <Icon icon="ph:arrow-left" width={16} height={16} color="#ffffff" />
-              <span style={{ fontSize:14, fontWeight:700, color:'#ffffff' }}>내 버킷리스트</span>
-            </button>
-          ) : <div />}
+          <div />
           <button onClick={onClose} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
             <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
           </button>

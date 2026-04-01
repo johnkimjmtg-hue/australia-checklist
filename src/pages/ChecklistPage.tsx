@@ -265,13 +265,19 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
             <div style={{ position:'sticky', top:0, zIndex:30, background: '#ffffff', borderBottom:'1px solid rgba(0,131,143,0.15)' }}>
               {/* 멘트 + 일정설정 + 일정보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
-                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: '#0D3349' }}>
-                  {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
-                </span>
+                {embedded && onGoHome ? (
+                  <button onClick={onGoHome} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'none', background:'#29B6D0', color:'#fff', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:ff }}>
+                    내버킷리스트 {done}
+                  </button>
+                ) : (
+                  <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: '#0D3349' }}>
+                    {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
+                  </span>
+                )}
                 {tripLabel && (
                   <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                    <Icon icon="ph:airplane-takeoff" width={14} height={14} color="#CC3300" />
-                    <span style={{ fontSize:15, fontWeight:700, color:'#CC3300', fontFamily:ff }}>{tripLabel}</span>
+                    <Icon icon="ph:airplane-takeoff" width={14} height={14} color="#DC2626" />
+                    <span style={{ fontSize:15, fontWeight:700, color:'#DC2626', fontFamily:ff }}>{tripLabel}</span>
                   </div>
                 )}
               </div>
@@ -290,12 +296,13 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                           onClick={()=>{ setState(setCategory(state,cat.id)); setShowSearch(false) }}
                           style={{
                             height:36, borderRadius:radius.sm, position:'relative',
-                            border: isActive ? '2px solid #29B6D0' : '1px solid rgba(0,131,143,0.2)',
-                            background: isActive ? '#29B6D0' : 'rgba(255,255,255,0.7)',
+                            border: '1px solid rgba(0,131,143,0.2)',
+                            borderBottom: isActive ? '3px solid #DC2626' : '1px solid rgba(0,131,143,0.2)',
+                            background: 'rgba(255,255,255,0.7)',
                             cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:ff,
                             WebkitTapHighlightColor:'transparent',
                           }}>
-                          <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color:isActive ? '#fff' : '#0D3349', lineHeight:1.2, textAlign:'center', padding:'0 2px', wordBreak:'keep-all' }}>
+                          <span style={{ fontSize:font.size.sm, fontWeight: isActive ? font.weight.bold : font.weight.medium, color:'#0D3349', lineHeight:1.2, textAlign:'center', padding:'0 2px', wordBreak:'keep-all' }}>
                             {cat.label}
                           </span>
                           {catDone>0 && (
@@ -358,8 +365,9 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                       padding:`${spacing[3]}px ${spacing[3]}px`,
                       background: colors.bgCard,
                       borderRadius:radius.md,
-                      border: checked ? `1px solid ${'#29B6D0'}` : isHighlight ? '1.5px solid #29B6D0' : `1px solid ${colors.gray300}`,
+                      border: isHighlight ? '1.5px solid #29B6D0' : `1px solid ${colors.gray300}`,
                       cursor:'pointer', transition:'all 0.15s',
+                      position:'relative', overflow:'hidden',
                     }}
                     onClick={()=>{
                       if(!db) return
@@ -370,6 +378,10 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                       } else setDetailBizCards([])
                     }}
                   >
+                    {/* 파란 오버레이 */}
+                    {checked && (
+                      <div style={{ position:'absolute', inset:0, background:'rgba(41,182,208,0.12)', pointerEvents:'none', borderRadius:'inherit' }} />
+                    )}
                     {/* 이미지 */}
                     <div style={{ width:56, height:56, borderRadius:radius.sm, flexShrink:0, background:colors.gray100, border:'1px solid rgba(0,131,143,0.2)', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
                       {db?.image_url
@@ -380,7 +392,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                     {/* 텍스트 */}
                     <div style={{ flex:1, minWidth:0 }}>
                       <div style={{
-                        fontSize:font.size.md, fontWeight:font.weight.medium, color:checked?'#29B6D0':colors.gray800,
+                        fontSize:font.size.md, fontWeight:font.weight.medium, color:colors.gray800,
                         display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', lineHeight:1.4,
                       }}>
                         {item.label}
@@ -389,7 +401,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                         {checked && dayCount===0 && (
                           <span
                             onClick={e=>{ e.stopPropagation(); if(trip) setSheetItem(item as CheckItem) }}
-                            style={{ fontSize:font.size.xs, color:'#CC3300', fontWeight:font.weight.bold, cursor:'pointer', textDecoration:'underline', textUnderlineOffset:2 }}
+                            style={{ fontSize:font.size.xs, color:'#DC2626', fontWeight:font.weight.bold, cursor:'pointer', textDecoration:'underline', textUnderlineOffset:2 }}
                           >일정 미지정</span>
                         )}
                         {checked && dayCount>0 && (state.schedules[item.id]??[]).map(dayIdx=>(

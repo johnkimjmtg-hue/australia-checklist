@@ -31,7 +31,7 @@ export default function BusinessCard({ business }: Props) {
 
   const btnBlue: React.CSSProperties = {
     ...btnBase,
-    background:'#1B6EF3', color:'#fff', border:'none',
+    background:'#10B981', color:'#fff', border:'none',
     
   }
 
@@ -169,7 +169,7 @@ export default function BusinessCard({ business }: Props) {
                 </span>
               )}
               {tags && tags.map(tag => (
-                <span key={tag} style={{ background:'#EFF6FF', color:'#1B6EF3', fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:'1px solid #BFDBFE' }}>{tag}</span>
+                <span key={tag} style={{ background:'#ECFDF5', color:'#10B981', fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:'1px solid #BFDBFE' }}>{tag}</span>
               ))}
             </div>
           )}

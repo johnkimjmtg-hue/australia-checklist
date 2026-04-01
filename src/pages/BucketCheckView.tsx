@@ -67,7 +67,7 @@ const catColors: Record<string,string> = {
   people:'#3a6b4a', parenting:'#6b4a3a', custom:'#4a6b5a',
 }
 
-function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDetailItem, onDetailItem }: {
+function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDetailItem, onDetailItem, onDeleteItem, onUncheck }: {
   items: { id: string; categoryId: string; label: string; emoji: string }[]
   dayIdx?: number
   dbItems: DBItem[]
@@ -75,6 +75,8 @@ function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDe
   toggleAchieved: (id: string, day?: number) => void
   setDetailItem: (item: DBItem) => void
   onDetailItem?: (item: DBItem) => void
+  onDeleteItem?: (id: string, day?: number) => void
+  onUncheck?: (id: string, day?: number) => void
 }) {
   return (
     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
@@ -97,24 +99,31 @@ function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDe
               WebkitTapHighlightColor:'transparent',
             }}>
             {db?.image_url
-              ? <img src={db.image_url} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
-              : <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              ? <img src={db.image_url} alt="" onClick={() => { if(db) { setDetailItem(db); onDetailItem?.(db) } }} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', cursor: db ? 'pointer' : 'default' }} />
+              : <div onClick={() => { if(db) { setDetailItem(db); onDetailItem?.(db) } }} style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', cursor: db ? 'pointer' : 'default' }}>
                   <Icon icon={db?.icon ?? CAT_ICONS[item.categoryId] ?? 'ph:star'} width={48} height={48} color="rgba(255,255,255,0.4)" />
                 </div>
             }
             <button
-              onClick={e => { e.stopPropagation(); toggleAchieved(item.id, dayIdx) }}
-              style={{ position:'absolute', top:10, right:10, width:26, height:26, borderRadius:'50%', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', background: isAchieved ? '#29B6D0' : 'rgba(255,255,255,0.25)', WebkitTapHighlightColor:'transparent' }}>
-              <svg width="12" height="12" viewBox="0 0 12 12">
+              onClick={e => { e.stopPropagation(); isAchieved ? onUncheck?.(item.id, dayIdx) : toggleAchieved(item.id, dayIdx) }}
+              style={{ position:'absolute', top:10, right:10, height:26, padding:'0 8px', borderRadius:20, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:3, background: isAchieved ? '#29B6D0' : 'rgba(255,255,255,0.35)', WebkitTapHighlightColor:'transparent' }}>
+              <svg width="11" height="11" viewBox="0 0 12 12">
                 <path d="M1.5 6L4.5 9L10.5 3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
               </svg>
+              <span style={{ fontSize:11, fontWeight:700, color:'#fff' }}>완료</span>
             </button>
             <div
-              onClick={() => { if(db) { setDetailItem(db); onDetailItem?.(db) } }}
-              style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 10px 12px', background:'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.82) 100%)', cursor: db ? 'pointer' : 'default', WebkitTapHighlightColor:'transparent' }}>
+              style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 10px 12px', background:'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.82) 100%)', WebkitTapHighlightColor:'transparent' }}>
               <div style={{ fontSize:14, fontWeight:400, color:'#fff', lineHeight:1.3 }}>{item.label}</div>
               {region && <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:3 }}>📍 {region.label}</div>}
             </div>
+            {onDeleteItem && (
+              <button
+                onClick={e => { e.stopPropagation(); onDeleteItem(item.id, dayIdx) }}
+                style={{ position:'absolute', bottom:10, right:10, background:'rgba(255,255,255,0.25)', border:'none', borderRadius:'50%', width:26, height:26, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                <Icon icon="ph:trash" width={13} height={13} color="#fff" />
+              </button>
+            )}
           </div>
         )
       })}
@@ -253,6 +262,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
   const [sheetItem, setSheetItem]       = useState<{id:string;label:string}|null>(null)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [deleteItemId, setDeleteItemId] = useState<{ id: string; day?: number } | null>(null)
+  const [uncheckConfirmId, setUncheckConfirmId] = useState<{ id: string; day?: number } | null>(null)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
   const prevAchieved = useRef(0)
   const logoTapCount = useRef(0)
@@ -583,6 +593,8 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                     toggleAchieved={toggleAchieved}
                     setDetailItem={setDetailItem}
                     onDetailItem={onDetailItem}
+                    onDeleteItem={(id, day) => setDeleteItemId({ id, day })}
+                    onUncheck={(id, day) => setUncheckConfirmId({ id, day })}
                   />
                 </div>
               )
@@ -605,6 +617,8 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                     toggleAchieved={toggleAchieved}
                     setDetailItem={setDetailItem}
                     onDetailItem={onDetailItem}
+                    onDeleteItem={(id) => setDeleteItemId({ id })}
+                    onUncheck={(id) => setUncheckConfirmId({ id })}
                   />
                 </div>
               )
@@ -664,6 +678,39 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       )}
 
       {/* ── 아이템 삭제 확인 팝업 */}
+      {/* ── 완료 취소 확인 팝업 */}
+      {uncheckConfirmId && (() => {
+        const item = allItems.find(i => i.id === uncheckConfirmId.id)
+        return (
+          <>
+            <div onClick={() => setUncheckConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1200 }} />
+            <div style={{
+              position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+              background:'#ffffff', borderRadius:16, padding:'28px 24px 20px',
+              zIndex:1201, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+              boxShadow:'0 20px 60px rgba(0,0,0,0.25)',
+            }}>
+              <div style={{ fontSize:16, fontWeight:800, color:'#0F172A', marginBottom:8 }}>완료를 취소할까요?</div>
+              {item && (
+                <div style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.5 }}>
+                  <span style={{ fontWeight:700, color:'#29B6D0' }}>{item.label}</span>의<br/>완료 처리를 취소합니다.
+                </div>
+              )}
+              <div style={{ display:'flex', gap:8 }}>
+                <button onClick={() => setUncheckConfirmId(null)} style={{
+                  flex:1, height:48, borderRadius:10, border:'1px solid #E2E8F0',
+                  background:'#ffffff', color:'#64748B', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit',
+                }}>취소</button>
+                <button onClick={() => { toggleAchieved(uncheckConfirmId.id, uncheckConfirmId.day); setUncheckConfirmId(null) }} style={{
+                  flex:2, height:48, borderRadius:10, border:'none',
+                  background:'#29B6D0', color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:'inherit',
+                }}>완료 취소</button>
+              </div>
+            </div>
+          </>
+        )
+      })()}
+
       {deleteItemId && (() => {
         const item = allItems.find(i => i.id === deleteItemId.id)
         return (

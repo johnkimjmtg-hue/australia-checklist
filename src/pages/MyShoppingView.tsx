@@ -63,6 +63,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showDeleteAll, setShowDeleteAll] = useState(false)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
+  const [uncheckConfirmId, setUncheckConfirmId] = useState<string | null>(null)
 
   const SHOPPING_MSGS = [
     '지갑이 열릴 준비가 됐나요?',
@@ -166,7 +167,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
             <div style={{ fontSize:18, fontWeight:700, color:'#0D3349' }}>내 쇼핑리스트</div>
             <div>
               <span style={{ fontSize:22, fontWeight:900, color:'#FF6B9D' }}>{checkedCount}</span>
-              <span style={{ fontSize:15, color:'#7BAAB5' }}> / {total} 완료</span>
+              <span style={{ fontSize:15, color:'#7BAAB5' }}> / {total} 구매</span>
             </div>
           </div>
           {/* 선물박스 그리드 */}
@@ -230,7 +231,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
             return (
               <div key={p.id} className="my-item" style={{
                 borderRadius:12, overflow:'hidden', position:'relative',
-                border: checked ? '1.5px solid #FF6B9D' : '1px solid rgba(0,0,0,0.08)',
+                border: '1px solid rgba(0,0,0,0.08)',
                 transition:'all 0.3s', background:'#ffffff',
                 boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
               }}>
@@ -253,26 +254,25 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                       ))}
                     </div>
                   )}
-                  <div style={{ fontSize:13, fontWeight:700, color: checked ? '#aaa' : '#0D3349', lineHeight:1.4, marginBottom:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', lineHeight:1.4, marginBottom:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
                   <div style={{ fontSize:11, color:'#7BAAB5', marginBottom:4 }}>{p.brand}</div>
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                    <span style={{ fontSize:11, fontWeight:700, color: PRICE_COLOR[p.price_range] ?? '#666' }}>{p.price_range} · {PRICE_LABEL[p.price_range]}</span>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:6 }}>
+                    <button onClick={e => { e.stopPropagation(); checked ? setUncheckConfirmId(p.id) : toggleChecked(p.id) }} style={{
+                      height:26, padding:'0 10px', borderRadius:20, border: checked ? 'none' : '1.5px solid #FF6B9D',
+                      background: checked ? '#FF6B9D' : '#ffffff',
+                      color: checked ? '#fff' : '#FF6B9D',
+                      fontSize:11, fontWeight:700, cursor:'pointer',
+                      display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+                      WebkitTapHighlightColor:'transparent', transition:'all 0.2s',
+                    }}>
+                      <Icon icon="ph:check-bold" width={11} height={11} color={checked ? '#fff' : '#FF6B9D'} />
+                      {checked ? '구매완료' : '구매'}
+                    </button>
                     <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(p.id) }} style={{ background:'none', border:'none', cursor:'pointer', padding:2, display:'flex', alignItems:'center' }}>
-                      <Icon icon="ph:trash" width={14} height={14} color="#94A3B8" />
+                      <Icon icon="ph:trash" width={18} height={18} color="#64748B" />
                     </button>
                   </div>
                 </div>
-                <button onClick={e => { e.stopPropagation(); toggleChecked(p.id) }} style={{
-                  position:'absolute', top:8, right:8,
-                  width:32, height:32, borderRadius:'50%', border:'none', cursor:'pointer',
-                  background: checked ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.06)',
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                  WebkitTapHighlightColor:'transparent', transition:'all 0.2s',
-                }}>
-                  <svg width="12" height="10" viewBox="0 0 11 8" fill="none">
-                    <path d="M1 4L4 7L10 1" stroke={checked ? '#fff' : '#aaa'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
               </div>
             )
           })
@@ -378,6 +378,37 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           </div>
         </>
       )}
+
+      {/* ── 구매 취소 확인 팝업 */}
+      {uncheckConfirmId && (() => {
+        const p = myProducts.find(x => x.id === uncheckConfirmId)
+        return (
+          <>
+            <div onClick={() => setUncheckConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:700 }} />
+            <div style={{
+              position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+              background: '#ffffff', borderRadius: radius.xl, padding:'28px 24px 20px',
+              zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
+              boxShadow:'0 20px 60px rgba(0,0,0,0.25)',
+            }}>
+              <div style={{ fontSize:16, fontWeight:800, color:'#0F172A', marginBottom:8 }}>구매를 취소할까요?</div>
+              {p && <div style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.5 }}>
+                <span style={{ fontWeight:700, color:'#FF6B9D' }}>{p.name}</span>의<br/>구매 완료를 취소합니다.
+              </div>}
+              <div style={{ display:'flex', gap:8 }}>
+                <button onClick={() => setUncheckConfirmId(null)} style={{
+                  flex:1, height:48, borderRadius:10, border:`1.5px solid ${colors.border}`,
+                  background:'#ffffff', color:colors.textSecondary, fontSize:font.size.md, fontWeight:font.weight.medium, cursor:'pointer', fontFamily:font.family,
+                }}>취소</button>
+                <button onClick={() => { toggleChecked(uncheckConfirmId); setUncheckConfirmId(null) }} style={{
+                  flex:2, height:48, borderRadius:10, border:'none',
+                  background:'#FF6B9D', color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:font.family,
+                }}>구매 취소</button>
+              </div>
+            </div>
+          </>
+        )
+      })()}
 
       {/* ── 삭제 확인 팝업 */}
       {deleteConfirmId && (() => {

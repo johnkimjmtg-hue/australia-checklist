@@ -116,30 +116,30 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
               borderBottom:`1px solid ${colors.gray100}`, color:colors.textPrimary,
               display:'flex', alignItems:'center', gap:8,
             }}
-              onMouseEnter={e => (e.currentTarget.style.background=colors.primaryLight)}
+              onMouseEnter={e => (e.currentTarget.style.background='rgba(16,185,129,0.12)')}
               onMouseLeave={e => (e.currentTarget.style.background=colors.bgCard)}
             >
-              <Icon icon="ph:map-pin-simple" width={14} height={14} color={colors.primary} />
+              <Icon icon="ph:map-pin-simple" width={14} height={14} color={'#10B981'} />
               {s.placePrediction?.text?.text || ''}
             </div>
           ))}
           <div onClick={() => { setSuggestions([]); setManualMode(true); onChange('') }} style={{
             padding:'10px 14px', fontSize:font.size.sm, cursor:'pointer',
-            color:colors.primary, fontWeight:font.weight.bold,
+            color:'#10B981', fontWeight:font.weight.bold,
             display:'flex', alignItems:'center', gap:8,
-            borderTop:`1px solid ${colors.border}`, background:colors.primaryLight,
+            borderTop:`1px solid ${colors.border}`, background:'rgba(16,185,129,0.12)',
           }}
             onMouseEnter={e => (e.currentTarget.style.opacity='0.8')}
             onMouseLeave={e => (e.currentTarget.style.opacity='1')}
           >
-            <Icon icon="ph:pencil-simple" width={14} height={14} color={colors.primary} />
+            <Icon icon="ph:pencil-simple" width={14} height={14} color={'#10B981'} />
             찾는 주소가 없어요 — 직접 입력하기
           </div>
         </div>
       )}
       {!loadingAc && !suggestions.length && value.length >= 3 && (
         <button onClick={() => setManualMode(true)} style={{
-          background:'none', border:'none', fontSize:11, color:colors.primary,
+          background:'none', border:'none', fontSize:11, color:'#10B981',
           cursor:'pointer', marginTop:4, padding:0, fontWeight:font.weight.bold,
         }}>
           주소를 찾을 수 없나요? 직접 입력하기 →
@@ -188,7 +188,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
       <div style={{ fontSize:48, marginBottom:16 }}>🎉</div>
       <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:8 }}>신청이 완료됐어요!</div>
       <div style={{ fontSize:font.size.sm, color:colors.textSecondary, lineHeight:1.6, marginBottom:24 }}>검토 후 등록해드릴게요.<br/>감사합니다 🙏</div>
-      <button onClick={onClose} style={{ width:'100%', height:48, background:colors.primaryLight, color:colors.primary, border:`1px solid ${colors.border}`, borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>확인</button>
+      <button onClick={onClose} style={{ width:'100%', height:48, background:'rgba(16,185,129,0.12)', color:'#10B981', border:`1px solid ${colors.border}`, borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>확인</button>
     </div>
   )
 
@@ -200,7 +200,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
           {lbl('카테고리 *')}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
             {businessCats.map(cat => (
-              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:radius.sm, border: form.category===cat.id ? `1.5px solid ${colors.primary}` : `1px solid ${colors.border}`, cursor:'pointer', background: form.category===cat.id ? colors.primaryLight : colors.bgCard, color: form.category===cat.id ? colors.primary : colors.textSecondary, fontSize:font.size.sm, fontWeight: form.category===cat.id ? font.weight.bold : font.weight.regular, fontFamily:ff }}>{cat.label}</button>
+              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:radius.sm, border: form.category===cat.id ? `1.5px solid ${'#10B981'}` : `1px solid ${colors.border}`, cursor:'pointer', background: form.category===cat.id ? 'rgba(16,185,129,0.12)' : colors.bgCard, color: form.category===cat.id ? '#10B981' : colors.textSecondary, fontSize:font.size.sm, fontWeight: form.category===cat.id ? font.weight.bold : font.weight.regular, fontFamily:ff }}>{cat.label}</button>
             ))}
           </div>
         </div>
@@ -214,7 +214,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
         <div>{lbl('웹사이트')}<input value={form.website} onChange={e => set('website', e.target.value)} placeholder="https://..." style={iStyle} /></div>
       </div>
       {error && <div style={{ marginTop:10, padding:'8px 12px', background:colors.dangerLight, borderRadius:radius.sm, fontSize:font.size.sm, color:colors.danger, fontWeight:font.weight.bold }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:colors.primary, color:'#fff', border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, fontFamily:ff }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:'#10B981', color:'#fff', border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, fontFamily:ff }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
     </div>
   )
 }
@@ -330,24 +330,24 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
     return sortByName(allBusinesses.filter(b => ids.includes(b.id)))
   }, [allBusinesses, bookmarkCount])
 
-  const [showAll, setShowAll] = useState(false)
+  const [displayLimit, setDisplayLimit] = useState(50)
   const [showRequestForm, setShowRequestForm] = useState(false)
 
   // category나 tab 바뀌면 showAll 리셋
-  useEffect(() => { setShowAll(false) }, [category, serviceTab, debouncedSearch])
+  useEffect(() => { setDisplayLimit(50) }, [category, serviceTab, debouncedSearch])
 
   const isSearch    = !!debouncedSearch.trim()
   const isCatFilter = !!category
   const isFiltered  = isSearch || isCatFilter
 
   return (
-    <div style={{ minHeight:'100dvh', background:colors.bgPage, fontFamily:ff, paddingBottom:130 }}>
+    <div style={{ minHeight:'100dvh', background:'#ffffff', fontFamily:ff, paddingBottom:130 }}>
       <style>{`
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .svc-btn  { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-        .cat-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:${colors.gray300} ${colors.bgPage}; }
+        .cat-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:${colors.gray300} #ffffff; }
         .cat-scroll::-webkit-scrollbar { height:4px; }
-        .cat-scroll::-webkit-scrollbar-track { background:${colors.bgPage}; border-radius:2px; }
+        .cat-scroll::-webkit-scrollbar-track { background:#ffffff; border-radius:2px; }
         .cat-scroll::-webkit-scrollbar-thumb { background:${colors.gray300}; border-radius:2px; }
         @keyframes slideUpSheet { from { transform: translateX(-50%) translateY(100%); } to { transform: translateX(-50%) translateY(0); } }
       `}</style>
@@ -355,25 +355,25 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       {/* ── 스티키 헤더 (탭+검색+카테고리) — 연한 회색 배경 ── */}
       <div style={{
         position:'sticky', top:0, zIndex:10,
-        background:colors.bgPage,
+        background:'#ffffff',
         borderBottom:`1px solid ${colors.border}`,
         padding:`${spacing[3]}px ${spacing[4]}px ${spacing[3]}px`,
       }}>
         {/* 전체/한인업체/북마크/비상연락처 탭 */}
         <div style={{ display:'flex', gap:spacing[2], marginBottom:spacing[3] }}>
-          {(['all', 'korean', 'bookmarks', 'emergency'] as ServiceTab[]).map(tab => {
+          {(['all', 'korean', 'bookmarks', 'emergency'] as ServiceTab[]).filter(tab => tab !== 'korean').map(tab => {
             const isActive = serviceTab === tab
             const iconName = tab === 'all' ? 'ph:list-bullets' : tab === 'korean' ? 'ph:flag' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:bell-fill'
             const label = tab === 'all' ? '전체 업종' : tab === 'korean' ? '한인업체' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
-            const activeColor = tab === 'emergency' ? colors.danger : colors.primary
-            const iconColor = isActive ? (tab === 'emergency' ? colors.danger : colors.primary) : tab === 'korean' ? '#EA580C' : tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? colors.danger : colors.textTertiary
+            const activeColor = tab === 'emergency' ? colors.danger : '#10B981'
+            const iconColor = isActive ? (tab === 'emergency' ? colors.danger : '#10B981') : tab === 'korean' ? '#EA580C' : tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? colors.danger : colors.textTertiary
             return (
               <button key={tab} onClick={() => { setServiceTab(tab); setCategory(''); setSearch('') }}
                 className="svc-btn"
                 style={{
                   height:34, padding:`0 ${spacing[3]}px`, borderRadius:radius.full,
                   cursor:'pointer', fontSize:font.size.sm, fontWeight:font.weight.bold,
-                  background: isActive ? (tab === 'emergency' ? colors.dangerLight : tab === 'korean' ? '#FFF7ED' : colors.primaryLight) : colors.bgCard,
+                  background: isActive ? (tab === 'emergency' ? colors.dangerLight : tab === 'korean' ? '#FFF7ED' : 'rgba(16,185,129,0.12)') : colors.bgCard,
                   color: isActive ? (tab === 'korean' ? '#EA580C' : activeColor) : colors.textSecondary,
                   border: isActive ? `1.5px solid ${tab === 'korean' ? '#FED7AA' : activeColor}` : `1px solid ${colors.border}`,
                   display:'flex', alignItems:'center', gap:5,
@@ -415,7 +415,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             onClick={() => setShowRequestForm(true)}
             style={{
               flexShrink:0, height:42, padding:`0 ${spacing[3]}px`,
-              background:colors.primary, color:'#fff',
+              background:'#10B981', color:'#fff',
               border:'none', borderRadius:radius.sm,
               fontSize:font.size.sm, fontWeight:font.weight.bold,
               cursor:'pointer', display:'flex', alignItems:'center', gap:4,
@@ -438,12 +438,12 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 onClick={() => { setCategory(isActive ? '' : cat.id) }}
                 style={{
                   height:34, borderRadius:radius.sm,
-                  background: isActive ? colors.primary : colors.bgCard,
+                  background: isActive ? '#10B981' : colors.bgCard,
                   color: isActive ? '#fff' : colors.gray600,
                   fontSize:font.size.sm, fontWeight:font.weight.bold,
                   cursor:'pointer', flexShrink:0,
                   padding:`0 ${spacing[3]}px`,
-                  border: isActive ? `2px solid ${colors.primary}` : `1px solid ${colors.gray300}`,
+                  border: isActive ? `2px solid ${'#10B981'}` : `1px solid ${colors.gray300}`,
                   display:'flex', alignItems:'center', gap:4,
                   whiteSpace:'nowrap', fontFamily:ff,
                   WebkitTapHighlightColor:'transparent',
@@ -470,7 +470,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             </div>
           ) : (
             <>
-              <SectionLabel icon="ph:bookmark-simple-fill" label={`내 북마크 (${bookmarked.length})`} color={colors.primary} />
+              <SectionLabel icon="ph:bookmark-simple-fill" label={`내 북마크 (${bookmarked.length})`} color={'#10B981'} />
               <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
                 {sortByName(bookmarked).map(b => <BusinessCard key={b.id} business={b} />)}
               </div>
@@ -496,16 +496,16 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
               color={colors.textSecondary}
             />
             {loading ? <LoadingState /> : displayedBusinesses.length === 0 ? <EmptyState /> : (() => {
-              // 첫화면(카테고리 없음, 검색 없음)만 제한 — 추천 전체 + 나머지 50개
+              // 전체/카테고리 모두 50개씩 로드
               const isFirstScreen = !isFiltered && !category
               const featured = isFirstScreen ? displayedBusinesses.filter(b => b.is_featured) : []
-              const normal   = isFirstScreen ? displayedBusinesses.filter(b => !b.is_featured) : []
-              const visibleNormal = isFirstScreen && !showAll ? normal.slice(0, 50) : normal
-              const hasMore  = isFirstScreen && !showAll && normal.length > 50
+              const normal   = isFirstScreen ? displayedBusinesses.filter(b => !b.is_featured) : displayedBusinesses
+              const visibleNormal = normal.slice(0, displayLimit)
+              const hasMore  = displayLimit < normal.length
 
               const listToRender = isFirstScreen
                 ? [...featured, ...visibleNormal]
-                : displayedBusinesses
+                : visibleNormal
 
               return (
                 <>
@@ -514,7 +514,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                   </div>
                   {hasMore && (
                     <button
-                      onClick={() => setShowAll(true)}
+                      onClick={() => setDisplayLimit(l => l + 50)}
                       style={{
                         width:'100%', marginTop:spacing[4], height:48,
                         borderRadius:radius.md, border:`1px solid ${colors.border}`,
@@ -524,7 +524,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                         display:'flex', alignItems:'center', justifyContent:'center', gap:spacing[2],
                       }}
                     >
-                      더 많은 업체 보기 ({normal.length - 50}개 더)
+                      더 보기 ({Math.min(50, normal.length - displayLimit)}개 더)
                     </button>
                   )}
                 </>
@@ -537,24 +537,24 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
       {/* ── 업체 등록 신청 모달 */}
       {showRequestForm && (
         <>
-          <div onClick={() => setShowRequestForm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600, backdropFilter:'blur(4px)' }}/>
-          <div style={{
-            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
-            borderRadius:radius.xl, zIndex:601,
-            animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
+          <div onClick={() => setShowRequestForm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1100 }}/>
+          <div onClick={e => e.stopPropagation()} style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, background:'#ffffff',
+            borderRadius:'20px 20px 0 0', zIndex:1101,
+            animation:'slideUpSheet 0.25s ease', maxHeight:'72vh', overflowY:'auto',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            display:'flex', flexDirection:'column',
           }}>
-            <div style={{ width:36, height:4, background:colors.gray200, borderRadius:radius.full, margin:`${spacing[3]}px auto 0` }}/>
-            <div style={{ padding:`${spacing[4]}px ${spacing[4]}px ${spacing[10]}px` }}>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:spacing[4] }}>
-                <div>
-                  <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary }}>업체 등록 신청</div>
-                  <div style={{ fontSize:font.size.sm, color:colors.textSecondary, marginTop:2 }}>검토 후 등록해드려요</div>
-                </div>
-                <button onClick={() => setShowRequestForm(false)} style={{ background:'none', border:'none', cursor:'pointer', padding:4, display:'flex' }}>
-                  <Icon icon="ph:x" width={20} height={20} color={colors.textTertiary} />
-                </button>
+            <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+              <button onClick={() => setShowRequestForm(false)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
+              </button>
+            </div>
+            <div style={{ flex:1, overflowY:'auto', padding:`${spacing[4]}px ${spacing[4]}px ${spacing[10]}px` }}>
+              <div style={{ marginBottom:spacing[4] }}>
+                <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary }}>업체 등록 신청</div>
+                <div style={{ fontSize:font.size.sm, color:colors.textSecondary, marginTop:2 }}>검토 후 등록해드려요</div>
               </div>
               <RequestForm onClose={() => setShowRequestForm(false)} />
             </div>
@@ -653,7 +653,7 @@ const EMERGENCY_DATA = [
   },
   {
     section: '로드사이드 어시스턴스', icon: 'ph:car',
-    color: '#1B6EF3',
+    color: '#10B981',
     bg: '#EFF6FF',
     border: '#BFDBFE',
     items: [
