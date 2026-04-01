@@ -199,39 +199,28 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
               ? SHOPPING_MSGS[msgIndex]
               : '찜한 상품을 체크하며 쇼핑하세요!'}
           </div>
-        </div>
-        {/* ── 버튼 */}
-        <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
-          <button onClick={onBack} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
-            border:'none', background: '#FF6B9D',
-            color: '#fff', fontSize: 13, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:shopping-bag" width={13} height={13} color="#fff" />
-            상품 추가하기
-          </button>
-          <button onClick={() => setShowReceipt(true)} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.border}`, background: '#ffffff',
-            color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
-            공유하기
-          </button>
-          <button onClick={() => setShowDeleteAll(true)} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
-            border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)',
-            color:'#DC2626', fontSize: 13, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:trash" width={13} height={13} color="#DC2626" />
-            비우기
-          </button>
+          <div style={{ display:'flex', justifyContent:'flex-end', gap:6, marginTop:10 }}>
+            <button onClick={onBack} style={{
+              height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
+              border:'none', background:'#FF6B9D',
+              color:'#fff', fontSize:13, fontWeight:font.weight.bold,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+              cursor:'pointer', fontFamily:font.family,
+            }}>
+              <Icon icon="ph:shopping-bag" width={13} height={13} color="#fff" />
+              상품 추가하기
+            </button>
+            <button onClick={() => setShowDeleteAll(true)} style={{
+              height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
+              border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)',
+              color:'#DC2626', fontSize:13, fontWeight:font.weight.bold,
+              display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+              cursor:'pointer', fontFamily:font.family,
+            }}>
+              <Icon icon="ph:trash" width={13} height={13} color="#DC2626" />
+              비우기
+            </button>
+          </div>
         </div>
       </div>
 
@@ -343,15 +332,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           }} onClick={e => e.stopPropagation()}>
             <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[4]}px` }} />
             <div style={{ fontSize:font.size.xs, fontWeight:font.weight.bold, color:colors.textTertiary, marginBottom:spacing[3], letterSpacing:0.5 }}>더보기</div>
-            <button onClick={() => { setShowMoreMenu(false); setShowReceipt(true) }} style={{
-              width:'100%', height:52, borderRadius:radius.md,
-              border:`1px solid ${colors.border}`, background:'#ffffff',
-              color:colors.primary, fontSize:font.size.md, fontWeight:font.weight.bold,
-              cursor:'pointer', display:'flex', alignItems:'center', gap:spacing[2],
-              padding:`0 ${spacing[4]}px`, marginBottom:spacing[2], fontFamily:font.family,
-            }}>
-              <Icon icon="ph:share-network" width={18} height={18} color={colors.primary} />공유하기
-            </button>
+
             <button onClick={() => { setShowMoreMenu(false); setShowDeleteAll(true) }} style={{
               width:'100%', height:52, borderRadius:radius.md,
               border:`1px solid ${colors.dangerLight}`, background:colors.dangerLight,
