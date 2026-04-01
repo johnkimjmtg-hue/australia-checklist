@@ -6,6 +6,7 @@ import { TripInfo, AppState, getTripDays } from '../store/state'
 import { ITEMS } from '../data/checklist'
 import AppHeader from '../components/AppHeader'
 import BucketSheet from '../components/BucketSheet'
+import ShoppingSheet from '../components/ShoppingSheet'
 import ChecklistSheet from '../components/ChecklistSheet'
 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
@@ -26,6 +27,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [showBucket, setShowBucket] = useState(false)
   const [showChecklist, setShowChecklist] = useState(false)
+  const [showShopping, setShowShopping] = useState(false)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
 
@@ -166,7 +168,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               {MENUS.map((m, i) => (
                 <div key={m.id} className="menu-card-hover card-anim"
-                  onClick={() => m.id === 'bucketlist' ? setShowBucket(true) : m.id === 'checklist' ? setShowChecklist(true) : onNavigate(m.id)}
+                  onClick={() => m.id === 'bucketlist' ? setShowBucket(true) : m.id === 'checklist' ? setShowChecklist(true) : m.id === 'shopping' ? setShowShopping(true) : onNavigate(m.id)}
                   style={{ background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', animationDelay:`${i * 0.08}s` }}>
                   <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
@@ -185,7 +187,14 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             </div>
           </>
       </div>
-      {/* 체크리스트 바텀시트 */}
+      {/* 쇼핑리스트 바텀시트 */}
+      {showShopping && (
+        <ShoppingSheet
+          onClose={() => setShowShopping(false)}
+        />
+      )}
+
+      {/* 체크리스트 바텀시트 */}}
       {showChecklist && (
         <ChecklistSheet
           state={state}
@@ -198,8 +207,6 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       {showBucket && (
         <BucketSheet
           trip={trip}
-          state={state}
-          setState={setState}
           onClose={() => setShowBucket(false)}
         />
       )}
