@@ -64,16 +64,7 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
           })}
         </div>
 
-        {/* 선택 현황 */}
-        {currentDays.length > 0 && (
-          <div style={{
-            background:'rgba(41,182,208,0.12)', borderRadius:10,
-            padding:'8px 12px', textAlign:'center',
-            fontSize:13, fontWeight:700, color:'#29B6D0', flexShrink:0,
-          }}>
-            📅 {currentDays.length}일 선택됨
-          </div>
-        )}
+
 
         {/* 확인 버튼 */}
         {currentDays.length > 0 && (
