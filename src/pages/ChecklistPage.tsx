@@ -270,8 +270,8 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                 </span>
                 {tripLabel && (
                   <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                    <Icon icon="ph:airplane-takeoff" width={14} height={14} color="#29B6D0" />
-                    <span style={{ fontSize:15, fontWeight:700, color:'#29B6D0', fontFamily:ff }}>{tripLabel}</span>
+                    <Icon icon="ph:airplane-takeoff" width={14} height={14} color="#CC3300" />
+                    <span style={{ fontSize:15, fontWeight:700, color:'#CC3300', fontFamily:ff }}>{tripLabel}</span>
                   </div>
                 )}
               </div>
@@ -364,7 +364,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
                     onClick={()=>{
                       if(!db) return
                       setDetailItem(db)
-      onDetailItem?.(db)
+                      onDetailItem?.(db)
                       if((db.related_business_ids?.length??0)>0){
                         const cached = getCachedBusinesses()
                         setDetailBizCards(cached?.filter(b => db.related_business_ids!.includes(b.id)) ?? [])
@@ -435,9 +435,9 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
         }}>
           {onGoHome && (
             <button className="nav-btn" onClick={onGoHome}
-              style={{ display:'flex', alignItems:'center', gap:6, background:'rgba(0,0,0,0.06)', border:'none', borderRadius:20, padding:'6px 14px 6px 10px', cursor:'pointer', WebkitTapHighlightColor:'transparent', fontFamily:ff }}>
-              <Icon icon="ph:arrow-left" width={16} height={16} color="#0D3349" />
-              <span style={{ fontSize:16, fontWeight:600, color:'#0D3349' }}>내 버킷리스트</span>
+              style={{ display:'flex', alignItems:'center', gap:6, background:'rgba(0,0,0,0.06)', border:'none', borderRadius:20, padding:'7px 16px 7px 12px', cursor:'pointer', WebkitTapHighlightColor:'transparent', fontFamily:ff }}>
+              <Icon icon="ph:arrow-left" width={18} height={18} color="#0D3349" />
+              <span style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>내 버킷리스트</span>
             </button>
           )}
           {TABS.map(tab=>{
