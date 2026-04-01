@@ -1,9 +1,9 @@
 import { Icon } from '@iconify/react'
 import { TripInfo, getTripDays, fmtMD, dow } from '../store/state'
 
-type Props = { itemLabel:string; trip:TripInfo; currentDays:number[]; onSelect:(days:number[])=>void; onClose:()=>void }
+type Props = { itemLabel:string; trip:TripInfo; currentDays:number[]; onSelect:(days:number[])=>void; onClose:()=>void; accentColor?:string }
 
-export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, onClose }: Props) {
+export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, onClose, accentColor = '#29B6D0' }: Props) {
   const days = getTripDays(trip)
   const toggle = (idx:number) => {
     const next = currentDays.includes(idx) ? currentDays.filter(d=>d!==idx) : [...currentDays, idx]
@@ -39,7 +39,7 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
         <div style={{ textAlign:'center', flexShrink:0 }}>
           <div style={{ fontSize:11, color:'#7BAAB5', fontWeight:500, marginBottom:4 }}>일정 추가</div>
           <div style={{ fontSize:15, fontWeight:700, color:'#0D3349', lineHeight:1.4 }}>
-            <span style={{ color:'#29B6D0' }}>"{itemLabel}"</span>
+            <span style={{ color:accentColor }}>"{itemLabel}"</span>
           </div>
         </div>
 
@@ -50,9 +50,9 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
             return (
               <button key={idx} onClick={() => toggle(idx)} style={{
                 padding:'10px 4px', borderRadius:10, cursor:'pointer', textAlign:'center',
-                border: sel ? '1.5px solid #29B6D0' : '1px solid rgba(0,131,143,0.15)',
-                background: sel ? 'rgba(41,182,208,0.12)' : '#ffffff',
-                color: sel ? '#29B6D0' : '#1565A0',
+                border: sel ? `1.5px solid ${accentColor}` : '1px solid rgba(0,131,143,0.15)',
+                background: sel ? `rgba(${accentColor === '#FF6B9D' ? '255,107,157' : '41,182,208'},0.12)` : '#ffffff',
+                color: sel ? accentColor : '#1565A0',
                 transition:'all 0.12s', WebkitTapHighlightColor:'transparent',
                 fontFamily:'inherit',
               }}>
@@ -70,7 +70,7 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
         {currentDays.length > 0 && (
           <button onClick={onClose} style={{
             width:'100%', height:48, flexShrink:0,
-            background:'#29B6D0', color:'#fff',
+            background:accentColor, color:'#fff',
             border:'none', borderRadius:12,
             fontSize:15, fontWeight:700, cursor:'pointer',
             fontFamily:'inherit', WebkitTapHighlightColor:'transparent', transition:'all 0.15s',

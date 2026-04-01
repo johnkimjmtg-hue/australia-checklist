@@ -404,27 +404,26 @@ export default function NearbyMap({ onBack }: Props) {
         <>
           <div onClick={() => setSelBiz(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1100 }} />
           <div onClick={e => e.stopPropagation()} style={{
-            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-            width:'100%', maxWidth:430, background:'#ffffff',
-            borderRadius:'20px 20px 0 0', zIndex:1101,
-            animation:'slideUpSheet 0.25s ease', maxHeight:'72vh', overflowY:'auto',
+            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
+            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
+            borderRadius:radius.xl, zIndex:1101,
+            animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
-            display:'flex', flexDirection:'column',
+            padding:`${spacing[3]}px ${spacing[3]}px ${spacing[8]}px`,
+            boxSizing:'border-box',
           }}>
-            {/* 헤더 - X 버튼 */}
-            <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+            {/* X 버튼 */}
+            <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:spacing[2] }}>
               <button onClick={() => setSelBiz(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
                 <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
               </button>
             </div>
-            <div style={{ flex:1, overflowY:'auto', padding:`8px ${spacing[3]}px ${spacing[8]}px` }}>
-              {myPos && (
-                <div style={{ textAlign:'center', fontSize:font.size.sm, color:colors.textTertiary, fontWeight:font.weight.bold, marginBottom:spacing[2] }}>
-                  📍 내 위치에서 {getDistanceKm(myPos.lat, myPos.lng, (selBiz as any).latitude, (selBiz as any).longitude).toFixed(1)}km
-                </div>
-              )}
-              <BusinessCard business={selBiz} accentColor="#F59E0B" />
-            </div>
+            {myPos && (
+              <div style={{ textAlign:'center', fontSize:font.size.sm, color:colors.textTertiary, fontWeight:font.weight.bold, marginBottom:spacing[2] }}>
+                📍 내 위치에서 {getDistanceKm(myPos.lat, myPos.lng, (selBiz as any).latitude, (selBiz as any).longitude).toFixed(1)}km
+              </div>
+            )}
+            <BusinessCard business={selBiz} accentColor="#F59E0B" />
           </div>
         </>
       )}

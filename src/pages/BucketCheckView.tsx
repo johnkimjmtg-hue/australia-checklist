@@ -67,7 +67,7 @@ const catColors: Record<string,string> = {
   people:'#3a6b4a', parenting:'#6b4a3a', custom:'#4a6b5a',
 }
 
-function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDetailItem, onDetailItem, onDeleteItem, onUncheck }: {
+function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDetailItem, onDetailItem, onDeleteItem, onUncheck, onSchedule }: {
   items: { id: string; categoryId: string; label: string; emoji: string }[]
   dayIdx?: number
   dbItems: DBItem[]
@@ -77,6 +77,7 @@ function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDe
   onDetailItem?: (item: DBItem) => void
   onDeleteItem?: (id: string, day?: number) => void
   onUncheck?: (id: string, day?: number) => void
+  onSchedule?: (id: string, label: string) => void
 }) {
   return (
     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
@@ -117,12 +118,23 @@ function PhotoCardGrid({ items, dayIdx, dbItems, achieved, toggleAchieved, setDe
               <div style={{ fontSize:14, fontWeight:400, color:'#fff', lineHeight:1.3 }}>{item.label}</div>
               {region && <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:3 }}>📍 {region.label}</div>}
             </div>
-            {onDeleteItem && (
-              <button
-                onClick={e => { e.stopPropagation(); onDeleteItem(item.id, dayIdx) }}
-                style={{ position:'absolute', bottom:10, right:10, background:'rgba(255,255,255,0.25)', border:'none', borderRadius:'50%', width:26, height:26, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
-                <Icon icon="ph:trash" width={13} height={13} color="#fff" />
-              </button>
+            {(onDeleteItem || onSchedule) && (
+              <div style={{ position:'absolute', bottom:10, right:10, display:'flex', alignItems:'center', gap:5 }}>
+                {onSchedule && (
+                  <button
+                    onClick={e => { e.stopPropagation(); onSchedule(item.id, item.label) }}
+                    style={{ height:22, padding:'0 8px', background:'rgba(255,255,255,0.25)', border:'none', borderRadius:20, display:'flex', alignItems:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                    <span style={{ fontSize:11, fontWeight:700, color:'#DC2626' }}>일정선택</span>
+                  </button>
+                )}
+                {onDeleteItem && (
+                  <button
+                    onClick={e => { e.stopPropagation(); onDeleteItem(item.id, dayIdx) }}
+                    style={{ background:'rgba(255,255,255,0.25)', border:'none', borderRadius:'50%', width:26, height:26, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                    <Icon icon="ph:trash" width={13} height={13} color="#fff" />
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )
@@ -619,6 +631,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
                     onDetailItem={onDetailItem}
                     onDeleteItem={(id) => setDeleteItemId({ id })}
                     onUncheck={(id) => setUncheckConfirmId({ id })}
+                    onSchedule={(id, label) => setSheetItem({ id, label })}
                   />
                 </div>
               )

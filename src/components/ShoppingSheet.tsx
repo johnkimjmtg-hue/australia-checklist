@@ -3,6 +3,7 @@
 // src/components/ShoppingSheet.tsx
 // ─────────────────────────────────────────────
 import { useState } from 'react'
+import { TripInfo } from '../store/state'
 import { Icon } from '@iconify/react'
 import MyShoppingView from '../pages/MyShoppingView'
 import Shopping from '../pages/Shopping'
@@ -11,9 +12,10 @@ type View = 'mylist' | 'shopping'
 
 type Props = {
   onClose: () => void
+  trip?: TripInfo
 }
 
-export default function ShoppingSheet({ onClose }: Props) {
+export default function ShoppingSheet({ onClose, trip }: Props) {
   const [view, setView] = useState<View>('mylist')
   const [myList, setMyList] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] }
@@ -68,6 +70,7 @@ export default function ShoppingSheet({ onClose }: Props) {
               onMyCheckedChange={handleMyCheckedChange}
               onBack={() => setView('shopping')}
               onLanding={onClose}
+              trip={trip}
             />
           ) : (
             <Shopping

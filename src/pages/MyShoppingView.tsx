@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
+import ScheduleSheet from '../components/ScheduleSheet'
+import { TripInfo } from '../store/state'
 import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 import { getCachedShopping } from '../lib/dataCache'
@@ -50,9 +52,10 @@ type Props = {
   myChecked: Record<string, boolean>
   onMyListChange: (next: string[]) => void
   onMyCheckedChange: (next: Record<string, boolean>) => void
+  trip?: TripInfo
 }
 
-export default function MyShoppingView({ onBack, onLanding, myList, myChecked, onMyListChange, onMyCheckedChange }: Props) {
+export default function MyShoppingView({ onBack, onLanding, myList, myChecked, onMyListChange, onMyCheckedChange, trip }: Props) {
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const [selProduct, setSelProduct]   = useState<Product | null>(null)
   const [loading, setLoading]         = useState(true)
@@ -63,6 +66,10 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showDeleteAll, setShowDeleteAll] = useState(false)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
+  const [scheduleItem, setScheduleItem] = useState<string | null>(null)
+  const [shoppingSchedules, setShoppingSchedules] = useState<Record<string, number[]>>(() => {
+    try { return JSON.parse(localStorage.getItem('shopping-schedules') ?? '{}') } catch { return {} }
+  })
   const [uncheckConfirmId, setUncheckConfirmId] = useState<string | null>(null)
 
   const SHOPPING_MSGS = [
@@ -149,6 +156,10 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         }
         .my-item { transition: all 0.2s ease; }
         .my-item:active { transform: scale(0.98); }
+          50%  { transform: scale(0.85) rotate(3deg); opacity:1; }
+          70%  { transform: scale(1.1) rotate(-2deg); }
+          100% { transform: scale(1) rotate(-8deg); opacity:1; }
+        }
       `}</style>
 
       {/* 꽃가루 애니메이션 */}
@@ -239,37 +250,54 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                   width:'100%', aspectRatio:'1',
                   background: p.image_url ? 'none' : '#f5f5f5',
                   display:'flex', alignItems:'center', justifyContent:'center',
-                  overflow:'hidden', cursor:'pointer',
+                  overflow:'hidden', cursor:'pointer', position:'relative',
                 }}>
                   {p.image_url
                     ? <img src={p.image_url} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                     : <Icon icon="ph:shopping-bag" width={32} height={32} color="#ccc" />
                   }
+                  
                 </div>
-                <div onClick={() => setSelProduct(p)} style={{ padding:'8px 10px 10px', cursor:'pointer' }}>
-                  {p.tags.length > 0 && (
-                    <div style={{ display:'flex', gap:3, flexWrap:'wrap', marginBottom:4 }}>
-                      {p.tags.slice(0,2).map(tag => (
-                        <span key={tag} style={{ fontSize:9, fontWeight:700, padding:'2px 5px', borderRadius:4, background: TAG_COLOR[tag]?.bg ?? '#f5f5f5', color: TAG_COLOR[tag]?.color ?? '#666' }}>{tag}</span>
-                      ))}
-                    </div>
-                  )}
-                  <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', lineHeight:1.4, marginBottom:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
-                  <div style={{ fontSize:11, color:'#7BAAB5', marginBottom:4 }}>{p.brand}</div>
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:6 }}>
+                <div style={{ padding:'8px 10px 10px' }}>
+                  <div onClick={() => setSelProduct(p)} style={{ cursor:'pointer', marginBottom:8 }}>
+                    {p.tags.length > 0 && (
+                      <div style={{ display:'flex', gap:3, flexWrap:'wrap', marginBottom:4 }}>
+                        {p.tags.slice(0,2).map(tag => (
+                          <span key={tag} style={{ fontSize:9, fontWeight:700, padding:'2px 5px', borderRadius:4, background: TAG_COLOR[tag]?.bg ?? '#f5f5f5', color: TAG_COLOR[tag]?.color ?? '#666' }}>{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                    <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', lineHeight:1.4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
+                  </div>
+                  {/* 버튼: 구매 1/2 + 달력 1/4 + 휴지통 1/4 */}
+                  <div style={{ display:'flex', alignItems:'center', gap:4 }}>
                     <button onClick={e => { e.stopPropagation(); checked ? setUncheckConfirmId(p.id) : toggleChecked(p.id) }} style={{
-                      height:26, padding:'0 10px', borderRadius:20, border: checked ? 'none' : '1.5px solid #FF6B9D',
-                      background: checked ? '#FF6B9D' : '#ffffff',
-                      color: checked ? '#fff' : '#FF6B9D',
-                      fontSize:11, fontWeight:700, cursor:'pointer',
-                      display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+                      flex:1, height:26, borderRadius:20, border:'none', cursor:'pointer',
+                      background: checked ? '#FF6B9D' : 'rgba(255,107,157,0.10)',
+                      display:'flex', alignItems:'center', justifyContent:'center', gap:4,
                       WebkitTapHighlightColor:'transparent', transition:'all 0.2s',
                     }}>
-                      <Icon icon="ph:check-bold" width={11} height={11} color={checked ? '#fff' : '#FF6B9D'} />
-                      {checked ? '구매완료' : '구매'}
+                      <Icon icon="ph:check-bold" width={13} height={13} color={checked ? '#fff' : '#FF6B9D'} />
+                      <span style={{ fontSize:11, fontWeight:700, color: checked ? '#fff' : '#FF6B9D' }}>구매</span>
                     </button>
-                    <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(p.id) }} style={{ background:'none', border:'none', cursor:'pointer', padding:2, display:'flex', alignItems:'center' }}>
-                      <Icon icon="ph:trash" width={18} height={18} color="#64748B" />
+                    {trip && (
+                      <button onClick={e => { e.stopPropagation(); setScheduleItem(p.id) }} style={{
+                        flex:1, height:26, borderRadius:20, border:'none', cursor:'pointer',
+                        background: shoppingSchedules[p.id]?.length ? 'rgba(41,182,208,0.15)' : 'rgba(41,182,208,0.08)',
+                        display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+                        WebkitTapHighlightColor:'transparent',
+                      }}>
+                        <Icon icon="ph:plus-bold" width={13} height={13} color="#29B6D0" />
+                        <span style={{ fontSize:11, fontWeight:700, color:'#29B6D0' }}>일정</span>
+                      </button>
+                    )}
+                    <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(p.id) }} style={{
+                      flex:1, height:26, borderRadius:20, border:'none', cursor:'pointer',
+                      background: 'rgba(220,38,38,0.08)',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      WebkitTapHighlightColor:'transparent',
+                    }}>
+                      <Icon icon="ph:trash" width={14} height={14} color="#DC2626" />
                     </button>
                   </div>
                 </div>
@@ -442,6 +470,24 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           </>
         )
       })()}
+
+      {/* ── 일정 선택 */}
+      {scheduleItem && trip && (
+        <ScheduleSheet
+          itemLabel={allProducts.find(p => p.id === scheduleItem)?.name ?? ''}
+          trip={trip}
+          accentColor="#FF6B9D"
+          currentDays={shoppingSchedules[scheduleItem] ?? []}
+          onSelect={days => {
+            const next = { ...shoppingSchedules, [scheduleItem]: days }
+            if (!days.length) delete next[scheduleItem]
+            setShoppingSchedules(next)
+            try { localStorage.setItem('shopping-schedules', JSON.stringify(next)) } catch {}
+            setScheduleItem(null)
+          }}
+          onClose={() => setScheduleItem(null)}
+        />
+      )}
 
       {/* ── 공유 영수증 모달 */}
       {showReceipt && (

@@ -652,8 +652,12 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
               boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
               animation:'slideUpSheet 0.25s ease',
             }}>
-              {/* 핸들 */}
-              <div style={{ width:36, height:4, borderRadius:radius.full, background:colors.gray200, margin:`0 auto ${spacing[3]}px` }} />
+              {/* X 버튼 */}
+              <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:spacing[2] }}>
+                <button onClick={() => setSelectedCafe(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                  <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
+                </button>
+              </div>
 
               {/* 인증샷 미리보기 */}
               {photos[idx] && (
@@ -769,7 +773,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   try {
                     const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
                     const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
-                    const compressed = await new Promise<Blob>(resolve => {
+                    const compressed = await new Promise<Blob>((resolve, reject) => {
                       const img = new Image()
                       const url = URL.createObjectURL(file)
                       img.onload = () => {
@@ -782,13 +786,22 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                         const canvas = document.createElement('canvas')
                         canvas.width = w; canvas.height = h
                         canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
-                        canvas.toBlob(blob => resolve(blob!), 'image/webp', 0.8)
-                        URL.revokeObjectURL(url)
+                        // webp 미지원 기기(iOS 등) 대비 jpeg로 폴백
+                        const tryBlob = (type: string, quality: number) => {
+                          canvas.toBlob(blob => {
+                            if (blob) { URL.revokeObjectURL(url); resolve(blob) }
+                            else if (type === 'image/webp') tryBlob('image/jpeg', 0.75)
+                            else reject(new Error('toBlob failed'))
+                          }, type, quality)
+                        }
+                        tryBlob('image/webp', 0.8)
                       }
+                      img.onerror = () => reject(new Error('image load failed'))
                       img.src = url
                     })
+                    const isJpeg = compressed.type === 'image/jpeg'
                     const fd = new FormData()
-                    fd.append('file', compressed, 'photo.webp')
+                    fd.append('file', compressed, isJpeg ? 'photo.jpg' : 'photo.webp')
                     fd.append('upload_preset', UPLOAD_PRESET)
                     fd.append('folder', 'bingo-photos')
                     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:'POST', body:fd })

@@ -2,15 +2,17 @@
 // HomePage.tsx — 달력 중심 홈
 // ─────────────────────────────────────────────
 import { useState, useEffect } from 'react'
+import { Icon } from '@iconify/react'
 import { TripInfo, AppState, getTripDays } from '../store/state'
 import { ITEMS } from '../data/checklist'
-import { getCachedChecklist } from '../lib/dataCache'
+import { getCachedChecklist, getCachedShopping } from '../lib/dataCache'
 import AppHeader from '../components/AppHeader'
 import BucketSheet from '../components/BucketSheet'
 import ShoppingSheet from '../components/ShoppingSheet'
 import ChecklistSheet from '../components/ChecklistSheet'
 import ServicesSheet from '../components/ServicesSheet'
 import NearbySheet from '../components/NearbySheet'
+import NoteSheet from '../components/NoteSheet'
 import BingoSheet from '../components/BingoSheet'
 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
@@ -45,6 +47,9 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   const [showShopping, setShowShopping] = useState(false)
   const [showServices, setShowServices] = useState(false)
   const [showNearby, setShowNearby] = useState(false)
+  const [showNote, setShowNote] = useState(false)
+  const [noteInitialId, setNoteInitialId] = useState<string | undefined>(undefined)
+  const [noteInitialView, setNoteInitialView] = useState<'list'|'write'|undefined>(undefined)
   const [showBingo, setShowBingo] = useState(false)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
@@ -87,6 +92,14 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       const hasBucket = dayIdx >= 0 && [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])].some(item => (state.schedules[item.id] ?? []).includes(dayIdx))
       const memoKey = `memo_${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
       const hasMemo = dayIdx >= 0 && !!(localStorage.getItem(memoKey) ?? '').trim()
+      const hasShopping = dayIdx >= 0 && (() => { try { const s = JSON.parse(localStorage.getItem('shopping-schedules') ?? '{}'); return Object.values(s).some((days: any) => days.includes(dayIdx)) } catch { return false } })()
+      const hasNote = dayIdx >= 0 && (() => {
+        try {
+          const notes = JSON.parse(localStorage.getItem('app-notes') ?? '[]')
+          const dateStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
+          return notes.some((n: any) => n.date === dateStr)
+        } catch { return false }
+      })()
 
       let bg = 'transparent', color = isPast ? '#7BAAB5' : '#0D3349', radius = '50%', fw: number = 400
       if (isSelected) { bg = '#00838F'; color = '#fff'; fw = 800 }
@@ -108,10 +121,12 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             WebkitTapHighlightColor:'transparent',
           }}>
           {d}
-          {(hasBucket || hasMemo) && (
+          {(hasBucket || hasShopping || hasMemo || hasNote) && (
             <div style={{ position:'absolute', bottom:3, display:'flex', gap:2 }}>
               {hasBucket && <div style={{ width:4, height:4, borderRadius:'50%', background:'#29B6D0' }} />}
-              {hasMemo && <div style={{ width:4, height:4, borderRadius:'50%', background:'#FF6B9D' }} />}
+              {hasShopping && <div style={{ width:4, height:4, borderRadius:'50%', background:'#FF6B9D' }} />}
+              {hasMemo && <div style={{ width:4, height:4, borderRadius:'50%', background:'#F59E0B' }} />}
+              {hasNote && <div style={{ width:4, height:4, borderRadius:'50%', background:'#F97316' }} />}
             </div>
           )}
         </div>
@@ -175,7 +190,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 <div style={{ width:36 }} />
               </div>
               {/* 일별 내용 */}
-              <div style={{ padding:'0 14px 16px', height:280, overflowY:'auto' }}>
+              <div style={{ padding:'0 14px 16px' }}>
                 {/* 버킷리스트 */}
                 {(() => {
                   const allItems = [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])]
@@ -229,6 +244,93 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                     </div>
                   )
                 })()}
+                {/* 쇼핑리스트 */}
+                {(() => {
+                  try {
+                    const schedules: Record<string, number[]> = JSON.parse(localStorage.getItem('shopping-schedules') ?? '{}')
+                    const myList: string[] = JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]')
+                    const myChecked: Record<string, boolean> = JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}')
+                    const dayShoppingIds = myList.filter(id => (schedules[id] ?? []).includes(selectedDay!))
+                    if (!dayShoppingIds.length) return null
+                    const cachedShopping = getCachedShopping()
+                    const allProds = cachedShopping?.products ?? []
+                    return (
+                      <div style={{ marginBottom:14 }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                          <div style={{ width:7, height:7, borderRadius:'50%', background:'#FF6B9D' }} />
+                          <div style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>쇼핑리스트 ({dayShoppingIds.length})</div>
+                        </div>
+                        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                          {dayShoppingIds.map(id => {
+                            const prod = allProds.find((p:any) => p.id === id)
+                            const isChecked = !!myChecked[id]
+                            return (
+                              <div key={id} style={{
+                                display:'flex', alignItems:'center', gap:10,
+                                background: isChecked ? 'rgba(255,107,157,0.08)' : 'rgba(0,0,0,0.03)',
+                                borderRadius:10, padding:'9px 12px',
+                                border: isChecked ? '1px solid rgba(255,107,157,0.25)' : '1px solid transparent',
+                              }}>
+                                {prod?.image_url && (
+                                  <div style={{ width:36, height:36, borderRadius:6, overflow:'hidden', flexShrink:0 }}>
+                                    <img src={prod.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                                  </div>
+                                )}
+                                <div style={{ flex:1, minWidth:0 }}>
+                                  <div style={{ fontSize:13, fontWeight:600, color: isChecked ? '#7BAAB5' : '#0D3349', textDecoration: isChecked ? 'line-through' : 'none', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{prod?.name ?? id}{prod?.brand ? <span style={{ fontSize:11, fontWeight:400, color:'#7BAAB5' }}> · {prod.brand}</span> : null}</div>
+                                </div>
+                                <button onClick={() => {
+                                  const next = { ...myChecked, [id]: !myChecked[id] }
+                                  if (!next[id]) delete next[id]
+                                  try { localStorage.setItem('my-shopping-checked', JSON.stringify(next)) } catch {}
+                                  setMemos(m => ({ ...m }))
+                                }} style={{
+                                  height:26, padding:'0 8px', borderRadius:20, border:'none', cursor:'pointer', flexShrink:0,
+                                  background: isChecked ? '#FF6B9D' : 'rgba(0,0,0,0.08)',
+                                  display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+                                  WebkitTapHighlightColor:'transparent',
+                                }}>
+                                  <svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 6L4.5 9L10.5 3" stroke={isChecked ? '#fff' : '#aaa'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+                                  <span style={{ fontSize:11, fontWeight:700, color: isChecked ? '#fff' : '#aaa' }}>구매</span>
+                                </button>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  } catch { return null }
+                })()}
+
+                {/* 노트 */}
+                {(() => {
+                  try {
+                    const notes = JSON.parse(localStorage.getItem('app-notes') ?? '[]')
+                    const dateStr = `${selectedDayDate!.getFullYear()}-${String(selectedDayDate!.getMonth()+1).padStart(2,'0')}-${String(selectedDayDate!.getDate()).padStart(2,'0')}`
+                    const dayNotes = notes.filter((n: any) => n.date === dateStr)
+                    if (!dayNotes.length) return null
+                    return (
+                      <div style={{ marginBottom:14 }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                          <div style={{ width:7, height:7, borderRadius:'50%', background:'#F97316' }} />
+                          <div style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>노트 ({dayNotes.length})</div>
+                        </div>
+                        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                          {dayNotes.map((note: any) => (
+                            <div key={note.id} style={{
+                              background:'rgba(249,115,22,0.06)', borderRadius:10, padding:'10px 12px',
+                              border:'1px solid rgba(249,115,22,0.15)',
+                            }}>
+                              <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', marginBottom: note.content ? 4 : 0 }}>{note.title}</div>
+                              {note.content && <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6, whiteSpace:'pre-wrap' }}>{note.content}</div>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  } catch { return null }
+                })()}
+
                 {/* 메모 */}
                 {(() => {
                   const memoKey = `memo_${selectedDayDate.getFullYear()}-${String(selectedDayDate.getMonth()+1).padStart(2,'0')}-${String(selectedDayDate.getDate()).padStart(2,'0')}`
@@ -323,8 +425,49 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                   <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>한인 업체·병원</div>
                 </div>
               </div>
+              {(() => {
+                const savedNotes = (() => { try { return JSON.parse(localStorage.getItem('app-notes') ?? '[]') } catch { return [] } })()
+                const previewNotes = savedNotes.slice(0, 3)
+                return (
+                  <div className="card-anim" style={{ gridColumn:'span 2', background:'#EFFCFC', borderRadius:20, padding:'16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', animationDelay:`${(MENUS.length + 1) * 0.08}s` }}>
+                    {/* 헤더 */}
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom: previewNotes.length > 0 ? 12 : 0 }}>
+                      <div onClick={() => setShowNote(true)} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                        <div style={{ width:36, height:36, borderRadius:12, background:'rgba(249,115,22,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>📝</div>
+                        <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>노트</div>
+                      </div>
+                      <button onClick={() => { setNoteInitialView('write'); setNoteInitialId(undefined); setShowNote(true) }} style={{
+                        width:28, height:28, borderRadius:'50%', background:'rgba(249,115,22,0.15)',
+                        border:'none', display:'flex', alignItems:'center', justifyContent:'center',
+                        cursor:'pointer', WebkitTapHighlightColor:'transparent',
+                      }}>
+                        <Icon icon="ph:plus-bold" width={14} height={14} color="#F97316" />
+                      </button>
+                    </div>
+                    {/* 노트 리스트 */}
+                    {previewNotes.length > 0 && (
+                      <div style={{ display:'flex', flexDirection:'column' }}>
+                        {previewNotes.map((note: any) => (
+                          <div key={note.id} onClick={() => { setNoteInitialId(note.id); setNoteInitialView(undefined); setShowNote(true) }} style={{
+                            display:'flex', alignItems:'center', gap:8, padding:'8px 4px',
+                            borderTop:'1px solid rgba(0,0,0,0.06)', cursor:'pointer',
+                            WebkitTapHighlightColor:'transparent',
+                          }}>
+                            <Icon icon="ph:note" width={13} height={13} color="#F97316" style={{ flexShrink:0 }} />
+                            <div style={{ fontSize:13, fontWeight:500, color:'#0D3349', flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{note.title}</div>
+                            <Icon icon="ph:caret-right" width={12} height={12} color="#CBD5E1" style={{ flexShrink:0 }} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {previewNotes.length === 0 && (
+                      <div onClick={() => setShowNote(true)} style={{ fontSize:13, color:'#94A3B8', cursor:'pointer', paddingTop:4 }}>메모·기록·여행 노트</div>
+                    )}
+                  </div>
+                )
+              })()}
               <div className="menu-card-hover card-anim" onClick={() => setShowBingo(true)}
-                style={{ gridColumn:'span 2', background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${(MENUS.length + 1) * 0.08}s` }}>
+                style={{ gridColumn:'span 2', background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${(MENUS.length + 2) * 0.08}s` }}>
                 <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
                 <div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
@@ -353,6 +496,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       {showShopping && (
         <ShoppingSheet
           onClose={() => setShowShopping(false)}
+          trip={trip}
         />
       )}
 
@@ -364,6 +508,9 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
           onClose={() => setShowChecklist(false)}
         />
       )}
+
+      {/* 노트 바텀시트 */}
+      {showNote && <NoteSheet onClose={() => { setShowNote(false); setNoteInitialId(undefined); setNoteInitialView(undefined) }} initialNoteId={noteInitialId} initialView={noteInitialView} trip={trip} />}
 
       {/* 버킷리스트 바텀시트 */}
       {showBucket && (
