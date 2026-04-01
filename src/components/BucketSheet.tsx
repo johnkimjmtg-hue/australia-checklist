@@ -71,9 +71,9 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
         {/* 헤더 */}
         <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 12px 0' }}>
           {view === 'checklist' ? (
-            <button onClick={handleBackToBucket} style={{ background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:4, padding:'4px 6px', borderRadius:8, WebkitTapHighlightColor:'transparent' }}>
-              <span style={{ fontSize:16, color:'#0D3349' }}>‹</span>
-              <span style={{ fontSize:13, color:'#0D3349', fontWeight:600 }}>버킷리스트</span>
+            <button onClick={handleBackToBucket} style={{ background:'rgba(0,0,0,0.06)', border:'none', borderRadius:20, padding:'7px 16px 7px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:6, WebkitTapHighlightColor:'transparent' }}>
+              <Icon icon="ph:arrow-left" width={18} height={18} color="#0D3349" />
+              <span style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>내 버킷리스트</span>
             </button>
           ) : <div />}
           <button onClick={onClose} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
