@@ -154,32 +154,50 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
       <PetalBurst trigger={petalTrigger} />
 
       {/* ── 진행 카드 */}
-      <div style={{ position:'sticky', top:0, zIndex:30, background: '#ffffff', padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
+      <div style={{ position:'sticky', top:0, zIndex:30, background:'#ffffff', padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
         <div style={{
           background: '#ffffff',
-          borderRadius: radius.lg,
-          border: `1.5px solid ${colors.gray300}`,
-          padding: `${spacing[4]}px`, display:'flex', alignItems:'center', gap: spacing[4],
+          borderRadius: 16,
+          border: '1px solid #FF6B9D',
+          padding: '14px 16px',
         }}>
-          {/* 선물박스 그리드 */}
-          <GiftBoxProgress total={total} checkedCount={checkedCount} myList={myList} myChecked={myChecked} />
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize: font.size['2xl'], fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1], lineHeight:1.2 }}>내 쇼핑리스트</div>
-            <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom: spacing[1] }}>
-              <span style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: colors.textPrimary, lineHeight:1 }}>{checkedCount}</span>
-              <span style={{ fontSize: font.size.xl, fontWeight: font.weight.medium, color: colors.textSecondary }}>/{total}개 구매 완료</span>
-            </div>
-            <div style={{ fontSize: font.size.sm, color: colors.textTertiary, lineHeight:1.5 }}>
-              {pct === 100
-                ? '쇼핑 완료! 모든 상품을 구매했어요 🎉'
-                : pct > 0
-                ? SHOPPING_MSGS[msgIndex]
-                : '찜한 상품을 체크하며 쇼핑하세요!'}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+            <div style={{ fontSize:18, fontWeight:700, color:'#0D3349' }}>내 쇼핑리스트</div>
+            <div style={{ fontSize:13, color:'#7BAAB5' }}>
+              <span style={{ fontSize:22, fontWeight:900, color:'#FF6B9D' }}>{checkedCount}</span>
+              <span style={{ fontSize:15, color:'#7BAAB5' }}> / {total} 구매 완료</span>
             </div>
           </div>
-          {/* 퍼센트 */}
-          <div style={{ textAlign:'center', flexShrink:0 }}>
-            <div style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: pct === 100 ? '#FF6B9D' : colors.textPrimary, lineHeight:1 }}>{pct}%</div>
+          {/* 12칸 고정 그리드 */}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(12,1fr)', gap:4, marginBottom:10 }}>
+            {Array.from({ length: 12 }).map((_, i) => {
+              const isItem = i < total
+              const isBought = i < checkedCount
+              return isItem ? (
+                isBought ? (
+                  <svg key={i} viewBox="0 0 100 115" style={{ width:'100%', aspectRatio:'1' }}>
+                    <rect x="10" y="42" width="80" height="62" rx="4" fill="#FF6B9D"/>
+                    <rect x="6" y="24" width="88" height="22" rx="4" fill="#FF8FB3"/>
+                    <rect x="43" y="24" width="14" height="80" fill="#fff"/>
+                    <rect x="6" y="29" width="88" height="12" fill="#fff"/>
+                    <path d="M50,18 Q34,4 22,10 Q18,18 30,22 Q40,24 50,18Z" fill="#fff"/>
+                    <path d="M50,18 Q66,4 78,10 Q82,18 70,22 Q60,24 50,18Z" fill="#fff"/>
+                    <circle cx="50" cy="19" r="7" fill="#FF6B9D"/>
+                  </svg>
+                ) : (
+                  <div key={i} style={{ width:'100%', aspectRatio:'1', background:'rgba(255,107,157,0.12)', borderRadius:3 }} />
+                )
+              ) : (
+                <div key={i} style={{ width:'100%', aspectRatio:'1', background:'rgba(0,0,0,0.05)', borderRadius:3 }} />
+              )
+            })}
+          </div>
+          <div style={{ fontSize:12, color:'#7BAAB5' }}>
+            {pct === 100
+              ? '쇼핑 완료! 모든 상품을 구매했어요 🎉'
+              : pct > 0
+              ? SHOPPING_MSGS[msgIndex]
+              : '찜한 상품을 체크하며 쇼핑하세요!'}
           </div>
         </div>
         {/* ── 버튼 */}
@@ -194,7 +212,16 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
             <Icon icon="ph:shopping-bag" width={13} height={13} color="#fff" />
             상품 추가하기
           </button>
-
+          <button onClick={() => setShowReceipt(true)} style={{
+            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
+            border:`1px solid ${colors.border}`, background: '#ffffff',
+            color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
+            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+            cursor:'pointer', fontFamily: font.family,
+          }}>
+            <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
+            공유하기
+          </button>
           <button onClick={() => setShowDeleteAll(true)} style={{
             height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
             border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)',
@@ -283,12 +310,12 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 <button onClick={e => { e.stopPropagation(); toggleChecked(p.id) }} style={{
                   position:'absolute', top:8, right:8,
                   width:32, height:32, borderRadius:'50%', border:'none', cursor:'pointer',
-                  background: checked ? '#FF6B9D' : 'rgba(255,107,157,0.15)',
+                  background: checked ? '#FF6B9D' : 'rgba(0,0,0,0.06)',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   WebkitTapHighlightColor:'transparent', transition:'all 0.2s',
                 }}>
                   <svg width="12" height="10" viewBox="0 0 11 8" fill="none">
-                    <path d="M1 4L4 7L10 1" stroke={checked ? '#fff' : '#FF6B9D'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M1 4L4 7L10 1" stroke={checked ? '#fff' : '#aaa'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
               </div>
@@ -296,7 +323,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           })
         )}
 
-        {/* 전체 완료 축하 */}
+        {/* 전체 완료 축하 */}}
       </div>
 
 
