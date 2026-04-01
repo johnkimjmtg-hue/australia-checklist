@@ -185,34 +185,25 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         {/* ── 버튼 */}
         <div style={{ display:'flex', justifyContent:'flex-end', gap: spacing[1], padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
           <button onClick={onBack} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
+            height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
             border:'none', background: '#FF6B9D',
-            color: '#fff', fontSize: 11, fontWeight: font.weight.bold,
+            color: '#fff', fontSize: 13, fontWeight: font.weight.bold,
             display:'flex', alignItems:'center', justifyContent:'center', gap:3,
             cursor:'pointer', fontFamily: font.family,
           }}>
-            <Icon icon="ph:shopping-bag" width={12} height={12} color="#fff" />
+            <Icon icon="ph:shopping-bag" width={13} height={13} color="#fff" />
             상품 추가하기
           </button>
-          <button onClick={() => setShowReceipt(true)} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.border}`, background: '#ffffff',
-            color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
-            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-            cursor:'pointer', fontFamily: font.family,
-          }}>
-            <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
-            공유하기
-          </button>
+
           <button onClick={() => setShowDeleteAll(true)} style={{
-            height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-            border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
-            color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
+            height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
+            border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)',
+            color:'#DC2626', fontSize: 13, fontWeight: font.weight.bold,
             display:'flex', alignItems:'center', justifyContent:'center', gap:3,
             cursor:'pointer', fontFamily: font.family,
           }}>
-            <Icon icon="ph:trash" width={12} height={12} color={colors.danger} />
-            리스트 비우기
+            <Icon icon="ph:trash" width={13} height={13} color="#DC2626" />
+            비우기
           </button>
         </div>
       </div>
@@ -305,7 +296,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           })
         )}
 
-        {/* 전체 완료 축하 */}
+        {/* 전체 완료 축하 */}}
       </div>
 
 
@@ -502,20 +493,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                     </div>
                   </div>
                 )}
-                <button onClick={() => {
-                  myList.includes(selProduct.id) ? removeFromMyList(selProduct.id) : addToMyList(selProduct.id)
-                }} style={{
-                  width:'100%', height:48, borderRadius:12,
-                  border:'1.5px solid #FF6B9D', cursor:'pointer',
-                  background: myList.includes(selProduct.id) ? '#FF6B9D' : '#ffffff',
-                  color: myList.includes(selProduct.id) ? '#fff' : '#FF6B9D',
-                  fontSize:15, fontWeight:700,
-                  display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-                  WebkitTapHighlightColor:'transparent',
-                }}>
-                  <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color={myList.includes(selProduct.id) ? '#fff' : '#FF6B9D'} />
-                  {myList.includes(selProduct.id) ? '찜 취소하기' : '내 쇼핑리스트에 찜하기'}
-                </button>
               </div>
             </div>
           </div>
