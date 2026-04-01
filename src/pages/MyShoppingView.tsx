@@ -165,16 +165,12 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
             <div style={{ fontSize:18, fontWeight:700, color:'#0D3349' }}>내 쇼핑리스트</div>
             <div>
-              <span style={{ fontSize:22, fontWeight:900, color:'#29B6D0' }}>{checkedCount}</span>
+              <span style={{ fontSize:22, fontWeight:900, color:'#FF6B9D' }}>{checkedCount}</span>
               <span style={{ fontSize:15, color:'#7BAAB5' }}> / {total} 완료</span>
             </div>
           </div>
           {/* 선물박스 그리드 */}
           <GiftBoxProgress total={total} checkedCount={checkedCount} myList={myList} myChecked={myChecked} />
-          {/* 프로그레스바 */}
-          <div style={{ height:6, borderRadius:3, background:'#E0F7FA', overflow:'hidden', marginTop:10 }}>
-            <div style={{ width:`${pct}%`, height:'100%', background:'#29B6D0', borderRadius:3, transition:'width 0.4s ease' }} />
-          </div>
           {/* 하단: 메시지 + 버튼 */}
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:10 }}>
             <div style={{ fontSize:12, color:'#7BAAB5' }}>
@@ -187,35 +183,11 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 :             '쇼핑 완료! 모든 상품을 구매했어요 🎉'}
             </div>
             <div style={{ display:'flex', gap:6 }}>
-              <button onClick={onBack} style={{
-                height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
-                border:'none', background:'rgba(0,0,0,0.08)',
-                color:'#0D3349', fontSize:11, fontWeight:font.weight.bold,
-                display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-                cursor:'pointer', fontFamily: font.family,
-              }}>
-                <Icon icon="ph:shopping-bag" width={12} height={12} color="#0D3349" />
-                추가하기
+              <button onClick={onBack} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'none', background:'#FF6B9D', color:'#fff', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
+                <Icon icon="ph:shopping-bag" width={13} height={13} color="#fff" />추가하기
               </button>
-              <button onClick={() => setShowReceipt(true)} style={{
-                height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
-                border:`1px solid ${colors.border}`, background: '#ffffff',
-                color: colors.textSecondary, fontSize: 11, fontWeight: font.weight.bold,
-                display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-                cursor:'pointer', fontFamily: font.family,
-              }}>
-                <Icon icon="ph:share-network" width={12} height={12} color={colors.textSecondary} />
-                공유하기
-              </button>
-              <button onClick={() => setShowDeleteAll(true)} style={{
-                height:28, paddingLeft:10, paddingRight:10, borderRadius:20,
-                border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
-                color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
-                display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-                cursor:'pointer', fontFamily: font.family,
-              }}>
-                <Icon icon="ph:trash" width={12} height={12} color={colors.danger} />
-                비우기
+              <button onClick={() => setShowDeleteAll(true)} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)', color:'#DC2626', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
+                <Icon icon="ph:trash" width={13} height={13} color="#DC2626" />비우기
               </button>
             </div>
           </div>
