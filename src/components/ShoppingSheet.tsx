@@ -5,7 +5,7 @@
 import { useState } from 'react'
 import { Icon } from '@iconify/react'
 import MyShoppingView from '../pages/MyShoppingView'
-import Shopping from './Shopping'
+import Shopping from '../pages/Shopping'
 
 type View = 'mylist' | 'shopping'
 
