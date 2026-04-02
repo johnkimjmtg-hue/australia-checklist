@@ -435,7 +435,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 <div>✈️ {fmtDate(startDate)} 출발</div>
                 <div>🏠 {fmtDate(endDate)} 귀국</div>
                 <div style={{ marginTop:6, fontSize:13, color:'rgba(255,255,255,0.9)', fontWeight:700 }}>{tripNights}박 {tripNights+1}일</div>
-                <button onClick={onChangeDates} style={{ marginTop:6, background:'none', border:'none', fontSize:12, color:'rgba(255,255,255,0.7)', cursor:'pointer', textDecoration:'underline', fontFamily:ff }}>날짜 변경</button>
+                <button onClick={onChangeDates} style={{ marginTop:6, background:'none', border:'none', fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.9)', cursor:'pointer', textDecoration:'underline', fontFamily:ff }}>날짜 변경</button>
               </div>
               </div>
             </div>
