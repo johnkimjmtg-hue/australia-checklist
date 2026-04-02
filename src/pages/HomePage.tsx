@@ -148,10 +148,10 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
           {/* 사용자 데이터 점 */}
           {(hasBucket || hasShopping || hasMemo || hasNote) && (
             <div style={{ position:'absolute', bottom:5, display:'flex', gap:2 }}>
-              {hasBucket && <div style={{ width:3, height:3, borderRadius:'50%', background:'#29B6D0' }} />}
-              {hasShopping && <div style={{ width:3, height:3, borderRadius:'50%', background:'#FF6B9D' }} />}
-              {hasMemo && <div style={{ width:3, height:3, borderRadius:'50%', background:'#16A34A' }} />}
-              {hasNote && <div style={{ width:3, height:3, borderRadius:'50%', background:'#EAB308' }} />}
+              {hasBucket && <div style={{ width:5, height:5, borderRadius:'50%', background:'#29B6D0' }} />}
+              {hasShopping && <div style={{ width:5, height:5, borderRadius:'50%', background:'#FF6B9D' }} />}
+              {hasMemo && <div style={{ width:5, height:5, borderRadius:'50%', background:'#16A34A' }} />}
+              {hasNote && <div style={{ width:5, height:5, borderRadius:'50%', background:'#EAB308' }} />}
             </div>
           )}
         </div>
