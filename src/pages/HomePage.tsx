@@ -182,12 +182,17 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   return (
     <div style={{
       minHeight:'100dvh',
-      background:'linear-gradient(180deg, #00BCD4 0%, #80DEEA 28%, #FFF0C8 50%, #F5C97A 70%, #D4703A 100%)',
+      background:'linear-gradient(180deg, #00BCD4 0%, #80DEEA 28%, #FFF0C8 50%, #F5C97A 70%, #D4703A 100%)', backgroundSize:'100% 200%', animation:'gradientShift 12s ease-in-out infinite',
       fontFamily: ff, maxWidth:430, margin:'0 auto', display:'flex', flexDirection:'column',
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         .menu-card-hover { transition: transform 0.12s; -webkit-tap-highlight-color: transparent; }
+        @keyframes gradientShift {
+          0%   { background-position: 0% 0%; }
+          50%  { background-position: 0% 100%; }
+          100% { background-position: 0% 0%; }
+        }
         .menu-card-hover:active { transform: scale(0.97); }
         .cal-nav-btn:hover { background: rgba(0,131,143,0.15) !important; }
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
