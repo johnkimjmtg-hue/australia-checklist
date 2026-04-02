@@ -134,8 +134,8 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             <div style={{ position:'absolute', bottom:3, display:'flex', gap:2 }}>
               {hasBucket && <div style={{ width:4, height:4, borderRadius:'50%', background:'#29B6D0' }} />}
               {hasShopping && <div style={{ width:4, height:4, borderRadius:'50%', background:'#FF6B9D' }} />}
-              {hasMemo && <div style={{ width:4, height:4, borderRadius:'50%', background:'#F59E0B' }} />}
-              {hasNote && <div style={{ width:4, height:4, borderRadius:'50%', background:'#F97316' }} />}
+              {hasMemo && <div style={{ width:4, height:4, borderRadius:'50%', background:'#16A34A' }} />}
+              {hasNote && <div style={{ width:4, height:4, borderRadius:'50%', background:'#EAB308' }} />}
             </div>
           )}
         </div>
@@ -349,7 +349,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                     return (
                       <div style={{ marginBottom:14 }}>
                         <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
-                          <div style={{ width:7, height:7, borderRadius:'50%', background:'#F97316' }} />
+                          <div style={{ width:7, height:7, borderRadius:'50%', background:'#EAB308' }} />
                           <div style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>노트 ({dayNotes.length})</div>
                         </div>
                         <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
@@ -375,7 +375,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                   return (
                     <div>
                       <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
-                        <div style={{ width:7, height:7, borderRadius:'50%', background:'#F59E0B' }} />
+                        <div style={{ width:7, height:7, borderRadius:'50%', background:'#16A34A' }} />
                         <div style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>메모</div>
                       </div>
                       <textarea
@@ -446,22 +446,131 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             </div>
 
 
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:18 }}>
-              {MENUS.map((m, i) => (
-                <div key={m.id} className="menu-card-hover card-anim"
-                  onClick={() => m.id === 'bucketlist' ? setShowBucket(true) : m.id === 'checklist' ? setShowChecklist(true) : m.id === 'shopping' ? setShowShopping(true) : m.id === 'services' ? setShowServices(true) : m.id === 'nearby' ? setShowNearby(true) : onNavigate(m.id)}
-                  style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', animationDelay:`${i * 0.08}s` }}>
-                  <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
-                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
-                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>{m.sub}</div>
-                  {m.badge > 0 && <div style={{ display:'inline-block', background:'#00838F', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, marginTop:8 }}>{m.badge}개</div>}
+            <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
+              {/* 준비 체크리스트 */}
+              <div className="menu-card-hover card-anim" onClick={() => setShowChecklist(true)}
+                style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>✅</div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>준비 체크리스트</div>
+                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>여행 준비 할 것들</div>
                 </div>
-              ))}
+              </div>
+              {/* 버킷리스트 */}
+              {(() => {
+                const checkedItems = [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])]
+                // 날짜 배정 기준 total 계산
+                const allRows: { id: string; day?: number }[] = []
+                checkedItems.forEach(item => {
+                  const days = state.schedules[item.id] ?? []
+                  if (days.length === 0) allRows.push({ id: item.id })
+                  else days.forEach(d => allRows.push({ id: item.id, day: d }))
+                })
+                const total = allRows.length
+                const previewItems = checkedItems.slice(0, 3)
+                return (
+                  <div className="card-anim" style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                      <div onClick={() => setShowBucket(true)} style={{ display:'flex', alignItems:'center', gap:14, cursor:'pointer', WebkitTapHighlightColor:'transparent', flex:1 }}>
+                        <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🗺️</div>
+                        <div>
+                          <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>버킷리스트</div>
+                          <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>꼭 해볼 것들</div>
+                        </div>
+                      </div>
+                      {total > 0 && <div style={{ background:'#29B6D0', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{total}개</div>}
+                    </div>
+                    {previewItems.length > 0 && (
+                      <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
+                        {previewItems.map((item: any) => {
+                          const db = dbItems.find((d:any) => d.id === item.id)
+                          return (
+                            <div key={item.id} onClick={() => setShowBucket(true)} style={{
+                              display:'flex', alignItems:'center', gap:10, padding:'8px 4px',
+                              borderTop:'1px solid rgba(0,0,0,0.06)', cursor:'pointer',
+                              WebkitTapHighlightColor:'transparent',
+                            }}>
+                              {db?.image_url
+                                ? <img src={db.image_url} alt="" style={{ width:32, height:32, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
+                                : <div style={{ width:32, height:32, borderRadius:8, background:'rgba(0,131,143,0.12)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                                    <Icon icon="ph:map-trifold" width={14} height={14} color="#00838F" />
+                                  </div>
+                              }
+                              <div style={{ fontSize:13, fontWeight:500, color:'#0D3349', flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.label}</div>
+                              <Icon icon="ph:caret-right" width={12} height={12} color="#CBD5E1" style={{ flexShrink:0 }} />
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
+              {/* 쇼핑리스트 */}
+              {(() => {
+                const myList: string[] = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] } })()
+                const cachedShopping = getCachedShopping()
+                const allProds = cachedShopping?.products ?? []
+                const previewProds = myList.slice(0, 3).map(id => allProds.find((p:any) => p.id === id)).filter(Boolean)
+                return (
+                  <div className="card-anim" style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                      <div onClick={() => setShowShopping(true)} style={{ display:'flex', alignItems:'center', gap:14, cursor:'pointer', WebkitTapHighlightColor:'transparent', flex:1 }}>
+                        <div style={{ width:44, height:44, borderRadius:14, background:'rgba(255,107,157,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🛍️</div>
+                        <div>
+                          <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>쇼핑리스트</div>
+                          <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>꼭 살 것들</div>
+                        </div>
+                      </div>
+                      {myShoppingCount > 0 && <div style={{ background:'#FF6B9D', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{myShoppingCount}개</div>}
+                    </div>
+                    {previewProds.length > 0 && (
+                      <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
+                        {previewProds.map((prod: any) => (
+                          <div key={prod.id} onClick={() => setShowShopping(true)} style={{
+                            display:'flex', alignItems:'center', gap:10, padding:'8px 4px',
+                            borderTop:'1px solid rgba(0,0,0,0.06)', cursor:'pointer',
+                            WebkitTapHighlightColor:'transparent',
+                          }}>
+                            {prod.image_url
+                              ? <img src={prod.image_url} alt="" style={{ width:32, height:32, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
+                              : <div style={{ width:32, height:32, borderRadius:8, background:'rgba(255,107,157,0.12)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                                  <Icon icon="ph:shopping-bag" width={14} height={14} color="#FF6B9D" />
+                                </div>
+                            }
+                            <div style={{ flex:1, minWidth:0, overflow:'hidden' }}>
+                              <div style={{ display:'flex', alignItems:'center', gap:4, overflow:'hidden' }}>
+                                <span style={{ fontSize:13, fontWeight:500, color:'#0D3349', whiteSpace:'nowrap', flexShrink:0 }}>{prod.name}</span>
+                                {prod.brand && <span style={{ fontSize:11, color:'#94A3B8', whiteSpace:'nowrap', flexShrink:0 }}>· {prod.brand}</span>}
+                                <span style={{ display:'flex', gap:4, overflow:'hidden', minWidth:0 }}>
+                                  {prod.tags?.map((tag:string) => (
+                                    <span key={tag} style={{ fontSize:10, fontWeight:700, color:'#FF6B9D', background:'rgba(255,107,157,0.1)', borderRadius:6, padding:'1px 6px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', flexShrink:1 }}>{tag}</span>
+                                  ))}
+                                </span>
+                              </div>
+                            </div>
+                            <Icon icon="ph:caret-right" width={12} height={12} color="#CBD5E1" style={{ flexShrink:0 }} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
+              {/* 내 주변 */}
+              <div className="menu-card-hover card-anim" onClick={() => setShowNearby(true)}
+                style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>📍</div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>내 주변</div>
+                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>주변 업체 지도</div>
+                </div>
+              </div>
               {(() => {
                 const savedNotes = (() => { try { return JSON.parse(localStorage.getItem('app-notes') ?? '[]') } catch { return [] } })()
                 const previewNotes = savedNotes.slice(0, 3)
                 return (
-                  <div className="card-anim" style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', animationDelay:`${(MENUS.length + 1) * 0.08}s` }}>
+                  <div className="card-anim" style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', animationDelay:`${(MENUS.length + 1) * 0.08}s` }}>
                     {/* 헤더 - 다른 타일과 동일한 구조 */}
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                       <div onClick={() => setShowNote(true)} style={{ display:'flex', alignItems:'center', gap:14, cursor:'pointer', WebkitTapHighlightColor:'transparent', flex:1 }}>
@@ -498,18 +607,16 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                   </div>
                 )
               })()}
-              <div className="menu-card-hover card-anim" onClick={() => setShowBingo(true)}
-                style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${(MENUS.length + 2) * 0.08}s` }}>
-                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
-                <div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:18 }}>
+                <div className="menu-card-hover card-anim" onClick={() => setShowBingo(true)}
+                  style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer' }}>
+                  <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>☕</div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
-                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>시드니·멜번 카페 25곳 투어</div>
+                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>시드니·멜번 카페 투어</div>
                 </div>
-              </div>
-              <div className="menu-card-hover card-anim" onClick={() => setShowServices(true)}
-                style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${MENUS.length * 0.08}s` }}>
-                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🏢</div>
-                <div>
+                <div className="menu-card-hover card-anim" onClick={() => setShowServices(true)}
+                  style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer' }}>
+                  <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>🏢</div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>업체정보</div>
                   <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>한인 업체·병원</div>
                 </div>

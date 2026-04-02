@@ -256,7 +256,18 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                     ? <img src={p.image_url} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                     : <Icon icon="ph:shopping-bag" width={32} height={32} color="#ccc" />
                   }
-                  
+                  {/* 일정 버튼 - 이미지 위 우상단 */}
+                  {trip && (
+                    <button onClick={e => { e.stopPropagation(); setScheduleItem(p.id) }} style={{
+                      position:'absolute', top:6, right:6,
+                      width:28, height:28, borderRadius:'50%', border:'none', cursor:'pointer',
+                      background: shoppingSchedules[p.id]?.length ? 'rgba(41,182,208,0.9)' : 'rgba(255,255,255,0.85)',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      WebkitTapHighlightColor:'transparent', boxShadow:'0 1px 4px rgba(0,0,0,0.15)',
+                    }}>
+                      <Icon icon="ph:calendar-plus" width={14} height={14} color={shoppingSchedules[p.id]?.length ? '#fff' : '#29B6D0'} />
+                    </button>
+                  )}
                 </div>
                 <div style={{ padding:'8px 10px 10px' }}>
                   <div onClick={() => setSelProduct(p)} style={{ cursor:'pointer', marginBottom:8 }}>
@@ -269,7 +280,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                     )}
                     <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', lineHeight:1.4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
                   </div>
-                  {/* 버튼: 구매 1/2 + 달력 1/4 + 휴지통 1/4 */}
+                  {/* 버튼: 구매 + 휴지통 */}
                   <div style={{ display:'flex', alignItems:'center', gap:4 }}>
                     <button onClick={e => { e.stopPropagation(); checked ? setUncheckConfirmId(p.id) : toggleChecked(p.id) }} style={{
                       flex:1, height:26, borderRadius:20, border:'none', cursor:'pointer',
@@ -280,20 +291,9 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                       <Icon icon="ph:check-bold" width={13} height={13} color={checked ? '#fff' : '#FF6B9D'} />
                       <span style={{ fontSize:11, fontWeight:700, color: checked ? '#fff' : '#FF6B9D' }}>구매</span>
                     </button>
-                    {trip && (
-                      <button onClick={e => { e.stopPropagation(); setScheduleItem(p.id) }} style={{
-                        flex:1, height:26, borderRadius:20, border:'none', cursor:'pointer',
-                        background: shoppingSchedules[p.id]?.length ? 'rgba(41,182,208,0.15)' : 'rgba(41,182,208,0.08)',
-                        display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-                        WebkitTapHighlightColor:'transparent',
-                      }}>
-                        <Icon icon="ph:plus-bold" width={13} height={13} color="#29B6D0" />
-                        <span style={{ fontSize:11, fontWeight:700, color:'#29B6D0' }}>일정</span>
-                      </button>
-                    )}
                     <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(p.id) }} style={{
-                      flex:1, height:26, borderRadius:20, border:'none', cursor:'pointer',
-                      background: 'rgba(220,38,38,0.08)',
+                      width:26, height:26, borderRadius:20, border:'none', cursor:'pointer',
+                      background: 'rgba(220,38,38,0.08)', flexShrink:0,
                       display:'flex', alignItems:'center', justifyContent:'center',
                       WebkitTapHighlightColor:'transparent',
                     }}>
@@ -343,7 +343,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
       {/* ── 저장 확인 팝업 */}
       {showSaveConfirm && (
         <>
-          <div onClick={() => setShowSaveConfirm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:700 }} />
+          <div onClick={() => setShowSaveConfirm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:700 }} />
           <div style={{
             position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
             background: '#ffffff', borderRadius: radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,
@@ -483,7 +483,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
             if (!days.length) delete next[scheduleItem]
             setShoppingSchedules(next)
             try { localStorage.setItem('shopping-schedules', JSON.stringify(next)) } catch {}
-            setScheduleItem(null)
           }}
           onClose={() => setScheduleItem(null)}
         />
@@ -501,7 +500,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
       {/* ── 상품 상세 팝업 */}
       {selProduct && (
         <>
-          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:1100 }} />
+          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1100 }} />
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:430, background:'#ffffff',

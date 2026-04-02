@@ -9,8 +9,10 @@ import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 import { Icon } from '@iconify/react'
 import { getCachedChecklist } from '../lib/dataCache'
+import { supabase } from '../lib/supabase'
 import BucketCheckView from '../pages/BucketCheckView'
 import ChecklistPage from '../pages/ChecklistPage'
+import { ITEMS as LOCAL_ITEMS } from '../data/checklist'
 
 type DBItem = {
   id: string; category_id: string; label: string; icon: string | null
@@ -36,9 +38,14 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
   const [detailBizCards, setDetailBizCards] = useState<Business[]>([])
 
   useEffect(() => {
-    // ✅ getCachedChecklist()는 { categories, items } 객체 반환 — .items로 접근
     const cached = getCachedChecklist()
-    if (cached?.items?.length) setDbItems(cached.items)
+    if (cached?.items?.length) {
+      setDbItems(cached.items)
+    } else {
+      // 캐시 없으면 supabase에서 직접 가져오기
+      supabase.from('checklist_items').select('*').eq('is_active', true).order('sort_order')
+        .then(({ data }) => { if (data?.length) setDbItems(data) })
+    }
   }, [])
 
   const handleBackToBucket = () => {
@@ -46,9 +53,9 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
     setDetailItem(null)
   }
 
-  const ITEMS: CheckItem[] = dbItems.map(i => ({
-    id: i.id, categoryId: i.category_id, label: i.label, emoji: '📌',
-  }))
+  const ITEMS: CheckItem[] = dbItems.length > 0
+    ? dbItems.map(i => ({ id: i.id, categoryId: i.category_id, label: i.label, emoji: '📌' }))
+    : LOCAL_ITEMS.map(i => ({ id: i.id, categoryId: i.categoryId, label: i.label, emoji: i.emoji }))
 
   return (
     <>
