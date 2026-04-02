@@ -9,6 +9,7 @@ const CACHE_KEYS = {
   businesses:   'cache-businesses',
   shopping:     'cache-shopping',
   bingo:        'cache-bingo',
+  events:       'cache-events',
   version:      'cache-version',
   lastChecked:  'cache-last-checked',
 }
@@ -16,8 +17,8 @@ const CACHE_KEYS = {
 // 5분마다 한 번만 cache_version DB 조회
 const VERSION_CHECK_INTERVAL = 5 * 60 * 1000
 
-type CacheVersion = { checklist: number; businesses: number; shopping: number; bingo: number }
-const DEFAULT_VERSION: CacheVersion = { checklist: 0, businesses: 0, shopping: 0, bingo: 0 }
+type CacheVersion = { checklist: number; businesses: number; shopping: number; bingo: number; events: number }
+const DEFAULT_VERSION: CacheVersion = { checklist: 0, businesses: 0, shopping: 0, bingo: 0, events: 0 }
 
 function getLocalVersion(): CacheVersion {
   try { return JSON.parse(localStorage.getItem(CACHE_KEYS.version) ?? 'null') ?? DEFAULT_VERSION }
@@ -91,6 +92,12 @@ async function fetchBingo() {
   setCache(CACHE_KEYS.bingo, data ?? [])
   return data ?? []
 }
+async function fetchEvents() {
+  const { data } = await supabase.from('events').select('*').eq('is_active', true)
+    .order('start_date')
+  setCache(CACHE_KEYS.events, data ?? [])
+  return data ?? []
+}
 
 // ── 메인 캐시 동기화
 // 반환값: true = 새 데이터 다운로드됨 (리렌더 필요), false = 캐시 그대로
@@ -100,12 +107,13 @@ export async function syncDataCache(): Promise<boolean> {
       getCache(CACHE_KEYS.checklist) &&
       getCache(CACHE_KEYS.businesses) &&
       getCache(CACHE_KEYS.shopping) &&
-      getCache(CACHE_KEYS.bingo)
+      getCache(CACHE_KEYS.bingo) &&
+      getCache(CACHE_KEYS.events)
 
     if (!allCached) {
       // 캐시 자체가 없으면 무조건 전체 다운로드 (TTL 무시)
       const serverVer = await fetchServerVersions()
-      await Promise.all([fetchChecklist(), fetchBusinesses(), fetchShopping(), fetchBingo()])
+      await Promise.all([fetchChecklist(), fetchBusinesses(), fetchShopping(), fetchBingo(), fetchEvents()])
       saveLocalVersion(serverVer)
       saveLastChecked()
       return true
@@ -123,6 +131,7 @@ export async function syncDataCache(): Promise<boolean> {
     if (serverVer.businesses > localVer.businesses) tasks.push(fetchBusinesses())
     if (serverVer.shopping > localVer.shopping)     tasks.push(fetchShopping())
     if (serverVer.bingo > localVer.bingo)           tasks.push(fetchBingo())
+    if (serverVer.events > localVer.events)         tasks.push(fetchEvents())
 
     if (tasks.length > 0) {
       await Promise.all(tasks)
@@ -151,4 +160,7 @@ export function getCachedShopping() {
 }
 export function getCachedBingo() {
   return getCache<any[]>(CACHE_KEYS.bingo)
+}
+export function getCachedEvents() {
+  return getCache<any[]>(CACHE_KEYS.events)
 }

@@ -6,7 +6,7 @@ import sydneyImg from '../assets/sydney.jpg'
 import { Icon } from '@iconify/react'
 import { TripInfo, AppState, getTripDays } from '../store/state'
 import { ITEMS } from '../data/checklist'
-import { getCachedChecklist, getCachedShopping } from '../lib/dataCache'
+import { getCachedChecklist, getCachedShopping, getCachedEvents } from '../lib/dataCache'
 import AppHeader from '../components/AppHeader'
 import BucketSheet from '../components/BucketSheet'
 import ShoppingSheet from '../components/ShoppingSheet'
@@ -40,9 +40,13 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   })
   const [memos, setMemos] = useState<Record<string,string>>({})
 
+  const [events, setEvents] = useState<any[]>(() => getCachedEvents() ?? [])
+
   useEffect(() => {
     const cached = getCachedChecklist()
     if (cached?.items?.length) setDbItems(cached.items)
+    const cachedEvents = getCachedEvents()
+    if (cachedEvents?.length) setEvents(cachedEvents)
   }, [])
   const [showBucket, setShowBucket] = useState(false)
   const [showChecklist, setShowChecklist] = useState(false)
@@ -54,6 +58,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   const [noteInitialView, setNoteInitialView] = useState<'list'|'write'|undefined>(undefined)
   const [showBingo, setShowBingo] = useState(false)
   const [showPacking, setShowPacking] = useState(false)
+  const [expandedEventId, setExpandedEventId] = useState<string | null>(null)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
 
@@ -103,6 +108,10 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
           return notes.some((n: any) => n.date === dateStr)
         } catch { return false }
       })()
+      const hasEvent = (() => {
+        const dateStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
+        return events.some(ev => ev.is_active && ev.start_date <= dateStr && ev.end_date >= dateStr)
+      })()
 
       let bg = 'transparent', color = isPast ? '#7BAAB5' : '#0D3349', radius = '50%', fw: number = 400
       if (isSelected) { bg = '#00BCD4'; color = '#fff'; fw = 800 }
@@ -132,12 +141,17 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             WebkitTapHighlightColor:'transparent',
           }}>
           {d}
+          {/* 행사 별표 */}
+          {hasEvent && !isSelected && (
+            <div style={{ position:'absolute', top:3, left:'50%', transform:'translateX(-50%)', fontSize:6, color:'#F59E0B', lineHeight:1 }}>★</div>
+          )}
+          {/* 사용자 데이터 점 */}
           {(hasBucket || hasShopping || hasMemo || hasNote) && (
-            <div style={{ position:'absolute', bottom:3, display:'flex', gap:2 }}>
-              {hasBucket && <div style={{ width:4, height:4, borderRadius:'50%', background:'#29B6D0' }} />}
-              {hasShopping && <div style={{ width:4, height:4, borderRadius:'50%', background:'#FF6B9D' }} />}
-              {hasMemo && <div style={{ width:4, height:4, borderRadius:'50%', background:'#16A34A' }} />}
-              {hasNote && <div style={{ width:4, height:4, borderRadius:'50%', background:'#EAB308' }} />}
+            <div style={{ position:'absolute', bottom:5, display:'flex', gap:2 }}>
+              {hasBucket && <div style={{ width:3, height:3, borderRadius:'50%', background:'#29B6D0' }} />}
+              {hasShopping && <div style={{ width:3, height:3, borderRadius:'50%', background:'#FF6B9D' }} />}
+              {hasMemo && <div style={{ width:3, height:3, borderRadius:'50%', background:'#16A34A' }} />}
+              {hasNote && <div style={{ width:3, height:3, borderRadius:'50%', background:'#EAB308' }} />}
             </div>
           )}
         </div>
@@ -368,6 +382,82 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                       </div>
                     )
                   } catch { return null }
+                })()}
+
+                {/* 행사 */}
+                {(() => {
+                  const dateStr = `${selectedDayDate!.getFullYear()}-${String(selectedDayDate!.getMonth()+1).padStart(2,'0')}-${String(selectedDayDate!.getDate()).padStart(2,'0')}`
+                  const dayEvents = events.filter(ev => ev.is_active && ev.start_date <= dateStr && ev.end_date >= dateStr)
+                  if (!dayEvents.length) return null
+                  const CITY_COLOR: Record<string, string> = { sydney: '#29B6D0', melbourne: '#7C3AED', both: '#F59E0B' }
+                  const CITY_LABEL: Record<string, string> = { sydney: '시드니', melbourne: '멜번', both: '전국' }
+                  const CAT_ICON: Record<string, string> = { festival:'🎉', sports:'🏆', nature:'🌿', culture:'🎭', food:'🍽' }
+                  return (
+                    <div style={{ marginBottom:14 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                        <div style={{ width:7, height:7, borderRadius:'50%', background:'#F59E0B' }} />
+                        <div style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>행사 ({dayEvents.length})</div>
+                      </div>
+                      <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                        {dayEvents.map((ev: any) => {
+                          const c = CITY_COLOR[ev.city] ?? '#F59E0B'
+                          const rgbMap: Record<string,string> = { '#29B6D0':'41,182,208', '#7C3AED':'124,58,237', '#F59E0B':'245,158,11' }
+                          const rgb = rgbMap[c] ?? '245,158,11'
+                          const isExpanded = expandedEventId === ev.id
+                          return (
+                            <div key={ev.id} style={{ borderRadius:10, overflow:'hidden', border:`1px solid ${c}33` }}>
+                              {/* 카드 헤더 */}
+                              <div style={{ display:'flex', alignItems:'center', gap:10, background:`rgba(${rgb},0.08)`, padding:'9px 12px' }}>
+                                <span style={{ fontSize:18, flexShrink:0 }}>{CAT_ICON[ev.category] ?? '📅'}</span>
+                                <div style={{ flex:1, minWidth:0 }}>
+                                  <div style={{ fontSize:13, fontWeight:600, color:'#0D3349', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{ev.title}</div>
+                                  <div style={{ fontSize:11, color: c, fontWeight:600, marginTop:1 }}>{CITY_LABEL[ev.city] ?? ev.city}</div>
+                                </div>
+                                {/* 펼치기 버튼 */}
+                                <button
+                                  onClick={() => setExpandedEventId(isExpanded ? null : ev.id)}
+                                  style={{ width:26, height:26, borderRadius:'50%', background:`rgba(${rgb},0.15)`, border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, WebkitTapHighlightColor:'transparent', transition:'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                                  <Icon icon="ph:caret-down" width={14} height={14} color={c} />
+                                </button>
+                              </div>
+                              {/* 펼쳐진 상세 */}
+                              {isExpanded && (
+                                <div style={{ background:'#fff', padding:'12px 14px', borderTop:`1px solid ${c}22` }}>
+                                  {/* 이미지 */}
+                                  {ev.image_url && (
+                                    <div style={{ width:'100%', height:140, borderRadius:8, overflow:'hidden', marginBottom:10 }}>
+                                      <img src={ev.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                                    </div>
+                                  )}
+                                  {/* 날짜 */}
+                                  <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8, fontSize:12, color:'#7BAAB5', fontWeight:600 }}>
+                                    <Icon icon="ph:calendar" width={13} height={13} color="#7BAAB5" />
+                                    {ev.start_date === ev.end_date
+                                      ? ev.start_date.replace(/-/g,'/')
+                                      : `${ev.start_date.replace(/-/g,'/')} ~ ${ev.end_date.replace(/-/g,'/')}`}
+                                  </div>
+                                  {/* 설명 */}
+                                  {ev.description && (
+                                    <div style={{ fontSize:13, color:'#475569', lineHeight:1.7, marginBottom:10, whiteSpace:'pre-wrap' }}>{ev.description}</div>
+                                  )}
+                                  {/* 공식 홈페이지 */}
+                                  {ev.website_url && (
+                                    <button
+                                      onClick={() => window.open(ev.website_url, '_blank')}
+                                      style={{ display:'flex', alignItems:'center', gap:6, width:'100%', background:`rgba(${rgb},0.12)`, border:`1px solid ${c}44`, borderRadius:8, padding:'9px 12px', cursor:'pointer', fontFamily:ff }}>
+                                      <Icon icon="ph:globe" width={14} height={14} color={c} />
+                                      <span style={{ fontSize:12, fontWeight:700, color:c, flex:1, textAlign:'left' }}>공식 홈페이지 보기</span>
+                                      <Icon icon="ph:arrow-square-out" width={13} height={13} color={c} />
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
                 })()}
 
                 {/* 메모 */}

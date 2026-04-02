@@ -11,15 +11,23 @@ const TODAY = new Date()
 
 type DotInfo = { color: string }
 
+// 행사 dot 색상 (도시별)
+const EVENT_DOT_COLOR: Record<string, string> = {
+  sydney:    '#29B6D0',
+  melbourne: '#7C3AED',
+  both:      '#F59E0B',
+}
+
 type Props = {
   trip: TripInfo
   state?: AppState
   selectedDay: number | null
   onDaySelect: (dayIndex: number | null) => void
   getDots?: (dayIndex: number) => DotInfo[]
+  events?: any[]  // getCachedEvents() 데이터
 }
 
-export default function TripCalendar({ trip, state, selectedDay, onDaySelect, getDots }: Props) {
+export default function TripCalendar({ trip, state, selectedDay, onDaySelect, getDots, events = [] }: Props) {
   const startDate = new Date(trip.startDate)
   const endDate = new Date(trip.endDate)
   const tripDays = getTripDays(trip)
@@ -36,6 +44,16 @@ export default function TripCalendar({ trip, state, selectedDay, onDaySelect, ge
 
   const fmtMD = (d: Date) => `${d.getMonth()+1}/${d.getDate()}`
   const dow = (d: Date) => ['일','월','화','수','목','금','토'][d.getDay()]
+
+  // 특정 날짜에 해당하는 행사 dot 목록 반환
+  const getEventDotsForDate = (dt: Date): DotInfo[] => {
+    if (!events.length) return []
+    const dateStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
+    return events
+      .filter(ev => ev.is_active && ev.start_date <= dateStr && ev.end_date >= dateStr)
+      .map(ev => ({ color: EVENT_DOT_COLOR[ev.city] ?? '#29B6D0' }))
+      .slice(0, 3)
+  }
 
   const renderCal = () => {
     const first = new Date(vy, vm, 1).getDay()
@@ -56,7 +74,13 @@ export default function TripCalendar({ trip, state, selectedDay, onDaySelect, ge
       const isToday = dt.toDateString() === TODAY.toDateString()
       const dayIdx = tripDays.findIndex(td => td.toDateString() === dt.toDateString())
       const isSelected = selectedDay === dayIdx && dayIdx >= 0
-      const dots = dayIdx >= 0 && getDots ? getDots(dayIdx) : []
+
+      // 버킷리스트 dots (여행 기간 내)
+      const bucketDots = dayIdx >= 0 && getDots ? getDots(dayIdx) : []
+      // 행사 dots (여행 기간 무관, 모든 날짜)
+      const eventDots = getEventDotsForDate(dt)
+      // 합쳐서 최대 3개 표시 (버킷 우선)
+      const allDots = [...bucketDots, ...eventDots].slice(0, 3)
 
       let bg = 'transparent'
       let color = isPast ? '#7BAAB5' : '#0D3349'
@@ -68,7 +92,8 @@ export default function TripCalendar({ trip, state, selectedDay, onDaySelect, ge
       else if (isInTrip) { bg = '#B2EBF2'; color = '#006064'; radius = '0' }
 
       cells.push(
-        <div key={d} onClick={() => dayIdx >= 0 && onDaySelect(selectedDay === dayIdx ? null : dayIdx)}
+        <div key={d}
+          onClick={() => dayIdx >= 0 ? onDaySelect(selectedDay === dayIdx ? null : dayIdx) : undefined}
           style={{
             aspectRatio:'1', display:'flex', flexDirection:'column',
             alignItems:'center', justifyContent:'center',
@@ -79,9 +104,9 @@ export default function TripCalendar({ trip, state, selectedDay, onDaySelect, ge
             userSelect:'none',
           }}>
           {d}
-          {dots.length > 0 && !isSelected && (
+          {allDots.length > 0 && !isSelected && (
             <div style={{ display:'flex', gap:2, position:'absolute', bottom:3 }}>
-              {dots.slice(0,3).map((dot, i) => (
+              {allDots.map((dot, i) => (
                 <div key={i} style={{ width:3, height:3, borderRadius:'50%', background: dot.color }} />
               ))}
             </div>
@@ -116,6 +141,22 @@ export default function TripCalendar({ trip, state, selectedDay, onDaySelect, ge
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, padding:'0 10px 12px' }}>
         {renderCal()}
       </div>
+
+      {/* 범례 (행사 dot 있을 때만) */}
+      {events.length > 0 && (
+        <div style={{ padding:'6px 16px 10px', borderTop:'1px solid rgba(0,131,143,0.08)', display:'flex', gap:10, flexWrap:'wrap' }}>
+          {[
+            { color: '#29B6D0', label: '시드니' },
+            { color: '#7C3AED', label: '멜번' },
+            { color: '#F59E0B', label: '전국' },
+          ].map(item => (
+            <div key={item.label} style={{ display:'flex', alignItems:'center', gap:4 }}>
+              <div style={{ width:6, height:6, borderRadius:'50%', background: item.color }} />
+              <span style={{ fontSize:10, color:'#7BAAB5', fontWeight:600 }}>{item.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* 선택된 날짜 표시 */}
       {selectedDayDate && (
