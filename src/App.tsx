@@ -4,7 +4,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { loadState, loadTrip, resetAll, clearTrip, AppState, TripInfo } from './store/state'
 import { syncDataCache } from './lib/dataCache'
 import ChecklistPage from './pages/ChecklistPage'
-import AdminPage from './pages/AdminPage'
+import AdminPage from './pages/admin/AdminPage'
 import LandingPage from './pages/LandingPage'
 import HomePage from './pages/HomePage'
 
