@@ -449,15 +449,27 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
 
             <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
-              {/* 준비 체크리스트 */}
-              <div className="menu-card-hover card-anim" onClick={() => setShowPacking(true)}
-                style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
-                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🧳</div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>짐싸기 체크리스트</div>
-                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>공항 통과 완벽 가이드</div>
-                </div>
-              </div>
+              {/* 짐싸기 체크리스트 */}
+              {(() => {
+                const packChecked: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('packing-checked') ?? '{}') } catch { return {} } })()
+                const packExcluded: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('packing-excluded') ?? '{}') } catch { return {} } })()
+                const packingTotal = (() => { try { return parseInt(localStorage.getItem('packing-total') ?? '0') } catch { return 0 } })()
+                const packingCustomCount = (() => { try { return parseInt(localStorage.getItem('packing-custom-count') ?? '0') } catch { return 0 } })()
+                const totalPack = (packingTotal + packingCustomCount) - Object.keys(packExcluded).length
+                const donePack  = Object.keys(packChecked).filter(id => !packExcluded[id]).length
+                const remainPack = totalPack - donePack
+                return (
+                  <div className="menu-card-hover card-anim" onClick={() => setShowPacking(true)}
+                    style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                    <div style={{ width:44, height:44, borderRadius:14, background:'rgba(139,92,246,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🧳</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>짐싸기 체크리스트</div>
+                      <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>공항 통과 완벽 가이드</div>
+                    </div>
+                    {remainPack > 0 && <div style={{ background:'#8B5CF6', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{remainPack}개</div>}
+                  </div>
+                )
+              })()}
               {/* 버킷리스트 */}
               {(() => {
                 const checkedItems = [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])]
@@ -469,7 +481,18 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                   else days.forEach(d => allRows.push({ id: item.id, day: d }))
                 })
                 const total = allRows.length
-                const previewItems = checkedItems.slice(0, 3)
+                // BucketCheckView와 동일한 로직: allRows 기반 미완료 계산
+                const bucketAchieved: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })()
+                const getKey = (id: string, day?: number) => day !== undefined ? `${id}_${day}` : id
+                const achievedCount = allRows.filter(r => !!bucketAchieved[getKey(r.id, r.day)]).length
+                const remainCount = total - achievedCount
+                // 미리보기: 아직 완료 안 된 항목
+                const undoneItems = checkedItems.filter(item => {
+                  const days = state.schedules[item.id] ?? []
+                  if (days.length === 0) return !bucketAchieved[item.id]
+                  return days.some(d => !bucketAchieved[`${item.id}_${d}`])
+                })
+                const previewItems = undoneItems.slice(0, 3)
                 return (
                   <div className="card-anim" style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -480,7 +503,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                           <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>꼭 해볼 것들</div>
                         </div>
                       </div>
-                      {total > 0 && <div style={{ background:'#29B6D0', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{total}개</div>}
+                      {remainCount > 0 && <div style={{ background:'#29B6D0', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{remainCount}개</div>}
                     </div>
                     {previewItems.length > 0 && (
                       <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
@@ -511,9 +534,12 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
               {/* 쇼핑리스트 */}
               {(() => {
                 const myList: string[] = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] } })()
+                const myChecked: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}') } catch { return {} } })()
                 const cachedShopping = getCachedShopping()
                 const allProds = cachedShopping?.products ?? []
-                const previewProds = myList.slice(0, 3).map(id => allProds.find((p:any) => p.id === id)).filter(Boolean)
+                const undoneList = myList.filter(id => !myChecked[id])
+                const previewProds = undoneList.slice(0, 3).map(id => allProds.find((p:any) => p.id === id)).filter(Boolean)
+                const shoppingRemain = undoneList.length
                 return (
                   <div className="card-anim" style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -524,7 +550,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                           <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>꼭 살 것들</div>
                         </div>
                       </div>
-                      {myShoppingCount > 0 && <div style={{ background:'#FF6B9D', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{myShoppingCount}개</div>}
+                      {shoppingRemain > 0 && <div style={{ background:'#FF6B9D', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{shoppingRemain}개</div>}
                     </div>
                     {previewProds.length > 0 && (
                       <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
