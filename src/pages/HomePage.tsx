@@ -2,6 +2,7 @@
 // HomePage.tsx — 달력 중심 홈
 // ─────────────────────────────────────────────
 import { useState, useEffect } from 'react'
+import sydneyImg from '../assets/sydney.jpg'
 import { Icon } from '@iconify/react'
 import { TripInfo, AppState, getTripDays } from '../store/state'
 import { ITEMS } from '../data/checklist'
@@ -91,9 +92,9 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       const isSelected = selectedDay === dayIdx && dayIdx >= 0
       const hasBucket = dayIdx >= 0 && [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])].some(item => (state.schedules[item.id] ?? []).includes(dayIdx))
       const memoKey = `memo_${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
-      const hasMemo = dayIdx >= 0 && !!(localStorage.getItem(memoKey) ?? '').trim()
+      const hasMemo = !!(localStorage.getItem(memoKey) ?? '').trim()
       const hasShopping = dayIdx >= 0 && (() => { try { const s = JSON.parse(localStorage.getItem('shopping-schedules') ?? '{}'); return Object.values(s).some((days: any) => days.includes(dayIdx)) } catch { return false } })()
-      const hasNote = dayIdx >= 0 && (() => {
+      const hasNote = (() => {
         try {
           const notes = JSON.parse(localStorage.getItem('app-notes') ?? '[]')
           const dateStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
@@ -111,7 +112,6 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
       cells.push(
         <div key={d} onClick={() => {
-            if (dayIdx < 0) return
             setSelectedDay(dayIdx)
             setSelectedDayDate(dt)
           }}
@@ -126,7 +126,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             textDecorationColor: isTodayOnly ? '#D4703A' : 'transparent',
             textUnderlineOffset: '3px',
             border: 'none',
-            cursor: dayIdx >= 0 ? 'pointer' : 'default', position:'relative',
+            cursor: 'pointer', position:'relative',
             WebkitTapHighlightColor:'transparent',
           }}>
           {d}
@@ -145,8 +145,31 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   }
 
   const ddayText = diffDays > 0 ? `D-${diffDays}` : diffDays === 0 ? 'D-Day' : `D+${Math.abs(diffDays)}`
-  const ddayLabel = diffDays > 0 ? '호주 출발까지' : diffDays === 0 ? '오늘 출발! 🎉' : '호주 여행 중! ✈️'
-  const ddayColor = diffDays > 0 ? '#0D3349' : diffDays === 0 ? '#00838F' : '#00695C'
+  const ddayColor = diffDays > 0 ? '#D4703A' : diffDays === 0 ? '#D4703A' : '#00838F'
+
+  const lastDay = new Date(endDate)
+  const isLastDay = todayMidnight.toDateString() === lastDay.toDateString()
+  const isAfterTrip = todayMidnight > lastDay
+
+  const ddayLabel = (() => {
+    if (isAfterTrip) return '호주 여행 어떠셨나요? 좋은 추억 담아오셨길! 🦘'
+    if (isLastDay) return '마지막 날이에요, 아쉽지만 좋은 마무리! 🥹'
+    if (diffDays < 0) {
+      const dayNum = Math.abs(diffDays)
+      return `호주 여행 ${dayNum}일차! 오늘도 즐겁게! 🌞`
+    }
+    if (diffDays === 0) return '오늘 출발! 즐거운 여행 되세요! 🎊'
+    if (diffDays === 1) return '내일이에요! 오늘 밤 잘 수 있을까요? 😄'
+    if (diffDays === 2) return '내일모레 출발! 설렘 폭발 🎉'
+    if (diffDays === 3) return '72시간 후엔 호주 공기를 마셔요 🌊'
+    if (diffDays === 4) return '4일 후 호주의 하늘 아래 있을 거예요 ☀️'
+    if (diffDays === 5) return '이제 손가락으로 셀 수 있어요! 🖐️'
+    if (diffDays === 6) return '6일 후면 호주예요! 준비됐나요? 🦘'
+    if (diffDays === 7) return '딱 일주일 남았어요! 설레지 않나요? ✈️'
+    if (diffDays <= 30) return '슬슬 짐 싸볼까요? 🧳'
+    return '호주 출발까지'
+  })()
+
   const fmtDate = (d: Date) => `${d.getMonth()+1}월 ${d.getDate()}일`
 
   const MENUS = [
@@ -182,7 +205,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       <AppHeader />
 
       {/* 달력 / 일별뷰 */}
-      <div style={{ padding:'0 18px 14px' }}>
+      <div style={{ padding:'0 18px 18px' }}>
         <div style={{ background:'rgba(255,255,255,0.88)', borderRadius:22, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
           {selectedDayDate && selectedDay !== null ? (
             /* ── 일별 뷰 */
@@ -194,14 +217,14 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                   <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>
                     <span style={{ color:'#00838F' }}>{selectedDayDate.getFullYear()}년</span> · {selectedDayDate.getMonth()+1}월 {selectedDayDate.getDate()}일
                   </div>
-                  <div style={{ fontSize:11, color:'#00838F', fontWeight:600 }}>여행 {selectedDay+1}일차 · {['일','월','화','수','목','금','토'][selectedDayDate.getDay()]}요일</div>
+                  <div style={{ fontSize:11, color:'#00838F', fontWeight:600 }}>{selectedDay >= 0 ? `여행 ${selectedDay+1}일차 · ` : ''}{['일','월','화','수','목','금','토'][selectedDayDate.getDay()]}요일</div>
                 </div>
                 <div style={{ width:36 }} />
               </div>
               {/* 일별 내용 */}
               <div style={{ padding:'0 14px 16px' }}>
-                {/* 버킷리스트 */}
-                {(() => {
+                {/* 버킷리스트 - 여행 날짜만 */}
+                {selectedDay >= 0 && (() => {
                   const allItems = [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])]
                   const dayBucket = allItems.filter(item => (state.schedules[item.id] ?? []).includes(selectedDay!))
                   return (
@@ -253,8 +276,8 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                     </div>
                   )
                 })()}
-                {/* 쇼핑리스트 */}
-                {(() => {
+                {/* 쇼핑리스트 - 여행 날짜만 */}
+                {selectedDay >= 0 && (() => {
                   try {
                     const schedules: Record<string, number[]> = JSON.parse(localStorage.getItem('shopping-schedules') ?? '{}')
                     const myList: string[] = JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]')
@@ -400,62 +423,60 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
           <>
             {/* D-day */}
-            <div style={{ background:'rgba(255,255,255,0.88)', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 2px 12px rgba(0,0,0,0.12)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            <div style={{ borderRadius:22, marginBottom:18, boxShadow:'0 2px 12px rgba(0,0,0,0.12)', overflow:'hidden', position:'relative' }}>
+              <div style={{ position:'absolute', inset:0, backgroundImage:`url(${sydneyImg})`, backgroundSize:'cover', backgroundPosition:'center' }} />
+              <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.55) 100%)' }} />
+              <div style={{ position:'relative', zIndex:1, padding:'20px 22px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
               <div>
-                <div style={{ fontSize:52, fontWeight:900, color: ddayColor, lineHeight:1 }}>{ddayText}</div>
-                <div style={{ fontSize:15, color:'#1565A0', marginTop:6 }}>{ddayLabel}</div>
+                <div style={{ fontSize:52, fontWeight:900, color: '#ffffff', lineHeight:1 }}>{ddayText}</div>
+                <div style={{ fontSize:15, color:'rgba(255,255,255,0.85)', marginTop:6 }}>{ddayLabel}</div>
               </div>
-              <div style={{ textAlign:'right', fontSize:13, color:'#1565A0', lineHeight:2 }}>
+              <div style={{ textAlign:'right', fontSize:13, color:'rgba(255,255,255,0.85)', lineHeight:2 }}>
                 <div>✈️ {fmtDate(startDate)} 출발</div>
                 <div>🏠 {fmtDate(endDate)} 귀국</div>
-                <div style={{ marginTop:6, fontSize:13, color:'#00838F', fontWeight:700 }}>{tripNights}박 {tripNights+1}일</div>
-                <button onClick={onChangeDates} style={{ marginTop:6, background:'none', border:'none', fontSize:12, color:'#00838F', cursor:'pointer', textDecoration:'underline', fontFamily:ff }}>날짜 변경</button>
+                <div style={{ marginTop:6, fontSize:13, color:'rgba(255,255,255,0.9)', fontWeight:700 }}>{tripNights}박 {tripNights+1}일</div>
+                <button onClick={onChangeDates} style={{ marginTop:6, background:'none', border:'none', fontSize:12, color:'rgba(255,255,255,0.7)', cursor:'pointer', textDecoration:'underline', fontFamily:ff }}>날짜 변경</button>
+              </div>
               </div>
             </div>
 
-            <div style={{ fontSize:16, fontWeight:700, color:'#0D4F6E', margin:'8px 0 12px' }}>나의 호주 여행 리스트</div>
 
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:18 }}>
               {MENUS.map((m, i) => (
                 <div key={m.id} className="menu-card-hover card-anim"
                   onClick={() => m.id === 'bucketlist' ? setShowBucket(true) : m.id === 'checklist' ? setShowChecklist(true) : m.id === 'shopping' ? setShowShopping(true) : m.id === 'services' ? setShowServices(true) : m.id === 'nearby' ? setShowNearby(true) : onNavigate(m.id)}
                   style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', animationDelay:`${i * 0.08}s` }}>
                   <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
-                  <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>{m.sub}</div>
+                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>{m.sub}</div>
                   {m.badge > 0 && <div style={{ display:'inline-block', background:'#00838F', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, marginTop:8 }}>{m.badge}개</div>}
                 </div>
               ))}
-              <div className="menu-card-hover card-anim" onClick={() => setShowServices(true)}
-                style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${MENUS.length * 0.08}s` }}>
-                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🏢</div>
-                <div>
-                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>업체정보</div>
-                  <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>한인 업체·병원</div>
-                </div>
-              </div>
               {(() => {
                 const savedNotes = (() => { try { return JSON.parse(localStorage.getItem('app-notes') ?? '[]') } catch { return [] } })()
                 const previewNotes = savedNotes.slice(0, 3)
                 return (
-                  <div className="card-anim" style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', animationDelay:`${(MENUS.length + 1) * 0.08}s` }}>
-                    {/* 헤더 */}
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom: previewNotes.length > 0 ? 12 : 0 }}>
-                      <div onClick={() => setShowNote(true)} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
-                        <div style={{ width:36, height:36, borderRadius:12, background:'rgba(249,115,22,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>📝</div>
-                        <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>노트</div>
+                  <div className="card-anim" style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', animationDelay:`${(MENUS.length + 1) * 0.08}s` }}>
+                    {/* 헤더 - 다른 타일과 동일한 구조 */}
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                      <div onClick={() => setShowNote(true)} style={{ display:'flex', alignItems:'center', gap:14, cursor:'pointer', WebkitTapHighlightColor:'transparent', flex:1 }}>
+                        <div style={{ width:44, height:44, borderRadius:14, background:'rgba(249,115,22,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>📝</div>
+                        <div>
+                          <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>노트</div>
+                          <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>메모·기록·여행 노트</div>
+                        </div>
                       </div>
                       <button onClick={() => { setNoteInitialView('write'); setNoteInitialId(undefined); setShowNote(true) }} style={{
                         width:28, height:28, borderRadius:'50%', background:'rgba(249,115,22,0.15)',
                         border:'none', display:'flex', alignItems:'center', justifyContent:'center',
-                        cursor:'pointer', WebkitTapHighlightColor:'transparent',
+                        cursor:'pointer', WebkitTapHighlightColor:'transparent', flexShrink:0,
                       }}>
                         <Icon icon="ph:plus-bold" width={14} height={14} color="#F97316" />
                       </button>
                     </div>
                     {/* 노트 리스트 */}
                     {previewNotes.length > 0 && (
-                      <div style={{ display:'flex', flexDirection:'column' }}>
+                      <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
                         {previewNotes.map((note: any) => (
                           <div key={note.id} onClick={() => { setNoteInitialId(note.id); setNoteInitialView(undefined); setShowNote(true) }} style={{
                             display:'flex', alignItems:'center', gap:8, padding:'8px 4px',
@@ -469,9 +490,6 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                         ))}
                       </div>
                     )}
-                    {previewNotes.length === 0 && (
-                      <div onClick={() => setShowNote(true)} style={{ fontSize:13, color:'#94A3B8', cursor:'pointer', paddingTop:4 }}>메모·기록·여행 노트</div>
-                    )}
                   </div>
                 )
               })()}
@@ -480,7 +498,15 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
                 <div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
-                  <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>시드니·멜번 카페 25곳 투어</div>
+                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>시드니·멜번 카페 25곳 투어</div>
+                </div>
+              </div>
+              <div className="menu-card-hover card-anim" onClick={() => setShowServices(true)}
+                style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${MENUS.length * 0.08}s` }}>
+                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🏢</div>
+                <div>
+                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>업체정보</div>
+                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>한인 업체·병원</div>
                 </div>
               </div>
             </div>

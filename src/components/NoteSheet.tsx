@@ -4,7 +4,7 @@
 // ─────────────────────────────────────────────
 import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
-import { TripInfo, getTripDays, fmtMD, dow } from '../store/state'
+import { TripInfo } from '../store/state'
 
 const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
 const ACCENT = '#F97316'
@@ -45,6 +45,8 @@ export default function NoteSheet({ onClose, initialNoteId, initialView, trip }:
   const [content, setContent] = useState('')
   const [noteDate, setNoteDate] = useState<string | undefined>(undefined)
   const [showDatePicker, setShowDatePicker] = useState(false)
+  const [calYear, setCalYear] = useState(() => new Date().getFullYear())
+  const [calMonth, setCalMonth] = useState(() => new Date().getMonth())
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -105,7 +107,7 @@ export default function NoteSheet({ onClose, initialNoteId, initialView, trip }:
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
+      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430, background:'#ffffff',
@@ -220,47 +222,75 @@ export default function NoteSheet({ onClose, initialNoteId, initialView, trip }:
                   }}
                 />
               )}
-              {/* 날짜 선택 */}
-              {trip && (
-                <div>
-                  <button onClick={() => setShowDatePicker(v => !v)} style={{
-                    height:36, padding:'0 14px', borderRadius:20, border:`1.5px solid ${noteDate ? ACCENT : 'rgba(0,0,0,0.1)'}`,
-                    background: noteDate ? ACCENT_LIGHT : '#F8FAFC',
-                    color: noteDate ? ACCENT : '#94A3B8',
-                    fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:ff,
-                    display:'flex', alignItems:'center', gap:6, WebkitTapHighlightColor:'transparent',
-                  }}>
-                    <Icon icon="ph:calendar" width={14} height={14} color={noteDate ? ACCENT : '#94A3B8'} />
-                    {noteDate ? noteDate : '날짜 추가'}
-                    {noteDate && (
-                      <span onClick={e => { e.stopPropagation(); setNoteDate(undefined) }} style={{ marginLeft:2, color:'#DC2626', fontWeight:900 }}>×</span>
-                    )}
-                  </button>
-                  {showDatePicker && (
-                    <div style={{ marginTop:8, background:'#F8FAFC', borderRadius:12, padding:12, border:'1px solid rgba(0,0,0,0.08)' }}>
-                      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6 }}>
-                        {getTripDays(trip).map((d, idx) => {
-                          const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
-                          const sel = noteDate === dateStr
-                          return (
-                            <button key={idx} onClick={() => { setNoteDate(sel ? undefined : dateStr); setShowDatePicker(false) }} style={{
-                              padding:'8px 4px', borderRadius:8, cursor:'pointer', textAlign:'center',
-                              border: sel ? `1.5px solid ${ACCENT}` : '1px solid rgba(0,0,0,0.08)',
-                              background: sel ? ACCENT_LIGHT : '#ffffff',
-                              color: sel ? ACCENT : '#0D3349',
-                              fontSize:12, fontWeight: sel ? 700 : 400, fontFamily:ff,
-                              WebkitTapHighlightColor:'transparent',
-                            }}>
-                              <div style={{ fontWeight:700 }}>{idx+1}일</div>
-                              <div style={{ fontSize:10, opacity:0.7 }}>{fmtMD(d)}</div>
-                            </button>
-                          )
-                        })}
+              {/* 달력에 추가 */}
+              <div>
+                <button onClick={() => setShowDatePicker(v => !v)} style={{
+                  height:36, padding:'0 14px', borderRadius:20, border:`1.5px solid ${noteDate ? ACCENT : 'rgba(0,0,0,0.1)'}`,
+                  background: noteDate ? ACCENT_LIGHT : '#F8FAFC',
+                  color: noteDate ? ACCENT : '#94A3B8',
+                  fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:ff,
+                  display:'flex', alignItems:'center', gap:6, WebkitTapHighlightColor:'transparent',
+                }}>
+                  <Icon icon="ph:calendar" width={14} height={14} color={noteDate ? ACCENT : '#94A3B8'} />
+                  {noteDate ? noteDate : '달력에 추가'}
+                  {noteDate && (
+                    <span onClick={e => { e.stopPropagation(); setNoteDate(undefined) }} style={{ marginLeft:2, color:'#DC2626', fontWeight:900 }}>×</span>
+                  )}
+                </button>
+                {showDatePicker && (() => {
+                  const today = new Date()
+                  const firstDay = new Date(calYear, calMonth, 1).getDay()
+                  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate()
+                  const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+                  const chgMo = (d: number) => {
+                    let ny = calYear, nm = calMonth + d
+                    if (nm > 11) { nm = 0; ny++ }
+                    if (nm < 0) { nm = 11; ny-- }
+                    setCalYear(ny); setCalMonth(nm)
+                  }
+                  const cells = []
+                  for (let i = 0; i < firstDay; i++) cells.push(<div key={`e${i}`} />)
+                  for (let d = 1; d <= daysInMonth; d++) {
+                    const dt = new Date(calYear, calMonth, d)
+                    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
+                    const isSel = noteDate === dateStr
+                    const isToday = dt.toDateString() === today.toDateString()
+                    cells.push(
+                      <div key={d} onClick={() => { setNoteDate(isSel ? undefined : dateStr); setShowDatePicker(false) }}
+                        style={{
+                          aspectRatio:'1', display:'flex', alignItems:'center', justifyContent:'center',
+                          borderRadius:'50%', fontSize:13, cursor:'pointer',
+                          background: isSel ? ACCENT : 'transparent',
+                          color: isSel ? '#fff' : isToday ? ACCENT : '#0D3349',
+                          fontWeight: isSel ? 800 : isToday ? 800 : 400,
+                          textDecoration: isToday && !isSel ? 'underline' : 'none',
+                          textDecorationColor: '#D4703A',
+                          textUnderlineOffset: '3px',
+                          WebkitTapHighlightColor:'transparent',
+                        }}>{d}</div>
+                    )
+                  }
+                  return (
+                    <div style={{ marginTop:10, background:'#ffffff', borderRadius:18, padding:'14px 12px', border:'1px solid rgba(0,0,0,0.08)', boxShadow:'0 4px 16px rgba(0,0,0,0.10)' }}>
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                        <button onClick={() => chgMo(-1)} style={{ background:'none', border:'none', fontSize:18, color:'#0D4F6E', cursor:'pointer', padding:'2px 8px' }}>‹</button>
+                        <div style={{ fontSize:14, fontWeight:700, color:'#0D3349' }}>
+                          <span style={{ color: ACCENT }}>{calYear}년</span> · {MONTHS[calMonth]}
+                        </div>
+                        <button onClick={() => chgMo(1)} style={{ background:'none', border:'none', fontSize:18, color:'#0D4F6E', cursor:'pointer', padding:'2px 8px' }}>›</button>
+                      </div>
+                      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', marginBottom:4 }}>
+                        {['일','월','화','수','목','금','토'].map(d => (
+                          <div key={d} style={{ textAlign:'center', fontSize:11, color:'#1565A0', fontWeight:600, padding:'2px 0' }}>{d}</div>
+                        ))}
+                      </div>
+                      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2 }}>
+                        {cells}
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
+                  )
+                })()}
+              </div>
               <textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
@@ -282,7 +312,7 @@ export default function NoteSheet({ onClose, initialNoteId, initialView, trip }:
       {/* 삭제 확인 팝업 */}
       {deleteConfirmId && (
         <>
-          <div onClick={() => setDeleteConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:1200 }} />
+          <div onClick={() => setDeleteConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1200 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',

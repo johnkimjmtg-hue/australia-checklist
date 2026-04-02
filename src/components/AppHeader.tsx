@@ -204,7 +204,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
                 { label:'🌡️ 체감', value: cityData[weatherSheet]?.feelsLike != null ? `${cityData[weatherSheet].feelsLike}°` : '—' },
                 { label:'☁️ 날씨', value: cityData[weatherSheet]?.description || '—' },
               ].map((item, i) => (
-                <div key={i} style={{ background:'rgba(0,131,143,0.08)', borderRadius:12, padding:'12px 14px' }}>
+                <div key={i} style={{ background:'rgba(0,188,212,0.08)', borderRadius:12, padding:'12px 14px' }}>
                   <div style={{ fontSize:12, color:'#1565A0', marginBottom:4 }}>{item.label}</div>
                   <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>{item.value}</div>
                 </div>
@@ -214,7 +214,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
               <div style={{ fontSize:13, fontWeight:700, color:'#1565A0', marginBottom:10 }}>시간대별 예보</div>
               <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:4 }}>
                 {(cityData[weatherSheet]?.hourly ?? []).map((h, i) => (
-                  <div key={i} style={{ background:'rgba(0,131,143,0.08)', borderRadius:12, padding:'10px 14px', textAlign:'center', flexShrink:0, minWidth:70 }}>
+                  <div key={i} style={{ background:'rgba(0,188,212,0.08)', borderRadius:12, padding:'10px 14px', textAlign:'center', flexShrink:0, minWidth:70 }}>
                     <div style={{ fontSize:11, color:'#1565A0', marginBottom:4 }}>{h.time}</div>
                     <div style={{ fontSize:18 }}>{getWeatherIcon(h.icon)}</div>
                     <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', marginTop:4 }}>{h.temp}°</div>
