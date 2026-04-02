@@ -15,6 +15,7 @@ import ServicesSheet from '../components/ServicesSheet'
 import NearbySheet from '../components/NearbySheet'
 import NoteSheet from '../components/NoteSheet'
 import BingoSheet from '../components/BingoSheet'
+import PackingSheet from '../components/PackingSheet'
 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
 const TODAY = new Date()
@@ -52,6 +53,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   const [noteInitialId, setNoteInitialId] = useState<string | undefined>(undefined)
   const [noteInitialView, setNoteInitialView] = useState<'list'|'write'|undefined>(undefined)
   const [showBingo, setShowBingo] = useState(false)
+  const [showPacking, setShowPacking] = useState(false)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
 
@@ -173,7 +175,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   const fmtDate = (d: Date) => `${d.getMonth()+1}월 ${d.getDate()}일`
 
   const MENUS = [
-    { id:'checklist' as Tab, icon:'✅', title:'준비 체크리스트', sub:'여행 준비 할 것들', badge: 0, local: false },
+    { id:'checklist' as Tab, icon:'✅', title:'짐싸기 체크리스트', sub:'공항 통과 완벽 가이드', badge: 0, local: false },
     { id:'bucketlist' as Tab, icon:'🗺️', title:'버킷리스트', sub:'꼭 해볼 것들', badge: bucketCount, local: false },
     { id:'shopping' as Tab, icon:'🛍️', title:'쇼핑리스트', sub:'꼭 살 것들', badge: myShoppingCount, local: false },
     { id:'nearby' as Tab, icon:'📍', title:'내 주변', sub:'주변 업체 지도', badge: 0, local: false },
@@ -448,12 +450,12 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
             <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
               {/* 준비 체크리스트 */}
-              <div className="menu-card-hover card-anim" onClick={() => setShowChecklist(true)}
+              <div className="menu-card-hover card-anim" onClick={() => setShowPacking(true)}
                 style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
-                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>✅</div>
+                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🧳</div>
                 <div style={{ flex:1 }}>
-                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>준비 체크리스트</div>
-                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>여행 준비 할 것들</div>
+                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>짐싸기 체크리스트</div>
+                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>공항 통과 완벽 가이드</div>
                 </div>
               </div>
               {/* 버킷리스트 */}
@@ -645,6 +647,11 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
           onClose={() => setShowShopping(false)}
           trip={trip}
         />
+      )}
+
+      {/* 짐싸기 바텀시트 */}
+      {showPacking && (
+        <PackingSheet onClose={() => setShowPacking(false)} />
       )}
 
       {/* 체크리스트 바텀시트 */}
