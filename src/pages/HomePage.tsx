@@ -150,7 +150,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   return (
     <div style={{
       minHeight:'100dvh',
-      background:'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #4DD0E1 65%, #26C6DA 100%)',
+      background:'linear-gradient(180deg, #00BCD4 0%, #80DEEA 28%, #FFF0C8 50%, #F5C97A 70%, #D4703A 100%)',
       fontFamily: ff, maxWidth:430, margin:'0 auto', display:'flex', flexDirection:'column',
     }}>
       <style>{`
@@ -174,7 +174,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
       {/* 달력 / 일별뷰 */}
       <div style={{ padding:'0 18px 14px' }}>
-        <div style={{ background:'#EFFCFC', borderRadius:22, overflow:'hidden', boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
+        <div style={{ background:'rgba(255,255,255,0.88)', borderRadius:22, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
           {selectedDayDate && selectedDay !== null ? (
             /* ── 일별 뷰 */
             <div className="day-view" style={{ overflow:'hidden' }}>
@@ -391,7 +391,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
           <>
             {/* D-day */}
-            <div style={{ background:'#EFFCFC', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.10)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            <div style={{ background:'rgba(255,255,255,0.88)', borderRadius:22, padding:'20px 22px', marginBottom:14, boxShadow:'0 2px 12px rgba(0,0,0,0.12)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
               <div>
                 <div style={{ fontSize:52, fontWeight:900, color: ddayColor, lineHeight:1 }}>{ddayText}</div>
                 <div style={{ fontSize:15, color:'#1565A0', marginTop:6 }}>{ddayLabel}</div>
@@ -410,7 +410,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
               {MENUS.map((m, i) => (
                 <div key={m.id} className="menu-card-hover card-anim"
                   onClick={() => m.id === 'bucketlist' ? setShowBucket(true) : m.id === 'checklist' ? setShowChecklist(true) : m.id === 'shopping' ? setShowShopping(true) : m.id === 'services' ? setShowServices(true) : m.id === 'nearby' ? setShowNearby(true) : onNavigate(m.id)}
-                  style={{ background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', animationDelay:`${i * 0.08}s` }}>
+                  style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', animationDelay:`${i * 0.08}s` }}>
                   <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{m.icon}</div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>{m.title}</div>
                   <div style={{ fontSize:14, color:'#1565A0', marginTop:4 }}>{m.sub}</div>
@@ -418,7 +418,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 </div>
               ))}
               <div className="menu-card-hover card-anim" onClick={() => setShowServices(true)}
-                style={{ gridColumn:'span 2', background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${MENUS.length * 0.08}s` }}>
+                style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${MENUS.length * 0.08}s` }}>
                 <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🏢</div>
                 <div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>업체정보</div>
@@ -429,7 +429,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 const savedNotes = (() => { try { return JSON.parse(localStorage.getItem('app-notes') ?? '[]') } catch { return [] } })()
                 const previewNotes = savedNotes.slice(0, 3)
                 return (
-                  <div className="card-anim" style={{ gridColumn:'span 2', background:'#EFFCFC', borderRadius:20, padding:'16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', animationDelay:`${(MENUS.length + 1) * 0.08}s` }}>
+                  <div className="card-anim" style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', animationDelay:`${(MENUS.length + 1) * 0.08}s` }}>
                     {/* 헤더 */}
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom: previewNotes.length > 0 ? 12 : 0 }}>
                       <div onClick={() => setShowNote(true)} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
@@ -467,7 +467,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 )
               })()}
               <div className="menu-card-hover card-anim" onClick={() => setShowBingo(true)}
-                style={{ gridColumn:'span 2', background:'#EFFCFC', borderRadius:20, padding:'18px 16px', boxShadow:'0 4px 20px rgba(0,0,0,0.10)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${(MENUS.length + 2) * 0.08}s` }}>
+                style={{ gridColumn:'span 2', background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14, animationDelay:`${(MENUS.length + 2) * 0.08}s` }}>
                 <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
                 <div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
