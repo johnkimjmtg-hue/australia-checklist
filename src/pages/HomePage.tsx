@@ -141,9 +141,9 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             WebkitTapHighlightColor:'transparent',
           }}>
           {d}
-          {/* 행사 별표 */}
+          {/* 행사 표시 - 숫자 위 노란 줄 */}
           {hasEvent && !isSelected && (
-            <div style={{ position:'absolute', top:3, left:'50%', transform:'translateX(-50%)', fontSize:6, color:'#F59E0B', lineHeight:1 }}>★</div>
+            <div style={{ position:'absolute', top:4, left:'50%', transform:'translateX(-50%)', width:16, height:2, borderRadius:1, background:'#F59E0B' }} />
           )}
           {/* 사용자 데이터 점 */}
           {(hasBucket || hasShopping || hasMemo || hasNote) && (
