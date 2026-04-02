@@ -68,16 +68,23 @@ export default function LandingPage({ onComplete }: Props) {
       const isToday = dt.toDateString() === TODAY.toDateString()
 
       let bg = 'transparent', color = isPast ? '#7BAAB5' : '#0D3349', radius = '50%', fw = 400
-      if (isStart || isEnd) { bg = '#00838F'; color = '#fff'; fw = 800 }
+      if (isStart) { bg = '#00BCD4'; color = '#fff'; fw = 800; radius = '50% 0 0 50%' }
+      else if (isEnd) { bg = '#00BCD4'; color = '#fff'; fw = 800; radius = '0 50% 50% 0' }
       else if (isRange) { bg = '#B2EBF2'; color = '#006064'; radius = '0' }
 
       cells.push(
         <div key={d} onClick={isPast ? undefined : () => pick(dt)}
           style={{
             aspectRatio: '1', display:'flex', alignItems:'center', justifyContent:'center',
-            borderRadius: radius, background: bg, color, fontWeight: fw,
-            fontSize: 13, cursor: isPast ? 'default' : 'pointer',
-            border: isToday && !isStart && !isEnd ? '1.5px solid #00838F' : 'none',
+            borderRadius: radius, background: bg,
+            color: (isToday && !isStart && !isEnd) ? '#00BCD4' : color,
+            fontWeight: (isToday && !isStart && !isEnd) ? 800 : fw,
+            fontSize: (isToday && !isStart && !isEnd) ? 15 : 13,
+            textDecoration: (isToday && !isStart && !isEnd) ? 'underline' : 'none',
+            textDecorationColor: (isToday && !isStart && !isEnd) ? '#D4703A' : 'transparent',
+            textUnderlineOffset: '3px',
+            cursor: isPast ? 'default' : 'pointer',
+            border: 'none',
             WebkitTapHighlightColor: 'transparent',
           }}
         >{d}</div>

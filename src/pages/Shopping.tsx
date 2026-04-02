@@ -407,7 +407,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
       {/* ── 상품 상세 바텀시트 */}
       {selProduct && (
         <>
-          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1100 }} />
+          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:1100 }} />
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:430, background:'#ffffff',

@@ -640,7 +640,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
         return (
           <div style={{ position:'fixed', inset:0, zIndex:800 }}>
-            <div onClick={() => setSelectedCafe(null)} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
+            <div onClick={() => setSelectedCafe(null)} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)' }} />
             <div style={{
               position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
               width:'calc(100% - 32px)', maxWidth:398,
@@ -825,7 +825,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       {/* ── 저장 확인 팝업 */}
       {showSaveConfirm && (
         <>
-          <div onClick={() => setShowSaveConfirm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:700 }} />
+          <div onClick={() => setShowSaveConfirm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:700 }} />
           <div style={{
             position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
             background: colors.bgCard, borderRadius: radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,

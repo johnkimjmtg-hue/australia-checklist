@@ -217,7 +217,7 @@ function CircleProgress({ pct }: { pct:number }) {
 function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>void; onClose:()=>void }) {
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:700 }}/>
+      <div onClick={onClose} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',backdropFilter:'blur(6px)',zIndex:700 }}/>
       <div style={{
         position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
         width:'calc(100% - 48px)',maxWidth:300,
@@ -248,7 +248,7 @@ function AllDoneModal({ total, onReset, onClose }: { total:number; onReset:()=>v
 function DeleteModal({ onConfirm, onCancel }: { onConfirm:()=>void; onCancel:()=>void }) {
   return (
     <>
-      <div onClick={onCancel} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:600 }}/>
+      <div onClick={onCancel} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',backdropFilter:'blur(6px)',zIndex:600 }}/>
       <div style={{
         position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
         width:'calc(100% - 48px)',maxWidth:300,
@@ -656,7 +656,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       {/* ══ 더보기 모달 ══ */}
       {showMoreMenu && (
         <>
-          <div style={{ position:'fixed', inset:0, zIndex:100, background:'rgba(0,0,0,0.5)' }}
+          <div style={{ position:'fixed', inset:0, zIndex:100, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)' }}
             onClick={() => setShowMoreMenu(false)} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
@@ -696,7 +696,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         const item = allItems.find(i => i.id === uncheckConfirmId.id)
         return (
           <>
-            <div onClick={() => setUncheckConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1200 }} />
+            <div onClick={() => setUncheckConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:1200 }} />
             <div style={{
               position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
               background:'#ffffff', borderRadius:16, padding:'28px 24px 20px',
@@ -728,7 +728,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
         const item = allItems.find(i => i.id === deleteItemId.id)
         return (
           <>
-            <div onClick={() => setDeleteItemId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:700 }} />
+            <div onClick={() => setDeleteItemId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:700 }} />
             <div style={{
               position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
               background:'#ffffff', borderRadius:radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,
@@ -762,7 +762,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       {/* ── 쇼핑 상품 팝업 */}
       {selProduct && (
         <>
-          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600 }} />
+          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:600 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
@@ -811,7 +811,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
       {/* ── 관련업체 팝업 */}
       {detailBizId && (
         <div style={{ position:'fixed', inset:0, zIndex:800 }}>
-          <div onClick={() => { setDetailBizId(null); setDetailBiz(null) }} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)' }} />
+          <div onClick={() => { setDetailBizId(null); setDetailBiz(null) }} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)' }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, zIndex:801,

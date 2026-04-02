@@ -80,7 +80,7 @@ export default function DaySheet({ dayIndex, trip, state, setState, onClose, onO
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
+      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
       <div style={{
         position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
         width:'calc(100% - 32px)', maxWidth:398,

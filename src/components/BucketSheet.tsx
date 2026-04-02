@@ -52,7 +52,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
+      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430,
@@ -119,7 +119,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
       {/* 상세보기 팝업 - BucketSheet 바깥 레벨 */}
       {detailItem && (
         <>
-          <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:1100, background:'rgba(0,0,0,0.5)' }} />
+          <div onClick={() => setDetailItem(null)} style={{ position:'fixed', inset:0, zIndex:1100, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)' }} />
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:430, background:'#ffffff',

@@ -135,7 +135,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
       {/* 메뉴 바텀시트 */}
       {showMenu && (
         <>
-          <div onClick={() => setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
+          <div onClick={() => setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
@@ -170,7 +170,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
       {/* 날씨 바텀시트 */}
       {weatherSheet && (
         <>
-          <div onClick={() => setWeatherSheet(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
+          <div onClick={() => setWeatherSheet(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff', borderRadius:20,
@@ -229,7 +229,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
       {/* 약관 바텀시트 */}
       {termsTab && (
         <>
-          <div onClick={() => setTermsTab(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:1000 }} />
+          <div onClick={() => setTermsTab(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:1000 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff', borderRadius:20,

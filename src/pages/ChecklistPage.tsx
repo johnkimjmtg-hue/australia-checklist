@@ -506,7 +506,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
       {/* ── 쇼핑 상품 팝업 ── */}
       {selProduct&&(
         <>
-          <div onClick={()=>setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600 }} />
+          <div onClick={()=>setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:600 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:colors.bgCard,
@@ -707,7 +707,7 @@ function CalendarModal({ state, trip, allItems, onClose }: { state:AppState; tri
 function AlertModal({ title, message, confirmLabel, confirmColor, onConfirm, onCancel, hideCancel, confirmFirst }: { title:string; message?:string; confirmLabel:string; confirmColor?:string; onConfirm:()=>void; onCancel:()=>void; hideCancel?:boolean; confirmFirst?:boolean }) {
   return (
     <>
-      <div onClick={onCancel} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:600, animation:'fadeIn 0.2s ease' }} />
+      <div onClick={onCancel} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:600, animation:'fadeIn 0.2s ease' }} />
       <div style={{
         position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
         background:colors.bgCard, borderRadius:radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,
@@ -763,7 +763,7 @@ function TripPickerModal({ step, startDate, onSelect, onReset, onClose }: { step
   const isStart=step==='start'; const minDate=!isStart&&startDate?startDate:undefined
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:500, animation:'fadeIn 0.2s ease' }} />
+      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:500, animation:'fadeIn 0.2s ease' }} />
       <div style={{ position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'calc(100% - 32px)', maxWidth:340, background:'#ffffff', borderRadius:radius.lg, padding:`${spacing[5]}px`, zIndex:501, animation:'scaleIn 0.2s ease', maxHeight:'90vh', overflowY:'auto', fontFamily:font.family }}>
         {/* X 닫기 버튼 */}
         <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:spacing[2] }}>

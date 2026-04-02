@@ -102,9 +102,12 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       })()
 
       let bg = 'transparent', color = isPast ? '#7BAAB5' : '#0D3349', radius = '50%', fw: number = 400
-      if (isSelected) { bg = '#00838F'; color = '#fff'; fw = 800 }
-      else if (isStart || isEnd) { bg = '#00838F'; color = '#fff'; fw = 800 }
+      if (isSelected) { bg = '#00BCD4'; color = '#fff'; fw = 800 }
+      else if (isStart) { bg = '#00BCD4'; color = '#fff'; fw = 800; radius = '50% 0 0 50%' }
+      else if (isEnd) { bg = '#00BCD4'; color = '#fff'; fw = 800; radius = '0 50% 50% 0' }
       else if (isInTrip) { bg = '#B2EBF2'; color = '#006064'; radius = '0' }
+
+      const isTodayOnly = isToday && !isSelected && !isStart && !isEnd
 
       cells.push(
         <div key={d} onClick={() => {
@@ -115,8 +118,14 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
           style={{
             aspectRatio:'1', display:'flex', flexDirection:'column',
             alignItems:'center', justifyContent:'center',
-            borderRadius: radius, background: bg, color, fontWeight: fw, fontSize: 13,
-            border: isToday && !isSelected && !isStart && !isEnd ? '1.5px solid #00838F' : 'none',
+            borderRadius: radius, background: bg,
+            color: isTodayOnly ? '#00BCD4' : color,
+            fontWeight: isTodayOnly ? 800 : fw,
+            fontSize: isTodayOnly ? 15 : 13,
+            textDecoration: isTodayOnly ? 'underline' : 'none',
+            textDecorationColor: isTodayOnly ? '#D4703A' : 'transparent',
+            textUnderlineOffset: '3px',
+            border: 'none',
             cursor: dayIdx >= 0 ? 'pointer' : 'default', position:'relative',
             WebkitTapHighlightColor:'transparent',
           }}>

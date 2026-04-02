@@ -12,7 +12,7 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:500, animation:'fadeIn 0.2s ease' }} />
+      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:500, animation:'fadeIn 0.2s ease' }} />
 
       <div style={{
         position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',

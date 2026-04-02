@@ -402,11 +402,11 @@ export default function NearbyMap({ onBack }: Props) {
       {/* 업체 바텀시트 */}
       {selBiz && (
         <>
-          <div onClick={() => setSelBiz(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1100 }} />
+          <div onClick={() => setSelBiz(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:1100 }} />
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
-            borderRadius:20, zIndex:1101,
+            borderRadius:radius.xl, zIndex:1101,
             animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
             padding:`${spacing[3]}px ${spacing[3]}px ${spacing[8]}px`,

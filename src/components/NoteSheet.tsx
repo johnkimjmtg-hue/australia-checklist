@@ -105,7 +105,7 @@ export default function NoteSheet({ onClose, initialNoteId, initialView, trip }:
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
+      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430, background:'#ffffff',
@@ -282,7 +282,7 @@ export default function NoteSheet({ onClose, initialNoteId, initialView, trip }:
       {/* 삭제 확인 팝업 */}
       {deleteConfirmId && (
         <>
-          <div onClick={() => setDeleteConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1200 }} />
+          <div onClick={() => setDeleteConfirmId(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:1200 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',

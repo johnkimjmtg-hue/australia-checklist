@@ -39,7 +39,7 @@ export default function ChecklistSheet({ state, setState, onClose }: Props) {
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
+      <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
 
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',

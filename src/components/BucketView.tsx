@@ -141,7 +141,7 @@ export default function BucketView({ state, setState, trip, selectedDay, onGoHom
       {/* 추가 바텀시트 */}
       {showAddSheet && (
         <>
-          <div onClick={() => setShowAddSheet(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
+          <div onClick={() => setShowAddSheet(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
           <div style={{ position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)', width:'calc(100% - 32px)', maxWidth:398, background:'#EFFCFC', borderRadius:20, maxHeight:'85vh', display:'flex', flexDirection:'column', zIndex:801, animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)' }}>
             <div style={{ width:36, height:4, borderRadius:999, background:'rgba(0,0,0,0.15)', margin:'12px auto 0', flexShrink:0 }} />
             <div style={{ padding:'14px 20px 8px', display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 }}>

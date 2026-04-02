@@ -144,7 +144,7 @@ export const T = {
 
 export const landing = {
   // 배경 그라데이션
-  gradient: 'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 35%, #26C6DA 65%, #00E5CC 100%)',
+  gradient: 'linear-gradient(180deg, #00BCD4 0%, #80DEEA 28%, #FFF0C8 50%, #F5C97A 70%, #D4703A 100%)',
 
   colors: {
     // 텍스트
@@ -156,7 +156,7 @@ export const landing = {
     textOnBg:     'rgba(255,255,255,0.9)', // 그라데이션 위 흰 텍스트
 
     // 카드
-    card:         'rgba(255,255,255,0.82)', // 반투명 흰색
+    card:         'rgba(255,255,255,0.88)', // 반투명 흰색
     cardShadow:   '0 4px 20px rgba(0,0,0,0.10)',
     iconBg:       'rgba(0,131,143,0.15)',   // 메뉴 아이콘 박스
 
@@ -209,4 +209,14 @@ export const landing = {
     btn:     50,  // 버튼 (pill)
     badge:   20,  // 뱃지
   },
+} as const
+
+// ─────────────────────────────────────────────
+// 오버레이 토큰
+// ─────────────────────────────────────────────
+export const overlay = {
+  sheet:     'rgba(0,0,0,0.45)',  // 바텀시트 메인 오버레이
+  sheetBlur: 'blur(8px)',
+  popup:     'rgba(0,0,0,0.5)',   // 중첩 팝업 오버레이
+  popupBlur: 'blur(6px)',
 } as const
