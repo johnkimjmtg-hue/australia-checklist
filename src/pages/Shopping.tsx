@@ -164,21 +164,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
         position:'sticky', top:0, zIndex:20,
         display:'flex', alignItems:'flex-start',
       }}>
-        {/* 내 쇼핑리스트 버튼 */}
-        {myList.length > 0 && onGoToMyList && (
-          <div style={{ paddingLeft:14, paddingTop:8, paddingBottom:8, flexShrink:0, display:'flex', alignItems:'flex-start' }}>
-            <button className="cat-btn" onClick={onGoToMyList} style={{
-              height:34, padding:'0 12px', borderRadius:radius.full, cursor:'pointer',
-              background: '#FF6B9D', border: 'none',
-              color: '#fff',
-              fontSize: font.size.sm, fontWeight: font.weight.bold, whiteSpace:'nowrap',
-              boxShadow:'0 3px 8px rgba(255,107,157,0.4)',
-              WebkitTapHighlightColor: 'transparent',
-            }}>
-              내쇼핑리스트 {myList.length}
-            </button>
-          </div>
-        )}
+        {/* 찜 버튼 - 고정 */}
 
         {/* 카테고리 스크롤 */}
         <div className="cat-scroll" style={{ display:'flex', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, overflowX:'auto', flex:1 }}>
@@ -228,7 +214,17 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
               <Icon icon="ph:x" width={14} height={14} color={colors.textTertiary} />
             </button>
           )}
-
+          {myList.length > 0 && onGoToMyList && (
+            <button onClick={onGoToMyList} style={{
+              flexShrink:0, height:28, padding:'0 10px', borderRadius:20, cursor:'pointer',
+              background: '#FF6B9D', border: 'none',
+              color: '#fff', fontSize: 12, fontWeight: 700, whiteSpace:'nowrap',
+              WebkitTapHighlightColor: 'transparent',
+              display:'flex', alignItems:'center', gap:4,
+            }}>
+              <Icon icon="ph:door-open" width={12} height={12} color="#fff" />내 쇼핑리스트
+            </button>
+          )}
         </div>
 
         {/* ── 추천 상품 (전체 탭일 때만) */}
@@ -268,25 +264,18 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
                     </div>
                   </div>
                   </div>
-                  {/* 핑크 오버레이 (찜했을 때) */}
-                  {myList.includes(p.id) && (
-                    <div style={{
-                      position:'absolute', inset:0,
-                      background:'rgba(255,107,157,0.45)',
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      borderRadius:'inherit', pointerEvents:'none',
-                    }}>
-                      <Icon icon="ph:check-bold" width={28} height={28} color="#fff" />
-                    </div>
-                  )}
                   <button onClick={e => { e.stopPropagation(); myList.includes(p.id) ? removeFromMyList(p.id) : addToMyList(p.id) }} style={{
                     position:'absolute', top:6, right:6,
                     width:26, height:26, borderRadius:'50%', border:'none', cursor:'pointer',
-                    background: myList.includes(p.id) ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.85)',
+                    background:'#FF6B9D',
                     display:'flex', alignItems:'center', justifyContent:'center',
+                    boxShadow:'0 2px 6px rgba(255,107,157,0.4)',
                     WebkitTapHighlightColor:'transparent',
                   }}>
-                    <Icon icon="ph:plus-bold" width={14} height={14} color={myList.includes(p.id) ? '#fff' : '#FF6B9D'} />
+                    {myList.includes(p.id)
+                      ? <Icon icon="ph:check-bold" width={16} height={16} color="#fff" />
+                      : <span style={{ fontSize:12, fontWeight: font.weight.bold, color:'#fff' }}>찜</span>
+                    }
                   </button>
                 </div>
               ))}
@@ -367,25 +356,18 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
                 </div>
               </div>
               </div>
-              {/* 핑크 오버레이 (찜했을 때) */}
-              {myList.includes(p.id) && (
-                <div style={{
-                  position:'absolute', inset:0,
-                  background:'rgba(255,107,157,0.45)',
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                  borderRadius:'inherit', pointerEvents:'none',
-                }}>
-                  <Icon icon="ph:check-bold" width={28} height={28} color="#fff" />
-                </div>
-              )}
               <button onClick={e => { e.stopPropagation(); myList.includes(p.id) ? removeFromMyList(p.id) : addToMyList(p.id) }} style={{
                 position:'absolute', top:6, right:6,
                 width:26, height:26, borderRadius:'50%', border:'none', cursor:'pointer',
-                background: myList.includes(p.id) ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.85)',
+                background:'#FF6B9D',
                 display:'flex', alignItems:'center', justifyContent:'center',
+                boxShadow:'0 2px 6px rgba(255,107,157,0.4)',
                 WebkitTapHighlightColor:'transparent',
               }}>
-                <Icon icon="ph:plus-bold" width={14} height={14} color={myList.includes(p.id) ? '#fff' : '#FF6B9D'} />
+                {myList.includes(p.id)
+                  ? <Icon icon="ph:check-bold" width={16} height={16} color="#fff" />
+                  : <span style={{ fontSize:12, fontWeight: font.weight.bold, color:'#fff' }}>찜</span>
+                }
               </button>
             </div>
           ))}
