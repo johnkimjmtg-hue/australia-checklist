@@ -406,7 +406,7 @@ export default function NearbyMap({ onBack }: Props) {
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff',
-            borderRadius:radius.xl, zIndex:1101,
+            borderRadius:20, zIndex:1101,
             animation:'slideUpSheet 0.25s ease', maxHeight:'85vh', overflowY:'auto',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
             padding:`${spacing[3]}px ${spacing[3]}px ${spacing[8]}px`,
