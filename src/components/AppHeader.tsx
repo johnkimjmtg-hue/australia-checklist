@@ -16,10 +16,14 @@ const CITIES = {
 } as const
 
 type CityKey = keyof typeof CITIES
+type DailyForecast = {
+  date: string; dayLabel: string; icon: string; tempMin: number; tempMax: number; description: string
+}
 type CityData = {
   temp: number | null; feelsLike: number | null; humidity: number | null
   windSpeed: number | null; description: string; sunrise: string; sunset: string
   icon: string; time: string; hourly: { time: string; icon: string; temp: number }[]
+  daily: DailyForecast[]
 }
 
 const WEATHER_KEY = '0058a9de4f094a13ad10578442284d72'
@@ -41,11 +45,19 @@ type Props = {
   paddingTop?: number  // 기본 26px, 페이지마다 다를 수 있음
 }
 
+const CITY_PREF_KEY = 'header-city'
+
 export default function AppHeader({ paddingTop = 26 }: Props) {
   const [cityData, setCityData] = useState<Record<string, CityData>>({})
   const [weatherSheet, setWeatherSheet] = useState<CityKey | null>(null)
   const [showMenu, setShowMenu] = useState(false)
   const [termsTab, setTermsTab] = useState<'terms'|'privacy'|null>(null)
+  const [selectedCity, setSelectedCity] = useState<CityKey>(() => {
+    try { return (localStorage.getItem(CITY_PREF_KEY) as CityKey) || 'sydney' } catch { return 'sydney' }
+  })
+  const [showCityPicker, setShowCityPicker] = useState(() => {
+    try { return !localStorage.getItem(CITY_PREF_KEY) } catch { return true }
+  })
   const timerRef = useRef<any>(null)
 
   const getTime = (tz: string) => new Date().toLocaleTimeString('ko-KR', {
@@ -66,15 +78,41 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
           const hourly = (forecast.list ?? []).slice(0, 5).map((item: any) => ({
             time: fmtTime(item.dt), icon: item.weather[0].icon, temp: Math.round(item.main.temp),
           }))
+          // 일별 예보: 3시간 간격 데이터를 날짜별로 그룹핑
+          const DAY_LABELS = ['일','월','화','수','목','금','토']
+          const dailyMap: Record<string, any[]> = {}
+          ;(forecast.list ?? []).forEach((item: any) => {
+            const d = new Date(item.dt * 1000).toLocaleDateString('ko-KR', { timeZone: c.tz })
+            if (!dailyMap[d]) dailyMap[d] = []
+            dailyMap[d].push(item)
+          })
+          const todayStr = new Date().toLocaleDateString('ko-KR', { timeZone: c.tz })
+          const daily: DailyForecast[] = Object.entries(dailyMap).slice(0, 5).map(([dateStr, items]) => {
+            const temps = (items as any[]).map((i: any) => i.main.temp)
+            const midday = (items as any[]).find((i: any) => {
+              const localH = parseInt(new Date(i.dt * 1000).toLocaleTimeString('ko-KR', { timeZone: c.tz, hour: '2-digit', hour12: false }))
+              return localH >= 11 && localH <= 14
+            }) ?? (items as any[])[Math.floor((items as any[]).length / 2)]
+            const localDate = new Date(midday.dt * 1000).toLocaleDateString('ko-KR', { timeZone: c.tz, weekday: 'short' })
+            const isToday = dateStr === todayStr
+            return {
+              date: dateStr,
+              dayLabel: isToday ? '오늘' : localDate.replace('요일',''),
+              icon: midday.weather[0].icon,
+              tempMin: Math.round(Math.min(...(temps as number[]))),
+              tempMax: Math.round(Math.max(...(temps as number[]))),
+              description: midday.weather[0].description,
+            }
+          })
           return [key, {
             temp: Math.round(data.main.temp), feelsLike: Math.round(data.main.feels_like),
             humidity: data.main.humidity, windSpeed: Math.round(data.wind.speed * 3.6),
             description: data.weather[0].description,
             sunrise: fmtTime(data.sys.sunrise), sunset: fmtTime(data.sys.sunset),
-            icon: data.weather[0].icon, time: getTime(c.tz), hourly,
+            icon: data.weather[0].icon, time: getTime(c.tz), hourly, daily,
           }] as [string, CityData]
         } catch {
-          return [key, { temp: null, feelsLike: null, humidity: null, windSpeed: null, description: '', sunrise: '—', sunset: '—', icon: '', time: getTime(c.tz), hourly: [] }] as [string, CityData]
+          return [key, { temp: null, feelsLike: null, humidity: null, windSpeed: null, description: '', sunrise: '—', sunset: '—', icon: '', time: getTime(c.tz), hourly: [], daily: [] }] as [string, CityData]
         }
       })
     )
@@ -103,29 +141,33 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
 
       {/* 날씨 버튼 + 메뉴 버튼 */}
       <div style={{ padding:`${paddingTop}px 18px 12px` }}>
-        <div style={{ display:'flex', gap:8 }}>
-          {(Object.keys(CITIES) as CityKey[]).map(city => {
-            const d = cityData[city]
-            return (
-              <div key={city} onClick={() => setWeatherSheet(city)} style={{
-                background:'#EFFCFC', borderRadius:20, padding:'6px 10px',
-                boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flex:1, textAlign:'center',
-                cursor:'pointer', WebkitTapHighlightColor:'transparent',
-              }}>
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, flexWrap:'nowrap' }}>
-                  <span style={{ fontSize:12, fontWeight:700, color:'#0D3349', whiteSpace:'nowrap' }}>{CITIES[city].label}</span>
-                  {d?.icon ? <span style={{ fontSize:16 }}>{getWeatherIcon(d.icon)}</span> : <span style={{ fontSize:16 }}>☀️</span>}
-                  {d?.temp != null && <span style={{ fontSize:11, color: d.temp < 15 ? '#60A5FA' : d.temp <= 25 ? '#34D399' : '#F97316', fontWeight:700, whiteSpace:'nowrap' }}>{d.temp}°</span>}
-                </div>
-              </div>
-            )
-          })}
+        <div style={{ display:'flex', gap:8, justifyContent:'flex-end', alignItems:'center' }}>
+          {/* 날씨 버튼 - 선택 도시 1개 + 현지 시간 */}
+          <div onClick={() => setWeatherSheet(selectedCity)} style={{
+            background:'#EFFCFC', borderRadius:20, padding:'6px 12px',
+            boxShadow:'0 4px 20px rgba(0,0,0,0.10)',
+            cursor:'pointer', WebkitTapHighlightColor:'transparent',
+            display:'flex', alignItems:'center', gap:5,
+          }}>
+            <span style={{ fontSize:12, fontWeight:700, color:'#0D3349', whiteSpace:'nowrap' }}>{CITIES[selectedCity].label}</span>
+            <span style={{ fontSize:16 }}>{cityData[selectedCity]?.icon ? getWeatherIcon(cityData[selectedCity].icon) : '☀️'}</span>
+            {cityData[selectedCity]?.temp != null && (
+              <span style={{ fontSize:11, fontWeight:700, whiteSpace:'nowrap',
+                color: cityData[selectedCity].temp! < 15 ? '#60A5FA' : cityData[selectedCity].temp! <= 25 ? '#34D399' : '#F97316'
+              }}>{cityData[selectedCity].temp}°</span>
+            )}
+            {cityData[selectedCity]?.time && (
+              <span style={{ fontSize:10, color:'#1565A0', whiteSpace:'nowrap', opacity:0.8 }}>
+                {cityData[selectedCity].time}
+              </span>
+            )}
+          </div>
           {/* ⋮ 메뉴 버튼 */}
           <div onClick={() => setShowMenu(true)} style={{
             background:'#EFFCFC', borderRadius:'50%', width:36, height:36,
             boxShadow:'0 4px 20px rgba(0,0,0,0.10)', flexShrink:0,
             display:'flex', alignItems:'center', justifyContent:'center',
-            cursor:'pointer', WebkitTapHighlightColor:'transparent', alignSelf:'center',
+            cursor:'pointer', WebkitTapHighlightColor:'transparent',
           }}>
             <span style={{ fontSize:18, color:'#0D3349', letterSpacing:1, lineHeight:1 }}>⋮</span>
           </div>
@@ -135,7 +177,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
       {/* 메뉴 바텀시트 */}
       {showMenu && (
         <>
-          <div onClick={() => setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
+          <div onClick={() => setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
@@ -167,17 +209,76 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
         </>
       )}
 
+      {/* 지역 선택 팝업 */}
+      {showCityPicker && (
+        <>
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:1200 }} />
+          <div style={{
+            position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            width:'calc(100% - 48px)', maxWidth:360,
+            background:'#ffffff', borderRadius:20, zIndex:1201,
+            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
+            padding:'24px 20px 32px', fontFamily:ff,
+          }}>
+            <div style={{ textAlign:'center', marginBottom:20 }}>
+              <div style={{ fontSize:32, marginBottom:8 }}>🌤</div>
+              <div style={{ fontSize:18, fontWeight:800, color:'#0D3349', marginBottom:6 }}>어느 도시로 여행하세요?</div>
+              <div style={{ fontSize:13, color:'#94A3B8', lineHeight:1.6 }}>선택한 도시의 날씨를 상단에 표시해드려요<br/>나중에 날씨 버튼을 탭하면 바꿀 수 있어요</div>
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              {(Object.entries(CITIES) as [CityKey, typeof CITIES[CityKey]][]).map(([key, city]) => (
+                <button key={key} onClick={() => {
+                  setSelectedCity(key)
+                  try { localStorage.setItem(CITY_PREF_KEY, key) } catch {}
+                  setShowCityPicker(false)
+                }} style={{
+                  width:'100%', height:56, borderRadius:14, border:'1.5px solid rgba(0,131,143,0.15)',
+                  background: selectedCity === key ? 'rgba(0,131,143,0.08)' : '#F8FAFC',
+                  cursor:'pointer', fontFamily:ff,
+                  display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 16px',
+                }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                    <span style={{ fontSize:24 }}>
+                      {key === 'sydney' ? '🦘' : key === 'melbourne' ? '☕' : '🌞'}
+                    </span>
+                    <div style={{ textAlign:'left' }}>
+                      <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>{city.label}</div>
+                      <div style={{ fontSize:11, color:'#94A3B8' }}>
+                        {key === 'sydney' ? 'New South Wales' : key === 'melbourne' ? 'Victoria' : 'Queensland'}
+                      </div>
+                    </div>
+                  </div>
+                  {cityData[key]?.temp != null && (
+                    <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                      <span style={{ fontSize:18 }}>{getWeatherIcon(cityData[key].icon)}</span>
+                      <span style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>{cityData[key].temp}°</span>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
       {/* 날씨 바텀시트 */}
       {weatherSheet && (
         <>
-          <div onClick={() => setWeatherSheet(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
+          <div onClick={() => setWeatherSheet(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff', borderRadius:20,
             maxHeight:'85vh', overflowY:'auto', zIndex:801,
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
           }}>
-            <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px 0' }}>
+              <button onClick={() => { setWeatherSheet(null); setShowCityPicker(true) }} style={{
+                height:28, padding:'0 10px', borderRadius:20, border:'1px solid rgba(0,131,143,0.2)',
+                background:'rgba(0,131,143,0.06)', cursor:'pointer', fontFamily:ff,
+                fontSize:11, fontWeight:700, color:'#00838F', display:'flex', alignItems:'center', gap:4,
+              }}>
+                <span>🌏</span> 도시 변경
+              </button>
               <button onClick={() => setWeatherSheet(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
                 <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
               </button>
@@ -204,17 +305,17 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
                 { label:'🌡️ 체감', value: cityData[weatherSheet]?.feelsLike != null ? `${cityData[weatherSheet].feelsLike}°` : '—' },
                 { label:'☁️ 날씨', value: cityData[weatherSheet]?.description || '—' },
               ].map((item, i) => (
-                <div key={i} style={{ background:'rgba(0,188,212,0.08)', borderRadius:12, padding:'12px 14px' }}>
+                <div key={i} style={{ background:'rgba(0,131,143,0.08)', borderRadius:12, padding:'12px 14px' }}>
                   <div style={{ fontSize:12, color:'#1565A0', marginBottom:4 }}>{item.label}</div>
                   <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>{item.value}</div>
                 </div>
               ))}
             </div>
-            <div style={{ padding:'14px 20px 32px' }}>
+            <div style={{ padding:'14px 20px 0' }}>
               <div style={{ fontSize:13, fontWeight:700, color:'#1565A0', marginBottom:10 }}>시간대별 예보</div>
               <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:4 }}>
                 {(cityData[weatherSheet]?.hourly ?? []).map((h, i) => (
-                  <div key={i} style={{ background:'rgba(0,188,212,0.08)', borderRadius:12, padding:'10px 14px', textAlign:'center', flexShrink:0, minWidth:70 }}>
+                  <div key={i} style={{ background:'rgba(0,131,143,0.08)', borderRadius:12, padding:'10px 14px', textAlign:'center', flexShrink:0, minWidth:70 }}>
                     <div style={{ fontSize:11, color:'#1565A0', marginBottom:4 }}>{h.time}</div>
                     <div style={{ fontSize:18 }}>{getWeatherIcon(h.icon)}</div>
                     <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', marginTop:4 }}>{h.temp}°</div>
@@ -222,6 +323,29 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
                 ))}
               </div>
             </div>
+
+            {/* 5일 예보 */}
+            {(cityData[weatherSheet]?.daily ?? []).length > 0 && (
+              <div style={{ padding:'14px 20px 32px' }}>
+                <div style={{ fontSize:13, fontWeight:700, color:'#1565A0', marginBottom:10 }}>5일 예보</div>
+                <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                  {(cityData[weatherSheet]?.daily ?? []).map((d, i) => (
+                    <div key={i} style={{
+                      display:'flex', alignItems:'center',
+                      background:'rgba(0,131,143,0.06)', borderRadius:12, padding:'10px 14px',
+                    }}>
+                      <div style={{ width:44, fontSize:13, fontWeight: i === 0 ? 700 : 500, color: i === 0 ? '#00838F' : '#0D3349' }}>{d.dayLabel}</div>
+                      <div style={{ fontSize:20, marginRight:10 }}>{getWeatherIcon(d.icon)}</div>
+                      <div style={{ flex:1, fontSize:12, color:'#1565A0' }}>{d.description}</div>
+                      <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+                        <span style={{ fontSize:13, fontWeight:700, color:'#0D3349' }}>{d.tempMax}°</span>
+                        <span style={{ fontSize:12, color:'#94A3B8' }}>{d.tempMin}°</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}
@@ -229,7 +353,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
       {/* 약관 바텀시트 */}
       {termsTab && (
         <>
-          <div onClick={() => setTermsTab(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:1000 }} />
+          <div onClick={() => setTermsTab(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:1000 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff', borderRadius:20,

@@ -923,16 +923,18 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 return null
               })}
 
-              {/* 위젯 추가 버튼 */}
+              {/* 홈 화면 편집 버튼 */}
               <button onClick={() => setShowWidgetManager(true)} style={{
-                width:'100%', height:48, borderRadius:16, border:'1.5px dashed rgba(41,182,208,0.4)',
-                background:'rgba(41,182,208,0.04)', color:'#29B6D0',
+                width:'100%', height:48, borderRadius:16,
+                border:'1.5px solid rgba(255,255,255,0.6)',
+                background:'rgba(255,255,255,0.25)', color:'#fff',
                 fontSize:14, fontWeight:700, cursor:'pointer',
                 display:'flex', alignItems:'center', justifyContent:'center', gap:8,
                 fontFamily:"-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif",
+                backdropFilter:'blur(4px)',
               }}>
-                <Icon icon="ph:plus-circle" width={18} height={18} color="#29B6D0" />
-                위젯 추가 · 편집
+                <Icon icon="ph:pencil-simple" width={16} height={16} color="#fff" />
+                홈 화면 편집
               </button>
 
             </div>
