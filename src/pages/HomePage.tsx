@@ -136,12 +136,12 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       const numFw = isToday || isSelected ? 800 : 500
       const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.06)' : 'transparent'
 
-      const labels: { text: string; color: string; bg: string; barColor: string }[] = [
-        ...(dayEvents.length > 0 ? [{ text: `행사(${dayEvents.length})`, color:'#92400E', bg:'#FEF9E7', barColor:'#F59E0B', icon:'📅' }] : []),
-        ...(bucketItems.length > 0 ? [{ text: `버킷(${bucketItems.length})`, color:'#0E7490', bg:'rgba(41,182,208,0.12)', barColor:'#29B6D0', icon:'🗺️' }] : []),
-        ...(shoppingItems.length > 0 ? [{ text: `쇼핑(${shoppingItems.length})`, color:'#9D174D', bg:'rgba(255,107,157,0.12)', barColor:'#FF6B9D', icon:'🛍️' }] : []),
-        ...(dayNotes.length > 0 ? [{ text: `노트(${dayNotes.length})`, color:'#C2410C', bg:'rgba(249,115,22,0.10)', barColor:'#F97316', icon:'📝' }] : []),
-      ] as { text: string; color: string; bg: string; barColor: string; icon: string }[]
+      const labels: { text: string; bg: string }[] = [
+        ...(dayEvents.length > 0 ? [{ text: `행사(${dayEvents.length})`, bg:'#FEF3C7' }] : []),
+        ...(bucketItems.length > 0 ? [{ text: `버킷(${bucketItems.length})`, bg:'rgba(41,182,208,0.20)' }] : []),
+        ...(shoppingItems.length > 0 ? [{ text: `쇼핑(${shoppingItems.length})`, bg:'rgba(255,107,157,0.20)' }] : []),
+        ...(dayNotes.length > 0 ? [{ text: `노트(${dayNotes.length})`, bg:'rgba(249,115,22,0.18)' }] : []),
+      ]
 
       allDayData.push({ d, dt, isPast, isInTrip, isToday, dayIdx, isSelected, cellBg, numColor, numFw, labels })
     }
@@ -205,10 +205,10 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             </div>
             {/* 일정 텍스트 - 왼쪽 바 포함 */}
             <div style={{ display:'flex', flexDirection:'column', gap:2, overflow:'hidden' }}>
-              {(labels as any[]).map((lbl, i) => (
-                <div key={i} style={{ display:'flex', alignItems:'center', borderRadius:2, overflow:'hidden', background: lbl.bg, padding:'1px 3px' }}>
-                  <div style={{ fontSize:8, fontWeight:600, color: lbl.color, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.4, flex:1, minWidth:0 }}>
-                    {lbl.icon}{lbl.text}
+              {labels.map((lbl, i) => (
+                <div key={i} style={{ borderRadius:2, overflow:'hidden', background: lbl.bg, padding:'1px 3px' }}>
+                  <div style={{ fontSize:8, fontWeight:700, color:'#0D3349', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.4 }}>
+                    {lbl.text}
                   </div>
                 </div>
               ))}
