@@ -166,15 +166,14 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
         : []
       const dayNotes = allNotes.filter((n: any) => n.date === dateStr)
 
-      const numColor = isSelected ? '#fff' : isToday ? '#00838F' : isPast ? '#7BAAB5' : '#0D3349'
-      const numFw = isToday || isSelected ? 800 : 500
+      const numColor = isSelected ? '#fff' : isToday ? '#00838F' : isPast ? '#7BAAB5' : dayEvents.length > 0 ? '#A855F7' : '#0D3349'
+      const numFw = isPast ? 400 : isToday || isSelected || dayEvents.length > 0 ? 800 : 500
       const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.06)' : 'transparent'
 
       const labels: { text: string; bg: string }[] = [
-        ...(dayEvents.length > 0 ? [{ text: `행사 (${dayEvents.length})`, bg:'#FEF3C7' }] : []),
-        ...(bucketItems.length > 0 ? [{ text: `버킷 (${bucketItems.length})`, bg:'rgba(41,182,208,0.20)' }] : []),
-        ...(shoppingItems.length > 0 ? [{ text: `쇼핑 (${shoppingItems.length})`, bg:'rgba(255,107,157,0.20)' }] : []),
-        ...(dayNotes.length > 0 ? [{ text: `노트 (${dayNotes.length})`, bg:'rgba(249,115,22,0.18)' }] : []),
+        ...bucketItems.slice(0, 2).map(item => ({ text: item.label, bg:'rgba(41,182,208,0.20)' })),
+        ...shoppingItems.slice(0, 2).map((item: any) => ({ text: item.name, bg:'rgba(255,107,157,0.20)' })),
+        ...dayNotes.slice(0, 2).map((note: any) => ({ text: note.title || '제목 없음', bg:'rgba(249,115,22,0.18)' })),
       ]
 
       allDayData.push({ d, dt, isPast, isInTrip, isToday, dayIdx, isSelected, cellBg, numColor, numFw, labels })
@@ -934,7 +933,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 backdropFilter:'blur(4px)',
               }}>
                 <Icon icon="ph:pencil-simple" width={16} height={16} color="#fff" />
-                홈 화면 편집
+                홈 화면 편집 <span style={{ fontSize:11, fontWeight:400, opacity:0.85 }}>(카드 추가·삭제)</span>
               </button>
 
             </div>
@@ -1044,7 +1043,10 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
           trip={trip}
           state={state}
           setState={setState}
-          onClose={() => setShowBucket(false)}
+          onClose={() => {
+            setShowBucket(false)
+            try { setAchieved(JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}')) } catch {}
+          }}
         />
       )}
     </div>

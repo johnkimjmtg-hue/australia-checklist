@@ -70,7 +70,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
         try {
           const [weatherRes, forecastRes] = await Promise.all([
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${c.lat}&lon=${c.lon}&appid=${WEATHER_KEY}&units=metric&lang=kr`),
-            fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${c.lat}&lon=${c.lon}&appid=${WEATHER_KEY}&units=metric&lang=kr&cnt=6`),
+            fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${c.lat}&lon=${c.lon}&appid=${WEATHER_KEY}&units=metric&lang=kr&cnt=40`),
           ])
           const data = await weatherRes.json()
           const forecast = await forecastRes.json()
@@ -144,20 +144,30 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
         <div style={{ display:'flex', gap:8, justifyContent:'flex-end', alignItems:'center' }}>
           {/* 날씨 버튼 - 선택 도시 1개 + 현지 시간 */}
           <div onClick={() => setWeatherSheet(selectedCity)} style={{
-            background:'#EFFCFC', borderRadius:20, padding:'6px 12px',
+            background: (() => {
+              const icon = cityData[selectedCity]?.icon ?? ''
+              if (icon === '01d') return 'linear-gradient(135deg, #FF8C42, #FFD166)'
+              if (icon === '01n') return 'linear-gradient(135deg, #1A1A4E, #4B2D8F)'
+              if (icon.startsWith('02')) return 'linear-gradient(135deg, #5BA4CF, #A8C8E8)'
+              if (icon.startsWith('03') || icon.startsWith('04')) return 'linear-gradient(135deg, #8E9EAB, #CFD9DF)'
+              if (icon.startsWith('09') || icon.startsWith('10')) return 'linear-gradient(135deg, #4A6FA5, #6B8CBE)'
+              if (icon.startsWith('11')) return 'linear-gradient(135deg, #2C3E50, #3D5A80)'
+              if (icon.startsWith('13')) return 'linear-gradient(135deg, #B8D4E8, #E8F4F8)'
+              if (icon.startsWith('50')) return 'linear-gradient(135deg, #9EACBA, #C8D6DF)'
+              return '#EFFCFC'
+            })(),
+            borderRadius:20, padding:'6px 12px',
             boxShadow:'0 4px 20px rgba(0,0,0,0.10)',
             cursor:'pointer', WebkitTapHighlightColor:'transparent',
             display:'flex', alignItems:'center', gap:5,
           }}>
-            <span style={{ fontSize:12, fontWeight:700, color:'#0D3349', whiteSpace:'nowrap' }}>{CITIES[selectedCity].label}</span>
+            <span style={{ fontSize:12, fontWeight:700, color:'#fff', whiteSpace:'nowrap' }}>{CITIES[selectedCity].label}</span>
             <span style={{ fontSize:16 }}>{cityData[selectedCity]?.icon ? getWeatherIcon(cityData[selectedCity].icon) : '☀️'}</span>
             {cityData[selectedCity]?.temp != null && (
-              <span style={{ fontSize:11, fontWeight:700, whiteSpace:'nowrap',
-                color: cityData[selectedCity].temp! < 15 ? '#60A5FA' : cityData[selectedCity].temp! <= 25 ? '#34D399' : '#F97316'
-              }}>{cityData[selectedCity].temp}°</span>
+              <span style={{ fontSize:12, fontWeight:700, whiteSpace:'nowrap', lineHeight:1, color:'#fff' }}>{cityData[selectedCity].temp}°</span>
             )}
             {cityData[selectedCity]?.time && (
-              <span style={{ fontSize:10, color:'#1565A0', whiteSpace:'nowrap', opacity:0.8 }}>
+              <span style={{ fontSize:12, color:'rgba(255,255,255,0.85)', whiteSpace:'nowrap', lineHeight:1 }}>
                 {cityData[selectedCity].time}
               </span>
             )}
@@ -177,7 +187,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
       {/* 메뉴 바텀시트 */}
       {showMenu && (
         <>
-          <div onClick={() => setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
+          <div onClick={() => setShowMenu(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398,
@@ -264,36 +274,51 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
       {/* 날씨 바텀시트 */}
       {weatherSheet && (
         <>
-          <div onClick={() => setWeatherSheet(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:800 }} />
+          <div onClick={() => setWeatherSheet(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:800 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff', borderRadius:20,
+            width:'calc(100% - 32px)', maxWidth:398, borderRadius:20,
             maxHeight:'85vh', overflowY:'auto', zIndex:801,
             animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
+            background: (() => {
+              const icon = cityData[weatherSheet]?.icon ?? ''
+              if (icon === '01d') return 'linear-gradient(180deg, #FF8C42 0%, #FFD166 30%, #ffffff 70%)'
+              if (icon === '01n') return 'linear-gradient(180deg, #1A1A4E 0%, #4B2D8F 30%, #ffffff 70%)'
+              if (icon.startsWith('02')) return 'linear-gradient(180deg, #5BA4CF 0%, #A8C8E8 30%, #ffffff 70%)'
+              if (icon.startsWith('03') || icon.startsWith('04')) return 'linear-gradient(180deg, #8E9EAB 0%, #CFD9DF 30%, #ffffff 70%)'
+              if (icon.startsWith('09') || icon.startsWith('10')) return 'linear-gradient(180deg, #4A6FA5 0%, #6B8CBE 30%, #ffffff 70%)'
+              if (icon.startsWith('11')) return 'linear-gradient(180deg, #2C3E50 0%, #3D5A80 30%, #ffffff 70%)'
+              if (icon.startsWith('13')) return 'linear-gradient(180deg, #B8D4E8 0%, #E8F4F8 30%, #ffffff 70%)'
+              if (icon.startsWith('50')) return 'linear-gradient(180deg, #9EACBA 0%, #C8D6DF 30%, #ffffff 70%)'
+              return 'linear-gradient(180deg, #FF8C42 0%, #FFD166 30%, #ffffff 70%)'
+            })(),
           }}>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px 0' }}>
-              <button onClick={() => { setWeatherSheet(null); setShowCityPicker(true) }} style={{
-                height:28, padding:'0 10px', borderRadius:20, border:'1px solid rgba(0,131,143,0.2)',
-                background:'rgba(0,131,143,0.06)', cursor:'pointer', fontFamily:ff,
-                fontSize:11, fontWeight:700, color:'#00838F', display:'flex', alignItems:'center', gap:4,
-              }}>
-                <span>🌏</span> 도시 변경
-              </button>
-              <button onClick={() => setWeatherSheet(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
-                <span style={{ fontSize:14, color:'#0D3349', lineHeight:1 }}>✕</span>
-              </button>
-            </div>
-            <div style={{ padding:'8px 20px 0', display:'flex', alignItems:'center', gap:10 }}>
-              {cityData[weatherSheet]?.icon
-                ? <span style={{ fontSize:52 }}>{getWeatherIcon(cityData[weatherSheet].icon)}</span>
-                : <span style={{ fontSize:52 }}>☀️</span>}
-              <div style={{ flex:1 }}>
-                <div style={{ fontSize:22, fontWeight:800, color:'#0D3349' }}>{CITIES[weatherSheet].label}</div>
-                <div style={{ fontSize:13, color:'#1565A0' }}>현지 시간 {cityData[weatherSheet]?.time ?? '--:--'} · {cityData[weatherSheet]?.description || ''}</div>
+            {/* 그라데이션 헤더 영역 */}
+            <div>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px 0' }}>
+                <button onClick={() => { setWeatherSheet(null); setShowCityPicker(true) }} style={{
+                  height:28, padding:'0 10px', borderRadius:20, border:'1px solid rgba(255,255,255,0.4)',
+                  background:'rgba(255,255,255,0.2)', cursor:'pointer', fontFamily:ff,
+                  fontSize:11, fontWeight:700, color:'#fff', display:'flex', alignItems:'center', gap:4,
+                }}>
+                  <span>🌏</span> 도시 변경
+                </button>
+                <button onClick={() => setWeatherSheet(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.15)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                  <span style={{ fontSize:14, color:'#fff', lineHeight:1 }}>✕</span>
+                </button>
               </div>
-              {cityData[weatherSheet]?.temp != null && (
-                <div style={{ fontSize:40, fontWeight:900, color:'#0D3349' }}>{cityData[weatherSheet].temp}°</div>
-              )}
+              <div style={{ padding:'8px 20px 20px', display:'flex', alignItems:'center', gap:10 }}>
+                {cityData[weatherSheet]?.icon
+                  ? <span style={{ fontSize:52 }}>{getWeatherIcon(cityData[weatherSheet].icon)}</span>
+                  : <span style={{ fontSize:52 }}>☀️</span>}
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:22, fontWeight:800, color:'#fff' }}>{CITIES[weatherSheet].label}</div>
+                  <div style={{ fontSize:13, color:'rgba(255,255,255,0.8)' }}>현지 시간 {cityData[weatherSheet]?.time ?? '--:--'} · {cityData[weatherSheet]?.description || ''}</div>
+                </div>
+                {cityData[weatherSheet]?.temp != null && (
+                  <div style={{ fontSize:40, fontWeight:900, color:'#fff' }}>{cityData[weatherSheet].temp}°</div>
+                )}
+              </div>
             </div>
             <div style={{ height:1, background:'rgba(0,0,0,0.08)', margin:'14px 20px' }} />
             <div style={{ padding:'0 20px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
@@ -328,19 +353,18 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
             {(cityData[weatherSheet]?.daily ?? []).length > 0 && (
               <div style={{ padding:'14px 20px 32px' }}>
                 <div style={{ fontSize:13, fontWeight:700, color:'#1565A0', marginBottom:10 }}>5일 예보</div>
-                <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:4, scrollbarWidth:'none' }}>
                   {(cityData[weatherSheet]?.daily ?? []).map((d, i) => (
                     <div key={i} style={{
-                      display:'flex', alignItems:'center',
-                      background:'rgba(0,131,143,0.06)', borderRadius:12, padding:'10px 14px',
+                      background: i === 0 ? 'rgba(0,131,143,0.12)' : 'rgba(0,131,143,0.06)',
+                      borderRadius:12, padding:'12px 14px', textAlign:'center', flexShrink:0, minWidth:80,
+                      border: i === 0 ? '1px solid rgba(0,131,143,0.2)' : 'none',
                     }}>
-                      <div style={{ width:44, fontSize:13, fontWeight: i === 0 ? 700 : 500, color: i === 0 ? '#00838F' : '#0D3349' }}>{d.dayLabel}</div>
-                      <div style={{ fontSize:20, marginRight:10 }}>{getWeatherIcon(d.icon)}</div>
-                      <div style={{ flex:1, fontSize:12, color:'#1565A0' }}>{d.description}</div>
-                      <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-                        <span style={{ fontSize:13, fontWeight:700, color:'#0D3349' }}>{d.tempMax}°</span>
-                        <span style={{ fontSize:12, color:'#94A3B8' }}>{d.tempMin}°</span>
-                      </div>
+                      <div style={{ fontSize:12, fontWeight: i === 0 ? 700 : 500, color: i === 0 ? '#00838F' : '#0D3349', marginBottom:6 }}>{d.dayLabel}</div>
+                      <div style={{ fontSize:22, marginBottom:6 }}>{getWeatherIcon(d.icon)}</div>
+                      <div style={{ fontSize:12, color:'#1565A0', marginBottom:6, lineHeight:1.3 }}>{d.description}</div>
+                      <div style={{ fontSize:13, fontWeight:700, color:'#0D3349' }}>{d.tempMax}°</div>
+                      <div style={{ fontSize:11, color:'#94A3B8' }}>{d.tempMin}°</div>
                     </div>
                   ))}
                 </div>
@@ -353,7 +377,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
       {/* 약관 바텀시트 */}
       {termsTab && (
         <>
-          <div onClick={() => setTermsTab(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:1000 }} />
+          <div onClick={() => setTermsTab(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', backdropFilter:'blur(8px)', zIndex:1000 }} />
           <div style={{
             position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
             width:'calc(100% - 32px)', maxWidth:398, background:'#ffffff', borderRadius:20,

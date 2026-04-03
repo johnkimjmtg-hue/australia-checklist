@@ -76,7 +76,12 @@ function MainApp() {
   if (!trip) {
     return (
       <div className="app-shell">
-        <LandingPage onComplete={(t) => { setTrip(t); setActiveTab(null) }} />
+        <LandingPage onComplete={async (t) => {
+          const updated = await syncDataCache()
+          if (updated) setCacheStamp(s => s + 1)
+          setTrip(t)
+          setActiveTab(null)
+        }} />
       </div>
     )
   }
@@ -92,6 +97,7 @@ function MainApp() {
             setState={setState}
             onNavigate={(tab) => setActiveTab(tab)}
             onChangeDates={handleChangeDates}
+            cacheStamp={cacheStamp}
           />
         </div>
       </>

@@ -341,7 +341,8 @@ export default function WidgetManager({ onClose, onSave }: Props) {
       <div onClick={drag ? undefined : onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)', zIndex: 900 }} />
       <div style={{
         position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-        width: '100%', maxWidth: 430, background: '#ffffff',
+        width: '100%', maxWidth: 430,
+        background: 'linear-gradient(180deg, #D4703A 0%, #F5C97A 30%, #ffffff 70%)',
         borderRadius: '20px 20px 0 0', height: '85vh', zIndex: 901,
         animation: 'slideUpSheet 0.25s ease', boxShadow: '0 8px 32px rgba(0,0,0,0.20)',
         display: 'flex', flexDirection: 'column', fontFamily: ff,
@@ -355,9 +356,9 @@ export default function WidgetManager({ onClose, onSave }: Props) {
 
         {/* 헤더 */}
         <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px 0' }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#0D3349' }}>⚙️ 카드 관리</div>
-          <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.08)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
-            <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>⚙️ 카드 관리</div>
+          <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.15)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
+            <Icon icon="ph:x" width={16} height={16} color="#fff" />
           </button>
         </div>
 
