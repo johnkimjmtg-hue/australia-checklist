@@ -4,8 +4,7 @@
 // ─────────────────────────────────────────────
 import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
-import { supabase } from '../lib/supabase'
-import { getCachedBusinesses } from '../lib/dataCache'
+import { getCachedPacking, getCachedBusinesses } from '../lib/dataCache'
 import BusinessCard from '../components/BusinessCard'
 import type { Business } from '../lib/businessService'
 
@@ -64,21 +63,10 @@ export default function PackingPage({ onClose }: Props) {
   const [customInput, setCustomInput] = useState('')
 
   useEffect(() => {
-    const load = async () => {
-      const [{ data: cats }, { data: its }] = await Promise.all([
-        supabase.from('packing_categories').select('*').order('sort_order'),
-        supabase.from('packing_items').select('*').eq('is_active', true).order('sort_order'),
-      ])
-      if (cats?.length) setCategories(cats)
-      if (its?.length) {
-        setItems(its)
-        // 반입금지(🔴) 항목 제외한 수 저장 (체크 대상 항목만)
-        const checkableCount = its.filter((i:any) => !i.tips?.startsWith('🔴')).length
-        try { localStorage.setItem('packing-total', String(checkableCount)) } catch {}
-      }
-      setLoading(false)
-    }
-    load()
+    const cached = getCachedPacking()
+    if (cached?.categories?.length) setCategories(cached.categories)
+    if (cached?.items?.length) setItems(cached.items)
+    setLoading(false)
   }, [])
 
   const toggleCheck = (id: string) => {

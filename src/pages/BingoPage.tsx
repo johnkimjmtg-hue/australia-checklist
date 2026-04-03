@@ -5,8 +5,6 @@ import { getCachedBingo, getCachedBusinesses } from '../lib/dataCache'
 import BusinessCard from '../components/BusinessCard'
 
 const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
-const ACCENT = '#29B6D0'
-const ACCENT_BROWN = '#29B6D0'  // 브라운 → 앱 메인 컬러로 통일
 
 interface BingoCafe {
   id: string
@@ -267,6 +265,9 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   const [prevBingoCount, setPrevBingoCount] = useState(0)
   const [stampAnim, setStampAnim] = useState<number|null>(null)
   const [showReset, setShowReset] = useState(false)
+  const [showPhotos, setShowPhotos] = useState<boolean>(() => {
+    try { return localStorage.getItem('bingo-show-photos') === 'true' } catch { return false }
+  })
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [lastCheckedCafe, setLastCheckedCafe] = useState<{ idx: number; sort_order: number } | null>(null)
@@ -480,8 +481,7 @@ fontFamily: ff,
       <div style={{ background:'transparent', padding:'12px 16px 0' }}>
         <div style={{
           background:'rgba(255,255,255,0.88)',
-          borderRadius:20,
-          border:'none',
+          borderRadius:20, border:'none',
           boxShadow:'0 2px 12px rgba(0,0,0,0.10)',
           padding:'16px', display:'flex', alignItems:'center', gap:16,
         }}>
@@ -513,6 +513,17 @@ fontFamily: ff,
         </div>
         <div style={{ display:'flex', gap:4 }}>
 
+        <button style={{
+          height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
+          border: showPhotos ? 'none' : '1px solid rgba(41,182,208,0.2)',
+          background: showPhotos ? '#29B6D0' : 'rgba(41,182,208,0.08)',
+          color: showPhotos ? '#fff' : '#29B6D0', fontSize:11, fontWeight:700,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+          cursor:'pointer', fontFamily:ff,
+        }} onClick={() => setShowPhotos(p => { const next = !p; try { localStorage.setItem('bingo-show-photos', String(next)) } catch {} return next })}>
+          <Icon icon="ph:camera" width={12} height={12} color={showPhotos ? '#fff' : '#29B6D0'} />
+          인증샷 보기
+        </button>
         <button onClick={() => setShowReset(true)} style={{
           height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
           border:'1px solid rgba(220,38,38,0.12)', background:'rgba(220,38,38,0.08)',
@@ -545,11 +556,9 @@ fontFamily: ff,
                   borderRadius:10,
                   overflow:'hidden',
                   cursor:'pointer',
-                  border: isHighlight ? '2px solid #EF4444' : '1px solid rgba(0,0,0,0.06)',
-                  background: isChecked ? 'rgba(41,182,208,0.04)' : 'rgba(255,255,255,0.9)',
-                  boxShadow: isHighlight
-                    ? '0 4px 16px rgba(239,68,68,0.20)'
-                    : '0 2px 8px rgba(0,0,0,0.06)',
+                  border: isHighlight ? '2.5px solid #EF4444' : '1px solid rgba(0,0,0,0.06)',
+                  background: 'rgba(255,255,255,0.9)',
+                  boxShadow: isHighlight ? '0 4px 16px rgba(239,68,68,0.25)' : '0 2px 8px rgba(0,0,0,0.06)',
                   transition:'all 0.2s',
                   aspectRatio:'1',
                   display:'flex',
@@ -571,26 +580,15 @@ fontFamily: ff,
                     style={{ width:'100%', height:'100%', objectFit:'cover' }}
                     onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
                   />
-                  {/* 체크 오버레이 — 인증샷 없을 때만 */}
-                  {isChecked && !photos[idx] && (
+                  {/* 체크 오버레이 — 인증샷 보기 모드 OFF일 때만 */}
+                  {isChecked && !(showPhotos && photos[idx]) && (
                     <div style={{
                       position:'absolute', inset:0,
-                      background:'rgba(41,182,208,0.75)',
+                      background:'rgba(41,182,208,0.72)',
                       display:'flex', alignItems:'center', justifyContent:'center',
                       animation: isStamping ? 'stampIn 0.5s ease both' : 'none',
                     }}>
-                      <Icon icon="ph:check-bold" width={28} height={28} color="#fff" />
-                    </div>
-                  )}
-                  {/* 인증샷 있으면 카메라 아이콘 뱃지 */}
-                  {photos[idx] && (
-                    <div style={{
-                      position:'absolute', bottom:3, right:3,
-                      background: '#8B5E3C', borderRadius:'50%',
-                      width:20, height:20, display:'flex', alignItems:'center', justifyContent:'center',
-                      boxShadow:'0 1px 4px rgba(0,0,0,0.3)',
-                    }}>
-                      <Icon icon="ph:camera-fill" width={12} height={12} color="#fff" />
+                      <Icon icon="ph:check-bold" width={32} height={32} color="#fff" />
                     </div>
                   )}
                 </div>
@@ -724,7 +722,7 @@ fontFamily: ff,
                       textAlign:'center',
                     }}>
                       <div style={{ fontSize:16, fontWeight:700, color:'#0D3349', marginBottom:4 }}>{c.name}</div>
-                      <div style={{ fontSize:12, color:'#94A3B8' }}>업체 정보가 아직 연결되지 않았어요</div>
+                      <div style={{ fontSize:13, color:'#94A3B8' }}>업체 정보가 아직 연결되지 않았어요</div>
                     </div>
                   )
                 }
