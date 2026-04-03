@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────
 // HomePage.tsx — 달력 중심 홈
 // ─────────────────────────────────────────────
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import sydneyImg from '../assets/sydney.jpg'
 import { Icon } from '@iconify/react'
 import { TripInfo, AppState, getTripDays } from '../store/state'
@@ -32,6 +32,7 @@ type Props = {
 export default function HomePage({ trip, state, setState, onNavigate, onChangeDates }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
+  const touchStartX = useRef<number | null>(null)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null)
   const [dbItems, setDbItems] = useState<any[]>([])
@@ -134,11 +135,11 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.08)' : 'transparent'
 
       const labels: { text: string; color: string; bg: string; barColor: string }[] = [
-        ...dayEvents.slice(0,1).map(ev => ({ text: ev.title, color:'#92400E', bg:'#ffffff', barColor:'#F59E0B' })),
-        ...bucketItems.slice(0,1).map((item:any) => ({ text: item.label, color:'#0E7490', bg:'rgba(41,182,208,0.12)', barColor:'#29B6D0' })),
-        ...shoppingItems.slice(0,1).map((p:any) => ({ text: p?.name ?? '', color:'#9D174D', bg:'rgba(255,107,157,0.12)', barColor:'#FF6B9D' })),
-        ...dayNotes.slice(0,1).map((n: any) => ({ text: n.title, color:'#C2410C', bg:'rgba(249,115,22,0.10)', barColor:'#F97316' })),
-      ].filter(l => l.text).slice(0,4)
+        ...(dayEvents.length > 0 ? [{ text: `행사 (${dayEvents.length})`, color:'#92400E', bg:'#FEF9E7', barColor:'#F59E0B', icon:'📅' }] : []),
+        ...(bucketItems.length > 0 ? [{ text: `버킷 (${bucketItems.length})`, color:'#0E7490', bg:'rgba(41,182,208,0.12)', barColor:'#29B6D0', icon:'🗺️' }] : []),
+        ...(shoppingItems.length > 0 ? [{ text: `쇼핑 (${shoppingItems.length})`, color:'#9D174D', bg:'rgba(255,107,157,0.12)', barColor:'#FF6B9D', icon:'🛍️' }] : []),
+        ...(dayNotes.length > 0 ? [{ text: `노트 (${dayNotes.length})`, color:'#C2410C', bg:'rgba(249,115,22,0.10)', barColor:'#F97316', icon:'📝' }] : []),
+      ] as { text: string; color: string; bg: string; barColor: string; icon: string }[]
 
       allDayData.push({ d, dt, isPast, isInTrip, isToday, dayIdx, isSelected, cellBg, numColor, numFw, labels })
     }
@@ -202,10 +203,12 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             </div>
             {/* 일정 텍스트 - 왼쪽 바 포함 */}
             <div style={{ display:'flex', flexDirection:'column', gap:2, overflow:'hidden' }}>
-              {labels.map((lbl, i) => (
+              {(labels as any[]).map((lbl, i) => (
                 <div key={i} style={{ display:'flex', alignItems:'stretch', borderRadius:2, overflow:'hidden', background: lbl.bg }}>
                   <div style={{ width:2, flexShrink:0, background: lbl.barColor, borderRadius:'2px 0 0 2px' }} />
-                  <div style={{ fontSize:8, fontWeight:600, color: lbl.color, padding:'1px 3px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.4, flex:1, minWidth:0 }}>{lbl.text}</div>
+                  <div style={{ fontSize:8, fontWeight:600, color: lbl.color, padding:'1px 3px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.4, flex:1, minWidth:0 }}>
+                    {lbl.icon} {lbl.text}
+                  </div>
                 </div>
               ))}
             </div>
@@ -293,7 +296,15 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
         <div style={{ background:'rgba(255,255,255,0.88)', borderRadius:22, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
           {selectedDayDate && selectedDay !== null ? (
             /* ── 일별 뷰 */
-            <div className="day-view" style={{ overflow:'hidden' }}>
+            <div className="day-view" style={{ overflow:'hidden' }}
+              onTouchStart={e => { touchStartX.current = e.touches[0].clientX }}
+              onTouchEnd={e => {
+                if (touchStartX.current === null) return
+                const dx = e.changedTouches[0].clientX - touchStartX.current
+                if (Math.abs(dx) > 50) { setSelectedDay(null); setSelectedDayDate(null) }
+                touchStartX.current = null
+              }}
+            >
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 8px' }}>
                 <button onClick={() => { setSelectedDay(null); setSelectedDayDate(null) }}
                   style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
@@ -571,7 +582,16 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             </div>
           ) : (
             /* ── 달력 뷰 */
-            <div className="cal-view" style={{ overflow:'hidden' }}>
+            <div className="cal-view" style={{ overflow:'hidden' }}
+              onTouchStart={e => { touchStartX.current = e.touches[0].clientX }}
+              onTouchEnd={e => {
+                if (touchStartX.current === null) return
+                const dx = e.changedTouches[0].clientX - touchStartX.current
+                if (dx < -50) chgMo(1)
+                else if (dx > 50) chgMo(-1)
+                touchStartX.current = null
+              }}
+            >
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 8px' }}>
                 <button className="cal-nav-btn" onClick={() => chgMo(-1)} style={{ background:'none', border:'none', fontSize:20, color:'#0D4F6E', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
                 <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>
