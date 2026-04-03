@@ -32,6 +32,7 @@ type Props = {
 export default function HomePage({ trip, state, setState, onNavigate, onChangeDates }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
+  const [calSlideDir, setCalSlideDir] = useState<'left'|'right'>('left')
   const touchStartX = useRef<number | null>(null)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null)
@@ -76,6 +77,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   })()
 
   const chgMo = (d: number) => {
+    setCalSlideDir(d > 0 ? 'right' : 'left')
     let ny = vy, nm = vm + d
     if (nm > 11) { nm = 0; ny++ }
     if (nm < 0) { nm = 11; ny-- }
@@ -132,13 +134,13 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
       const numColor = isSelected ? '#fff' : isToday ? '#00838F' : isPast ? '#7BAAB5' : '#0D3349'
       const numFw = isToday || isSelected ? 800 : 500
-      const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.08)' : 'transparent'
+      const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.06)' : 'transparent'
 
       const labels: { text: string; color: string; bg: string; barColor: string }[] = [
-        ...(dayEvents.length > 0 ? [{ text: `행사 (${dayEvents.length})`, color:'#92400E', bg:'#FEF9E7', barColor:'#F59E0B', icon:'📅' }] : []),
-        ...(bucketItems.length > 0 ? [{ text: `버킷 (${bucketItems.length})`, color:'#0E7490', bg:'rgba(41,182,208,0.12)', barColor:'#29B6D0', icon:'🗺️' }] : []),
-        ...(shoppingItems.length > 0 ? [{ text: `쇼핑 (${shoppingItems.length})`, color:'#9D174D', bg:'rgba(255,107,157,0.12)', barColor:'#FF6B9D', icon:'🛍️' }] : []),
-        ...(dayNotes.length > 0 ? [{ text: `노트 (${dayNotes.length})`, color:'#C2410C', bg:'rgba(249,115,22,0.10)', barColor:'#F97316', icon:'📝' }] : []),
+        ...(dayEvents.length > 0 ? [{ text: `행사(${dayEvents.length})`, color:'#92400E', bg:'#FEF9E7', barColor:'#F59E0B', icon:'📅' }] : []),
+        ...(bucketItems.length > 0 ? [{ text: `버킷(${bucketItems.length})`, color:'#0E7490', bg:'rgba(41,182,208,0.12)', barColor:'#29B6D0', icon:'🗺️' }] : []),
+        ...(shoppingItems.length > 0 ? [{ text: `쇼핑(${shoppingItems.length})`, color:'#9D174D', bg:'rgba(255,107,157,0.12)', barColor:'#FF6B9D', icon:'🛍️' }] : []),
+        ...(dayNotes.length > 0 ? [{ text: `노트(${dayNotes.length})`, color:'#C2410C', bg:'rgba(249,115,22,0.10)', barColor:'#F97316', icon:'📝' }] : []),
       ] as { text: string; color: string; bg: string; barColor: string; icon: string }[]
 
       allDayData.push({ d, dt, isPast, isInTrip, isToday, dayIdx, isSelected, cellBg, numColor, numFw, labels })
@@ -204,10 +206,9 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             {/* 일정 텍스트 - 왼쪽 바 포함 */}
             <div style={{ display:'flex', flexDirection:'column', gap:2, overflow:'hidden' }}>
               {(labels as any[]).map((lbl, i) => (
-                <div key={i} style={{ display:'flex', alignItems:'stretch', borderRadius:2, overflow:'hidden', background: lbl.bg }}>
-                  <div style={{ width:2, flexShrink:0, background: lbl.barColor, borderRadius:'2px 0 0 2px' }} />
-                  <div style={{ fontSize:8, fontWeight:600, color: lbl.color, padding:'1px 3px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.4, flex:1, minWidth:0 }}>
-                    {lbl.icon} {lbl.text}
+                <div key={i} style={{ display:'flex', alignItems:'center', borderRadius:2, overflow:'hidden', background: lbl.bg, padding:'1px 3px' }}>
+                  <div style={{ fontSize:8, fontWeight:600, color: lbl.color, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.4, flex:1, minWidth:0 }}>
+                    {lbl.icon}{lbl.text}
                   </div>
                 </div>
               ))}
@@ -284,6 +285,8 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
         @keyframes slideInLeft { from{transform:translateX(-100%);opacity:0} to{transform:translateX(0);opacity:1} }
         .cal-view { animation: slideInLeft 0.28s ease both; }
         .day-view { animation: slideInRight 0.28s ease both; }
+        .cal-slide-left { animation: slideInLeft 0.28s ease both; }
+        .cal-slide-right { animation: slideInRight 0.28s ease both; }
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         .card-anim { animation: fadeUp 0.5s ease both; }
       `}</style>
@@ -582,7 +585,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             </div>
           ) : (
             /* ── 달력 뷰 */
-            <div className="cal-view" style={{ overflow:'hidden' }}
+            <div className={`cal-slide-${calSlideDir}`} style={{ overflow:'hidden' }}
               onTouchStart={e => { touchStartX.current = e.touches[0].clientX }}
               onTouchEnd={e => {
                 if (touchStartX.current === null) return
