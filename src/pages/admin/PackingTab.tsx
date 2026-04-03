@@ -5,7 +5,7 @@
 import { useState, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { supabase } from '../../lib/supabase'
-import { inputStyle, btnPrimary, Card, SectionTitle, Toast, EditBizMultiSearch, EditProdMultiSearch, uploadToCloudinary, type Cat, type Item } from './adminShared'
+import { inputStyle, btnPrimary, Card, SectionTitle, Toast, type Cat, type Item } from './adminShared'
 
 // ── 아이콘 목록
 const PH_ICONS = [
@@ -166,7 +166,7 @@ export function PackingItemsTab({ cats, items, setItems }: { cats: Cat[]; items:
   const [editId, setEditId] = useState<string | null>(null)
   const [editLabel, setEditLabel] = useState('')
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
-  const [detailEdits, setDetailEdits] = useState<Record<string, { address: string; description: string; tips: string }>>({})
+  const [detailEdits, setDetailEdits] = useState<Record<string, { description: string; tips: string }>>({})
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [businesses, setBusinesses] = useState<{ id: string; name: string }[]>([])
   const [products, setProducts] = useState<{ id: string; name: string }[]>([])
@@ -179,7 +179,7 @@ export function PackingItemsTab({ cats, items, setItems }: { cats: Cat[]; items:
   const [bizSearch, setBizSearch] = useState('')
   const [bizFocused, setBizFocused] = useState(false)
 
-  const getDetailEdit = (item: Item) => detailEdits[item.id] ?? { address: item.address ?? '', description: item.description ?? '', tips: item.tips ?? '' }
+  const getDetailEdit = (item: Item) => detailEdits[item.id] ?? { description: item.description ?? '', tips: item.tips ?? '' }
   const setDetailEdit = (id: string, field: string, val: string) => setDetailEdits(prev => ({ ...prev, [id]: { ...getDetailEdit(items.find(i => i.id === id)!), [field]: val } }))
 
   const filteredBiz = businesses.filter(b => !newBizIds.includes(b.id) && (!bizSearch || b.name.toLowerCase().includes(bizSearch.toLowerCase()))).slice(0, 8)
@@ -228,10 +228,6 @@ export function PackingItemsTab({ cats, items, setItems }: { cats: Cat[]; items:
   async function deleteItem(id: string) { await supabase.from('packing_items').delete().eq('id', id); setItems(items.filter(i => i.id !== id)); showToast('항목 삭제됨') }
   async function saveLabel(id: string) { if (!editLabel.trim()) return; await supabase.from('packing_items').update({ label: editLabel.trim() }).eq('id', id); setItems(items.map(i => i.id === id ? { ...i, label: editLabel.trim() } : i)); setEditId(null); showToast('저장됨') }
   async function saveDetail(id: string, field: string, val: string) { const value = val.trim() || null; await supabase.from('packing_items').update({ [field]: value }).eq('id', id); setItems(items.map(i => i.id === id ? { ...i, [field]: value } : i)); showToast('저장됨') }
-  async function saveRelatedBiz(id: string, ids: string[]) { await supabase.from('packing_items').update({ related_business_ids: ids }).eq('id', id); setItems(items.map(i => i.id === id ? { ...i, related_business_ids: ids } : i)); showToast('저장됨') }
-  async function saveRelatedProducts(id: string, ids: string[]) { await supabase.from('packing_items').update({ related_product_ids: ids }).eq('id', id); setItems(items.map(i => i.id === id ? { ...i, related_product_ids: ids } : i)); showToast('저장됨') }
-  async function uploadItemImage(id: string, file: File) { setSaving(true); try { const url = await uploadToCloudinary(file, 'checklist'); await supabase.from('packing_items').update({ image_url: url }).eq('id', id); setItems(items.map(i => i.id === id ? { ...i, image_url: url } : i)); showToast('이미지 저장됨') } catch { showToast('이미지 업로드 실패') } setSaving(false) }
-  async function deleteItemImage(id: string) { await supabase.from('packing_items').update({ image_url: null }).eq('id', id); setItems(items.map(i => i.id === id ? { ...i, image_url: null } : i)); showToast('이미지 삭제됨') }
   async function updateIcon(id: string, icon: string) { await supabase.from('packing_items').update({ icon }).eq('id', id); setItems(items.map(i => i.id === id ? { ...i, icon } : i)) }
   async function toggleActive(id: string, current: boolean) { await supabase.from('packing_items').update({ is_active: !current }).eq('id', id); setItems(items.map(i => i.id === id ? { ...i, is_active: !current } : i)) }
 
@@ -377,7 +373,7 @@ export function PackingItemsTab({ cats, items, setItems }: { cats: Cat[]; items:
                   </div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600, width: 70, flexShrink: 0 }}>📍 Suburb</span>
-                    <input value={getDetailEdit(item).address} onChange={e => setDetailEdit(item.id, 'address', e.target.value)} placeholder="예: Surry Hills NSW 2010" style={{ ...inputStyle, flex: 1, fontSize: 12, padding: '5px 8px' }} />
+
                   </div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                     <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600, width: 70, flexShrink: 0, paddingTop: 6 }}>📝 설명</span>
@@ -389,14 +385,14 @@ export function PackingItemsTab({ cats, items, setItems }: { cats: Cat[]; items:
                   </div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                     <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600, width: 70, flexShrink: 0, paddingTop: 6 }}>🏢 관련업체</span>
-                    <EditBizMultiSearch businesses={businesses} values={item.related_business_ids ?? (item.related_business_id ? [item.related_business_id] : [])} onChange={ids => saveRelatedBiz(item.id, ids)} />
+
                   </div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                     <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600, width: 70, flexShrink: 0, paddingTop: 6 }}>🛍 관련상품</span>
-                    <EditProdMultiSearch products={products} values={item.related_product_ids ?? []} onChange={ids => saveRelatedProducts(item.id, ids)} />
+
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 4 }}>
-                    <button onClick={async () => { const edit = getDetailEdit(item); await saveDetail(item.id, 'address', edit.address); await saveDetail(item.id, 'description', edit.description); await saveDetail(item.id, 'tips', edit.tips); showToast('✅ 상세정보 저장됨') }} style={{ ...btnPrimary, padding: '8px 20px', fontSize: 13 }}>적용하기</button>
+                    <button onClick={async () => { const edit = getDetailEdit(item); await saveDetail(item.id, 'description', edit.description); await saveDetail(item.id, 'tips', edit.tips); showToast('✅ 상세정보 저장됨') }} style={{ ...btnPrimary, padding: '8px 20px', fontSize: 13 }}>적용하기</button>
                   </div>
                 </div>
               )}

@@ -30,7 +30,7 @@ const TAB_META: { id: MainTab; icon: string; label: string }[] = [
   { id: 'events',    icon: 'ph:calendar-check',     label: '행사' },
   { id: 'google',    icon: 'ph:magnifying-glass',   label: '구글매핑' },
   { id: 'packing_cats',  icon: 'ph:suitcase',        label: '짐카테고리' },
-  { id: 'packing_items', icon: 'ph:luggage',         label: '짐항목' },
+  { id: 'packing_items', icon: 'ph:bag-simple',         label: '짐항목' },
   { id: 'deploy',    icon: 'ph:rocket-launch',      label: '배포' },
 ]
 
