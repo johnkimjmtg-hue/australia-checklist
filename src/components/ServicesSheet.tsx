@@ -29,7 +29,8 @@ export default function ServicesSheet({ onClose }: Props) {
         `}</style>
 
         {/* 헤더 */}
-        <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+        <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px 0' }}>
+          <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>🏢 업체정보</div>
           <button onClick={onClose} style={{
             width:28, height:28, borderRadius:'50%',
             background:'rgba(0,0,0,0.08)', border:'none',

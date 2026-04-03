@@ -53,8 +53,8 @@ export default function ShoppingSheet({ onClose, trip }: Props) {
         `}</style>
 
         {/* 헤더 */}
-        <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 12px 0' }}>
-          <div />
+        <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px 0' }}>
+          <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>🛍️ 쇼핑리스트</div>
           <button onClick={onClose} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
             <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
           </button>
