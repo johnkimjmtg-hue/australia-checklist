@@ -977,7 +977,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
               fontSize:15, fontWeight:600, color:'#DC2626',
               fontFamily:"-apple-system,'Apple SD Gothic Neo','Pretendard',sans-serif",
             }}>
-              <span style={{ fontSize:18 }}>🙈</span> 카드 숨기기
+              <Icon icon="ph:eye-slash" width={18} height={18} color="#DC2626" /> 카드 숨기기
             </button>
           </div>
         </>
