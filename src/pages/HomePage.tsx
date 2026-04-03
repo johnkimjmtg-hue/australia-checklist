@@ -84,12 +84,30 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   const renderCal = () => {
     const first = new Date(vy, vm, 1).getDay()
     const days = new Date(vy, vm+1, 0).getDate()
-    const cells = []
 
-    // 빈 셀
-    for (let i = 0; i < first; i++) {
-      cells.push(<div key={`e${i}`} style={{ height:90, borderTop:'1px solid rgba(0,0,0,0.06)' }} />)
-    }
+    const HEADER_H = 22  // 날짜 숫자 영역
+    const ITEM_H   = 14  // 항목 한 줄 높이
+    const ITEM_GAP = 2   // 항목 간 gap
+    const PADDING  = 6   // 상하 패딩
+
+    // 각 날짜별 데이터 미리 계산
+    const allDayData: {
+      d: number; dt: Date; isPast: boolean; isInTrip: boolean; isToday: boolean
+      dayIdx: number; isSelected: boolean; cellBg: string; numColor: string; numFw: number
+      labels: { text: string; color: string; bg: string; barColor: string }[]
+    }[] = []
+
+    const shoppingSchedules: Record<string, number[]> = (() => {
+      try { return JSON.parse(localStorage.getItem('shopping-schedules') ?? '{}') } catch { return {} }
+    })()
+    const myList: string[] = (() => {
+      try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] }
+    })()
+    const allNotes: any[] = (() => {
+      try { return JSON.parse(localStorage.getItem('app-notes') ?? '[]') } catch { return [] }
+    })()
+    const cachedShopping = getCachedShopping()
+    const allProds = cachedShopping?.products ?? []
 
     for (let d = 1; d <= days; d++) {
       const dt = new Date(vy, vm, d)
@@ -100,115 +118,109 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       const isSelected = selectedDay === dayIdx && dayIdx >= 0
       const dateStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
 
-      // 행사
       const dayEvents = events.filter(ev => ev.is_active && ev.start_date <= dateStr && ev.end_date >= dateStr)
-
-      // 버킷리스트 항목
       const bucketItems = dayIdx >= 0
         ? [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])]
             .filter(item => (state.schedules[item.id] ?? []).includes(dayIdx))
         : []
+      const shoppingItems = dayIdx >= 0
+        ? myList.filter(id => (shoppingSchedules[id] ?? []).includes(dayIdx))
+            .map(id => allProds.find((p:any) => p.id === id)).filter(Boolean)
+        : []
+      const dayNotes = allNotes.filter((n: any) => n.date === dateStr)
 
-      // 쇼핑 항목
-      const shoppingItems = dayIdx >= 0 ? (() => {
-        try {
-          const schedules: Record<string, number[]> = JSON.parse(localStorage.getItem('shopping-schedules') ?? '{}')
-          const myList: string[] = JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]')
-          const cachedShopping = getCachedShopping()
-          const allProds = cachedShopping?.products ?? []
-          return myList
-            .filter(id => (schedules[id] ?? []).includes(dayIdx))
-            .map(id => allProds.find((p:any) => p.id === id))
-            .filter(Boolean)
-        } catch { return [] }
-      })() : []
-
-      // 날짜 숫자 색상
       const numColor = isSelected ? '#fff' : isToday ? '#00838F' : isPast ? '#7BAAB5' : '#0D3349'
       const numFw = isToday || isSelected ? 800 : 500
       const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.04)' : 'transparent'
 
-      // 노트
-      const dayNotes = (() => {
-        try {
-          const notes = JSON.parse(localStorage.getItem('app-notes') ?? '[]')
-          return notes.filter((n: any) => n.date === dateStr)
-        } catch { return [] }
-      })()
-
-      // 표시할 항목 (최대 3개, 우선순위: 행사 > 버킷 > 쇼핑 > 노트)
       const labels: { text: string; color: string; bg: string; barColor: string }[] = [
-        ...dayEvents.slice(0,1).map(ev => ({
-          text: ev.title,
-          color: '#92400E',
-          bg: '#FEF9E7',
-          barColor: '#F59E0B',
-        })),
-        ...bucketItems.slice(0, 2 - Math.min(dayEvents.length,1)).map((item:any) => ({
-          text: item.label,
-          color: '#0E7490',
-          bg: 'rgba(41,182,208,0.12)',
-          barColor: '#29B6D0',
-        })),
-        ...shoppingItems.slice(0, 2 - Math.min(dayEvents.length,1) - Math.min(bucketItems.length, 2 - Math.min(dayEvents.length,1))).map((p:any) => ({
-          text: p?.name ?? '',
-          color: '#9D174D',
-          bg: 'rgba(255,107,157,0.12)',
-          barColor: '#FF6B9D',
-        })),
-        ...dayNotes.map((n: any) => ({
-          text: n.title,
-          color: '#C2410C',
-          bg: 'rgba(249,115,22,0.10)',
-          barColor: '#F97316',
-        })),
-      ].filter(l => l.text).slice(0,3)
+        ...dayEvents.slice(0,1).map(ev => ({ text: ev.title, color:'#92400E', bg:'#FEF9E7', barColor:'#F59E0B' })),
+        ...bucketItems.slice(0,1).map((item:any) => ({ text: item.label, color:'#0E7490', bg:'rgba(41,182,208,0.12)', barColor:'#29B6D0' })),
+        ...shoppingItems.slice(0,1).map((p:any) => ({ text: p?.name ?? '', color:'#9D174D', bg:'rgba(255,107,157,0.12)', barColor:'#FF6B9D' })),
+        ...dayNotes.slice(0,1).map((n: any) => ({ text: n.title, color:'#C2410C', bg:'rgba(249,115,22,0.10)', barColor:'#F97316' })),
+      ].filter(l => l.text).slice(0,4)
 
-      cells.push(
-        <div key={d}
-          onClick={() => { setSelectedDay(dayIdx); setSelectedDayDate(dt) }}
-          style={{
-            height:90, background: cellBg,
-            borderTop: `1px solid rgba(0,0,0,0.06)`,
-            borderRadius: isSelected ? 6 : 0,
-            cursor:'pointer', padding:'3px 2px 3px 2px',
-            display:'flex', flexDirection:'column',
-            WebkitTapHighlightColor:'transparent',
-            boxSizing:'border-box', overflow:'hidden',
-          }}>
-          {/* 날짜 숫자 - 우상단 */}
-          <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:2 }}>
-            <div style={{
-              fontSize:11, fontWeight: numFw, color: numColor, lineHeight:1,
-              width:18, height:18, display:'flex', alignItems:'center', justifyContent:'center',
-              borderRadius:'50%',
-              background: isToday && !isSelected ? 'rgba(0,131,143,0.12)' : 'transparent',
-            }}>{d}</div>
+      allDayData.push({ d, dt, isPast, isInTrip, isToday, dayIdx, isSelected, cellBg, numColor, numFw, labels })
+    }
+
+    // 주 단위로 묶어서 행 높이 계산
+    const totalCells = first + days
+    const weeks = Math.ceil(totalCells / 7)
+    const rows: JSX.Element[] = []
+
+    for (let w = 0; w < weeks; w++) {
+      const weekCells: JSX.Element[] = []
+      let maxLabels = 0
+
+      // 이 주의 최대 항목 수 계산
+      for (let col = 0; col < 7; col++) {
+        const cellIdx = w * 7 + col - first
+        if (cellIdx >= 0 && cellIdx < days) {
+          maxLabels = Math.max(maxLabels, allDayData[cellIdx].labels.length)
+        }
+      }
+
+      // 셀 너비 기준 최소 높이 (정사각형) = 약 (430 - 20) / 7 ≈ 58px
+      const minH = 52
+      const rowH = Math.max(minH, HEADER_H + maxLabels * (ITEM_H + ITEM_GAP) + PADDING)
+
+      // 이 주의 셀 렌더링
+      for (let col = 0; col < 7; col++) {
+        const cellIdx = w * 7 + col - first
+
+        if (cellIdx < 0 || cellIdx >= days) {
+          // 빈 셀
+          weekCells.push(
+            <div key={`e_${w}_${col}`} style={{ height: rowH, borderTop:'1px solid rgba(0,0,0,0.06)' }} />
+          )
+          continue
+        }
+
+        const { d, dt, isSelected, cellBg, numColor, numFw, labels } = allDayData[cellIdx]
+        const dayIdx = allDayData[cellIdx].dayIdx
+
+        weekCells.push(
+          <div key={d}
+            onClick={() => { setSelectedDay(dayIdx); setSelectedDayDate(dt) }}
+            style={{
+              height: rowH, background: cellBg,
+              borderTop:'1px solid rgba(0,0,0,0.06)',
+              borderRadius: isSelected ? 6 : 0,
+              cursor:'pointer', padding:'3px 2px 3px 2px',
+              display:'flex', flexDirection:'column',
+              WebkitTapHighlightColor:'transparent',
+              boxSizing:'border-box', overflow:'hidden',
+            }}>
+            {/* 날짜 숫자 - 우상단 */}
+            <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:2 }}>
+              <div style={{
+                fontSize:11, fontWeight: numFw, color: numColor, lineHeight:1,
+                width:18, height:18, display:'flex', alignItems:'center', justifyContent:'center',
+                borderRadius:'50%',
+                background: allDayData[cellIdx].isToday && !isSelected ? 'rgba(0,131,143,0.12)' : 'transparent',
+              }}>{d}</div>
+            </div>
+            {/* 일정 텍스트 - 왼쪽 바 포함 */}
+            <div style={{ display:'flex', flexDirection:'column', gap:2, overflow:'hidden' }}>
+              {labels.map((lbl, i) => (
+                <div key={i} style={{ display:'flex', alignItems:'stretch', borderRadius:2, overflow:'hidden', background: lbl.bg }}>
+                  <div style={{ width:2, flexShrink:0, background: lbl.barColor, borderRadius:'2px 0 0 2px' }} />
+                  <div style={{ fontSize:8, fontWeight:600, color: lbl.color, padding:'1px 3px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.4, flex:1, minWidth:0 }}>{lbl.text}</div>
+                </div>
+              ))}
+            </div>
           </div>
-          {/* 일정 텍스트 - 왼쪽 바 포함 */}
-          <div style={{ display:'flex', flexDirection:'column', gap:2, overflow:'hidden' }}>
-            {labels.map((lbl, i) => (
-              <div key={i} style={{
-                display:'flex', alignItems:'stretch',
-                borderRadius:2, overflow:'hidden',
-                background: lbl.bg,
-              }}>
-                {/* 왼쪽 세로 바 */}
-                <div style={{ width:2, flexShrink:0, background: lbl.barColor, borderRadius:'2px 0 0 2px' }} />
-                {/* 텍스트 */}
-                <div style={{
-                  fontSize:8, fontWeight:600, color: lbl.color,
-                  padding:'1px 3px',
-                  overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
-                  lineHeight:1.4, flex:1, minWidth:0,
-                }}>{lbl.text}</div>
-              </div>
-            ))}
-          </div>
+        )
+      }
+
+      rows.push(
+        <div key={`week_${w}`} style={{ display:'contents' }}>
+          {weekCells}
         </div>
       )
     }
-    return cells
+
+    return rows
   }
 
   const ddayText = diffDays > 0 ? `D-${diffDays}` : diffDays === 0 ? 'D-Day' : `D+${Math.abs(diffDays)}`
