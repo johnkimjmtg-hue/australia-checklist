@@ -14,10 +14,11 @@ import BingoTab       from './BingoTab'
 import EventsTab      from './EventsTab'
 import GoogleMappingTab from './GoogleMappingTab'
 import DeployTab      from './DeployTab'
+import { PackingCategoriesTab, PackingItemsTab } from './PackingTab'
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'hojugaja2024'
 
-type MainTab = 'business' | 'requests' | 'categories' | 'items' | 'shopping' | 'bingo' | 'events' | 'google' | 'deploy'
+type MainTab = 'business' | 'requests' | 'categories' | 'items' | 'shopping' | 'bingo' | 'events' | 'google' | 'deploy' | 'packing_cats' | 'packing_items'
 
 const TAB_META: { id: MainTab; icon: string; label: string }[] = [
   { id: 'business',  icon: 'ph:buildings',         label: '업체' },
@@ -28,6 +29,8 @@ const TAB_META: { id: MainTab; icon: string; label: string }[] = [
   { id: 'bingo',     icon: 'ph:coffee',             label: '빙고' },
   { id: 'events',    icon: 'ph:calendar-check',     label: '행사' },
   { id: 'google',    icon: 'ph:magnifying-glass',   label: '구글매핑' },
+  { id: 'packing_cats',  icon: 'ph:suitcase',        label: '짐카테고리' },
+  { id: 'packing_items', icon: 'ph:luggage',         label: '짐항목' },
   { id: 'deploy',    icon: 'ph:rocket-launch',      label: '배포' },
 ]
 
@@ -41,6 +44,10 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
   const [sharedCats,  setSharedCats]  = useState<Cat[]>([])
   const [sharedItems, setSharedItems] = useState<Item[]>([])
   const [clLoading,   setClLoading]   = useState(true)
+  // 짐싸기 state
+  const [packingCats,  setPackingCats]  = useState<Cat[]>([])
+  const [packingItems, setPackingItems] = useState<Item[]>([])
+  const [packingLoading, setPackingLoading] = useState(true)
 
   const fetchCL = async () => {
     setClLoading(true)
@@ -53,7 +60,18 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
     setClLoading(false)
   }
 
-  useEffect(() => { fetchCL() }, [])
+  const fetchPacking = async () => {
+    setPackingLoading(true)
+    const [{ data: cats }, { data: items }] = await Promise.all([
+      supabase.from('packing_categories').select('*').order('sort_order'),
+      supabase.from('packing_items').select('*').order('sort_order'),
+    ])
+    if (cats)  setPackingCats(cats)
+    if (items) setPackingItems(items)
+    setPackingLoading(false)
+  }
+
+  useEffect(() => { fetchCL(); fetchPacking() }, [])
 
   function handleLogin() {
     if (pw === ADMIN_PASSWORD) { setAuthed(true); setPwError(false) }
@@ -104,6 +122,8 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
         {tab === 'bingo'      && <BingoTab />}
         {tab === 'events'     && <EventsTab />}
         {tab === 'google'     && <GoogleMappingTab />}
+        {tab === 'packing_cats'  && (packingLoading ? <div style={{ padding:32, textAlign:'center', color:'#aaa' }}>불러오는 중...</div> : <PackingCategoriesTab cats={packingCats} setCats={setPackingCats} />)}
+        {tab === 'packing_items' && (packingLoading ? <div style={{ padding:32, textAlign:'center', color:'#aaa' }}>불러오는 중...</div> : <PackingItemsTab cats={packingCats} items={packingItems} setItems={setPackingItems} />)}
         {tab === 'deploy'     && <DeployTab />}
       </div>
 
@@ -117,7 +137,7 @@ export default function AdminPage({ onBack }: { onBack: () => void }) {
           </button>
         ))}
         {/* 새로고침 버튼 */}
-        <button onClick={fetchCL} disabled={clLoading} style={{ width: 52, border: 'none', background: 'none', cursor: 'pointer', padding: '8px 2px 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: clLoading ? '#C8C8C8' : '#16A34A', borderLeft: '1px solid #E8EDF3' }}>
+        <button onClick={() => { fetchCL(); fetchPacking() }} disabled={clLoading || packingLoading} style={{ width: 52, border: 'none', background: 'none', cursor: 'pointer', padding: '8px 2px 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: clLoading ? '#C8C8C8' : '#16A34A', borderLeft: '1px solid #E8EDF3' }}>
           <Icon icon={clLoading ? 'ph:spinner' : 'ph:arrow-clockwise'} width={22} height={22} color={clLoading ? '#C8C8C8' : '#16A34A'} style={clLoading ? { animation: 'spin 1s linear infinite' } : {}} />
           <span style={{ fontSize: 9, fontWeight: 700, lineHeight: 1 }}>새로고침</span>
         </button>

@@ -13,6 +13,7 @@ const DEPLOY_ITEMS = [
   { key: 'shopping',   label: '쇼핑리스트',  icon: 'ph:shopping-bag',      desc: '카테고리 + 상품' },
   { key: 'bingo',      label: '카페빙고',    icon: 'ph:coffee',             desc: '빙고 카페 목록' },
   { key: 'events',     label: '행사일정',    icon: 'ph:calendar-check',    desc: '달력 행사 데이터' },
+  { key: 'packing',    label: '짐싸기',      icon: 'ph:suitcase',          desc: '짐싸기 체크리스트' },
 ]
 
 export default function DeployTab() {
