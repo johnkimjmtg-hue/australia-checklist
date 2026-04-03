@@ -88,7 +88,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
     // 빈 셀
     for (let i = 0; i < first; i++) {
-      cells.push(<div key={`e${i}`} style={{ height:60, borderTop:'1px solid rgba(0,0,0,0.06)' }} />)
+      cells.push(<div key={`e${i}`} style={{ height:90, borderTop:'1px solid rgba(0,0,0,0.06)' }} />)
     }
 
     for (let d = 1; d <= days; d++) {
@@ -128,22 +128,39 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       const numFw = isToday || isSelected ? 800 : 500
       const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.04)' : 'transparent'
 
-      // 표시할 항목 (최대 3개, 우선순위: 행사 > 버킷 > 쇼핑)
-      const labels: { text: string; color: string; bg: string }[] = [
+      // 노트
+      const dayNotes = (() => {
+        try {
+          const notes = JSON.parse(localStorage.getItem('app-notes') ?? '[]')
+          return notes.filter((n: any) => n.date === dateStr)
+        } catch { return [] }
+      })()
+
+      // 표시할 항목 (최대 3개, 우선순위: 행사 > 버킷 > 쇼핑 > 노트)
+      const labels: { text: string; color: string; bg: string; barColor: string }[] = [
         ...dayEvents.slice(0,1).map(ev => ({
           text: ev.title,
           color: '#92400E',
-          bg: '#FEF3C7',
+          bg: '#FEF9E7',
+          barColor: '#F59E0B',
         })),
         ...bucketItems.slice(0, 2 - Math.min(dayEvents.length,1)).map((item:any) => ({
           text: item.label,
           color: '#0E7490',
-          bg: 'rgba(41,182,208,0.15)',
+          bg: 'rgba(41,182,208,0.12)',
+          barColor: '#29B6D0',
         })),
         ...shoppingItems.slice(0, 2 - Math.min(dayEvents.length,1) - Math.min(bucketItems.length, 2 - Math.min(dayEvents.length,1))).map((p:any) => ({
           text: p?.name ?? '',
           color: '#9D174D',
-          bg: 'rgba(255,107,157,0.15)',
+          bg: 'rgba(255,107,157,0.12)',
+          barColor: '#FF6B9D',
+        })),
+        ...dayNotes.map((n: any) => ({
+          text: n.title,
+          color: '#C2410C',
+          bg: 'rgba(249,115,22,0.10)',
+          barColor: '#F97316',
         })),
       ].filter(l => l.text).slice(0,3)
 
@@ -151,10 +168,10 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
         <div key={d}
           onClick={() => { setSelectedDay(dayIdx); setSelectedDayDate(dt) }}
           style={{
-            height:60, background: cellBg,
+            height:90, background: cellBg,
             borderTop: `1px solid rgba(0,0,0,0.06)`,
             borderRadius: isSelected ? 6 : 0,
-            cursor:'pointer', padding:'3px 3px 3px 2px',
+            cursor:'pointer', padding:'3px 2px 3px 2px',
             display:'flex', flexDirection:'column',
             WebkitTapHighlightColor:'transparent',
             boxSizing:'border-box', overflow:'hidden',
@@ -168,16 +185,24 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
               background: isToday && !isSelected ? 'rgba(0,131,143,0.12)' : 'transparent',
             }}>{d}</div>
           </div>
-          {/* 일정 텍스트 */}
-          <div style={{ display:'flex', flexDirection:'column', gap:1, overflow:'hidden' }}>
+          {/* 일정 텍스트 - 왼쪽 바 포함 */}
+          <div style={{ display:'flex', flexDirection:'column', gap:2, overflow:'hidden' }}>
             {labels.map((lbl, i) => (
               <div key={i} style={{
-                fontSize:8, fontWeight:600, color: lbl.color,
+                display:'flex', alignItems:'stretch',
+                borderRadius:2, overflow:'hidden',
                 background: lbl.bg,
-                borderRadius:2, padding:'1px 3px',
-                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
-                lineHeight:1.4,
-              }}>{lbl.text}</div>
+              }}>
+                {/* 왼쪽 세로 바 */}
+                <div style={{ width:2, flexShrink:0, background: lbl.barColor, borderRadius:'2px 0 0 2px' }} />
+                {/* 텍스트 */}
+                <div style={{
+                  fontSize:8, fontWeight:600, color: lbl.color,
+                  padding:'1px 3px',
+                  overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+                  lineHeight:1.4, flex:1, minWidth:0,
+                }}>{lbl.text}</div>
+              </div>
             ))}
           </div>
         </div>
