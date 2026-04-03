@@ -342,7 +342,7 @@ export default function WidgetManager({ onClose, onSave }: Props) {
       <div style={{
         position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
         width: '100%', maxWidth: 430,
-        background: 'linear-gradient(180deg, #D4703A 0%, #F5C97A 30%, #ffffff 70%)',
+        background: 'linear-gradient(180deg, #D4703A 0%, #F5C97A 40%, #F5D4BC 100%)',
         borderRadius: '20px 20px 0 0', height: '85vh', zIndex: 901,
         animation: 'slideUpSheet 0.25s ease', boxShadow: '0 8px 32px rgba(0,0,0,0.20)',
         display: 'flex', flexDirection: 'column', fontFamily: ff,
@@ -365,11 +365,13 @@ export default function WidgetManager({ onClose, onSave }: Props) {
         <div style={{ flex: 1, overflowY: drag ? 'hidden' : 'auto', padding: '16px 16px 0', minHeight: 0 }}>
 
           {/* 홈 화면 카드 */}
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', marginBottom: 8 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 8 }}>
             홈 화면에 표시 중 ({active.length})
           </div>
-          <div ref={activeSectionRef} style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 20, minHeight: 60 }}>
-            {renderActive().map((el, i) => <div key={i} data-card>{el}</div>)}
+          <div style={{ background: 'rgba(255,255,255,0.85)', borderRadius: 16, padding: '10px', marginBottom: 20 }}>
+            <div ref={activeSectionRef} style={{ display: 'flex', flexDirection: 'column', gap: 6, minHeight: 60 }}>
+              {renderActive().map((el, i) => <div key={i} data-card>{el}</div>)}
+            </div>
           </div>
 
           {/* 카드 보관함 */}
@@ -379,8 +381,8 @@ export default function WidgetManager({ onClose, onSave }: Props) {
             return (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8' }}>카드 보관함</div>
-                  <div style={{ fontSize: 11, color: '#CBD5E1' }}>여기로 끌면 홈에서 숨겨져요</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#7C3A10' }}>카드 보관함</div>
+                  <div style={{ fontSize: 11, color: '#7C3A10', opacity: 0.7 }}>여기로 끌면 홈에서 숨겨져요</div>
                 </div>
                 <div
                   ref={shelfSectionRef}
@@ -388,15 +390,15 @@ export default function WidgetManager({ onClose, onSave }: Props) {
                     display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24,
                     minHeight: 60, padding: '8px', borderRadius: 14,
                     background: drag?.fromSection === 'active' && dropTarget?.section === 'shelf'
-                      ? 'rgba(41,182,208,0.06)' : 'rgba(0,0,0,0.02)',
+                      ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.3)',
                     border: drag?.fromSection === 'active' && dropTarget?.section === 'shelf'
-                      ? '2px dashed rgba(41,182,208,0.3)' : '1px dashed rgba(0,0,0,0.08)',
+                      ? '2px dashed rgba(255,255,255,0.6)' : '1px dashed rgba(255,255,255,0.5)',
                     transition: 'all 0.2s',
                   }}
                 >
                   {renderShelf().map((el, i) => <div key={i} data-card>{el}</div>)}
                   {currentShelf.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '16px', fontSize: 13, color: '#CBD5E1' }}>
+                    <div style={{ textAlign: 'center', padding: '16px', fontSize: 13, color: '#7C3A10' }}>
                       여기로 카드를 끌어다 놓으세요
                     </div>
                   )}
@@ -407,15 +409,15 @@ export default function WidgetManager({ onClose, onSave }: Props) {
         </div>
 
         {/* 하단 */}
-        <div style={{ flexShrink: 0, padding: '12px 16px 32px', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', gap: 8 }}>
+        <div style={{ flexShrink: 0, padding: '12px 16px 32px', borderTop: '1px solid rgba(255,255,255,0.3)', display: 'flex', gap: 8 }}>
           <button onClick={handleReset} style={{
-            height: 48, padding: '0 20px', borderRadius: 12, border: '1px solid rgba(0,0,0,0.1)',
-            background: '#F8FAFC', color: '#64748B', fontSize: 14, fontWeight: 700,
+            height: 48, padding: '0 20px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.5)',
+            background: 'rgba(255,255,255,0.5)', color: '#7C3A10', fontSize: 14, fontWeight: 700,
             cursor: 'pointer', fontFamily: ff,
           }}>초기화</button>
           <button onClick={onClose} style={{
             flex: 1, height: 48, borderRadius: 12, border: 'none',
-            background: '#0D3349', color: '#fff', fontSize: 15, fontWeight: 700,
+            background: '#D4703A', color: '#fff', fontSize: 15, fontWeight: 700,
             cursor: 'pointer', fontFamily: ff,
           }}>완료</button>
         </div>
