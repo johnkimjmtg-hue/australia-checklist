@@ -85,75 +85,101 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
     const first = new Date(vy, vm, 1).getDay()
     const days = new Date(vy, vm+1, 0).getDate()
     const cells = []
+
+    // 빈 셀
     for (let i = 0; i < first; i++) {
-      cells.push(<div key={`e${i}`} style={{ aspectRatio:'1' }} />)
+      cells.push(<div key={`e${i}`} style={{ height:60, borderTop:'1px solid rgba(0,0,0,0.06)' }} />)
     }
+
     for (let d = 1; d <= days; d++) {
       const dt = new Date(vy, vm, d)
       const isPast = dt < todayMidnight
-      const isStart = dt.toDateString() === startDate.toDateString()
-      const isEnd = dt.toDateString() === endDate.toDateString()
       const isInTrip = dt >= startDate && dt <= endDate
       const isToday = dt.toDateString() === TODAY.toDateString()
       const dayIdx = tripDays.findIndex(td => td.toDateString() === dt.toDateString())
       const isSelected = selectedDay === dayIdx && dayIdx >= 0
-      const hasBucket = dayIdx >= 0 && [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])].some(item => (state.schedules[item.id] ?? []).includes(dayIdx))
-      const memoKey = `memo_${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
-      const hasMemo = !!(localStorage.getItem(memoKey) ?? '').trim()
-      const hasShopping = dayIdx >= 0 && (() => { try { const s = JSON.parse(localStorage.getItem('shopping-schedules') ?? '{}'); return Object.values(s).some((days: any) => days.includes(dayIdx)) } catch { return false } })()
-      const hasNote = (() => {
+      const dateStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
+
+      // 행사
+      const dayEvents = events.filter(ev => ev.is_active && ev.start_date <= dateStr && ev.end_date >= dateStr)
+
+      // 버킷리스트 항목
+      const bucketItems = dayIdx >= 0
+        ? [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])]
+            .filter(item => (state.schedules[item.id] ?? []).includes(dayIdx))
+        : []
+
+      // 쇼핑 항목
+      const shoppingItems = dayIdx >= 0 ? (() => {
         try {
-          const notes = JSON.parse(localStorage.getItem('app-notes') ?? '[]')
-          const dateStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
-          return notes.some((n: any) => n.date === dateStr)
-        } catch { return false }
-      })()
-      const hasEvent = (() => {
-        const dateStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
-        return events.some(ev => ev.is_active && ev.start_date <= dateStr && ev.end_date >= dateStr)
-      })()
+          const schedules: Record<string, number[]> = JSON.parse(localStorage.getItem('shopping-schedules') ?? '{}')
+          const myList: string[] = JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]')
+          const cachedShopping = getCachedShopping()
+          const allProds = cachedShopping?.products ?? []
+          return myList
+            .filter(id => (schedules[id] ?? []).includes(dayIdx))
+            .map(id => allProds.find((p:any) => p.id === id))
+            .filter(Boolean)
+        } catch { return [] }
+      })() : []
 
-      let bg = 'transparent', color = isPast ? '#7BAAB5' : '#0D3349', radius = '50%', fw: number = 400
-      if (isSelected) { bg = '#00BCD4'; color = '#fff'; fw = 800 }
-      else if (isStart) { bg = '#00BCD4'; color = '#fff'; fw = 800; radius = '50% 0 0 50%' }
-      else if (isEnd) { bg = '#00BCD4'; color = '#fff'; fw = 800; radius = '0 50% 50% 0' }
-      else if (isInTrip) { bg = '#B2EBF2'; color = '#006064'; radius = '0' }
+      // 날짜 숫자 색상
+      const numColor = isSelected ? '#fff' : isToday ? '#00838F' : isPast ? '#7BAAB5' : '#0D3349'
+      const numFw = isToday || isSelected ? 800 : 500
+      const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.04)' : 'transparent'
 
-      const isTodayOnly = isToday && !isSelected && !isStart && !isEnd
+      // 표시할 항목 (최대 3개, 우선순위: 행사 > 버킷 > 쇼핑)
+      const labels: { text: string; color: string; bg: string }[] = [
+        ...dayEvents.slice(0,1).map(ev => ({
+          text: ev.title,
+          color: '#92400E',
+          bg: '#FEF3C7',
+        })),
+        ...bucketItems.slice(0, 2 - Math.min(dayEvents.length,1)).map((item:any) => ({
+          text: item.label,
+          color: '#0E7490',
+          bg: 'rgba(41,182,208,0.15)',
+        })),
+        ...shoppingItems.slice(0, 2 - Math.min(dayEvents.length,1) - Math.min(bucketItems.length, 2 - Math.min(dayEvents.length,1))).map((p:any) => ({
+          text: p?.name ?? '',
+          color: '#9D174D',
+          bg: 'rgba(255,107,157,0.15)',
+        })),
+      ].filter(l => l.text).slice(0,3)
 
       cells.push(
-        <div key={d} onClick={() => {
-            setSelectedDay(dayIdx)
-            setSelectedDayDate(dt)
-          }}
+        <div key={d}
+          onClick={() => { setSelectedDay(dayIdx); setSelectedDayDate(dt) }}
           style={{
-            aspectRatio:'1', display:'flex', flexDirection:'column',
-            alignItems:'center', justifyContent:'center',
-            borderRadius: radius, background: bg,
-            color: isTodayOnly ? '#00BCD4' : color,
-            fontWeight: isTodayOnly ? 800 : fw,
-            fontSize: isTodayOnly ? 15 : 13,
-            textDecoration: isTodayOnly ? 'underline' : 'none',
-            textDecorationColor: isTodayOnly ? '#D4703A' : 'transparent',
-            textUnderlineOffset: '3px',
-            border: 'none',
-            cursor: 'pointer', position:'relative',
+            height:60, background: cellBg,
+            borderTop: `1px solid rgba(0,0,0,0.06)`,
+            borderRadius: isSelected ? 6 : 0,
+            cursor:'pointer', padding:'3px 3px 3px 2px',
+            display:'flex', flexDirection:'column',
             WebkitTapHighlightColor:'transparent',
+            boxSizing:'border-box', overflow:'hidden',
           }}>
-          {d}
-          {/* 행사 표시 - 숫자 위 노란 줄 */}
-          {hasEvent && !isSelected && (
-            <div style={{ position:'absolute', top:4, left:'50%', transform:'translateX(-50%)', width:16, height:2, borderRadius:1, background:'#F59E0B' }} />
-          )}
-          {/* 사용자 데이터 점 */}
-          {(hasBucket || hasShopping || hasMemo || hasNote) && (
-            <div style={{ position:'absolute', bottom:5, display:'flex', gap:2 }}>
-              {hasBucket && <div style={{ width:5, height:5, borderRadius:'50%', background:'#29B6D0' }} />}
-              {hasShopping && <div style={{ width:5, height:5, borderRadius:'50%', background:'#FF6B9D' }} />}
-              {hasMemo && <div style={{ width:5, height:5, borderRadius:'50%', background:'#16A34A' }} />}
-              {hasNote && <div style={{ width:5, height:5, borderRadius:'50%', background:'#EAB308' }} />}
-            </div>
-          )}
+          {/* 날짜 숫자 - 우상단 */}
+          <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:2 }}>
+            <div style={{
+              fontSize:11, fontWeight: numFw, color: numColor, lineHeight:1,
+              width:18, height:18, display:'flex', alignItems:'center', justifyContent:'center',
+              borderRadius:'50%',
+              background: isToday && !isSelected ? 'rgba(0,131,143,0.12)' : 'transparent',
+            }}>{d}</div>
+          </div>
+          {/* 일정 텍스트 */}
+          <div style={{ display:'flex', flexDirection:'column', gap:1, overflow:'hidden' }}>
+            {labels.map((lbl, i) => (
+              <div key={i} style={{
+                fontSize:8, fontWeight:600, color: lbl.color,
+                background: lbl.bg,
+                borderRadius:2, padding:'1px 3px',
+                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+                lineHeight:1.4,
+              }}>{lbl.text}</div>
+            ))}
+          </div>
         </div>
       )
     }
@@ -250,13 +276,11 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                   const dayBucket = allItems.filter(item => (state.schedules[item.id] ?? []).includes(selectedDay!))
                   return (
                     <div style={{ marginBottom:14 }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom: dayBucket.length ? 8 : 0 }}>
                         <div style={{ width:7, height:7, borderRadius:'50%', background:'#29B6D0' }} />
                         <div style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>버킷리스트 ({dayBucket.length})</div>
                       </div>
-                      {dayBucket.length === 0 ? (
-                        <div style={{ fontSize:12, color:'#7BAAB5', padding:'8px 0' }}>배정된 항목이 없어요</div>
-                      ) : (
+                      {dayBucket.length > 0 && (
                         <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
                           {dayBucket.map(item => {
                             const key = `${item.id}_${selectedDay}`
@@ -304,52 +328,53 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                     const myList: string[] = JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]')
                     const myChecked: Record<string, boolean> = JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}')
                     const dayShoppingIds = myList.filter(id => (schedules[id] ?? []).includes(selectedDay!))
-                    if (!dayShoppingIds.length) return null
                     const cachedShopping = getCachedShopping()
                     const allProds = cachedShopping?.products ?? []
                     return (
                       <div style={{ marginBottom:14 }}>
-                        <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom: dayShoppingIds.length ? 8 : 0 }}>
                           <div style={{ width:7, height:7, borderRadius:'50%', background:'#FF6B9D' }} />
                           <div style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>쇼핑리스트 ({dayShoppingIds.length})</div>
                         </div>
-                        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-                          {dayShoppingIds.map(id => {
-                            const prod = allProds.find((p:any) => p.id === id)
-                            const isChecked = !!myChecked[id]
-                            return (
-                              <div key={id} style={{
-                                display:'flex', alignItems:'center', gap:10,
-                                background: isChecked ? 'rgba(255,107,157,0.08)' : 'rgba(0,0,0,0.03)',
-                                borderRadius:10, padding:'9px 12px',
-                                border: isChecked ? '1px solid rgba(255,107,157,0.25)' : '1px solid transparent',
-                              }}>
-                                {prod?.image_url && (
-                                  <div style={{ width:36, height:36, borderRadius:6, overflow:'hidden', flexShrink:0 }}>
-                                    <img src={prod.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                                  </div>
-                                )}
-                                <div style={{ flex:1, minWidth:0 }}>
-                                  <div style={{ fontSize:13, fontWeight:600, color: isChecked ? '#7BAAB5' : '#0D3349', textDecoration: isChecked ? 'line-through' : 'none', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{prod?.name ?? id}{prod?.brand ? <span style={{ fontSize:11, fontWeight:400, color:'#7BAAB5' }}> · {prod.brand}</span> : null}</div>
-                                </div>
-                                <button onClick={() => {
-                                  const next = { ...myChecked, [id]: !myChecked[id] }
-                                  if (!next[id]) delete next[id]
-                                  try { localStorage.setItem('my-shopping-checked', JSON.stringify(next)) } catch {}
-                                  setMemos(m => ({ ...m }))
-                                }} style={{
-                                  height:26, padding:'0 8px', borderRadius:20, border:'none', cursor:'pointer', flexShrink:0,
-                                  background: isChecked ? '#FF6B9D' : 'rgba(0,0,0,0.08)',
-                                  display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-                                  WebkitTapHighlightColor:'transparent',
+                        {dayShoppingIds.length > 0 && (
+                          <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                            {dayShoppingIds.map(id => {
+                              const prod = allProds.find((p:any) => p.id === id)
+                              const isChecked = !!myChecked[id]
+                              return (
+                                <div key={id} style={{
+                                  display:'flex', alignItems:'center', gap:10,
+                                  background: isChecked ? 'rgba(255,107,157,0.08)' : 'rgba(0,0,0,0.03)',
+                                  borderRadius:10, padding:'9px 12px',
+                                  border: isChecked ? '1px solid rgba(255,107,157,0.25)' : '1px solid transparent',
                                 }}>
-                                  <svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 6L4.5 9L10.5 3" stroke={isChecked ? '#fff' : '#aaa'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-                                  <span style={{ fontSize:11, fontWeight:700, color: isChecked ? '#fff' : '#aaa' }}>구매</span>
-                                </button>
-                              </div>
-                            )
-                          })}
-                        </div>
+                                  {prod?.image_url && (
+                                    <div style={{ width:36, height:36, borderRadius:6, overflow:'hidden', flexShrink:0 }}>
+                                      <img src={prod.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                                    </div>
+                                  )}
+                                  <div style={{ flex:1, minWidth:0 }}>
+                                    <div style={{ fontSize:13, fontWeight:600, color: isChecked ? '#7BAAB5' : '#0D3349', textDecoration: isChecked ? 'line-through' : 'none', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{prod?.name ?? id}{prod?.brand ? <span style={{ fontSize:11, fontWeight:400, color:'#7BAAB5' }}> · {prod.brand}</span> : null}</div>
+                                  </div>
+                                  <button onClick={() => {
+                                    const next = { ...myChecked, [id]: !myChecked[id] }
+                                    if (!next[id]) delete next[id]
+                                    try { localStorage.setItem('my-shopping-checked', JSON.stringify(next)) } catch {}
+                                    setMemos(m => ({ ...m }))
+                                  }} style={{
+                                    height:26, padding:'0 8px', borderRadius:20, border:'none', cursor:'pointer', flexShrink:0,
+                                    background: isChecked ? '#FF6B9D' : 'rgba(0,0,0,0.08)',
+                                    display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+                                    WebkitTapHighlightColor:'transparent',
+                                  }}>
+                                    <svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 6L4.5 9L10.5 3" stroke={isChecked ? '#fff' : '#aaa'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+                                    <span style={{ fontSize:11, fontWeight:700, color: isChecked ? '#fff' : '#aaa' }}>구매완료</span>
+                                  </button>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )}
                       </div>
                     )
                   } catch { return null }
@@ -369,15 +394,29 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                           <div style={{ fontSize:12, fontWeight:700, color:'#0D3349' }}>노트 ({dayNotes.length})</div>
                         </div>
                         <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-                          {dayNotes.map((note: any) => (
-                            <div key={note.id} style={{
-                              background:'rgba(249,115,22,0.06)', borderRadius:10, padding:'10px 12px',
-                              border:'1px solid rgba(249,115,22,0.15)',
-                            }}>
-                              <div style={{ fontSize:13, fontWeight:700, color:'#0D3349', marginBottom: note.content ? 4 : 0 }}>{note.title}</div>
-                              {note.content && <div style={{ fontSize:12, color:'#64748B', lineHeight:1.6, whiteSpace:'pre-wrap' }}>{note.content}</div>}
-                            </div>
-                          ))}
+                          {dayNotes.map((note: any) => {
+                            const isExpanded = expandedEventId === `note_${note.id}`
+                            return (
+                              <div key={note.id} style={{ borderRadius:10, overflow:'hidden', border:'1px solid rgba(249,115,22,0.2)' }}>
+                                <div style={{ display:'flex', alignItems:'center', gap:10, background:'rgba(249,115,22,0.06)', padding:'9px 12px' }}>
+                                  <Icon icon="ph:note" width={16} height={16} color="#F97316" style={{ flexShrink:0 }} />
+                                  <div style={{ flex:1, fontSize:13, fontWeight:600, color:'#0D3349', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{note.title}</div>
+                                  {note.content && (
+                                    <button
+                                      onClick={() => setExpandedEventId(isExpanded ? null : `note_${note.id}`)}
+                                      style={{ width:26, height:26, borderRadius:'50%', background:'rgba(249,115,22,0.15)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, WebkitTapHighlightColor:'transparent', transition:'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                                      <Icon icon="ph:caret-down" width={14} height={14} color="#F97316" />
+                                    </button>
+                                  )}
+                                </div>
+                                {isExpanded && note.content && (
+                                  <div style={{ background:'#fff', padding:'10px 12px', borderTop:'1px solid rgba(249,115,22,0.1)' }}>
+                                    <div style={{ fontSize:13, color:'#64748B', lineHeight:1.7, whiteSpace:'pre-wrap' }}>{note.content}</div>
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })}
                         </div>
                       </div>
                     )
@@ -505,10 +544,10 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'0 10px' }}>
                 {['일','월','화','수','목','금','토'].map(d => (
-                  <div key={d} style={{ textAlign:'center', fontSize:11, color:'#1565A0', fontWeight:600, padding:'4px 0 6px' }}>{d}</div>
+                  <div key={d} style={{ textAlign:'right', fontSize:10, color:'#1565A0', fontWeight:600, padding:'4px 4px 4px 0' }}>{d}</div>
                 ))}
               </div>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, padding:'0 10px 12px' }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:0, padding:'0 10px 12px' }}>
                 {renderCal()}
               </div>
             </div>

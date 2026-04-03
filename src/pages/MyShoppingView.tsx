@@ -388,7 +388,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
             </div>
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={() => setShowDeleteAll(false)} style={{
-                flex:1, height:48, borderRadius:10, border:'none',
+                flex:1, height:48, borderRadius:10,
                 background: '#ffffff', color: colors.textSecondary, fontSize: font.size.md, fontWeight: font.weight.medium, cursor:'pointer',
                 border:`1.5px solid ${colors.border}`,
               }}>취소</button>
@@ -398,7 +398,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 setShowDeleteAll(false)
                 onBack()
               }} style={{
-                flex:2, height:48, borderRadius:10, border:'none',
+                flex:2, height:48, borderRadius:10,
                 background: '#ffffff', color: colors.danger, fontSize:14, fontWeight:700, cursor:'pointer',
                 border:`1.5px solid ${colors.border}`,
               }}>삭제하기</button>
@@ -456,12 +456,12 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
               </div>}
               <div style={{ display:'flex', gap:8 }}>
                 <button onClick={() => setDeleteConfirmId(null)} style={{
-                  flex:1, height:48, borderRadius:10, border:'none',
+                  flex:1, height:48, borderRadius:10,
                   background: '#ffffff', color: colors.textSecondary, fontSize: font.size.md, fontWeight: font.weight.medium, cursor:'pointer',
                   border:`1.5px solid ${colors.border}`,
                 }}>취소</button>
                 <button onClick={() => { removeFromMyList(deleteConfirmId); setDeleteConfirmId(null) }} style={{
-                  flex:2, height:48, borderRadius:10, border:'none',
+                  flex:2, height:48, borderRadius:10,
                   background: '#ffffff', color: colors.danger, fontSize:14, fontWeight:700, cursor:'pointer',
                   border:`1.5px solid ${colors.border}`,
                 }}>삭제하기</button>

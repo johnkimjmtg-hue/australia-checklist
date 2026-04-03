@@ -90,7 +90,6 @@ export default function BusinessCard({ business, accentColor = '#10B981' }: Prop
       <div style={{
         background:'#fff', borderRadius:14,
         overflow:'hidden',
-        borderLeft: is_featured ? `4px solid ${accentColor}` : '4px solid #CBD5E1',
         border: '1px solid #C8C8C8',
         borderLeft: is_featured ? `4px solid ${accentColor}` : '4px solid #CBD5E1',
       }}>
