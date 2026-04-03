@@ -134,7 +134,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.04)' : 'transparent'
 
       const labels: { text: string; color: string; bg: string; barColor: string }[] = [
-        ...dayEvents.slice(0,1).map(ev => ({ text: ev.title, color:'#7C3AED', bg:'#ffffff', barColor:'#7C3AED' })),
+        ...dayEvents.slice(0,1).map(ev => ({ text: ev.title, color:'#92400E', bg:'#ffffff', barColor:'#F59E0B' })),
         ...bucketItems.slice(0,1).map((item:any) => ({ text: item.label, color:'#0E7490', bg:'rgba(41,182,208,0.12)', barColor:'#29B6D0' })),
         ...shoppingItems.slice(0,1).map((p:any) => ({ text: p?.name ?? '', color:'#9D174D', bg:'rgba(255,107,157,0.12)', barColor:'#FF6B9D' })),
         ...dayNotes.slice(0,1).map((n: any) => ({ text: n.title, color:'#C2410C', bg:'rgba(249,115,22,0.10)', barColor:'#F97316' })),
