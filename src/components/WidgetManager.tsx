@@ -368,7 +368,7 @@ export default function WidgetManager({ onClose, onSave }: Props) {
           <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 8 }}>
             홈 화면에 표시 중 ({active.length})
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.85)', borderRadius: 16, padding: '10px', marginBottom: 20 }}>
+          <div style={{ background: 'rgba(255,255,255,0.85)', borderRadius: 16, padding: '10px', marginBottom: 20, border: '1.5px solid rgba(212,112,58,0.4)' }}>
             <div ref={activeSectionRef} style={{ display: 'flex', flexDirection: 'column', gap: 6, minHeight: 60 }}>
               {renderActive().map((el, i) => <div key={i} data-card>{el}</div>)}
             </div>
