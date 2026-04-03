@@ -108,14 +108,18 @@ export default function WidgetManager({ onClose, onSave }: Props) {
   const [drag, setDrag] = useState<DragState | null>(null)
   const [dropTarget, setDropTarget] = useState<DropTarget>(null)
 
+  const dragRef = useRef<DragState | null>(null)
+  const dropTargetRef = useRef<DropTarget>(null)
+  const activeRef = useRef<WidgetId[]>(active)
+
   const activeRefs = useRef<(HTMLDivElement | null)[]>([])
   const shelfRefs = useRef<(HTMLDivElement | null)[]>([])
   const activeSectionRef = useRef<HTMLDivElement>(null)
   const shelfSectionRef = useRef<HTMLDivElement>(null)
 
-  // 드래그 중 현재 위치로 드롭 타겟 계산
+  useEffect(() => { activeRef.current = active }, [active])
+
   const calcDropTarget = useCallback((clientY: number): DropTarget => {
-    // active 섹션
     const activeEl = activeSectionRef.current
     const shelfEl = shelfSectionRef.current
     if (!activeEl || !shelfEl) return null
@@ -123,7 +127,6 @@ export default function WidgetManager({ onClose, onSave }: Props) {
     const activeRect = activeEl.getBoundingClientRect()
     const shelfRect = shelfEl.getBoundingClientRect()
 
-    // active 영역
     if (clientY >= activeRect.top - 20 && clientY <= activeRect.bottom + 20) {
       const items = activeRefs.current
       for (let i = 0; i < items.length; i++) {
@@ -132,10 +135,9 @@ export default function WidgetManager({ onClose, onSave }: Props) {
         const rect = el.getBoundingClientRect()
         if (clientY < rect.top + rect.height / 2) return { section: 'active', idx: i }
       }
-      return { section: 'active', idx: active.length }
+      return { section: 'active', idx: activeRef.current.length }
     }
 
-    // shelf 영역
     if (clientY >= shelfRect.top - 20) {
       const items = shelfRefs.current
       for (let i = 0; i < items.length; i++) {
@@ -144,11 +146,12 @@ export default function WidgetManager({ onClose, onSave }: Props) {
         const rect = el.getBoundingClientRect()
         if (clientY < rect.top + rect.height / 2) return { section: 'shelf', idx: i }
       }
-      return { section: 'shelf', idx: shelf.length }
+      const currentShelf = ALL_WIDGETS.filter(w => !activeRef.current.includes(w.id))
+      return { section: 'shelf', idx: currentShelf.length }
     }
 
     return null
-  }, [active, shelf])
+  }, [])
 
   const startDrag = useCallback((
     id: WidgetId,
@@ -159,66 +162,91 @@ export default function WidgetManager({ onClose, onSave }: Props) {
     el: HTMLElement
   ) => {
     const rect = el.getBoundingClientRect()
-    setDrag({
+    const newDrag = {
       id, fromSection, fromIdx,
       x: rect.left, y: rect.top,
       startX: clientX, startY: clientY,
       width: rect.width, height: rect.height,
-    })
-    setDropTarget({ section: fromSection, idx: fromIdx })
+    }
+    dragRef.current = newDrag
+    setDrag(newDrag)
+    const dt = { section: fromSection, idx: fromIdx } as DropTarget
+    dropTargetRef.current = dt
+    setDropTarget(dt)
     if (navigator.vibrate) navigator.vibrate(30)
   }, [])
 
-  const handleMove = useCallback((clientX: number, clientY: number) => {
-    if (!drag) return
-    setDrag(prev => prev ? { ...prev, x: prev.x + (clientX - drag.startX), y: prev.y + (clientY - drag.startY), startX: clientX, startY: clientY } : null)
-    setDropTarget(calcDropTarget(clientY))
-  }, [drag, calcDropTarget])
+  const handleMoveRef = useRef((clientX: number, clientY: number) => {
+    const d = dragRef.current
+    if (!d) return
+    const newDrag = { ...d, x: d.x + (clientX - d.startX), y: d.y + (clientY - d.startY), startX: clientX, startY: clientY }
+    dragRef.current = newDrag
+    setDrag(newDrag)
+    const dt = calcDropTarget(clientY)
+    dropTargetRef.current = dt
+    setDropTarget(dt)
+  })
 
-  const handleDrop = useCallback(() => {
-    if (!drag || !dropTarget) { setDrag(null); setDropTarget(null); return }
+  useEffect(() => {
+    handleMoveRef.current = (clientX: number, clientY: number) => {
+      const d = dragRef.current
+      if (!d) return
+      const newDrag = { ...d, x: d.x + (clientX - d.startX), y: d.y + (clientY - d.startY), startX: clientX, startY: clientY }
+      dragRef.current = newDrag
+      setDrag(newDrag)
+      const dt = calcDropTarget(clientY)
+      dropTargetRef.current = dt
+      setDropTarget(dt)
+    }
+  }, [calcDropTarget])
 
-    const { id, fromSection } = drag
-    const { section: toSection, idx: toIdx } = dropTarget
+  const handleDropRef = useRef(() => {
+    const d = dragRef.current
+    const dt = dropTargetRef.current
+    if (!d || !dt) { dragRef.current = null; setDrag(null); setDropTarget(null); return }
+
+    const { id, fromSection } = d
+    const { section: toSection, idx: toIdx } = dt
 
     setActive(prev => {
       const currentShelf = ALL_WIDGETS.filter(w => !prev.includes(w.id)).map(w => w.id)
       let newActive = [...prev]
 
       if (fromSection === 'active' && toSection === 'active') {
-        // active → active 순서 변경
         const fromI = newActive.indexOf(id)
         newActive.splice(fromI, 1)
         const insertAt = Math.min(toIdx, newActive.length)
         newActive.splice(insertAt, 0, id)
       } else if (fromSection === 'shelf' && toSection === 'active') {
-        // shelf → active 추가
         const insertAt = Math.min(toIdx, newActive.length)
         newActive.splice(insertAt, 0, id)
       } else if (fromSection === 'active' && toSection === 'shelf') {
-        // active → shelf 제거
         if (newActive.length > 1) {
           newActive = newActive.filter(w => w !== id)
         }
       }
-      // shelf → shelf는 순서 의미 없음 (무시)
 
       saveWidgets(newActive)
       onSave(newActive)
       return newActive
     })
 
+    dragRef.current = null
+    dropTargetRef.current = null
     setDrag(null)
     setDropTarget(null)
-  }, [drag, dropTarget, onSave])
+  })
 
-  // 글로벌 이벤트
+  // 글로벌 이벤트 — 최초 1회만 등록
   useEffect(() => {
-    if (!drag) return
-    const onMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY)
-    const onTouchMove = (e: TouchEvent) => { e.preventDefault(); handleMove(e.touches[0].clientX, e.touches[0].clientY) }
-    const onMouseUp = () => handleDrop()
-    const onTouchEnd = () => handleDrop()
+    const onMouseMove = (e: MouseEvent) => handleMoveRef.current(e.clientX, e.clientY)
+    const onTouchMove = (e: TouchEvent) => {
+      if (!dragRef.current) return
+      e.preventDefault()
+      handleMoveRef.current(e.touches[0].clientX, e.touches[0].clientY)
+    }
+    const onMouseUp = () => handleDropRef.current()
+    const onTouchEnd = () => handleDropRef.current()
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('mouseup', onMouseUp)
     window.addEventListener('touchmove', onTouchMove, { passive: false })
@@ -229,7 +257,7 @@ export default function WidgetManager({ onClose, onSave }: Props) {
       window.removeEventListener('touchmove', onTouchMove)
       window.removeEventListener('touchend', onTouchEnd)
     }
-  }, [drag, handleMove, handleDrop])
+  }, [])
 
   const handleReset = () => {
     const next = [...DEFAULT_WIDGETS]
