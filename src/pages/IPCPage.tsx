@@ -251,12 +251,12 @@ export default function IPCPage({ onClose }: { onClose: () => void }) {
                             fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: ff,
                           }}>NO</button>
                           <button onClick={() => setTipItem(q)} style={{
-                            marginLeft: 'auto', height: 28, padding: '0 10px', borderRadius: 20, border: 'none',
-                            background: '#F1F5F9', color: '#64748B',
-                            fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: ff,
+                            marginLeft: 'auto', height: 28, padding: '0 12px', borderRadius: 20, border: 'none',
+                            background: 'rgba(41,182,208,0.12)', color: '#0369A1',
+                            fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: ff,
                             display: 'flex', alignItems: 'center', gap: 4,
                           }}>
-                            <Icon icon="ph:info" width={12} height={12} color="#94A3B8" />팁
+                            💡 팁
                           </button>
                         </div>
                         {q.warning && ans === 'yes' && (
