@@ -259,7 +259,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
     { id:'checklist' as Tab, icon:'✅', title:'짐싸기 체크리스트', sub:'공항 통과 완벽 가이드', badge: 0, local: false },
     { id:'bucketlist' as Tab, icon:'🗺️', title:'버킷리스트', sub:'꼭 해볼 것들', badge: bucketCount, local: false },
     { id:'shopping' as Tab, icon:'🛍️', title:'쇼핑리스트', sub:'꼭 살 것들', badge: myShoppingCount, local: false },
-    { id:'nearby' as Tab, icon:'📍', title:'내 주변', sub:'주변 업체 지도', badge: 0, local: false },
+    { id:'nearby' as Tab, icon:'📍', title:'내 주변', sub:'내 주변에는', badge: 0, local: false },
   ]
 
   return (
@@ -780,7 +780,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>📍</div>
                 <div style={{ flex:1 }}>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>내 주변</div>
-                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>주변 업체 지도</div>
+                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>내 주변에는</div>
                 </div>
               </div>
               {(() => {
@@ -835,7 +835,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                   style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer' }}>
                   <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>🏢</div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>업체정보</div>
-                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>한인 업체·병원</div>
+                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>여행 중 필요한 업체 정보</div>
                 </div>
               </div>
             </div>
