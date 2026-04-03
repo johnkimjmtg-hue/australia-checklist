@@ -17,6 +17,9 @@ import NoteSheet from '../components/NoteSheet'
 import BingoSheet from '../components/BingoSheet'
 import PackingSheet from '../components/PackingSheet'
 import IPCSheet from '../components/IPCSheet'
+import ExchangeSheet from '../components/ExchangeSheet'
+import EmergencySheet from '../components/EmergencySheet'
+import WidgetManager, { loadWidgets, saveWidgets, type WidgetId } from '../components/WidgetManager'
 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
 const TODAY = new Date()
@@ -62,13 +65,42 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   const [showBingo, setShowBingo] = useState(false)
   const [showPacking, setShowPacking] = useState(false)
   const [showIPC, setShowIPC] = useState(false)
+  const [showExchange, setShowExchange] = useState(false)
+  const [showEmergency, setShowEmergency] = useState(false)
+  const [showWidgetManager, setShowWidgetManager] = useState(false)
+  const [contextMenu, setContextMenu] = useState<{ widgetId: WidgetId; x: number; y: number } | null>(null)
+  const longPressTimer = { current: null as ReturnType<typeof setTimeout> | null }
+
+  const handleLongPress = (widgetId: WidgetId, e: React.TouchEvent | React.MouseEvent) => {
+    const touch = 'touches' in e ? e.touches[0] : e as MouseEvent
+    const x = 'touches' in e ? (e as React.TouchEvent).touches[0].clientX : (e as React.MouseEvent).clientX
+    const y = 'touches' in e ? (e as React.TouchEvent).touches[0].clientY : (e as React.MouseEvent).clientY
+    longPressTimer.current = setTimeout(() => {
+      setContextMenu({ widgetId, x, y })
+      if (navigator.vibrate) navigator.vibrate(30)
+    }, 500)
+  }
+
+  const cancelLongPress = () => {
+    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null }
+  }
+
+  const hideWidget = (widgetId: WidgetId) => {
+    const next = activeWidgets.filter(w => w !== widgetId)
+    setActiveWidgets(next)
+    saveWidgets(next)
+    setContextMenu(null)
+  }
+  const [activeWidgets, setActiveWidgets] = useState<WidgetId[]>(() => loadWidgets())
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
 
   const tripDays = getTripDays(trip)
-  const startDate = new Date(trip.startDate)
-  const endDate = new Date(trip.endDate)
+  // "YYYY-MM-DD" 문자열을 로컬 시간 기준으로 파싱 (UTC 파싱 방지)
+  const parseLocalDate = (s: string) => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d) }
+  const startDate = parseLocalDate(trip.startDate)
+  const endDate = parseLocalDate(trip.endDate)
   const todayMidnight = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate())
   const diffDays = Math.ceil((startDate.getTime() - todayMidnight.getTime()) / (1000*60*60*24))
   const tripNights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000*60*60*24))
@@ -640,219 +672,324 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
 
             <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
-              {/* 짐싸기 체크리스트 */}
-              {(() => {
-                const packChecked: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('packing-checked') ?? '{}') } catch { return {} } })()
-                const packExcluded: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('packing-excluded') ?? '{}') } catch { return {} } })()
-                const packingTotal = (() => { try { return parseInt(localStorage.getItem('packing-total') ?? '0') } catch { return 0 } })()
-                const packingCustomCount = (() => { try { return parseInt(localStorage.getItem('packing-custom-count') ?? '0') } catch { return 0 } })()
-                const totalPack = (packingTotal + packingCustomCount) - Object.keys(packExcluded).length
-                const donePack  = Object.keys(packChecked).filter(id => !packExcluded[id]).length
-                const remainPack = totalPack - donePack
-                return (
-                  <div className="menu-card-hover card-anim" onClick={() => setShowPacking(true)}
-                    style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
-                    <div style={{ width:44, height:44, borderRadius:14, background:'rgba(139,92,246,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🧳</div>
-                    <div style={{ flex:1 }}>
-                      <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>짐싸기 체크리스트</div>
-                      <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>공항 통과 완벽 가이드</div>
+              {/* ── 위젯 렌더링 ── */}
+              {activeWidgets.map(widgetId => {
+                if (widgetId === 'packing') {
+                  const packChecked: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('packing-checked') ?? '{}') } catch { return {} } })()
+                  const packExcluded: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('packing-excluded') ?? '{}') } catch { return {} } })()
+                  const packingTotal = (() => { try { return parseInt(localStorage.getItem('packing-total') ?? '0') } catch { return 0 } })()
+                  const packingCustomCount = (() => { try { return parseInt(localStorage.getItem('packing-custom-count') ?? '0') } catch { return 0 } })()
+                  const totalPack = (packingTotal + packingCustomCount) - Object.keys(packExcluded).length
+                  const donePack = Object.keys(packChecked).filter(id => !packExcluded[id]).length
+                  const remainPack = totalPack - donePack
+                  return (
+                    <div key="packing" className="menu-card-hover card-anim"
+                      onClick={() => setShowPacking(true)}
+                      onTouchStart={(e) => handleLongPress('packing', e)}
+                      onTouchEnd={cancelLongPress} onTouchMove={cancelLongPress}
+                      onMouseDown={(e) => handleLongPress('packing', e)} onMouseUp={cancelLongPress} onMouseLeave={cancelLongPress}
+                      style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                      <div style={{ width:44, height:44, borderRadius:14, background:'rgba(139,92,246,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🧳</div>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>짐싸기 체크리스트</div>
+                        <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>공항 통과 완벽 가이드</div>
+                      </div>
+                      {remainPack > 0 && <div style={{ background:'#8B5CF6', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{remainPack}개</div>}
                     </div>
-                    {remainPack > 0 && <div style={{ background:'#8B5CF6', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{remainPack}개</div>}
+                  )
+                }
+
+                if (widgetId === 'ipc') return (
+                  <div key="ipc" className="menu-card-hover card-anim"
+                    onClick={() => setShowIPC(true)}
+                    onTouchStart={(e) => handleLongPress('ipc', e)}
+                    onTouchEnd={cancelLongPress} onTouchMove={cancelLongPress}
+                    onMouseDown={(e) => handleLongPress('ipc', e)} onMouseUp={cancelLongPress} onMouseLeave={cancelLongPress}
+                    style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                    <div style={{ width:44, height:44, borderRadius:14, background:'rgba(41,182,208,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>✈️</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>입국 신고서 가이드</div>
+                      <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>기내에서 미리 연습해요 · <span style={{ color:'#29B6D0', fontWeight:700 }}>✈️ 오프라인 OK</span></div>
+                    </div>
                   </div>
                 )
-              })()}
-              {/* 입국 신고서 가이드 */}
-              <div className="menu-card-hover card-anim" onClick={() => setShowIPC(true)}
-                style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
-                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(41,182,208,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>✈️</div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>입국 신고서 가이드</div>
-                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>기내에서 미리 연습해요 · <span style={{ color:'#29B6D0', fontWeight:700 }}>✈️ 오프라인 OK</span></div>
-                </div>
-              </div>
 
-              {/* 버킷리스트 */}
-              {(() => {
-                const checkedItems = [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])]
-                // 날짜 배정 기준 total 계산
-                const allRows: { id: string; day?: number }[] = []
-                checkedItems.forEach(item => {
-                  const days = state.schedules[item.id] ?? []
-                  if (days.length === 0) allRows.push({ id: item.id })
-                  else days.forEach(d => allRows.push({ id: item.id, day: d }))
-                })
-                const total = allRows.length
-                // BucketCheckView와 동일한 로직: allRows 기반 미완료 계산
-                const bucketAchieved: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })()
-                const getKey = (id: string, day?: number) => day !== undefined ? `${id}_${day}` : id
-                const achievedCount = allRows.filter(r => !!bucketAchieved[getKey(r.id, r.day)]).length
-                const remainCount = total - achievedCount
-                // 미리보기: 아직 완료 안 된 항목
-                const undoneItems = checkedItems.filter(item => {
-                  const days = state.schedules[item.id] ?? []
-                  if (days.length === 0) return !bucketAchieved[item.id]
-                  return days.some(d => !bucketAchieved[`${item.id}_${d}`])
-                })
-                const previewItems = undoneItems.slice(0, 3)
-                return (
-                  <div className="card-anim" style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                      <div onClick={() => setShowBucket(true)} style={{ display:'flex', alignItems:'center', gap:14, cursor:'pointer', WebkitTapHighlightColor:'transparent', flex:1 }}>
-                        <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🗺️</div>
-                        <div>
-                          <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>버킷리스트</div>
-                          <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>꼭 해볼 것들</div>
+                if (widgetId === 'bucket') {
+                  const checkedItems = [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])]
+                  const allRows: { id: string; day?: number }[] = []
+                  checkedItems.forEach(item => {
+                    const days = state.schedules[item.id] ?? []
+                    if (days.length === 0) allRows.push({ id: item.id })
+                    else days.forEach(d => allRows.push({ id: item.id, day: d }))
+                  })
+                  const bucketAchieved: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}') } catch { return {} } })()
+                  const getKey = (id: string, day?: number) => day !== undefined ? `${id}_${day}` : id
+                  const achievedCount = allRows.filter(r => !!bucketAchieved[getKey(r.id, r.day)]).length
+                  const remainCount = allRows.length - achievedCount
+                  const undoneItems = checkedItems.filter(item => {
+                    const days = state.schedules[item.id] ?? []
+                    if (days.length === 0) return !bucketAchieved[item.id]
+                    return days.some(d => !bucketAchieved[`${item.id}_${d}`])
+                  })
+                  const previewItems = undoneItems.slice(0, 3)
+                  return (
+                    <div key="bucket" className="card-anim"
+                      onTouchStart={(e) => handleLongPress('bucket', e)}
+                      onTouchEnd={cancelLongPress} onTouchMove={cancelLongPress}
+                      onMouseDown={(e) => handleLongPress('bucket', e)} onMouseUp={cancelLongPress} onMouseLeave={cancelLongPress}
+                      style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                        <div onClick={() => setShowBucket(true)} style={{ display:'flex', alignItems:'center', gap:14, cursor:'pointer', WebkitTapHighlightColor:'transparent', flex:1 }}>
+                          <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🗺️</div>
+                          <div>
+                            <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>버킷리스트</div>
+                            <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>꼭 해볼 것들</div>
+                          </div>
                         </div>
+                        {remainCount > 0 && <div style={{ background:'#29B6D0', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{remainCount}개</div>}
                       </div>
-                      {remainCount > 0 && <div style={{ background:'#29B6D0', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{remainCount}개</div>}
+                      {previewItems.length > 0 && (
+                        <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
+                          {previewItems.map((item: any) => {
+                            const db = dbItems.find((d:any) => d.id === item.id)
+                            return (
+                              <div key={item.id} onClick={() => setShowBucket(true)} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 4px', borderTop:'1px solid rgba(0,0,0,0.06)', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                                {db?.image_url
+                                  ? <img src={db.image_url} alt="" style={{ width:32, height:32, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
+                                  : <div style={{ width:32, height:32, borderRadius:8, background:'rgba(0,131,143,0.12)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><Icon icon="ph:map-trifold" width={14} height={14} color="#00838F" /></div>}
+                                <div style={{ fontSize:13, fontWeight:500, color:'#0D3349', flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.label}</div>
+                                <Icon icon="ph:caret-right" width={12} height={12} color="#CBD5E1" style={{ flexShrink:0 }} />
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
                     </div>
-                    {previewItems.length > 0 && (
-                      <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
-                        {previewItems.map((item: any) => {
-                          const db = dbItems.find((d:any) => d.id === item.id)
-                          return (
-                            <div key={item.id} onClick={() => setShowBucket(true)} style={{
-                              display:'flex', alignItems:'center', gap:10, padding:'8px 4px',
-                              borderTop:'1px solid rgba(0,0,0,0.06)', cursor:'pointer',
-                              WebkitTapHighlightColor:'transparent',
-                            }}>
-                              {db?.image_url
-                                ? <img src={db.image_url} alt="" style={{ width:32, height:32, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
-                                : <div style={{ width:32, height:32, borderRadius:8, background:'rgba(0,131,143,0.12)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                                    <Icon icon="ph:map-trifold" width={14} height={14} color="#00838F" />
-                                  </div>
-                              }
-                              <div style={{ fontSize:13, fontWeight:500, color:'#0D3349', flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.label}</div>
+                  )
+                }
+
+                if (widgetId === 'shopping') {
+                  const myList: string[] = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] } })()
+                  const myChecked: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}') } catch { return {} } })()
+                  const allProds = getCachedShopping()?.products ?? []
+                  const undoneList = myList.filter(id => !myChecked[id])
+                  const previewProds = undoneList.slice(0, 3).map(id => allProds.find((p:any) => p.id === id)).filter(Boolean)
+                  return (
+                    <div key="shopping" className="card-anim"
+                      onTouchStart={(e) => handleLongPress('shopping', e)}
+                      onTouchEnd={cancelLongPress} onTouchMove={cancelLongPress}
+                      onMouseDown={(e) => handleLongPress('shopping', e)} onMouseUp={cancelLongPress} onMouseLeave={cancelLongPress}
+                      style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                        <div onClick={() => setShowShopping(true)} style={{ display:'flex', alignItems:'center', gap:14, cursor:'pointer', WebkitTapHighlightColor:'transparent', flex:1 }}>
+                          <div style={{ width:44, height:44, borderRadius:14, background:'rgba(255,107,157,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🛍️</div>
+                          <div>
+                            <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>쇼핑리스트</div>
+                            <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>꼭 살 것들</div>
+                          </div>
+                        </div>
+                        {undoneList.length > 0 && <div style={{ background:'#FF6B9D', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{undoneList.length}개</div>}
+                      </div>
+                      {previewProds.length > 0 && (
+                        <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
+                          {previewProds.map((prod: any) => (
+                            <div key={prod.id} onClick={() => setShowShopping(true)} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 4px', borderTop:'1px solid rgba(0,0,0,0.06)', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                              {prod.image_url
+                                ? <img src={prod.image_url} alt="" style={{ width:32, height:32, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
+                                : <div style={{ width:32, height:32, borderRadius:8, background:'rgba(255,107,157,0.12)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><Icon icon="ph:shopping-bag" width={14} height={14} color="#FF6B9D" /></div>}
+                              <div style={{ flex:1, minWidth:0, overflow:'hidden' }}>
+                                <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                                  <span style={{ fontSize:13, fontWeight:500, color:'#0D3349', whiteSpace:'nowrap' }}>{prod.name}</span>
+                                  {prod.brand && <span style={{ fontSize:11, color:'#94A3B8', whiteSpace:'nowrap' }}>· {prod.brand}</span>}
+                                </div>
+                              </div>
                               <Icon icon="ph:caret-right" width={12} height={12} color="#CBD5E1" style={{ flexShrink:0 }} />
                             </div>
-                          )
-                        })}
-                      </div>
-                    )}
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+
+                if (widgetId === 'nearby') return (
+                  <div key="nearby" className="menu-card-hover card-anim"
+                    onClick={() => setShowNearby(true)}
+                    onTouchStart={(e) => handleLongPress('nearby', e)}
+                    onTouchEnd={cancelLongPress} onTouchMove={cancelLongPress}
+                    onMouseDown={(e) => handleLongPress('nearby', e)} onMouseUp={cancelLongPress} onMouseLeave={cancelLongPress}
+                    style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                    <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>📍</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>내 주변</div>
+                      <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>내 주변에는</div>
+                    </div>
                   </div>
                 )
-              })()}
-              {/* 쇼핑리스트 */}
-              {(() => {
-                const myList: string[] = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] } })()
-                const myChecked: Record<string,boolean> = (() => { try { return JSON.parse(localStorage.getItem('my-shopping-checked') ?? '{}') } catch { return {} } })()
-                const cachedShopping = getCachedShopping()
-                const allProds = cachedShopping?.products ?? []
-                const undoneList = myList.filter(id => !myChecked[id])
-                const previewProds = undoneList.slice(0, 3).map(id => allProds.find((p:any) => p.id === id)).filter(Boolean)
-                const shoppingRemain = undoneList.length
-                return (
-                  <div className="card-anim" style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                      <div onClick={() => setShowShopping(true)} style={{ display:'flex', alignItems:'center', gap:14, cursor:'pointer', WebkitTapHighlightColor:'transparent', flex:1 }}>
-                        <div style={{ width:44, height:44, borderRadius:14, background:'rgba(255,107,157,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🛍️</div>
-                        <div>
-                          <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>쇼핑리스트</div>
-                          <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>꼭 살 것들</div>
+
+                if (widgetId === 'note') {
+                  const savedNotes = (() => { try { return JSON.parse(localStorage.getItem('app-notes') ?? '[]') } catch { return [] } })()
+                  const previewNotes = savedNotes.slice(0, 3)
+                  return (
+                    <div key="note" className="card-anim" style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                        <div onClick={() => setShowNote(true)} style={{ display:'flex', alignItems:'center', gap:14, cursor:'pointer', WebkitTapHighlightColor:'transparent', flex:1 }}>
+                          <div style={{ width:44, height:44, borderRadius:14, background:'rgba(249,115,22,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>📝</div>
+                          <div>
+                            <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>노트</div>
+                            <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>메모·기록·여행 노트</div>
+                          </div>
                         </div>
+                        <button onClick={() => { setNoteInitialView('write'); setNoteInitialId(undefined); setShowNote(true) }} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(249,115,22,0.15)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent', flexShrink:0 }}>
+                          <Icon icon="ph:plus-bold" width={14} height={14} color="#F97316" />
+                        </button>
                       </div>
-                      {shoppingRemain > 0 && <div style={{ background:'#FF6B9D', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{shoppingRemain}개</div>}
-                    </div>
-                    {previewProds.length > 0 && (
-                      <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
-                        {previewProds.map((prod: any) => (
-                          <div key={prod.id} onClick={() => setShowShopping(true)} style={{
-                            display:'flex', alignItems:'center', gap:10, padding:'8px 4px',
-                            borderTop:'1px solid rgba(0,0,0,0.06)', cursor:'pointer',
-                            WebkitTapHighlightColor:'transparent',
-                          }}>
-                            {prod.image_url
-                              ? <img src={prod.image_url} alt="" style={{ width:32, height:32, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
-                              : <div style={{ width:32, height:32, borderRadius:8, background:'rgba(255,107,157,0.12)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                                  <Icon icon="ph:shopping-bag" width={14} height={14} color="#FF6B9D" />
-                                </div>
-                            }
-                            <div style={{ flex:1, minWidth:0, overflow:'hidden' }}>
-                              <div style={{ display:'flex', alignItems:'center', gap:4, overflow:'hidden' }}>
-                                <span style={{ fontSize:13, fontWeight:500, color:'#0D3349', whiteSpace:'nowrap', flexShrink:0 }}>{prod.name}</span>
-                                {prod.brand && <span style={{ fontSize:11, color:'#94A3B8', whiteSpace:'nowrap', flexShrink:0 }}>· {prod.brand}</span>}
-                                <span style={{ display:'flex', gap:4, overflow:'hidden', minWidth:0 }}>
-                                  {prod.tags?.map((tag:string) => (
-                                    <span key={tag} style={{ fontSize:10, fontWeight:700, color:'#FF6B9D', background:'rgba(255,107,157,0.1)', borderRadius:6, padding:'1px 6px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', flexShrink:1 }}>{tag}</span>
-                                  ))}
-                                </span>
-                              </div>
+                      {previewNotes.length > 0 && (
+                        <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
+                          {previewNotes.map((note: any) => (
+                            <div key={note.id} onClick={() => { setNoteInitialId(note.id); setNoteInitialView(undefined); setShowNote(true) }} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 4px', borderTop:'1px solid rgba(0,0,0,0.06)', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                              <Icon icon="ph:note" width={13} height={13} color="#F97316" style={{ flexShrink:0 }} />
+                              <div style={{ fontSize:13, fontWeight:500, color:'#0D3349', flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{note.title}</div>
+                              <Icon icon="ph:caret-right" width={12} height={12} color="#CBD5E1" style={{ flexShrink:0 }} />
                             </div>
-                            <Icon icon="ph:caret-right" width={12} height={12} color="#CBD5E1" style={{ flexShrink:0 }} />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              })()}
-              {/* 내 주변 */}
-              <div className="menu-card-hover card-anim" onClick={() => setShowNearby(true)}
-                style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
-                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>📍</div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>내 주변</div>
-                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>내 주변에는</div>
-                </div>
-              </div>
-              {(() => {
-                const savedNotes = (() => { try { return JSON.parse(localStorage.getItem('app-notes') ?? '[]') } catch { return [] } })()
-                const previewNotes = savedNotes.slice(0, 3)
-                return (
-                  <div className="card-anim" style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'16px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', animationDelay:`${(MENUS.length + 1) * 0.08}s` }}>
-                    {/* 헤더 - 다른 타일과 동일한 구조 */}
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                      <div onClick={() => setShowNote(true)} style={{ display:'flex', alignItems:'center', gap:14, cursor:'pointer', WebkitTapHighlightColor:'transparent', flex:1 }}>
-                        <div style={{ width:44, height:44, borderRadius:14, background:'rgba(249,115,22,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>📝</div>
-                        <div>
-                          <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>노트</div>
-                          <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>메모·기록·여행 노트</div>
+                          ))}
                         </div>
-                      </div>
-                      <button onClick={() => { setNoteInitialView('write'); setNoteInitialId(undefined); setShowNote(true) }} style={{
-                        width:28, height:28, borderRadius:'50%', background:'rgba(249,115,22,0.15)',
-                        border:'none', display:'flex', alignItems:'center', justifyContent:'center',
-                        cursor:'pointer', WebkitTapHighlightColor:'transparent', flexShrink:0,
-                      }}>
-                        <Icon icon="ph:plus-bold" width={14} height={14} color="#F97316" />
-                      </button>
+                      )}
                     </div>
-                    {/* 노트 리스트 */}
-                    {previewNotes.length > 0 && (
-                      <div style={{ display:'flex', flexDirection:'column', marginTop:12 }}>
-                        {previewNotes.map((note: any) => (
-                          <div key={note.id} onClick={() => { setNoteInitialId(note.id); setNoteInitialView(undefined); setShowNote(true) }} style={{
-                            display:'flex', alignItems:'center', gap:8, padding:'8px 4px',
-                            borderTop:'1px solid rgba(0,0,0,0.06)', cursor:'pointer',
-                            WebkitTapHighlightColor:'transparent',
-                          }}>
-                            <Icon icon="ph:note" width={13} height={13} color="#F97316" style={{ flexShrink:0 }} />
-                            <div style={{ fontSize:13, fontWeight:500, color:'#0D3349', flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{note.title}</div>
-                            <Icon icon="ph:caret-right" width={12} height={12} color="#CBD5E1" style={{ flexShrink:0 }} />
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                  )
+                }
+
+                if (widgetId === 'exchange') return (
+                  <div key="exchange" className="menu-card-hover card-anim"
+                    onClick={() => setShowExchange(true)}
+                    onTouchStart={(e) => handleLongPress('exchange', e)}
+                    onTouchEnd={cancelLongPress} onTouchMove={cancelLongPress}
+                    onMouseDown={(e) => handleLongPress('exchange', e)} onMouseUp={cancelLongPress} onMouseLeave={cancelLongPress}
+                    style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                    <div style={{ width:44, height:44, borderRadius:14, background:'rgba(16,185,129,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>💱</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>환율 계산기</div>
+                      <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>AUD ↔ KRW 실시간</div>
+                    </div>
                   </div>
                 )
-              })()}
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:18 }}>
-                <div className="menu-card-hover card-anim" onClick={() => setShowBingo(true)}
-                  style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer' }}>
-                  <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>☕</div>
-                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
-                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>시드니·멜번 카페 투어</div>
-                </div>
-                <div className="menu-card-hover card-anim" onClick={() => setShowServices(true)}
-                  style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer' }}>
-                  <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>🏢</div>
-                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>업체정보</div>
-                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>여행 중 필요한 업체 정보</div>
-                </div>
-              </div>
+
+                if (widgetId === 'emergency') return (
+                  <div key="emergency" className="menu-card-hover card-anim"
+                    onClick={() => setShowEmergency(true)}
+                    onTouchStart={(e) => handleLongPress('emergency', e)}
+                    onTouchEnd={cancelLongPress} onTouchMove={cancelLongPress}
+                    onMouseDown={(e) => handleLongPress('emergency', e)} onMouseUp={cancelLongPress} onMouseLeave={cancelLongPress}
+                    style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                    <div style={{ width:44, height:44, borderRadius:14, background:'rgba(220,38,38,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🚨</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>긴급 번역</div>
+                      <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>오프라인 긴급 표현 카드</div>
+                    </div>
+                    <div style={{ fontSize:10, fontWeight:700, color:'#DC2626', background:'rgba(220,38,38,0.08)', padding:'3px 8px', borderRadius:20, flexShrink:0 }}>오프라인</div>
+                  </div>
+                )
+
+                if (widgetId === 'bingo') return (
+                  <div key="bingo" className="menu-card-hover card-anim"
+                    onClick={() => setShowBingo(true)}
+                    onTouchStart={(e) => handleLongPress('bingo', e)}
+                    onTouchEnd={cancelLongPress} onTouchMove={cancelLongPress}
+                    onMouseDown={(e) => handleLongPress('bingo', e)} onMouseUp={cancelLongPress} onMouseLeave={cancelLongPress}
+                    style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                    <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>☕</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>카페 빙고</div>
+                      <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>시드니·멜번 카페 투어</div>
+                    </div>
+                  </div>
+                )
+
+                if (widgetId === 'services') return (
+                  <div key="services" className="menu-card-hover card-anim"
+                    onClick={() => setShowServices(true)}
+                    onTouchStart={(e) => handleLongPress('services', e)}
+                    onTouchEnd={cancelLongPress} onTouchMove={cancelLongPress}
+                    onMouseDown={(e) => handleLongPress('services', e)} onMouseUp={cancelLongPress} onMouseLeave={cancelLongPress}
+                    style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                    <div style={{ width:44, height:44, borderRadius:14, background:'rgba(2,132,199,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🏢</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>업체 정보</div>
+                      <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>여행 중 필요한 업체 정보</div>
+                    </div>
+                  </div>
+                )
+
+                return null
+              })}
+
+              {/* 위젯 추가 버튼 */}
+              <button onClick={() => setShowWidgetManager(true)} style={{
+                width:'100%', height:48, borderRadius:16, border:'1.5px dashed rgba(41,182,208,0.4)',
+                background:'rgba(41,182,208,0.04)', color:'#29B6D0',
+                fontSize:14, fontWeight:700, cursor:'pointer',
+                display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+                fontFamily:"-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif",
+              }}>
+                <Icon icon="ph:plus-circle" width={18} height={18} color="#29B6D0" />
+                위젯 추가 · 편집
+              </button>
+
             </div>
           </>
       </div>
+      {/* 환율 계산기 바텀시트 */}
+      {showExchange && <ExchangeSheet onClose={() => setShowExchange(false)} />}
+
+      {/* 긴급 번역 바텀시트 */}
+      {showEmergency && <EmergencySheet onClose={() => setShowEmergency(false)} />}
+
+      {/* 롱프레스 컨텍스트 메뉴 */}
+      {contextMenu && (
+        <>
+          <div onClick={() => setContextMenu(null)} style={{ position:'fixed', inset:0, zIndex:1500 }} />
+          <div style={{
+            position:'fixed',
+            top: Math.min(contextMenu.y - 10, window.innerHeight - 140),
+            left: Math.min(Math.max(contextMenu.x - 80, 12), window.innerWidth - 180),
+            zIndex:1501,
+            background:'#fff',
+            borderRadius:16,
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            overflow:'hidden',
+            minWidth:160,
+            animation:'fadeInScale 0.15s ease',
+          }}>
+            <style>{`@keyframes fadeInScale { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }`}</style>
+            <button onClick={() => { setContextMenu(null); setShowWidgetManager(true) }} style={{
+              width:'100%', padding:'14px 16px', border:'none', background:'none',
+              display:'flex', alignItems:'center', gap:12, cursor:'pointer',
+              fontSize:15, fontWeight:600, color:'#0D3349',
+              fontFamily:"-apple-system,'Apple SD Gothic Neo','Pretendard',sans-serif",
+              borderBottom:'1px solid rgba(0,0,0,0.06)',
+            }}>
+              <span style={{ fontSize:18 }}>⇅</span> 재배치
+            </button>
+            <button onClick={() => hideWidget(contextMenu.widgetId)} style={{
+              width:'100%', padding:'14px 16px', border:'none', background:'none',
+              display:'flex', alignItems:'center', gap:12, cursor:'pointer',
+              fontSize:15, fontWeight:600, color:'#DC2626',
+              fontFamily:"-apple-system,'Apple SD Gothic Neo','Pretendard',sans-serif",
+            }}>
+              <span style={{ fontSize:18 }}>🙈</span> 카드 숨기기
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* 위젯 매니저 */}
+      {showWidgetManager && (
+        <WidgetManager
+          onClose={() => setShowWidgetManager(false)}
+          onSave={(widgets) => setActiveWidgets(widgets)}
+        />
+      )}
+
       {/* 카페 빙고 바텀시트 */}
       {showBingo && (
         <BingoSheet onClose={() => setShowBingo(false)} />
