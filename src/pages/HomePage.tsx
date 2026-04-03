@@ -207,7 +207,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             <div style={{ display:'flex', flexDirection:'column', gap:2, overflow:'hidden' }}>
               {labels.map((lbl, i) => (
                 <div key={i} style={{ borderRadius:2, overflow:'hidden', background: lbl.bg, padding:'1px 3px' }}>
-                  <div style={{ fontSize:8, fontWeight:700, color:'#0D3349', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.4 }}>
+                  <div style={{ fontSize:9, fontWeight:400, color:'#0D3349', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.4 }}>
                     {lbl.text}
                   </div>
                 </div>
