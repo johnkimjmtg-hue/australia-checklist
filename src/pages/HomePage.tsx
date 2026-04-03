@@ -16,6 +16,7 @@ import NearbySheet from '../components/NearbySheet'
 import NoteSheet from '../components/NoteSheet'
 import BingoSheet from '../components/BingoSheet'
 import PackingSheet from '../components/PackingSheet'
+import IPCSheet from '../components/IPCSheet'
 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
 const TODAY = new Date()
@@ -60,6 +61,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
   const [noteInitialView, setNoteInitialView] = useState<'list'|'write'|undefined>(undefined)
   const [showBingo, setShowBingo] = useState(false)
   const [showPacking, setShowPacking] = useState(false)
+  const [showIPC, setShowIPC] = useState(false)
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null)
 
   const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
@@ -659,6 +661,16 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                   </div>
                 )
               })()}
+              {/* 입국 신고서 가이드 */}
+              <div className="menu-card-hover card-anim" onClick={() => setShowIPC(true)}
+                style={{ background:'rgba(255,255,255,0.88)', borderRadius:20, padding:'18px 16px', boxShadow:'0 2px 12px rgba(0,0,0,0.12)', cursor:'pointer', display:'flex', alignItems:'center', gap:14 }}>
+                <div style={{ width:44, height:44, borderRadius:14, background:'rgba(41,182,208,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>✈️</div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>입국 신고서 가이드</div>
+                  <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>기내에서 미리 연습해요 · <span style={{ color:'#29B6D0', fontWeight:700 }}>✈️ 오프라인 OK</span></div>
+                </div>
+              </div>
+
               {/* 버킷리스트 */}
               {(() => {
                 const checkedItems = [...ITEMS.filter(i => state.selected[i.id]), ...state.customItems.filter(i => state.selected[i.id])]
@@ -862,6 +874,11 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
           onClose={() => setShowShopping(false)}
           trip={trip}
         />
+      )}
+
+      {/* 입국 신고서 바텀시트 */}
+      {showIPC && (
+        <IPCSheet onClose={() => setShowIPC(false)} />
       )}
 
       {/* 짐싸기 바텀시트 */}
