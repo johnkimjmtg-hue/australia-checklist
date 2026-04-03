@@ -951,13 +951,14 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
           <div style={{
             position:'fixed',
             top: Math.min(contextMenu.y - 10, window.innerHeight - 140),
-            left: Math.min(Math.max(contextMenu.x - 80, 12), window.innerWidth - 180),
+            left: '50%',
+            transform: 'translateX(-50%)',
             zIndex:1501,
             background:'#fff',
             borderRadius:16,
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
             overflow:'hidden',
-            minWidth:160,
+            minWidth:200,
             animation:'fadeInScale 0.15s ease',
           }}>
             <style>{`@keyframes fadeInScale { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }`}</style>
