@@ -131,7 +131,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
       const numColor = isSelected ? '#fff' : isToday ? '#00838F' : isPast ? '#7BAAB5' : '#0D3349'
       const numFw = isToday || isSelected ? 800 : 500
-      const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.04)' : 'transparent'
+      const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.08)' : 'transparent'
 
       const labels: { text: string; color: string; bg: string; barColor: string }[] = [
         ...dayEvents.slice(0,1).map(ev => ({ text: ev.title, color:'#92400E', bg:'#ffffff', barColor:'#F59E0B' })),
