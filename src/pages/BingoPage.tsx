@@ -3,7 +3,10 @@ import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 import { getCachedBingo, getCachedBusinesses } from '../lib/dataCache'
 import BusinessCard from '../components/BusinessCard'
-import { colors, font, radius, spacing } from '../styles/tokens'
+
+const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
+const ACCENT = '#29B6D0'
+const ACCENT_BROWN = '#29B6D0'  // 브라운 → 앱 메인 컬러로 통일
 
 interface BingoCafe {
   id: string
@@ -106,7 +109,7 @@ function MiniGrid({ count }: { count: number }) {
         {Array.from({ length: 25 }, (_, i) => (
           <div key={i} style={{
             borderRadius:2,
-            background: i < count ? '#FFCD00' : '#F1F5F9',
+            background: i < count ? '#29B6D0' : 'rgba(0,0,0,0.08)',
             transition: `background 0.3s ease ${i * 0.04}s`,
             boxShadow: i < count ? 'inset 0 1px 2px rgba(180,130,0,0.3)' : 'none',
           }}/>
@@ -120,13 +123,13 @@ function MiniGrid({ count }: { count: number }) {
       }}>
         <div style={{
           width:36, height:36, borderRadius:'50%',
-          background: count > 0 ? 'rgba(255,205,0,0.92)' : 'rgba(241,245,249,0.92)',
+          background: count > 0 ? 'rgba(41,182,208,0.9)' : 'rgba(0,0,0,0.06)',
           display:'flex', alignItems:'center', justifyContent:'center',
           boxShadow: count > 0 ? '0 2px 8px rgba(180,130,0,0.35)' : '0 1px 4px rgba(0,0,0,0.08)',
           transition:'background 0.4s ease, box-shadow 0.4s ease',
         }}>
           <Icon icon="ph:coffee" width={18} height={18}
-            color={count > 0 ? '#92620a' : '#CBD5E1'} />
+            color={count > 0 ? '#fff' : '#CBD5E1'} />
         </div>
       </div>
     </div>
@@ -281,6 +284,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   }
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const photoInputRef = useRef<HTMLInputElement>(null)
+  const [pendingPhoto, setPendingPhoto] = useState<{ idx: number; url: string; file: Blob } | null>(null)
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
@@ -408,8 +412,8 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   return (
     <div ref={pageRef} style={{
       height: embedded ? 'auto' : '100vh',
-      background: '#ffffff',
-      fontFamily: font.family,
+      background: 'transparent',
+fontFamily: ff,
       display: 'flex', flexDirection: 'column',
       overflow: embedded ? 'visible' : 'hidden',
     }}>
@@ -442,20 +446,13 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
           80%  { opacity:0.8; }
           100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1) rotate(var(--r)); opacity:0; }
         }
-        .neu-tab {
-          background: #e8e8e8; border: none; cursor: pointer;
-          display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-          transition: all 0.15s ease; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-          box-shadow: 3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff; border-radius: 10px;
-        }
-        .neu-tab.active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff; }
-        .neu-tab:active { box-shadow: inset 3px 3px 6px #c5c5c5, inset -3px -3px 6px #ffffff; }
+        .bingo-tab { background:none; border:none; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:all 0.15s; }
       `}</style>
 
       {/* ── 도시 탭 (헤더 역할) */}
       <div style={{
         position:'sticky', top:0, zIndex:30,
-        background: '#ffffff', borderBottom:`1.5px solid ${colors.border}`,
+        background:'rgba(255,255,255,0.95)', backdropFilter:'blur(8px)', borderBottom:'1px solid rgba(0,0,0,0.06)',
       }}>
         <div style={{ display:'flex' }}>
           {([
@@ -464,14 +461,14 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
           ] as { id: 'melbourne'|'sydney'; label: string }[]).map(c => (
             <button key={c.id} onClick={() => { setCity(c.id); onCityChange?.(c.id) }} style={{
               flex:1, height:44, border:'none', cursor:'pointer',
-              fontWeight: city===c.id ? font.weight.bold : font.weight.regular,
-              fontSize: font.size.md,
-              color: city===c.id ? '#8B5E3C' : colors.textTertiary,
+              fontWeight: city===c.id ? 700 : 400,
+              fontSize:15,
+              color: city===c.id ? '#29B6D0' : '#94A3B8',
               background: 'none',
-              borderBottom: city===c.id ? `2px solid ${'#8B5E3C'}` : '2px solid transparent',
+              borderBottom: city===c.id ? '2px solid #29B6D0' : '2px solid transparent',
               transition:'all 0.15s',
               WebkitTapHighlightColor: 'transparent',
-              fontFamily: font.family,
+              fontFamily: ff,
             }}>
               {c.label}
             </button>
@@ -480,19 +477,20 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
       </div>
 
       {/* ── 상황판 */}
-      <div style={{ background: '#ffffff', padding:`${spacing[3]}px ${spacing[3]}px 0` }}>
+      <div style={{ background:'transparent', padding:'12px 16px 0' }}>
         <div style={{
-          background: '#ffffff',
-          borderRadius: radius.lg,
-          border: `1.5px solid ${colors.gray300}`,
-          padding: `${spacing[4]}px`, display:'flex', alignItems:'center', gap: spacing[4],
+          background:'rgba(255,255,255,0.88)',
+          borderRadius:20,
+          border:'none',
+          boxShadow:'0 2px 12px rgba(0,0,0,0.10)',
+          padding:'16px', display:'flex', alignItems:'center', gap:16,
         }}>
           <MiniGrid count={checked.size} />
           <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1], lineHeight:1.3 }}>
+            <div style={{ fontSize:16, fontWeight:700, color:'#0D3349', marginBottom:4, lineHeight:1.3 }}>
               {getStatusMsg(checked.size, bingoCount, city).title}
             </div>
-            <div style={{ fontSize: font.size.sm, color: colors.textTertiary, fontWeight: font.weight.regular, lineHeight:1.6 }}>
+            <div style={{ fontSize:13, color:'#64748B', fontWeight:400, lineHeight:1.6 }}>
               {lastCheckedCafe && checked.has(lastCheckedCafe.idx)
                 ? (city === 'melbourne'
                     ? MEL_CAFE_MSG[lastCheckedCafe.sort_order]
@@ -502,27 +500,27 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
           </div>
           {/* 카운터 */}
           <div style={{ textAlign:'center', flexShrink:0 }}>
-            <div style={{ fontSize: font.size['3xl'], fontWeight: font.weight.bold, color: colors.textPrimary, lineHeight:1 }}>{checked.size}</div>
-            <div style={{ fontSize: font.size.lg, color: colors.textSecondary, fontWeight: font.weight.medium, marginTop:2 }}>/25 카페</div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: '#0D3349', lineHeight:1 }}>{checked.size}</div>
+            <div style={{ fontSize: 16, color: '#64748B', fontWeight: 500, marginTop:2 }}>/25 카페</div>
           </div>
         </div>
       </div>
 
       {/* ── 공유 / 리셋 버튼 */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[2]}px ${spacing[3]}px 0` }}>
-        <div style={{ fontSize: font.size.xs, color: colors.textTertiary, fontWeight: font.weight.medium }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 16px 0' }}>
+        <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
           ☕ {city === 'melbourne' ? '멜번 카페 투어 25곳' : '시드니 카페 투어 25곳'}
         </div>
-        <div style={{ display:'flex', gap: spacing[1] }}>
+        <div style={{ display:'flex', gap:4 }}>
 
         <button onClick={() => setShowReset(true)} style={{
-          height:28, paddingLeft:10, paddingRight:10, borderRadius: radius.sm,
-          border:`1px solid ${colors.dangerLight}`, background: colors.dangerLight,
-          color: colors.danger, fontSize: 11, fontWeight: font.weight.bold,
+          height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
+          border:'1px solid rgba(220,38,38,0.12)', background:'rgba(220,38,38,0.08)',
+          color: '#DC2626', fontSize: 11, fontWeight: 700,
           display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-          cursor:'pointer', fontFamily: font.family,
+          cursor:'pointer', fontFamily:ff,
         }}>
-          <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color={colors.danger} />
+          <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color='#DC2626' />
           전체 리셋
         </button>
         </div>
@@ -547,11 +545,11 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   borderRadius:10,
                   overflow:'hidden',
                   cursor:'pointer',
-                  border: isHighlight ? '2px solid #EF4444' : '1px solid #C8C8C8',
-                  background: '#fff',
+                  border: isHighlight ? '2px solid #EF4444' : '1px solid rgba(0,0,0,0.06)',
+                  background: isChecked ? 'rgba(41,182,208,0.04)' : 'rgba(255,255,255,0.9)',
                   boxShadow: isHighlight
-                    ? '0 2px 10px rgba(239,68,68,0.20)'
-                    : '0 1px 4px rgba(0,0,0,0.06)',
+                    ? '0 4px 16px rgba(239,68,68,0.20)'
+                    : '0 2px 8px rgba(0,0,0,0.06)',
                   transition:'all 0.2s',
                   aspectRatio:'1',
                   display:'flex',
@@ -563,7 +561,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                 {/* 이미지 */}
                 <div style={{
                   width:'100%', flex:1,
-                  background: colors.gray100,
+                  background:'#F1F5F9',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   overflow:'hidden', position:'relative',
                 }}>
@@ -577,7 +575,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   {isChecked && !photos[idx] && (
                     <div style={{
                       position:'absolute', inset:0,
-                      background:'rgba(139,94,60,0.65)',
+                      background:'rgba(41,182,208,0.75)',
                       display:'flex', alignItems:'center', justifyContent:'center',
                       animation: isStamping ? 'stampIn 0.5s ease both' : 'none',
                     }}>
@@ -599,10 +597,10 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
                 {/* 상호명 */}
                 <div style={{
-                  width:'100%', padding:'3px 4px',
+                  width:'100%', padding:'4px 4px',
                   fontSize:9, fontWeight:700, textAlign:'center',
-                  color: isChecked ? '#8B5E3C' : colors.textSecondary,
-                  lineHeight:1.2, background: colors.bgCard,
+                  color: isChecked ? '#29B6D0' : '#64748B',
+                  lineHeight:1.2, background:'rgba(255,255,255,0.95)',
                   whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
                 }}>{c.name}</div>
               </div>
@@ -624,6 +622,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
             const next = { ...photos }
             delete next[idx]
             setPhotos(next)
+            setPendingPhoto(null)
             handleCell(idx)
             setSelectedCafe(null)
           } else {
@@ -632,39 +631,70 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
             setTimeout(() => setSelectedCafe(null), 400)
           }
         }
-        const handleVisitWithPhoto = () => {
-          // 미방문 → 방문하기 버튼
+        const handleVisitWithPhoto = async () => {
+          // pendingPhoto 있으면 방문완료 시 Cloudinary 업로드
+          if (pendingPhoto && pendingPhoto.idx === idx) {
+            setUploadingPhoto(true)
+            try {
+              const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+              const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+              const isJpeg = pendingPhoto.file.type === 'image/jpeg'
+              const fd = new FormData()
+              fd.append('file', pendingPhoto.file, isJpeg ? 'photo.jpg' : 'photo.webp')
+              fd.append('upload_preset', UPLOAD_PRESET)
+              fd.append('folder', 'bingo-photos')
+              const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:'POST', body:fd })
+              const data = await res.json()
+              if (data.secure_url) {
+                const next = { ...photos, [idx]: data.secure_url }
+                setPhotos(next)
+              }
+            } catch { alert('업로드 실패') }
+            setUploadingPhoto(false)
+            setPendingPhoto(null)
+          }
           handleCell(idx)
           setTimeout(() => setSelectedCafe(null), 400)
         }
 
         return (
           <div style={{ position:'fixed', inset:0, zIndex:800 }}>
-            <div onClick={() => setSelectedCafe(null)} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)' }} />
+            <div onClick={() => { setSelectedCafe(null); setPendingPhoto(null) }} style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)' }} />
             <div style={{
               position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
               width:'calc(100% - 32px)', maxWidth:398,
               maxHeight:'85vh', overflowY:'auto',
-              borderRadius:radius.xl,
+              borderRadius:20,
               background: '#ffffff',
-              padding:`${spacing[3]}px ${spacing[3]}px ${spacing[8]}px`,
+              padding:'12px 12px 32px',
               boxSizing:'border-box',
               boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
               animation:'slideUpSheet 0.25s ease',
             }}>
               {/* X 버튼 */}
-              <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:spacing[2] }}>
-                <button onClick={() => setSelectedCafe(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+              <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:8 }}>
+                <button onClick={() => { setSelectedCafe(null); setPendingPhoto(null) }} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
                   <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
                 </button>
               </div>
 
               {/* 인증샷 미리보기 */}
-              {photos[idx] && (
-                <div style={{ marginBottom: spacing[3], position:'relative' }}>
-                  <div style={{ borderRadius: radius.md, overflow:'hidden', height:180 }}>
-                    <img src={photos[idx]} alt="인증샷" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+              {(pendingPhoto?.idx === idx ? pendingPhoto.url : photos[idx]) && (
+                <div style={{ marginBottom:12, position:'relative' }}>
+                  <div style={{ borderRadius:12, overflow:'hidden', height:180 }}>
+                    <img src={pendingPhoto?.idx === idx ? pendingPhoto.url : photos[idx]} alt="인증샷" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                   </div>
+                  {/* 미방문+pendingPhoto: 취소 버튼 */}
+                  {!isChecked && pendingPhoto?.idx === idx && (
+                    <button onClick={() => setPendingPhoto(null)} style={{
+                      position:'absolute', top:8, right:8,
+                      width:32, height:32, borderRadius:'50%',
+                      background:'rgba(0,0,0,0.55)', border:'none',
+                      cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+                    }}>
+                      <Icon icon="ph:trash" width={16} height={16} color="#fff" />
+                    </button>
+                  )}
                   {/* 방문완료 상태일 때만 삭제 아이콘 표시 */}
                   {isChecked && (
                     <button onClick={() => {
@@ -684,48 +714,48 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
               )}
 
               {/* 카페 카드 */}
-              <div style={{ marginBottom: spacing[3] }}>
+              <div style={{ marginBottom:12 }}>
                 {c.business_id
                   ? <CafeBusinessInfo businessId={c.business_id} />
                   : (
                     <div style={{
-                      background: colors.bgCard, borderRadius: radius.md,
-                      border:`1px solid ${colors.border}`, padding:`${spacing[4]}px`,
+                      background:'rgba(255,255,255,0.88)', borderRadius:16,
+                      border:'1px solid rgba(0,0,0,0.06)', padding:'16px',
                       textAlign:'center',
                     }}>
-                      <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[1] }}>{c.name}</div>
-                      <div style={{ fontSize: font.size.sm, color: colors.textTertiary }}>업체 정보가 아직 연결되지 않았어요</div>
+                      <div style={{ fontSize:16, fontWeight:700, color:'#0D3349', marginBottom:4 }}>{c.name}</div>
+                      <div style={{ fontSize:12, color:'#94A3B8' }}>업체 정보가 아직 연결되지 않았어요</div>
                     </div>
                   )
                 }
               </div>
 
               {/* 버튼 영역 */}
-              <div style={{ display:'flex', gap: spacing[2] }}>
+              <div style={{ display:'flex', gap:8 }}>
                 {isChecked ? (
                   <>
                     {/* 방문완료 상태: 방문 취소 + 이미지 변경 */}
                     <button onClick={handleToggle} style={{
-                      flex:2, height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
-                      background: colors.dangerLight, color: colors.danger,
-                      fontSize: font.size.md, fontWeight: font.weight.bold,
-                      display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
-                      fontFamily: font.family, transition:'all 0.15s',
+                      flex:2, height:50, borderRadius:12, border:'none', cursor:'pointer',
+                      background:'rgba(220,38,38,0.08)', color:'#DC2626',
+                      fontSize:15, fontWeight:700,
+                      display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+                      fontFamily:ff, transition:'all 0.15s',
                     }}>
-                      <Icon icon="ph:x-circle" width={20} height={20} color={colors.danger} />
+                      <Icon icon="ph:x-circle" width={20} height={20} color='#DC2626' />
                       방문 취소
                     </button>
                     <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
-                      flex:1, height:50, borderRadius: radius.md,
-                      border:`1px solid ${colors.border}`, background: colors.bgCard,
-                      color: colors.textSecondary, fontSize: font.size.sm, fontWeight: font.weight.bold,
+                      flex:1, height:50, borderRadius:12,
+                      border:'1px solid rgba(0,0,0,0.08)', background:'rgba(255,255,255,0.88)',
+                      color:'#64748B', fontSize:13, fontWeight:700,
                       display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-                      cursor:'pointer', fontFamily: font.family,
+                      cursor:'pointer', fontFamily:ff,
                       opacity: uploadingPhoto ? 0.6 : 1,
                     }}>
                       {uploadingPhoto
-                        ? <Icon icon="ph:circle-notch" width={16} height={16} color={colors.textSecondary} style={{ animation:'spin 0.8s linear infinite' }} />
-                        : <Icon icon="ph:camera" width={16} height={16} color={colors.textSecondary} />
+                        ? <Icon icon="ph:circle-notch" width={16} height={16} color={'#64748B'} style={{ animation:'spin 0.8s linear infinite' }} />
+                        : <Icon icon="ph:camera" width={16} height={16} color={'#64748B'} />
                       }
                       이미지 변경
                     </button>
@@ -734,26 +764,26 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   <>
                     {/* 미방문 상태: 방문하기 + 인증샷 */}
                     <button onClick={handleVisitWithPhoto} style={{
-                      flex:2, height:50, borderRadius: radius.md, border:'none', cursor:'pointer',
-                      background: '#8B5E3C', color: '#fff',
-                      fontSize: font.size.md, fontWeight: font.weight.bold,
-                      display:'flex', alignItems:'center', justifyContent:'center', gap: spacing[2],
-                      fontFamily: font.family, transition:'all 0.15s',
+                      flex:2, height:50, borderRadius:12, border:'none', cursor:'pointer',
+                      background:'#29B6D0', color:'#fff',
+                      fontSize:15, fontWeight:700,
+                      display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+                      fontFamily:ff, transition:'all 0.15s',
                     }}>
                       <Icon icon="ph:check-circle" width={20} height={20} color="#fff" />
                       방문완료
                     </button>
                     <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
-                      flex:1, height:50, borderRadius: radius.md,
-                      border:`1px solid ${colors.border}`, background: colors.bgCard,
-                      color: colors.textSecondary, fontSize: font.size.sm, fontWeight: font.weight.bold,
+                      flex:1, height:50, borderRadius:12,
+                      border:'1px solid rgba(0,0,0,0.08)', background:'rgba(255,255,255,0.88)',
+                      color:'#64748B', fontSize:13, fontWeight:700,
                       display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-                      cursor:'pointer', fontFamily: font.family,
+                      cursor:'pointer', fontFamily:ff,
                       opacity: uploadingPhoto ? 0.6 : 1,
                     }}>
                       {uploadingPhoto
-                        ? <Icon icon="ph:circle-notch" width={16} height={16} color={colors.textSecondary} style={{ animation:'spin 0.8s linear infinite' }} />
-                        : <Icon icon="ph:camera" width={16} height={16} color={colors.textSecondary} />
+                        ? <Icon icon="ph:circle-notch" width={16} height={16} color={'#64748B'} style={{ animation:'spin 0.8s linear infinite' }} />
+                        : <Icon icon="ph:camera" width={16} height={16} color={'#64748B'} />
                       }
                       인증샷
                     </button>
@@ -771,8 +801,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                   if (!file) return
                   setUploadingPhoto(true)
                   try {
-                    const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-                    const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
                     const compressed = await new Promise<Blob>((resolve, reject) => {
                       const img = new Image()
                       const url = URL.createObjectURL(file)
@@ -786,7 +814,6 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                         const canvas = document.createElement('canvas')
                         canvas.width = w; canvas.height = h
                         canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
-                        // webp 미지원 기기(iOS 등) 대비 jpeg로 폴백
                         const tryBlob = (type: string, quality: number) => {
                           canvas.toBlob(blob => {
                             if (blob) { URL.revokeObjectURL(url); resolve(blob) }
@@ -799,18 +826,10 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
                       img.onerror = () => reject(new Error('image load failed'))
                       img.src = url
                     })
-                    const isJpeg = compressed.type === 'image/jpeg'
-                    const fd = new FormData()
-                    fd.append('file', compressed, isJpeg ? 'photo.jpg' : 'photo.webp')
-                    fd.append('upload_preset', UPLOAD_PRESET)
-                    fd.append('folder', 'bingo-photos')
-                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:'POST', body:fd })
-                    const data = await res.json()
-                    if (data.secure_url) {
-                      const next = { ...photos, [idx]: data.secure_url }
-                      setPhotos(next)
-                    }
-                  } catch { alert('업로드 실패') }
+                    // 로컬 미리보기만 — Cloudinary 업로드는 방문완료 시
+                    const previewUrl = URL.createObjectURL(compressed)
+                    setPendingPhoto({ idx, url: previewUrl, file: compressed })
+                  } catch { alert('이미지 처리 실패') }
                   setUploadingPhoto(false)
                   e.target.value = ''
                 }}
@@ -828,27 +847,27 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
           <div onClick={() => setShowSaveConfirm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:700 }} />
           <div style={{
             position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-            background: colors.bgCard, borderRadius: radius.lg, padding:`${spacing[6]}px ${spacing[5]}px`,
+            background:'#fff', borderRadius:20, padding:'28px 20px',
             zIndex:701, width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
-            boxShadow:'0 8px 32px rgba(0,0,0,0.15)', fontFamily: font.family,
+            boxShadow:'0 8px 32px rgba(0,0,0,0.18)', fontFamily:ff,
           }}>
-            <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.textPrimary, marginBottom: spacing[2] }}>저장하기</div>
-            <div style={{ fontSize: font.size.sm, color: colors.textSecondary, marginBottom: spacing[5], lineHeight:1.6 }}>
+            <div style={{ fontSize:17, fontWeight:700, color:'#0D3349', marginBottom:8 }}>저장하기</div>
+            <div style={{ fontSize:13, color:'#64748B', marginBottom:20, lineHeight:1.6 }}>
               현재 빙고 진행 상황을 저장할까요?<br/>나중에 언제든지 다시 저장할 수 있어요.
             </div>
-            <div style={{ display:'flex', gap: spacing[2] }}>
+            <div style={{ display:'flex', gap:8 }}>
               <button onClick={() => setShowSaveConfirm(false)} style={{
-                flex:1, height:48, borderRadius: radius.sm, border:`1px solid ${colors.border}`,
-                background: colors.bgCard, color: colors.textSecondary,
-                fontSize: font.size.md, fontWeight: font.weight.medium, cursor:'pointer', fontFamily: font.family,
+                flex:1, height:48, borderRadius:12, border:'1px solid rgba(0,0,0,0.1)',
+                background:'#F8FAFC', color:'#64748B',
+                fontSize:14, fontWeight:500, cursor:'pointer', fontFamily:ff,
               }}>취소</button>
               <button onClick={() => {
                 setShowSaveConfirm(false)
                 onBack?.()
               }} style={{
-                flex:2, height:48, borderRadius: radius.sm, border:'none',
-                background: '#8B5E3C', color:'#fff',
-                fontSize: font.size.md, fontWeight: font.weight.bold, cursor:'pointer', fontFamily: font.family,
+                flex:2, height:48, borderRadius:12, border:'none',
+                background:'#29B6D0', color:'#fff',
+                fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:ff,
               }}>저장하기</button>
             </div>
           </div>
@@ -911,5 +930,5 @@ function CafeBusinessInfo({ businessId }: { businessId: string }) {
     <div style={{ textAlign:'center', padding:'24px 0', color:'#94A3B8', fontSize:14 }}>업체 정보를 찾을 수 없어요</div>
   )
 
-  return <BusinessCard business={biz} accentColor="#8B5E3C" />
+  return <BusinessCard business={biz} accentColor="#29B6D0" />
 }

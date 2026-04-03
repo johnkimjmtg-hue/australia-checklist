@@ -137,10 +137,10 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.06)' : 'transparent'
 
       const labels: { text: string; bg: string }[] = [
-        ...(dayEvents.length > 0 ? [{ text: `행사(${dayEvents.length})`, bg:'#FEF3C7' }] : []),
-        ...(bucketItems.length > 0 ? [{ text: `버킷(${bucketItems.length})`, bg:'rgba(41,182,208,0.20)' }] : []),
-        ...(shoppingItems.length > 0 ? [{ text: `쇼핑(${shoppingItems.length})`, bg:'rgba(255,107,157,0.20)' }] : []),
-        ...(dayNotes.length > 0 ? [{ text: `노트(${dayNotes.length})`, bg:'rgba(249,115,22,0.18)' }] : []),
+        ...(dayEvents.length > 0 ? [{ text: `행사 (${dayEvents.length})`, bg:'#FEF3C7' }] : []),
+        ...(bucketItems.length > 0 ? [{ text: `버킷 (${bucketItems.length})`, bg:'rgba(41,182,208,0.20)' }] : []),
+        ...(shoppingItems.length > 0 ? [{ text: `쇼핑 (${shoppingItems.length})`, bg:'rgba(255,107,157,0.20)' }] : []),
+        ...(dayNotes.length > 0 ? [{ text: `노트 (${dayNotes.length})`, bg:'rgba(249,115,22,0.18)' }] : []),
       ]
 
       allDayData.push({ d, dt, isPast, isInTrip, isToday, dayIdx, isSelected, cellBg, numColor, numFw, labels })
