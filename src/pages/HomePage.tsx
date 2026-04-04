@@ -651,72 +651,111 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
           <>
             {/* D-day */}
-            <div style={{ borderRadius:22, marginBottom:18, boxShadow:'0 2px 12px rgba(0,0,0,0.12)', overflow:'hidden', position:'relative', background:'rgba(13,43,62,0.88)' }}>
-              {/* 파도 SVG 애니메이션 */}
-              <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%' }} viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <style>{`
-                    @keyframes wave1 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-                    @keyframes wave2 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-                    @keyframes wave3 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-                    @keyframes twinkle { 0%,100%{opacity:0.9} 50%{opacity:0.3} }
-                    .w1{animation:wave1 6s linear infinite}
-                    .w2{animation:wave2 9s linear infinite}
-                    .w3{animation:wave3 12s linear infinite}
-                    .s1{animation:twinkle 2.1s ease-in-out infinite}
-                    .s2{animation:twinkle 1.7s ease-in-out infinite 0.3s}
-                    .s3{animation:twinkle 2.4s ease-in-out infinite 0.7s}
-                    .s4{animation:twinkle 1.9s ease-in-out infinite 0.2s}
-                    .s5{animation:twinkle 2.2s ease-in-out infinite 0.5s}
-                  `}</style>
-                </defs>
-                {/* 남십자성 - 카드 중앙 상단 */}
-                {/* Acrux (가장 밝은 별 - 맨 아래) */}
-                <polygon className="s1" points="200,52 201.5,47 203,52 208,52 204,55 205.5,60 201.5,57 197.5,60 199,55 194,52" fill="white"/>
-                {/* Mimosa (두번째 - 왼쪽) */}
-                <polygon className="s2" points="181,34 182.5,30 184,34 188,34 185,36.5 186,41 182.5,38.5 179,41 180,36.5 177,34" fill="white" opacity="0.9"/>
-                {/* Gacrux (세번째 - 맨 위) */}
-                <polygon className="s3" points="197,16 198.5,12 200,16 204,16 201,18.5 202,23 198.5,20.5 195,23 196,18.5 193,16" fill="white" opacity="0.85"/>
-                {/* Delta Crucis (네번째 - 오른쪽) */}
-                <polygon className="s4" points="220,31 221,28 222,31 225,31 223,33 223.5,37 221,35 218.5,37 219,33 217,31" fill="white" opacity="0.8"/>
-                {/* Epsilon Crucis (작은 별 - 중앙) */}
-                <circle className="s5" cx="205" cy="38" r="1.5" fill="white" opacity="0.6"/>
+            {(() => {
+              const hour = new Date().getHours()
+              const isDay = hour >= 6 && hour < 18
+              return (
+                <div style={{ borderRadius:22, marginBottom:18, boxShadow:'0 2px 12px rgba(0,0,0,0.12)', overflow:'hidden', position:'relative', background: isDay ? 'rgba(0,150,199,0.88)' : 'rgba(13,43,62,0.88)' }}>
+                  {/* SVG 배경 */}
+                  <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%' }} viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <style>{`
+                        @keyframes wave1 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+                        @keyframes wave2 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+                        @keyframes wave3 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+                        @keyframes twinkle { 0%,100%{opacity:0.9} 50%{opacity:0.3} }
+                        @keyframes drift { 0%{transform:translateX(0)} 100%{transform:translateX(30px)} }
+                        @keyframes sunpulse { 0%,100%{opacity:0.95} 50%{opacity:0.75} }
+                        .w1{animation:wave1 6s linear infinite}
+                        .w2{animation:wave2 9s linear infinite}
+                        .w3{animation:wave3 12s linear infinite}
+                        .s1{animation:twinkle 2.1s ease-in-out infinite}
+                        .s2{animation:twinkle 1.7s ease-in-out infinite 0.3s}
+                        .s3{animation:twinkle 2.4s ease-in-out infinite 0.7s}
+                        .s4{animation:twinkle 1.9s ease-in-out infinite 0.2s}
+                        .s5{animation:twinkle 2.2s ease-in-out infinite 0.5s}
+                        .cloud1{animation:drift 8s ease-in-out infinite alternate}
+                        .cloud2{animation:drift 11s ease-in-out infinite alternate-reverse}
+                        .sun{animation:sunpulse 3s ease-in-out infinite}
+                      `}</style>
+                    </defs>
 
-                {/* 작은 배경 별들 */}
-                <circle cx="30" cy="20" r="1" fill="white" opacity="0.4"/>
-                <circle cx="80" cy="35" r="1.2" fill="white" opacity="0.3"/>
-                <circle cx="150" cy="15" r="1" fill="white" opacity="0.35"/>
-                <circle cx="220" cy="28" r="0.8" fill="white" opacity="0.3"/>
-                <circle cx="340" cy="22" r="1" fill="white" opacity="0.25"/>
-                <circle cx="60" cy="55" r="0.8" fill="white" opacity="0.2"/>
-                <circle cx="180" cy="45" r="1" fill="white" opacity="0.25"/>
-
-                {/* 파도 3 (가장 뒤) */}
-                <g className="w3">
-                  <path d="M0 90 Q50 75 100 90 Q150 105 200 90 Q250 75 300 90 Q350 105 400 90 Q450 75 500 90 Q550 105 600 90 Q650 75 700 90 Q750 105 800 90 L800 140 L0 140 Z" fill="#00838F" opacity="0.3"/>
-                </g>
-                {/* 파도 2 (중간) */}
-                <g className="w2">
-                  <path d="M0 100 Q50 82 100 100 Q150 118 200 100 Q250 82 300 100 Q350 118 400 100 Q450 82 500 100 Q550 118 600 100 Q650 82 700 100 Q750 118 800 100 L800 140 L0 140 Z" fill="#29B6D0" opacity="0.35"/>
-                </g>
-                {/* 파도 1 (가장 앞) */}
-                <g className="w1">
-                  <path d="M0 110 Q50 95 100 110 Q150 125 200 110 Q250 95 300 110 Q350 125 400 110 Q450 95 500 110 Q550 125 600 110 Q650 95 700 110 Q750 125 800 110 L800 140 L0 140 Z" fill="#00E5CC" opacity="0.25"/>
-                </g>
-              </svg>
-              <div style={{ position:'relative', zIndex:1, padding:'20px 22px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-              <div>
-                <div style={{ fontSize:52, fontWeight:900, color: '#ffffff', lineHeight:1 }}>{ddayText}</div>
-                <div style={{ fontSize:15, color:'rgba(255,255,255,0.85)', marginTop:6 }}>{ddayLabel}</div>
-              </div>
-              <div style={{ textAlign:'right', fontSize:13, color:'rgba(255,255,255,0.85)', lineHeight:2 }}>
-                <div>✈️ {fmtDate(startDate)} 출발</div>
-                <div>🏠 {fmtDate(endDate)} 귀국</div>
-                <div style={{ marginTop:6, fontSize:13, color:'rgba(255,255,255,0.9)', fontWeight:700 }}>{tripNights}박 {tripNights+1}일</div>
-                <button onClick={onChangeDates} style={{ marginTop:6, background:'none', border:'none', fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.9)', cursor:'pointer', textDecoration:'underline', fontFamily:ff }}>일정 변경</button>
-              </div>
-              </div>
-            </div>
+                    {isDay ? (
+                      <>
+                        {/* 하늘 배경 */}
+                        <rect width="400" height="90" fill="#29B6D0" opacity="0.4"/>
+                        {/* 태양 - 같은 크기 두 원 겹침 */}
+                        <circle className="sun" cx="200" cy="32" r="20" fill="#F59E0B"/>
+                        <circle cx="200" cy="32" r="20" fill="#FFD166" opacity="0.6"/>
+                        {/* 구름 - 타원 여러개 겹쳐서 자연스럽게 */}
+                        <g className="cloud1">
+                          <ellipse cx="95" cy="32" rx="16" ry="10" fill="white" opacity="0.95"/>
+                          <ellipse cx="108" cy="26" rx="13" ry="9" fill="white" opacity="0.95"/>
+                          <ellipse cx="120" cy="29" rx="14" ry="8" fill="white" opacity="0.95"/>
+                          <ellipse cx="132" cy="27" rx="11" ry="8" fill="white" opacity="0.95"/>
+                          <ellipse cx="118" cy="33" rx="18" ry="7" fill="white" opacity="0.95"/>
+                          <ellipse cx="103" cy="34" rx="12" ry="6" fill="white" opacity="0.9"/>
+                          <ellipse cx="128" cy="34" rx="10" ry="6" fill="white" opacity="0.9"/>
+                        </g>
+                        {/* 파도 3 */}
+                        <g className="w3">
+                          <path d="M0 85 Q50 70 100 85 Q150 100 200 85 Q250 70 300 85 Q350 100 400 85 Q450 70 500 85 Q550 100 600 85 Q650 70 700 85 Q750 100 800 85 L800 140 L0 140 Z" fill="#0097A7" opacity="0.4"/>
+                        </g>
+                        {/* 파도 2 */}
+                        <g className="w2">
+                          <path d="M0 98 Q50 82 100 98 Q150 114 200 98 Q250 82 300 98 Q350 114 400 98 Q450 82 500 98 Q550 114 600 98 Q650 82 700 98 Q750 114 800 98 L800 140 L0 140 Z" fill="#00BCD4" opacity="0.45"/>
+                        </g>
+                        {/* 파도 1 */}
+                        <g className="w1">
+                          <path d="M0 110 Q50 95 100 110 Q150 125 200 110 Q250 95 300 110 Q350 125 400 110 Q450 95 500 110 Q550 125 600 110 Q650 95 700 110 Q750 125 800 110 L800 140 L0 140 Z" fill="#80DEEA" opacity="0.35"/>
+                        </g>
+                      </>
+                    ) : (
+                      <>
+                        {/* 남십자성 */}
+                        <polygon className="s1" points="200,52 201.5,47 203,52 208,52 204,55 205.5,60 201.5,57 197.5,60 199,55 194,52" fill="white"/>
+                        <polygon className="s2" points="181,34 182.5,30 184,34 188,34 185,36.5 186,41 182.5,38.5 179,41 180,36.5 177,34" fill="white" opacity="0.9"/>
+                        <polygon className="s3" points="197,16 198.5,12 200,16 204,16 201,18.5 202,23 198.5,20.5 195,23 196,18.5 193,16" fill="white" opacity="0.85"/>
+                        <polygon className="s4" points="220,31 221,28 222,31 225,31 223,33 223.5,37 221,35 218.5,37 219,33 217,31" fill="white" opacity="0.8"/>
+                        <circle className="s5" cx="205" cy="38" r="1.5" fill="white" opacity="0.6"/>
+                        {/* 배경 별들 */}
+                        <circle cx="30" cy="20" r="1" fill="white" opacity="0.4"/>
+                        <circle cx="80" cy="35" r="1.2" fill="white" opacity="0.3"/>
+                        <circle cx="150" cy="15" r="1" fill="white" opacity="0.35"/>
+                        <circle cx="220" cy="28" r="0.8" fill="white" opacity="0.3"/>
+                        <circle cx="340" cy="22" r="1" fill="white" opacity="0.25"/>
+                        <circle cx="60" cy="55" r="0.8" fill="white" opacity="0.2"/>
+                        <circle cx="180" cy="45" r="1" fill="white" opacity="0.25"/>
+                        {/* 파도 3 */}
+                        <g className="w3">
+                          <path d="M0 90 Q50 75 100 90 Q150 105 200 90 Q250 75 300 90 Q350 105 400 90 Q450 75 500 90 Q550 105 600 90 Q650 75 700 90 Q750 105 800 90 L800 140 L0 140 Z" fill="#00838F" opacity="0.3"/>
+                        </g>
+                        {/* 파도 2 */}
+                        <g className="w2">
+                          <path d="M0 100 Q50 82 100 100 Q150 118 200 100 Q250 82 300 100 Q350 118 400 100 Q450 82 500 100 Q550 118 600 100 Q650 82 700 100 Q750 118 800 100 L800 140 L0 140 Z" fill="#29B6D0" opacity="0.35"/>
+                        </g>
+                        {/* 파도 1 */}
+                        <g className="w1">
+                          <path d="M0 110 Q50 95 100 110 Q150 125 200 110 Q250 95 300 110 Q350 125 400 110 Q450 95 500 110 Q550 125 600 110 Q650 95 700 110 Q750 125 800 110 L800 140 L0 140 Z" fill="#00E5CC" opacity="0.25"/>
+                        </g>
+                      </>
+                    )}
+                  </svg>
+                  <div style={{ position:'relative', zIndex:1, padding:'20px 22px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                    <div>
+                      <div style={{ fontSize:52, fontWeight:900, color:'#ffffff', lineHeight:1 }}>{ddayText}</div>
+                      <div style={{ fontSize:15, color:'rgba(255,255,255,0.85)', marginTop:6 }}>{ddayLabel}</div>
+                    </div>
+                    <div style={{ textAlign:'right', fontSize:13, color:'rgba(255,255,255,0.85)', lineHeight:2 }}>
+                      <div>✈️ {fmtDate(startDate)} 출발</div>
+                      <div>🏠 {fmtDate(endDate)} 귀국</div>
+                      <div style={{ marginTop:6, fontSize:13, color:'rgba(255,255,255,0.9)', fontWeight:700 }}>{tripNights}박 {tripNights+1}일</div>
+                      <button onClick={onChangeDates} style={{ marginTop:6, background:'none', border:'none', fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.9)', cursor:'pointer', textDecoration:'underline', fontFamily:ff }}>일정 변경</button>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
 
 
             <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
