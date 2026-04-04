@@ -9,7 +9,6 @@ import {
   DndContext,
   closestCenter,
   PointerSensor,
-  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -79,8 +78,6 @@ function SortableCard({ id, onRemove }: { id: WidgetId; onRemove: () => void }) 
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
       <div
         ref={setNodeRef}
-        {...attributes}
-        {...listeners}
         style={{
           flex: 1,
           transform: CSS.Transform.toString(transform),
@@ -89,11 +86,22 @@ function SortableCard({ id, onRemove }: { id: WidgetId; onRemove: () => void }) 
           background: '#F8FAFC',
           borderRadius: 14,
           border: '1px solid rgba(0,0,0,0.06)',
-          touchAction: 'none',
-          cursor: 'grab',
+          display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
         }}
       >
-        <CardContent w={w} />
+        {/* 핸들에만 listeners 적용 */}
+        <div
+          {...attributes}
+          {...listeners}
+          style={{ touchAction: 'none', cursor: 'grab', flexShrink: 0, display: 'flex', alignItems: 'center', padding: '4px' }}
+        >
+          <Icon icon="ph:dots-six-vertical" width={20} height={20} color="#94A3B8" />
+        </div>
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: `${w.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{w.icon}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#0D3349' }}>{w.title}</div>
+          <div style={{ fontSize: 11, color: '#94A3B8' }}>{w.sub}</div>
+        </div>
       </div>
       <button onClick={onRemove} style={{
         width: 28, height: 28, borderRadius: '50%', border: 'none', flexShrink: 0,
@@ -134,7 +142,6 @@ export default function WidgetManager({ onClose, onSave }: Props) {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 15 } }),
   )
 
   const handleDragStart = (e: DragStartEvent) => {
