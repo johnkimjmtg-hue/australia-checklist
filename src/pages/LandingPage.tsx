@@ -108,9 +108,33 @@ export default function LandingPage({ onComplete }: Props) {
         @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
         @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
         @keyframes ripple { 0%{transform:scale(0.8);opacity:0.6} 100%{transform:scale(2.2);opacity:0} }
-        .blob1 { animation: floatA 7s ease-in-out infinite; }
-        .blob2 { animation: floatA 5s ease-in-out infinite; animation-delay:1s; }
-        .blob3 { animation: floatB 5.5s ease-in-out infinite; animation-delay:0.5s; }
+        .drop1 { animation: floatA 7s ease-in-out infinite; }
+        .drop2 { animation: floatA 5s ease-in-out infinite; animation-delay:1s; }
+        .drop3 { animation: floatB 5.5s ease-in-out infinite; animation-delay:0.5s; }
+        .wdrop {
+          position:relative;
+          background: linear-gradient(150deg, rgba(255,255,255,0.22) 0%, rgba(200,240,255,0.10) 40%, rgba(0,180,220,0.18) 100%);
+          border: 1.5px solid rgba(255,255,255,0.75);
+          box-shadow: inset 0 -4px 8px rgba(0,150,200,0.2), inset 0 6px 12px rgba(255,255,255,0.3), 0 4px 10px rgba(0,100,150,0.18);
+        }
+        .wdrop::after {
+          content:""; position:absolute; background:rgba(255,255,255,0.82); border-radius:50%; transform:rotate(-30deg); filter:blur(1.5px);
+        }
+        .wdrop::before {
+          content:""; position:absolute; background:rgba(255,255,255,0.6); border-radius:50%; filter:blur(0.8px);
+        }
+        .wdrop-lg { width:180px; height:180px; border-radius:50% 50% 48% 48% / 55% 55% 45% 45%; }
+        .wdrop-lg::after { width:38px; height:18px; top:18%; left:20%; }
+        .wdrop-lg::before { width:15px; height:15px; top:13%; left:48%; }
+        .wdrop-md { width:120px; height:120px; border-radius:50% 50% 48% 48% / 55% 55% 45% 45%; }
+        .wdrop-md::after { width:26px; height:13px; top:18%; left:20%; }
+        .wdrop-md::before { width:10px; height:10px; top:13%; left:48%; }
+        .wdrop-sm { width:90px; height:90px; border-radius:50% 50% 48% 48% / 55% 55% 45% 45%; }
+        .wdrop-sm::after { width:18px; height:9px; top:18%; left:20%; }
+        .wdrop-sm::before { width:7px; height:7px; top:13%; left:48%; }
+        .wdrop-shadow-lg { width:140px; height:10px; background:rgba(0,100,140,0.18); border-radius:50%; margin:-4px auto 0; filter:blur(3px); }
+        .wdrop-shadow-md { width:95px; height:7px; background:rgba(0,100,140,0.15); border-radius:50%; margin:-3px auto 0; filter:blur(2px); }
+        .wdrop-shadow-sm { width:70px; height:5px; background:rgba(0,100,140,0.13); border-radius:50%; margin:-2px auto 0; filter:blur(1.5px); }
         .icon-bounce { animation: bounceIn 0.7s cubic-bezier(.4,0,.2,1) both; }
         .icon-pulse { animation: pulse 3s ease-in-out infinite; }
         .ripple-anim { animation: ripple 2s ease-out infinite; }
@@ -128,9 +152,18 @@ export default function LandingPage({ onComplete }: Props) {
 
       {/* ── 상단 히어로 */}
       <div style={{ position:'relative', overflow:'hidden', background:'transparent', padding:'52px 28px 36px', minHeight:280 }}>
-        <div className="blob1" style={{ position:'absolute', width:180, height:180, borderRadius:'50%', background:'#80DEEA', top:-40, right:-30 }} />
-        <div className="blob2" style={{ position:'absolute', width:120, height:120, borderRadius:'50%', background:'#26C6DA', top:60, left:-20 }} />
-        <div className="blob3" style={{ position:'absolute', width:90, height:90, borderRadius:'50%', background:'#00ACC1', bottom:40, right:30 }} />
+        <div className="drop1" style={{ position:'absolute', top:-40, right:-30 }}>
+          <div className="wdrop wdrop-lg" />
+          <div className="wdrop-shadow-lg" />
+        </div>
+        <div className="drop2" style={{ position:'absolute', top:60, left:-20 }}>
+          <div className="wdrop wdrop-md" />
+          <div className="wdrop-shadow-md" />
+        </div>
+        <div className="drop3" style={{ position:'absolute', bottom:40, right:30 }}>
+          <div className="wdrop wdrop-sm" />
+          <div className="wdrop-shadow-sm" />
+        </div>
 
         <div className="icon-bounce" style={{ position:'relative', display:'inline-block', marginBottom:20 }}>
           <div className="ripple-anim" style={{ position:'absolute', inset:-8, borderRadius:'50%', background:'rgba(0,172,193,0.2)' }} />
