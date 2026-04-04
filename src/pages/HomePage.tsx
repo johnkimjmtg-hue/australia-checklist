@@ -671,17 +671,17 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                     .s5{animation:twinkle 2.2s ease-in-out infinite 0.5s}
                   `}</style>
                 </defs>
-                {/* 남십자성 - 오른쪽 상단 영역 */}
+                {/* 남십자성 - 카드 중앙 상단 */}
                 {/* Acrux (가장 밝은 별 - 맨 아래) */}
-                <polygon className="s1" points="285,80 287,74 289,80 295,80 290,84 292,90 287,86 282,90 284,84 279,80" fill="white"/>
+                <polygon className="s1" points="200,72 202,66 204,72 210,72 205,76 207,82 202,78 197,82 199,76 194,72" fill="white"/>
                 {/* Mimosa (두번째 - 왼쪽) */}
-                <polygon className="s2" points="262,58 263.5,53 265,58 270,58 266,61 267.5,66 263.5,63 259.5,66 261,61 257,58" fill="white" opacity="0.9"/>
+                <polygon className="s2" points="177,50 178.5,45 180,50 185,50 181,53 182.5,58 178.5,55 174.5,58 176,53 172,50" fill="white" opacity="0.9"/>
                 {/* Gacrux (세번째 - 맨 위) */}
-                <polygon className="s3" points="280,38 281.5,33 283,38 288,38 284,41 285.5,46 281.5,43 277.5,46 279,41 275,38" fill="white" opacity="0.85"/>
+                <polygon className="s3" points="195,30 196.5,25 198,30 203,30 199,33 200.5,38 196.5,35 192.5,38 194,33 190,30" fill="white" opacity="0.85"/>
                 {/* Delta Crucis (네번째 - 오른쪽) */}
-                <polygon className="s4" points="308,55 309,51 310,55 314,55 311,57.5 312,62 309,59.5 306,62 307,57.5 304,55" fill="white" opacity="0.8"/>
-                {/* Epsilon Crucis (작은 별 - 중앙 약간 위) */}
-                <circle className="s5" cx="291" cy="62" r="2" fill="white" opacity="0.6"/>
+                <polygon className="s4" points="223,47 224,43 225,47 229,47 226,49.5 227,54 224,51.5 221,54 222,49.5 219,47" fill="white" opacity="0.8"/>
+                {/* Epsilon Crucis (작은 별 - 중앙) */}
+                <circle className="s5" cx="206" cy="54" r="2" fill="white" opacity="0.6"/>
 
                 {/* 작은 배경 별들 */}
                 <circle cx="30" cy="20" r="1" fill="white" opacity="0.4"/>
@@ -714,7 +714,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 <div>✈️ {fmtDate(startDate)} 출발</div>
                 <div>🏠 {fmtDate(endDate)} 귀국</div>
                 <div style={{ marginTop:6, fontSize:13, color:'rgba(255,255,255,0.9)', fontWeight:700 }}>{tripNights}박 {tripNights+1}일</div>
-                <button onClick={onChangeDates} style={{ marginTop:6, background:'none', border:'none', fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.9)', cursor:'pointer', textDecoration:'underline', fontFamily:ff }}>날짜 변경</button>
+                <button onClick={onChangeDates} style={{ marginTop:6, background:'none', border:'none', fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.9)', cursor:'pointer', textDecoration:'underline', fontFamily:ff }}>일정 변경</button>
               </div>
               </div>
             </div>

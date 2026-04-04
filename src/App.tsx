@@ -53,7 +53,7 @@ function MainApp() {
         padding:'28px 24px 20px', fontFamily:ff,
         width:'calc(100% - 48px)', maxWidth:300, textAlign:'center',
       }}>
-        <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', marginBottom:10, textAlign:'center' }}>날짜를 변경할까요?</div>
+        <div style={{ fontSize:18, fontWeight:800, color:'#0F172A', marginBottom:10, textAlign:'center' }}>일정을 변경할까요?</div>
         <div style={{ fontSize:14, color:'#64748B', marginBottom:28, textAlign:'center', lineHeight:1.7 }}>
           버킷리스트, 쇼핑, 노트, 메모 등<br/>모든 데이터가 삭제됩니다.
         </div>
