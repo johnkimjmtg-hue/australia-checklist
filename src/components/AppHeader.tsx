@@ -137,6 +137,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
     <>
       <style>{`
         @keyframes slideUpSheet { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
+        @keyframes fadeIn { from{opacity:0; transform:translate(-50%,-50%) scale(0.95)} to{opacity:1; transform:translate(-50%,-50%) scale(1)} }
       `}</style>
 
       {/* 날씨 버튼 + 메뉴 버튼 */}
@@ -227,7 +228,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
             position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
             width:'calc(100% - 48px)', maxWidth:360,
             background:'#ffffff', borderRadius:20, zIndex:1201,
-            animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
+            animation:'fadeIn 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
             padding:'24px 20px 32px', fontFamily:ff,
           }}>
             <div style={{ textAlign:'center', marginBottom:20 }}>
