@@ -265,15 +265,9 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
             <div style={{ position:'sticky', top:0, zIndex:30, background: '#ffffff', borderBottom:'1px solid rgba(0,131,143,0.15)' }}>
               {/* 멘트 + 일정설정 + 일정보기 */}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:`${spacing[3]}px ${spacing[4]}px ${spacing[2]}px` }}>
-                {embedded && onGoHome ? (
-                  <button onClick={onGoHome} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'none', background:'#29B6D0', color:'#fff', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:ff }}>
-                    내버킷리스트 {done}
-                  </button>
-                ) : (
-                  <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: '#0D3349' }}>
-                    {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
-                  </span>
-                )}
+                <span style={{ fontSize:font.size.sm, fontWeight:font.weight.bold, color: '#0D3349' }}>
+                  {done > 0 ? `${done}개 선택됨` : trip ? '항목을 선택하세요' : '여행 일정을 설정하세요'}
+                </span>
                 {tripLabel && (
                   <div style={{ display:'flex', alignItems:'center', gap:4 }}>
                     <Icon icon="ph:airplane-takeoff" width={14} height={14} color="#DC2626" />

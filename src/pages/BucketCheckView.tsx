@@ -532,7 +532,7 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
 
       {/* ══ 상단 진행 카드 ══ */}
       <div style={{ padding:'16px 16px 0' }}>
-        <div style={{ background:'#ffffff', borderRadius:16, padding:'14px 16px', border:'1px solid #26C6DA' }}>
+        <div style={{ background:'#ffffff', borderRadius:16, padding:'14px 16px' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
             <div style={{ fontSize:18, fontWeight:700, color:'#0D3349' }}>내 버킷리스트</div>
             <div style={{ fontSize:13, color:'#1565A0' }}>
@@ -552,14 +552,6 @@ export default function BucketCheckView({ state, trip, setState, items, dbItems,
               pct < 100 ? '거의 다 왔어요! 마지막 스퍼트! 🔥' :
                           '모든 항목을 완료했어요! 축하합니다 🎉'
             }</div>
-            <div style={{ display:'flex', gap:6 }}>
-              <button onClick={onEdit} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'none', background:'#29B6D0', color:'#fff', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
-                <Icon icon="ph:pencil-simple" width={13} height={13} color="#fff" />수정하기
-              </button>
-              <button onClick={() => setShowDelete(true)} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)', color:'#DC2626', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
-                <Icon icon="ph:trash" width={13} height={13} color="#DC2626" />비우기
-              </button>
-            </div>
           </div>
         </div>
       </div>

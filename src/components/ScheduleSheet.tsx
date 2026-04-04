@@ -56,7 +56,7 @@ export default function ScheduleSheet({ itemLabel, trip, currentDays, onSelect, 
                 transition:'all 0.12s', WebkitTapHighlightColor:'transparent',
                 fontFamily:'inherit',
               }}>
-                <div style={{ fontWeight: sel ? 700 : 500, fontSize:14 }}>{idx+1}일</div>
+                <div style={{ fontWeight: sel ? 700 : 500, fontSize:14 }}>{idx+1}일차</div>
                 <div style={{ fontSize:11, opacity:0.8, marginTop:2 }}>{fmtMD(d)}</div>
                 <div style={{ fontSize:9, opacity:0.6 }}>{dow(d)}</div>
               </button>
