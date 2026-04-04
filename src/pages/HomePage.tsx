@@ -299,7 +299,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
     <div style={{
       minHeight:'100dvh',
       background:'linear-gradient(180deg, #00BCD4 0%, #80DEEA 28%, #FFF0C8 50%, #F5C97A 70%, #D4703A 100%)', backgroundSize:'100% 200%', animation:'gradientShift 12s ease-in-out infinite',
-      fontFamily: ff, maxWidth:430, margin:'0 auto',
+      fontFamily: ff, maxWidth:430, margin:'0 auto', display:'flex', flexDirection:'column',
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -649,7 +649,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       </div>
 
       {/* 스크롤 영역 */}
-      <div style={{ padding:'0 18px 80px', minHeight:'100dvh' }}>
+      <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
           <>
             {/* D-day */}
             {(() => {
