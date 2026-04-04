@@ -652,7 +652,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
           <>
             {/* D-day */}
-            <div style={{ borderRadius:22, marginBottom:18, boxShadow:'0 2px 12px rgba(0,0,0,0.12)', overflow:'hidden', position:'relative', background:'#0D3349' }}>
+            <div style={{ borderRadius:22, marginBottom:18, boxShadow:'0 2px 12px rgba(0,0,0,0.12)', overflow:'hidden', position:'relative', background:'rgba(13,43,62,0.88)' }}>
               {/* 파도 SVG 애니메이션 */}
               <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%' }} viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
                 <defs>
@@ -660,12 +660,38 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                     @keyframes wave1 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
                     @keyframes wave2 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
                     @keyframes wave3 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+                    @keyframes twinkle { 0%,100%{opacity:0.9} 50%{opacity:0.3} }
                     .w1{animation:wave1 6s linear infinite}
                     .w2{animation:wave2 9s linear infinite}
                     .w3{animation:wave3 12s linear infinite}
+                    .s1{animation:twinkle 2.1s ease-in-out infinite}
+                    .s2{animation:twinkle 1.7s ease-in-out infinite 0.3s}
+                    .s3{animation:twinkle 2.4s ease-in-out infinite 0.7s}
+                    .s4{animation:twinkle 1.9s ease-in-out infinite 0.2s}
+                    .s5{animation:twinkle 2.2s ease-in-out infinite 0.5s}
                   `}</style>
                 </defs>
-                <rect width="400" height="140" fill="#0D2B3E"/>
+                {/* 남십자성 - 오른쪽 상단 영역 */}
+                {/* Acrux (가장 밝은 별 - 맨 아래) */}
+                <polygon className="s1" points="285,80 287,74 289,80 295,80 290,84 292,90 287,86 282,90 284,84 279,80" fill="white"/>
+                {/* Mimosa (두번째 - 왼쪽) */}
+                <polygon className="s2" points="262,58 263.5,53 265,58 270,58 266,61 267.5,66 263.5,63 259.5,66 261,61 257,58" fill="white" opacity="0.9"/>
+                {/* Gacrux (세번째 - 맨 위) */}
+                <polygon className="s3" points="280,38 281.5,33 283,38 288,38 284,41 285.5,46 281.5,43 277.5,46 279,41 275,38" fill="white" opacity="0.85"/>
+                {/* Delta Crucis (네번째 - 오른쪽) */}
+                <polygon className="s4" points="308,55 309,51 310,55 314,55 311,57.5 312,62 309,59.5 306,62 307,57.5 304,55" fill="white" opacity="0.8"/>
+                {/* Epsilon Crucis (작은 별 - 중앙 약간 위) */}
+                <circle className="s5" cx="291" cy="62" r="2" fill="white" opacity="0.6"/>
+
+                {/* 작은 배경 별들 */}
+                <circle cx="30" cy="20" r="1" fill="white" opacity="0.4"/>
+                <circle cx="80" cy="35" r="1.2" fill="white" opacity="0.3"/>
+                <circle cx="150" cy="15" r="1" fill="white" opacity="0.35"/>
+                <circle cx="220" cy="28" r="0.8" fill="white" opacity="0.3"/>
+                <circle cx="340" cy="22" r="1" fill="white" opacity="0.25"/>
+                <circle cx="60" cy="55" r="0.8" fill="white" opacity="0.2"/>
+                <circle cx="180" cy="45" r="1" fill="white" opacity="0.25"/>
+
                 {/* 파도 3 (가장 뒤) */}
                 <g className="w3">
                   <path d="M0 90 Q50 75 100 90 Q150 105 200 90 Q250 75 300 90 Q350 105 400 90 Q450 75 500 90 Q550 105 600 90 Q650 75 700 90 Q750 105 800 90 L800 140 L0 140 Z" fill="#00838F" opacity="0.3"/>
