@@ -30,9 +30,10 @@ type Props = {
   setState: (s: AppState) => void
   onNavigate: (tab: Tab) => void
   onChangeDates: () => void
+  cacheStamp?: number
 }
 
-export default function HomePage({ trip, state, setState, onNavigate, onChangeDates }: Props) {
+export default function HomePage({ trip, state, setState, onNavigate, onChangeDates, cacheStamp }: Props) {
   const [vy, setVy] = useState(TODAY.getFullYear())
   const [vm, setVm] = useState(TODAY.getMonth())
   const [calSlideDir, setCalSlideDir] = useState<'left'|'right'>('left')
@@ -52,7 +53,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
     if (cached?.items?.length) setDbItems(cached.items)
     const cachedEvents = getCachedEvents()
     if (cachedEvents?.length) setEvents(cachedEvents)
-  }, [])
+  }, [cacheStamp])
   const [showBucket, setShowBucket] = useState(false)
   const [showChecklist, setShowChecklist] = useState(false)
   const [showShopping, setShowShopping] = useState(false)

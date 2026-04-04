@@ -255,7 +255,7 @@ export default function ChecklistPage({ state, setState, initialTab, onGoHome, e
         </>
       ) : (
         // ── 버킷리스트 선택 화면 (paddingBottom으로 하단 고정 영역 확보)
-        <div style={{ paddingBottom: embedded ? 20 : 130, background: 'transparent', minHeight: '100dvh' }}>
+        <div style={{ paddingBottom: embedded ? 20 : 130, background: 'transparent', minHeight: embedded ? 'auto' : '100dvh' }}>
 
           {!embedded && <AppHeader />}
 
