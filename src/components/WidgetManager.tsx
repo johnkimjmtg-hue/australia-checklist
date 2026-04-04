@@ -76,6 +76,14 @@ function SortableCard({ id, onRemove }: { id: WidgetId; onRemove: () => void }) 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <button onClick={onRemove} style={{
+        width: 28, height: 28, borderRadius: '50%', border: 'none', flexShrink: 0,
+        background: 'rgba(220,38,38,0.1)', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        WebkitTapHighlightColor: 'transparent',
+      }}>
+        <Icon icon="ph:minus" width={14} height={14} color="#DC2626" />
+      </button>
       <div
         ref={setNodeRef}
         style={{
@@ -89,7 +97,11 @@ function SortableCard({ id, onRemove }: { id: WidgetId; onRemove: () => void }) 
           display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
         }}
       >
-        {/* 핸들에만 listeners 적용 */}
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: `${w.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{w.icon}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#0D3349' }}>{w.title}</div>
+          <div style={{ fontSize: 11, color: '#94A3B8' }}>{w.sub}</div>
+        </div>
         <div
           {...attributes}
           {...listeners}
@@ -97,20 +109,7 @@ function SortableCard({ id, onRemove }: { id: WidgetId; onRemove: () => void }) 
         >
           <Icon icon="ph:dots-six-vertical" width={20} height={20} color="#94A3B8" />
         </div>
-        <div style={{ width: 36, height: 36, borderRadius: 10, background: `${w.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{w.icon}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#0D3349' }}>{w.title}</div>
-          <div style={{ fontSize: 11, color: '#94A3B8' }}>{w.sub}</div>
-        </div>
       </div>
-      <button onClick={onRemove} style={{
-        width: 28, height: 28, borderRadius: '50%', border: 'none', flexShrink: 0,
-        background: 'rgba(220,38,38,0.1)', cursor: 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        WebkitTapHighlightColor: 'transparent',
-      }}>
-        <Icon icon="ph:minus" width={14} height={14} color="#DC2626" />
-      </button>
     </div>
   )
 }
@@ -123,13 +122,12 @@ function ShelfCard({ id, onAdd }: { id: WidgetId; onAdd: () => void }) {
       background: 'rgba(255,255,255,0.6)', borderRadius: 14,
       border: '1px dashed rgba(212,112,58,0.3)', cursor: 'pointer',
     }}>
-      <div style={{ width: 20, flexShrink: 0 }} />
+      <div style={{ fontSize: 20, color: '#D4703A', fontWeight: 700, flexShrink: 0 }}>+</div>
       <div style={{ width: 36, height: 36, borderRadius: 10, background: `${w.color}10`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0, opacity: 0.6 }}>{w.icon}</div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: '#7C3A10', opacity: 0.7 }}>{w.title}</div>
         <div style={{ fontSize: 11, color: '#94A3B8' }}>{w.sub}</div>
       </div>
-      <div style={{ fontSize: 20, color: '#D4703A', fontWeight: 700, paddingRight: 4 }}>+</div>
     </div>
   )
 }
