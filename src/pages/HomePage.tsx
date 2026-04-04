@@ -303,6 +303,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        html, body { overscroll-behavior: none; }
         .menu-card-hover { transition: transform 0.12s; -webkit-tap-highlight-color: transparent; }
         @keyframes gradientShift {
           0%   { background-position: 0% 0%; }
