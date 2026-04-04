@@ -164,22 +164,6 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
         position:'sticky', top:0, zIndex:20,
         display:'flex', alignItems:'flex-start',
       }}>
-        {/* 내 쇼핑리스트 버튼 */}
-        {myList.length > 0 && onGoToMyList && (
-          <div style={{ paddingLeft:14, paddingTop:8, paddingBottom:8, flexShrink:0, display:'flex', alignItems:'flex-start' }}>
-            <button className="cat-btn" onClick={onGoToMyList} style={{
-              height:34, padding:'0 12px', borderRadius:radius.full, cursor:'pointer',
-              background: '#FF6B9D', border: 'none',
-              color: '#fff',
-              fontSize: font.size.sm, fontWeight: font.weight.bold, whiteSpace:'nowrap',
-              boxShadow:'0 3px 8px rgba(255,107,157,0.4)',
-              WebkitTapHighlightColor: 'transparent',
-            }}>
-              내쇼핑리스트 {myList.length}
-            </button>
-          </div>
-        )}
-
         {/* 카테고리 스크롤 */}
         <div className="cat-scroll" style={{ display:'flex', gap:spacing[2], padding:`${spacing[2]}px ${spacing[3]}px`, overflowX:'auto', flex:1 }}>
           <button className="cat-btn" onClick={() => setSelCat(null)} style={{

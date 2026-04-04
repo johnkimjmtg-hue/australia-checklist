@@ -170,7 +170,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
         <div style={{
           background: '#ffffff',
           borderRadius: radius.lg,
-          border: `1px solid #FF6B9D`,
           padding: `14px 16px`,
         }}>
           {/* 상단: 제목 + 카운터 */}
@@ -183,7 +182,7 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
           </div>
           {/* 선물박스 그리드 */}
           <GiftBoxProgress total={total} checkedCount={checkedCount} myList={myList} myChecked={myChecked} />
-          {/* 하단: 메시지 + 버튼 */}
+          {/* 하단: 메시지 */}
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:10 }}>
             <div style={{ fontSize:12, color:'#7BAAB5' }}>
               {pct === 0
@@ -193,14 +192,6 @@ export default function MyShoppingView({ onBack, onLanding, myList, myChecked, o
                 : pct < 75  ? '절반을 넘었어요! 조금만 더! ⚡'
                 : pct < 100 ? '거의 다 왔어요! 마지막 스퍼트! 🔥'
                 :             '쇼핑 완료! 모든 상품을 구매했어요 🎉'}
-            </div>
-            <div style={{ display:'flex', gap:6 }}>
-              <button onClick={onBack} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'none', background:'#FF6B9D', color:'#fff', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
-                <Icon icon="ph:shopping-bag" width={13} height={13} color="#fff" />추가하기
-              </button>
-              <button onClick={() => setShowDeleteAll(true)} style={{ height:28, paddingLeft:10, paddingRight:10, borderRadius:20, border:'1px solid rgba(220,38,38,0.3)', background:'rgba(220,38,38,0.08)', color:'#DC2626', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:3, cursor:'pointer', fontFamily:'inherit' }}>
-                <Icon icon="ph:trash" width={13} height={13} color="#DC2626" />비우기
-              </button>
             </div>
           </div>
         </div>
