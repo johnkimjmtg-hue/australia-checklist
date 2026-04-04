@@ -134,7 +134,9 @@ export default function LandingPage({ onComplete }: Props) {
 
         <div className="icon-bounce" style={{ position:'relative', display:'inline-block', marginBottom:20 }}>
           <div className="ripple-anim" style={{ position:'absolute', inset:-8, borderRadius:'50%', background:'rgba(0,172,193,0.2)' }} />
-          <div className="icon-pulse" style={{ width:72, height:72, borderRadius:24, background:'#FF7043', display:'flex', alignItems:'center', justifyContent:'center', fontSize:36, position:'relative', zIndex:1 }}>✈️</div>
+          <div className="icon-pulse" style={{ width:72, height:72, position:'relative', zIndex:1 }}>
+            <img src="/suitcase.png" alt="가방" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
+          </div>
         </div>
 
         <h1 className="title-anim" style={{ fontSize:32, fontWeight:800, color:'#0D3349', lineHeight:1.3, margin:0 }}>
