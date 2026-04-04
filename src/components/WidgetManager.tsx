@@ -111,6 +111,8 @@ export default function WidgetManager({ onClose, onSave }: Props) {
   const dragRef = useRef<DragState | null>(null)
   const dropTargetRef = useRef<DropTarget>(null)
   const activeRef = useRef<WidgetId[]>(active)
+  const floatingRef = useRef<HTMLDivElement>(null)
+  const rafRef = useRef<number | null>(null)
 
   const activeRefs = useRef<(HTMLDivElement | null)[]>([])
   const shelfRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -176,77 +178,74 @@ export default function WidgetManager({ onClose, onSave }: Props) {
     if (navigator.vibrate) navigator.vibrate(30)
   }, [])
 
-  const handleMoveRef = useRef((clientX: number, clientY: number) => {
-    const d = dragRef.current
-    if (!d) return
-    const newDrag = { ...d, x: d.x + (clientX - d.startX), y: d.y + (clientY - d.startY), startX: clientX, startY: clientY }
-    dragRef.current = newDrag
-    setDrag(newDrag)
-    const dt = calcDropTarget(clientY)
-    dropTargetRef.current = dt
-    setDropTarget(dt)
-  })
-
-  useEffect(() => {
-    handleMoveRef.current = (clientX: number, clientY: number) => {
-      const d = dragRef.current
-      if (!d) return
-      const newDrag = { ...d, x: d.x + (clientX - d.startX), y: d.y + (clientY - d.startY), startX: clientX, startY: clientY }
-      dragRef.current = newDrag
-      setDrag(newDrag)
-      const dt = calcDropTarget(clientY)
-      dropTargetRef.current = dt
-      setDropTarget(dt)
-    }
-  }, [calcDropTarget])
-
-  const handleDropRef = useRef(() => {
-    const d = dragRef.current
-    const dt = dropTargetRef.current
-    if (!d || !dt) { dragRef.current = null; setDrag(null); setDropTarget(null); return }
-
-    const { id, fromSection } = d
-    const { section: toSection, idx: toIdx } = dt
-
-    setActive(prev => {
-      const currentShelf = ALL_WIDGETS.filter(w => !prev.includes(w.id)).map(w => w.id)
-      let newActive = [...prev]
-
-      if (fromSection === 'active' && toSection === 'active') {
-        const fromI = newActive.indexOf(id)
-        newActive.splice(fromI, 1)
-        const insertAt = Math.min(toIdx, newActive.length)
-        newActive.splice(insertAt, 0, id)
-      } else if (fromSection === 'shelf' && toSection === 'active') {
-        const insertAt = Math.min(toIdx, newActive.length)
-        newActive.splice(insertAt, 0, id)
-      } else if (fromSection === 'active' && toSection === 'shelf') {
-        if (newActive.length > 1) {
-          newActive = newActive.filter(w => w !== id)
-        }
-      }
-
-      saveWidgets(newActive)
-      onSave(newActive)
-      return newActive
-    })
-
-    dragRef.current = null
-    dropTargetRef.current = null
-    setDrag(null)
-    setDropTarget(null)
-  })
-
   // 글로벌 이벤트 — 최초 1회만 등록
   useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => handleMoveRef.current(e.clientX, e.clientY)
+    const onMove = (clientX: number, clientY: number) => {
+      const d = dragRef.current
+      if (!d) return
+
+      // 플로팅 카드 위치 DOM 직접 조작 (리렌더 없음)
+      if (floatingRef.current) {
+        const dx = clientX - d.startX
+        const dy = clientY - d.startY
+        floatingRef.current.style.left = `${d.x + dx}px`
+        floatingRef.current.style.top = `${d.y + dy}px`
+      }
+
+      // dragRef startX/Y 업데이트
+      dragRef.current = { ...d, x: d.x + (clientX - d.startX), y: d.y + (clientY - d.startY), startX: clientX, startY: clientY }
+
+      // 드롭 타겟은 RAF로 계산 (과도한 setState 방지)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      rafRef.current = requestAnimationFrame(() => {
+        const dt = calcDropTarget(clientY)
+        if (JSON.stringify(dt) !== JSON.stringify(dropTargetRef.current)) {
+          dropTargetRef.current = dt
+          setDropTarget(dt)
+        }
+      })
+    }
+
+    const onDrop = () => {
+      const d = dragRef.current
+      const dt = dropTargetRef.current
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      if (!d || !dt) { dragRef.current = null; setDrag(null); setDropTarget(null); return }
+
+      const { id, fromSection } = d
+      const { section: toSection, idx: toIdx } = dt
+
+      setActive(prev => {
+        let newActive = [...prev]
+        if (fromSection === 'active' && toSection === 'active') {
+          const fromI = newActive.indexOf(id)
+          newActive.splice(fromI, 1)
+          newActive.splice(Math.min(toIdx, newActive.length), 0, id)
+        } else if (fromSection === 'shelf' && toSection === 'active') {
+          newActive.splice(Math.min(toIdx, newActive.length), 0, id)
+        } else if (fromSection === 'active' && toSection === 'shelf') {
+          if (newActive.length > 1) newActive = newActive.filter(w => w !== id)
+        }
+        saveWidgets(newActive)
+        onSave(newActive)
+        return newActive
+      })
+
+      dragRef.current = null
+      dropTargetRef.current = null
+      setDrag(null)
+      setDropTarget(null)
+    }
+
+    const onMouseMove = (e: MouseEvent) => onMove(e.clientX, e.clientY)
     const onTouchMove = (e: TouchEvent) => {
       if (!dragRef.current) return
       e.preventDefault()
-      handleMoveRef.current(e.touches[0].clientX, e.touches[0].clientY)
+      onMove(e.touches[0].clientX, e.touches[0].clientY)
     }
-    const onMouseUp = () => handleDropRef.current()
-    const onTouchEnd = () => handleDropRef.current()
+    const onMouseUp = () => onDrop()
+    const onTouchEnd = () => onDrop()
+
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('mouseup', onMouseUp)
     window.addEventListener('touchmove', onTouchMove, { passive: false })
@@ -256,8 +255,9 @@ export default function WidgetManager({ onClose, onSave }: Props) {
       window.removeEventListener('mouseup', onMouseUp)
       window.removeEventListener('touchmove', onTouchMove)
       window.removeEventListener('touchend', onTouchEnd)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
-  }, [])
+  }, [calcDropTarget, onSave])
 
   const handleReset = () => {
     const next = [...DEFAULT_WIDGETS]
@@ -453,14 +453,14 @@ export default function WidgetManager({ onClose, onSave }: Props) {
 
       {/* 플로팅 드래그 카드 */}
       {drag && dragWidget && (
-        <div style={{
+        <div ref={floatingRef} style={{
           position: 'fixed',
           left: drag.x,
           top: drag.y,
           width: drag.width,
           zIndex: 1100,
           pointerEvents: 'none',
-          transform: 'scale(1.04) rotate(1.5deg)',
+          transform: 'scale(1.04)',
           boxShadow: '0 12px 40px rgba(0,0,0,0.25)',
           borderRadius: 14,
           background: '#fff',
