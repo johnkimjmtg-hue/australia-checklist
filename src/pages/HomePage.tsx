@@ -673,15 +673,15 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 </defs>
                 {/* 남십자성 - 카드 중앙 상단 */}
                 {/* Acrux (가장 밝은 별 - 맨 아래) */}
-                <polygon className="s1" points="200,72 202,66 204,72 210,72 205,76 207,82 202,78 197,82 199,76 194,72" fill="white"/>
+                <polygon className="s1" points="200,52 201.5,47 203,52 208,52 204,55 205.5,60 201.5,57 197.5,60 199,55 194,52" fill="white"/>
                 {/* Mimosa (두번째 - 왼쪽) */}
-                <polygon className="s2" points="177,50 178.5,45 180,50 185,50 181,53 182.5,58 178.5,55 174.5,58 176,53 172,50" fill="white" opacity="0.9"/>
+                <polygon className="s2" points="181,34 182.5,30 184,34 188,34 185,36.5 186,41 182.5,38.5 179,41 180,36.5 177,34" fill="white" opacity="0.9"/>
                 {/* Gacrux (세번째 - 맨 위) */}
-                <polygon className="s3" points="195,30 196.5,25 198,30 203,30 199,33 200.5,38 196.5,35 192.5,38 194,33 190,30" fill="white" opacity="0.85"/>
+                <polygon className="s3" points="197,16 198.5,12 200,16 204,16 201,18.5 202,23 198.5,20.5 195,23 196,18.5 193,16" fill="white" opacity="0.85"/>
                 {/* Delta Crucis (네번째 - 오른쪽) */}
-                <polygon className="s4" points="223,47 224,43 225,47 229,47 226,49.5 227,54 224,51.5 221,54 222,49.5 219,47" fill="white" opacity="0.8"/>
+                <polygon className="s4" points="220,31 221,28 222,31 225,31 223,33 223.5,37 221,35 218.5,37 219,33 217,31" fill="white" opacity="0.8"/>
                 {/* Epsilon Crucis (작은 별 - 중앙) */}
-                <circle className="s5" cx="206" cy="54" r="2" fill="white" opacity="0.6"/>
+                <circle className="s5" cx="205" cy="38" r="1.5" fill="white" opacity="0.6"/>
 
                 {/* 작은 배경 별들 */}
                 <circle cx="30" cy="20" r="1" fill="white" opacity="0.4"/>
