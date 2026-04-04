@@ -248,9 +248,6 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
                   display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 16px',
                 }}>
                   <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                    <span style={{ fontSize:24 }}>
-                      {key === 'sydney' ? '🦘' : key === 'melbourne' ? '☕' : '🌞'}
-                    </span>
                     <div style={{ textAlign:'left' }}>
                       <div style={{ fontSize:15, fontWeight:700, color:'#0D3349' }}>{city.label}</div>
                       <div style={{ fontSize:11, color:'#94A3B8' }}>

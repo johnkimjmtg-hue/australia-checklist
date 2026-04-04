@@ -2,7 +2,6 @@
 // HomePage.tsx — 달력 중심 홈
 // ─────────────────────────────────────────────
 import { useState, useEffect, useRef } from 'react'
-import sydneyImg from '../assets/sydney.jpg'
 import { Icon } from '@iconify/react'
 import { TripInfo, AppState, getTripDays } from '../store/state'
 import { ITEMS } from '../data/checklist'
@@ -166,14 +165,15 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
         : []
       const dayNotes = allNotes.filter((n: any) => n.date === dateStr)
 
-      const numColor = isSelected ? '#fff' : isToday ? '#00838F' : isPast ? '#7BAAB5' : dayEvents.length > 0 ? '#A855F7' : '#0D3349'
-      const numFw = isPast ? 400 : isToday || isSelected || dayEvents.length > 0 ? 800 : 500
+      const numColor = isSelected ? '#fff' : isToday ? '#00838F' : isPast ? '#7BAAB5' : '#0D3349'
+      const numFw = isToday || isSelected ? 800 : 500
       const cellBg = isSelected ? '#00838F' : isInTrip ? 'rgba(0,0,0,0.06)' : 'transparent'
 
       const labels: { text: string; bg: string }[] = [
-        ...bucketItems.slice(0, 2).map(item => ({ text: item.label, bg:'rgba(41,182,208,0.20)' })),
-        ...shoppingItems.slice(0, 2).map((item: any) => ({ text: item.name, bg:'rgba(255,107,157,0.20)' })),
-        ...dayNotes.slice(0, 2).map((note: any) => ({ text: note.title || '제목 없음', bg:'rgba(249,115,22,0.18)' })),
+        ...(dayEvents.length > 0 ? [{ text: `행사 (${dayEvents.length})`, bg:'#FEF3C7' }] : []),
+        ...(bucketItems.length > 0 ? [{ text: `버킷 (${bucketItems.length})`, bg:'rgba(41,182,208,0.20)' }] : []),
+        ...(shoppingItems.length > 0 ? [{ text: `쇼핑 (${shoppingItems.length})`, bg:'rgba(255,107,157,0.20)' }] : []),
+        ...(dayNotes.length > 0 ? [{ text: `노트 (${dayNotes.length})`, bg:'rgba(249,115,22,0.18)' }] : []),
       ]
 
       allDayData.push({ d, dt, isPast, isInTrip, isToday, dayIdx, isSelected, cellBg, numColor, numFw, labels })
@@ -652,9 +652,33 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       <div style={{ flex:1, padding:'0 18px 40px', overflowY:'auto' }}>
           <>
             {/* D-day */}
-            <div style={{ borderRadius:22, marginBottom:18, boxShadow:'0 2px 12px rgba(0,0,0,0.12)', overflow:'hidden', position:'relative' }}>
-              <div style={{ position:'absolute', inset:0, backgroundImage:`url(${sydneyImg})`, backgroundSize:'cover', backgroundPosition:'center' }} />
-              <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.55) 100%)' }} />
+            <div style={{ borderRadius:22, marginBottom:18, boxShadow:'0 2px 12px rgba(0,0,0,0.12)', overflow:'hidden', position:'relative', background:'#0D3349' }}>
+              {/* 파도 SVG 애니메이션 */}
+              <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%' }} viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <style>{`
+                    @keyframes wave1 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+                    @keyframes wave2 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+                    @keyframes wave3 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+                    .w1{animation:wave1 6s linear infinite}
+                    .w2{animation:wave2 9s linear infinite}
+                    .w3{animation:wave3 12s linear infinite}
+                  `}</style>
+                </defs>
+                <rect width="400" height="140" fill="#0D2B3E"/>
+                {/* 파도 3 (가장 뒤) */}
+                <g className="w3">
+                  <path d="M0 90 Q50 75 100 90 Q150 105 200 90 Q250 75 300 90 Q350 105 400 90 Q450 75 500 90 Q550 105 600 90 Q650 75 700 90 Q750 105 800 90 L800 140 L0 140 Z" fill="#00838F" opacity="0.3"/>
+                </g>
+                {/* 파도 2 (중간) */}
+                <g className="w2">
+                  <path d="M0 100 Q50 82 100 100 Q150 118 200 100 Q250 82 300 100 Q350 118 400 100 Q450 82 500 100 Q550 118 600 100 Q650 82 700 100 Q750 118 800 100 L800 140 L0 140 Z" fill="#29B6D0" opacity="0.35"/>
+                </g>
+                {/* 파도 1 (가장 앞) */}
+                <g className="w1">
+                  <path d="M0 110 Q50 95 100 110 Q150 125 200 110 Q250 95 300 110 Q350 125 400 110 Q450 95 500 110 Q550 125 600 110 Q650 95 700 110 Q750 125 800 110 L800 140 L0 140 Z" fill="#00E5CC" opacity="0.25"/>
+                </g>
+              </svg>
               <div style={{ position:'relative', zIndex:1, padding:'20px 22px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
               <div>
                 <div style={{ fontSize:52, fontWeight:900, color: '#ffffff', lineHeight:1 }}>{ddayText}</div>
@@ -933,7 +957,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                 backdropFilter:'blur(4px)',
               }}>
                 <Icon icon="ph:pencil-simple" width={16} height={16} color="#fff" />
-                홈 화면 편집 <span style={{ fontSize:11, fontWeight:400, opacity:0.85 }}>(카드 추가·삭제)</span>
+                홈 화면 편집
               </button>
 
             </div>
@@ -1043,10 +1067,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
           trip={trip}
           state={state}
           setState={setState}
-          onClose={() => {
-            setShowBucket(false)
-            try { setAchieved(JSON.parse(localStorage.getItem('bucket-achieved') ?? '{}')) } catch {}
-          }}
+          onClose={() => setShowBucket(false)}
         />
       )}
     </div>
