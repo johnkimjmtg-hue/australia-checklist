@@ -674,8 +674,6 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                         .s3{animation:twinkle 2.4s ease-in-out infinite 0.7s}
                         .s4{animation:twinkle 1.9s ease-in-out infinite 0.2s}
                         .s5{animation:twinkle 2.2s ease-in-out infinite 0.5s}
-                        .cloud1{animation:drift 8s ease-in-out infinite alternate}
-                        .cloud2{animation:drift 11s ease-in-out infinite alternate-reverse}
                         .sun{animation:sunpulse 3s ease-in-out infinite}
                       `}</style>
                     </defs>
@@ -687,16 +685,6 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                         {/* 태양 - 같은 크기 두 원 겹침 */}
                         <circle className="sun" cx="200" cy="32" r="20" fill="#F59E0B"/>
                         <circle cx="200" cy="32" r="20" fill="#FFD166" opacity="0.6"/>
-                        {/* 구름 - 타원 여러개 겹쳐서 자연스럽게 */}
-                        <g className="cloud1">
-                          <ellipse cx="95" cy="32" rx="16" ry="10" fill="white" opacity="0.95"/>
-                          <ellipse cx="108" cy="26" rx="13" ry="9" fill="white" opacity="0.95"/>
-                          <ellipse cx="120" cy="29" rx="14" ry="8" fill="white" opacity="0.95"/>
-                          <ellipse cx="132" cy="27" rx="11" ry="8" fill="white" opacity="0.95"/>
-                          <ellipse cx="118" cy="33" rx="18" ry="7" fill="white" opacity="0.95"/>
-                          <ellipse cx="103" cy="34" rx="12" ry="6" fill="white" opacity="0.9"/>
-                          <ellipse cx="128" cy="34" rx="10" ry="6" fill="white" opacity="0.9"/>
-                        </g>
                         {/* 파도 3 */}
                         <g className="w3">
                           <path d="M0 85 Q50 70 100 85 Q150 100 200 85 Q250 70 300 85 Q350 100 400 85 Q450 70 500 85 Q550 100 600 85 Q650 70 700 85 Q750 100 800 85 L800 140 L0 140 Z" fill="#0097A7" opacity="0.4"/>
