@@ -649,7 +649,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       </div>
 
       {/* 스크롤 영역 */}
-      <div style={{ padding:'0 18px 80px', minHeight:'60vh' }}>
+      <div style={{ padding:'0 18px 80px', minHeight:'100dvh' }}>
           <>
             {/* D-day */}
             {(() => {
