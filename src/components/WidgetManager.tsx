@@ -141,7 +141,7 @@ export default function WidgetManager({ onClose, onSave }: Props) {
   const shelf = ALL_WIDGETS.filter(w => !active.includes(w.id)).map(w => w.id)
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
   )
 
   const handleDragStart = (e: DragStartEvent) => {
