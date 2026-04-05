@@ -41,7 +41,7 @@ export const ALL_WIDGETS: { id: WidgetId; icon: string; title: string; sub: stri
   { id: 'services',  icon: '🏢', title: '업체 정보',           sub: '여행 중 필요한 업체 정보', color: '#0284C7' },
 ]
 
-export const DEFAULT_WIDGETS: WidgetId[] = ['bucket', 'note']
+export const DEFAULT_WIDGETS: WidgetId[] = ['packing', 'ipc', 'bucket', 'shopping', 'note']
 
 export function loadWidgets(): WidgetId[] {
   try {
