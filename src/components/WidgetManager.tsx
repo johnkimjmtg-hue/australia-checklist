@@ -31,8 +31,8 @@ export type WidgetId = 'packing' | 'ipc' | 'bucket' | 'shopping' | 'nearby' | 'n
 export const ALL_WIDGETS: { id: WidgetId; icon: string; title: string; sub: string; color: string }[] = [
   { id: 'packing',   icon: '🧳', title: '짐싸기 체크리스트', sub: '공항 통과 완벽 가이드',    color: '#8B5CF6' },
   { id: 'ipc',       icon: '✈️', title: '입국 신고서 가이드', sub: '기내에서 미리 연습해요',    color: '#29B6D0' },
-  { id: 'bucket',    icon: '🗺️', title: '버킷리스트',         sub: '꼭 해볼 것들',            color: '#00838F' },
-  { id: 'shopping',  icon: '🛍️', title: '쇼핑리스트',         sub: '꼭 살 것들',              color: '#FF6B9D' },
+  { id: 'bucket',    icon: '🗺️', title: '버킷리스트',         sub: '나중에 후회하지 않으려면 꼬옥',         color: '#00838F' },
+  { id: 'shopping',  icon: '🛍️', title: '쇼핑리스트',         sub: '내 트렁크에 꼭 담아가야 하는 것들',     color: '#FF6B9D' },
   { id: 'nearby',    icon: '📍', title: '내 주변',             sub: '내 주변에는',             color: '#00838F' },
   { id: 'note',      icon: '📝', title: '노트',               sub: '메모·기록·여행 노트',      color: '#F97316' },
   { id: 'exchange',  icon: '💱', title: '환율 계산기',         sub: 'AUD ↔ KRW 실시간',        color: '#10B981' },

@@ -290,8 +290,8 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
 
   const MENUS = [
     { id:'checklist' as Tab, icon:'✅', title:'짐싸기 체크리스트', sub:'공항 통과 완벽 가이드', badge: 0, local: false },
-    { id:'bucketlist' as Tab, icon:'🗺️', title:'버킷리스트', sub:'꼭 해볼 것들', badge: bucketCount, local: false },
-    { id:'shopping' as Tab, icon:'🛍️', title:'쇼핑리스트', sub:'꼭 살 것들', badge: myShoppingCount, local: false },
+    { id:'bucketlist' as Tab, icon:'🗺️', title:'버킷리스트', sub:'나중에 후회하지 않으려면 꼬옥', badge: bucketCount, local: false },
+    { id:'shopping' as Tab, icon:'🛍️', title:'쇼핑리스트', sub:'내 트렁크에 꼭 담아가야 하는 것들', badge: myShoppingCount, local: false },
     { id:'nearby' as Tab, icon:'📍', title:'내 주변', sub:'내 주변에는', badge: 0, local: false },
   ]
 
@@ -819,7 +819,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                           <div style={{ width:44, height:44, borderRadius:14, background:'rgba(0,131,143,0.15)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🗺️</div>
                           <div>
                             <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>버킷리스트</div>
-                            <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>꼭 해볼 것들</div>
+                            <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>나중에 후회하지 않으려면 꼬옥</div>
                           </div>
                         </div>
                         {remainCount > 0 && <div style={{ background:'#29B6D0', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{remainCount}개</div>}
@@ -861,7 +861,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                           <div style={{ width:44, height:44, borderRadius:14, background:'rgba(255,107,157,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>🛍️</div>
                           <div>
                             <div style={{ fontSize:17, fontWeight:700, color:'#0D3349' }}>쇼핑리스트</div>
-                            <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>꼭 살 것들</div>
+                            <div style={{ fontSize:13, color:'#64748B', marginTop:4 }}>내 트렁크에 꼭 담아가야 하는 것들</div>
                           </div>
                         </div>
                         {undoneList.length > 0 && <div style={{ background:'#FF6B9D', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, flexShrink:0 }}>{undoneList.length}개</div>}
