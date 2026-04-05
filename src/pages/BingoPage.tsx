@@ -242,6 +242,7 @@ export { Props as BingoProps }
 
 const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embedded = false, initialCity, onCityChange }, ref) {
   const pageRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
   const [footerWidth, setFooterWidth] = useState<number | undefined>(undefined)
   const [city, setCity] = useState<'melbourne'|'sydney'>(initialCity ?? 'sydney')
   const [melbourneCafes, setMelbourneCafes] = useState<BingoCafe[]>([])
@@ -453,20 +454,21 @@ fontFamily: ff,
       {/* ── 도시 탭 (헤더 역할) */}
       <div style={{
         position:'sticky', top:0, zIndex:30,
-        background:'rgba(255,255,255,0.95)', backdropFilter:'blur(8px)', borderBottom:'1px solid rgba(0,0,0,0.06)',
+        background:'transparent',
+        borderBottom:'1px solid rgba(255,255,255,0.3)',
       }}>
         <div style={{ display:'flex' }}>
           {([
-            { id:'sydney',    label:'시드니' },
-            { id:'melbourne', label:'멜번' },
+            { id:'sydney',    label:'시드니 카페 25' },
+            { id:'melbourne', label:'멜번 카페 25' },
           ] as { id: 'melbourne'|'sydney'; label: string }[]).map(c => (
             <button key={c.id} onClick={() => { setCity(c.id); onCityChange?.(c.id) }} style={{
               flex:1, height:44, border:'none', cursor:'pointer',
               fontWeight: city===c.id ? 700 : 400,
               fontSize:15,
-              color: city===c.id ? '#29B6D0' : '#94A3B8',
+              color: city===c.id ? '#fff' : 'rgba(255,255,255,0.6)',
               background: 'none',
-              borderBottom: city===c.id ? '2px solid #29B6D0' : '2px solid transparent',
+              borderBottom: city===c.id ? '2px solid #fff' : '2px solid transparent',
               transition:'all 0.15s',
               WebkitTapHighlightColor: 'transparent',
               fontFamily: ff,
@@ -478,71 +480,78 @@ fontFamily: ff,
       </div>
 
       {/* ── 상황판 */}
-      <div style={{ background:'transparent', padding:'12px 16px 0' }}>
-        <div style={{
-          background:'rgba(255,255,255,0.88)',
-          borderRadius:20, border:'none',
-          boxShadow:'0 2px 12px rgba(0,0,0,0.10)',
-          padding:'16px', display:'flex', alignItems:'center', gap:16,
-        }}>
-          <MiniGrid count={checked.size} />
-          <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize:16, fontWeight:700, color:'#0D3349', marginBottom:4, lineHeight:1.3 }}>
-              {getStatusMsg(checked.size, bingoCount, city).title}
-            </div>
-            <div style={{ fontSize:13, color:'#64748B', fontWeight:400, lineHeight:1.6 }}>
-              {lastCheckedCafe && checked.has(lastCheckedCafe.idx)
-                ? (city === 'melbourne'
-                    ? MEL_CAFE_MSG[lastCheckedCafe.sort_order]
-                    : SYD_CAFE_MSG[lastCheckedCafe.sort_order])
-                : getStatusMsg(checked.size, bingoCount, city).sub}
-            </div>
+      <div style={{ padding:'12px 16px 0', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
+        {/* 메시지 */}
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:3, lineHeight:1.3 }}>
+            {getStatusMsg(checked.size, bingoCount, city).title}
           </div>
-          {/* 카운터 */}
-          <div style={{ textAlign:'center', flexShrink:0 }}>
-            <div style={{ fontSize: 32, fontWeight: 700, color: '#0D3349', lineHeight:1 }}>{checked.size}</div>
-            <div style={{ fontSize: 16, color: '#64748B', fontWeight: 500, marginTop:2 }}>/25 카페</div>
+          <div style={{ fontSize:12, color:'rgba(255,255,255,0.75)', fontWeight:400, lineHeight:1.5 }}>
+            {lastCheckedCafe && checked.has(lastCheckedCafe.idx)
+              ? (city === 'melbourne'
+                  ? MEL_CAFE_MSG[lastCheckedCafe.sort_order]
+                  : SYD_CAFE_MSG[lastCheckedCafe.sort_order])
+              : getStatusMsg(checked.size, bingoCount, city).sub}
           </div>
         </div>
-      </div>
-
-      {/* ── 공유 / 리셋 버튼 */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 16px 0' }}>
-        <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
-          ☕ {city === 'melbourne' ? '멜번 카페 투어 25곳' : '시드니 카페 투어 25곳'}
-        </div>
-        <div style={{ display:'flex', gap:4 }}>
-
-        <button style={{
-          height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
-          border: showPhotos ? 'none' : '1px solid rgba(41,182,208,0.2)',
-          background: showPhotos ? '#29B6D0' : 'rgba(41,182,208,0.08)',
-          color: showPhotos ? '#fff' : '#29B6D0', fontSize:11, fontWeight:700,
-          display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-          cursor:'pointer', fontFamily:ff,
-        }} onClick={() => setShowPhotos(p => { const next = !p; try { localStorage.setItem('bingo-show-photos', String(next)) } catch {} return next })}>
-          <Icon icon="ph:camera" width={12} height={12} color={showPhotos ? '#fff' : '#29B6D0'} />
-          인증샷 보기
-        </button>
-        <button onClick={() => setShowReset(true)} style={{
-          height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
-          border:'1px solid rgba(220,38,38,0.12)', background:'rgba(220,38,38,0.08)',
-          color: '#DC2626', fontSize: 11, fontWeight: 700,
-          display:'flex', alignItems:'center', justifyContent:'center', gap:3,
-          cursor:'pointer', fontFamily:ff,
-        }}>
-          <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color='#DC2626' />
-          전체 리셋
-        </button>
+        {/* 카운터 */}
+        <div style={{ textAlign:'center', flexShrink:0, background:'rgba(255,255,255,0.35)', borderRadius:14, padding:'8px 14px' }}>
+          <div style={{ display:'flex', alignItems:'baseline', gap:2 }}>
+            <span style={{ fontSize:28, fontWeight:900, color:'#fff', lineHeight:1 }}>{checked.size}</span>
+            <span style={{ fontSize:13, color:'rgba(255,255,255,0.8)', fontWeight:500 }}>/25</span>
+          </div>
+          <div style={{ fontSize:10, color:'rgba(255,255,255,0.8)', fontWeight:600, marginTop:2 }}>카페 방문</div>
         </div>
       </div>
 
       {/* ── 5x5 빙고판 */}
       <div style={{ flex:1, padding:`8px 12px ${embedded ? '60px' : '20px'}`, overflowY:'auto', minHeight:0 }}>
-        <div style={{
+        <div ref={gridRef} style={{
           display:'grid', gridTemplateColumns:'repeat(5, 1fr)',
-          gap:6,
+          gap:6, position:'relative',
         }}>
+          {/* 빙고 라인 SVG 오버레이 */}
+          {completedLines.length > 0 && gridRef.current && (() => {
+            const grid = gridRef.current
+            const gridRect = grid.getBoundingClientRect()
+            const gap = 6
+            const cellW = (gridRect.width - gap * 4) / 5
+            const cellH = cellW
+
+            const getCellCenter = (idx: number) => {
+              const col = idx % 5
+              const row = Math.floor(idx / 5)
+              return {
+                x: col * (cellW + gap) + cellW / 2,
+                y: row * (cellH + gap) + cellH / 2,
+              }
+            }
+
+            return (
+              <svg style={{
+                position:'absolute', inset:0,
+                width:'100%', height: 5 * cellH + 4 * gap,
+                pointerEvents:'none', zIndex:0,
+                overflow:'visible',
+              }}>
+                {completedLines.map((line, li) => {
+                  const from = getCellCenter(line[0])
+                  const to = getCellCenter(line[line.length - 1])
+                  return (
+                    <line
+                      key={li}
+                      x1={from.x} y1={from.y}
+                      x2={to.x} y2={to.y}
+                      stroke="#EF4444"
+                      strokeWidth={7.5}
+                      strokeLinecap="round"
+                      opacity={0.9}
+                    />
+                  )
+                })}
+              </svg>
+            )
+          })()}
           {cafe.map((c, idx) => {
             const isChecked = checked.has(idx)
             const isHighlight = highlightedCells.has(idx)
@@ -553,6 +562,7 @@ fontFamily: ff,
                 onClick={() => setSelectedCafe({ cafe: c, idx })}
                 style={{
                   position:'relative',
+                  zIndex:1,
                   borderRadius:10,
                   overflow:'hidden',
                   cursor:'pointer',
@@ -606,6 +616,30 @@ fontFamily: ff,
           })}
         </div>
 
+        {/* ── 인증샷 / 리셋 버튼 */}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end', gap:4, padding:'12px 0 0' }}>
+          <button style={{
+            height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
+            border: showPhotos ? 'none' : '1px solid rgba(41,182,208,0.2)',
+            background: showPhotos ? '#29B6D0' : 'rgba(41,182,208,0.08)',
+            color: showPhotos ? '#fff' : '#29B6D0', fontSize:11, fontWeight:700,
+            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+            cursor:'pointer', fontFamily:ff,
+          }} onClick={() => setShowPhotos(p => { const next = !p; try { localStorage.setItem('bingo-show-photos', String(next)) } catch {} return next })}>
+            <Icon icon="ph:camera" width={12} height={12} color={showPhotos ? '#fff' : '#29B6D0'} />
+            인증샷 보기
+          </button>
+          <button onClick={() => setShowReset(true)} style={{
+            height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
+            border:'1px solid rgba(220,38,38,0.12)', background:'rgba(220,38,38,0.08)',
+            color: '#DC2626', fontSize: 11, fontWeight: 700,
+            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
+            cursor:'pointer', fontFamily:ff,
+          }}>
+            <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color='#DC2626' />
+            전체 리셋
+          </button>
+        </div>
 
       </div>
 

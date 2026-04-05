@@ -16,7 +16,7 @@ export default function BingoSheet({ onClose }: Props) {
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430,
-        background:'#ffffff', borderRadius:'20px 20px 0 0',
+        background:'linear-gradient(180deg, #8E9EAB 0%, #CFD9DF 30%, #EEF2F5 100%)', borderRadius:'20px 20px 0 0',
         maxHeight:'85vh', overflowY:'auto', zIndex:801,
         animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
         display:'flex', flexDirection:'column',
@@ -33,7 +33,7 @@ export default function BingoSheet({ onClose }: Props) {
           <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>☕ 카페 빙고</div>
           <button onClick={onClose} style={{
             width:28, height:28, borderRadius:'50%',
-            background:'rgba(0,0,0,0.08)', border:'none',
+            background:'rgba(0,0,0,0.10)', border:'none',
             display:'flex', alignItems:'center', justifyContent:'center',
             cursor:'pointer', WebkitTapHighlightColor:'transparent',
           }}>
