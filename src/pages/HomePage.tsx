@@ -358,7 +358,6 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
             background: 'radial-gradient(circle at 50% 55%, rgba(255,255,255,0.18) 0%, rgba(235,248,255,0.08) 60%, rgba(200,235,255,0.04) 100%)',
             overflow: 'hidden',
             cursor: 'pointer',
-            position: 'absolute',
           }}>
             {/* 코알라 이미지 — 먼저 렌더링 */}
             <img
