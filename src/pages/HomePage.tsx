@@ -295,6 +295,21 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
     { id:'nearby' as Tab, icon:'📍', title:'내 주변', sub:'내 주변에는', badge: 0, local: false },
   ]
 
+  // 선택된 코알라
+  const [selectedKoala, setSelectedKoala] = useState<string|null>(() => {
+    try { return localStorage.getItem('selected-koala') } catch { return null }
+  })
+
+  useEffect(() => {
+    const handleStorage = () => {
+      try { setSelectedKoala(localStorage.getItem('selected-koala')) } catch {}
+    }
+    window.addEventListener('storage', handleStorage)
+    // AppHeader와 같은 페이지라 storage 이벤트 안 뜸 → polling으로 보완
+    const interval = setInterval(handleStorage, 500)
+    return () => { window.removeEventListener('storage', handleStorage); clearInterval(interval) }
+  }, [])
+
   return (
     <div style={{
       minHeight:'100dvh',
@@ -322,10 +337,50 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
         .cal-slide-right { animation: slideInRight 0.28s ease both; }
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         .card-anim { animation: fadeUp 0.5s ease both; }
+        @keyframes koalaFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        @keyframes koalaGlow {
+          0%,100% { box-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(200,235,255,0.3); }
+          50%      { box-shadow: 0 0 18px rgba(255,255,255,0.8), 0 0 35px rgba(200,235,255,0.5); }
+        }
+        .koala-pet { animation: koalaFloat 3s ease-in-out infinite, koalaGlow 3s ease-in-out infinite; }
       `}</style>
 
       {/* 공통 헤더 (날씨 + 메뉴) */}
-      <AppHeader />
+      <div style={{ position: 'relative' }}>
+        <AppHeader />
+        {/* 코알라 물풍선 */}
+        {selectedKoala && (
+          <div className="koala-pet" style={{
+            position: 'absolute', top: 14, left: 16, zIndex: 20,
+            width: 60, height: 60,
+            borderRadius: '50%',
+            border: '2px solid rgba(255,255,255,0.75)',
+            background: 'radial-gradient(circle at 50% 55%, rgba(255,255,255,0.18) 0%, rgba(235,248,255,0.08) 60%, rgba(200,235,255,0.04) 100%)',
+            overflow: 'hidden',
+            cursor: 'pointer',
+            position: 'absolute',
+          }}>
+            {/* 코알라 이미지 — 먼저 렌더링 */}
+            <img
+              src={`/${selectedKoala}.png`}
+              alt="내 코알라"
+              style={{
+                width: '92%', height: '92%', objectFit: 'contain',
+                position: 'absolute', top: '50%', left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 1,
+              }}
+            />
+            {/* 하이라이트 — 코알라 위 (살짝만) */}
+            <div style={{
+              position: 'absolute', top: 5, left: 7, width: 12, height: 6,
+              background: 'rgba(255,255,255,0.55)', borderRadius: '50%',
+              filter: 'blur(2px)', transform: 'rotate(-30deg)',
+              zIndex: 2, pointerEvents: 'none',
+            }} />
+          </div>
+        )}
+      </div>
 
       {/* 달력 / 일별뷰 */}
       <div style={{ padding:'0 18px 18px' }}>

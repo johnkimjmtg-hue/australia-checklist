@@ -58,6 +58,9 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
   const [showCityPicker, setShowCityPicker] = useState(() => {
     try { return !localStorage.getItem(CITY_PREF_KEY) } catch { return true }
   })
+  const [selectedKoala, setSelectedKoala] = useState<string>(() => {
+    try { return localStorage.getItem('selected-koala') || '' } catch { return '' }
+  })
   const timerRef = useRef<any>(null)
 
   const getTime = (tz: string) => new Date().toLocaleTimeString('ko-KR', {
@@ -230,8 +233,50 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
             background:'#ffffff', borderRadius:20, zIndex:1201,
             animation:'fadeIn 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
             padding:'24px 20px 32px', fontFamily:ff,
+            maxHeight:'85vh', overflowY:'auto',
           }}>
-            <div style={{ textAlign:'center', marginBottom:20 }}>
+
+            {/* ── 코알라 선택 */}
+            <div style={{ textAlign:'center', marginBottom:16 }}>
+              <div style={{ fontSize:32, marginBottom:6 }}>🐨</div>
+              <div style={{ fontSize:16, fontWeight:800, color:'#0D3349', marginBottom:4 }}>나만의 코알라를 선택해요</div>
+              <div style={{ fontSize:12, color:'#94A3B8' }}>홈 화면에서 항상 함께해요</div>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:8, marginBottom:24 }}>
+              {[
+                'koala_cream_phone','koala_mint_glasses','koala_gray','koala_pink','koala_brown',
+                'koala_mint_clover','koala_lavender','koala_peach','koala_yellow','koala_blue',
+              ].map(id => {
+                const sel = selectedKoala === id
+                return (
+                  <div key={id} onClick={() => {
+                    setSelectedKoala(id)
+                    try { localStorage.setItem('selected-koala', id) } catch {}
+                  }}
+                    style={{
+                      aspectRatio:'1', borderRadius:'50%', position:'relative', overflow:'hidden',
+                      border: sel ? '2.5px solid #00BCD4' : '1.5px solid rgba(0,188,212,0.2)',
+                      background: 'radial-gradient(circle, rgba(0,188,212,0.06) 0%, rgba(0,188,212,0.02) 100%)',
+                      boxShadow: sel ? '0 0 0 2px rgba(0,188,212,0.3)' : 'none',
+                      cursor:'pointer', transition:'all 0.15s',
+                      transform: sel ? 'scale(1.08)' : 'scale(1)',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}>
+                    <img src={`/${id}.png`} alt={id} style={{
+                      width:'88%', height:'88%', objectFit:'contain',
+                      position:'absolute', top:'50%', left:'50%',
+                      transform:'translate(-50%,-50%)',
+                    }} />
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* 구분선 */}
+            <div style={{ height:1, background:'rgba(0,0,0,0.06)', marginBottom:20 }} />
+
+            {/* ── 도시 선택 */}
+            <div style={{ textAlign:'center', marginBottom:16 }}>
               <div style={{ fontSize:32, marginBottom:8 }}>🌤</div>
               <div style={{ fontSize:18, fontWeight:800, color:'#0D3349', marginBottom:6 }}>어느 도시로 여행하세요?</div>
               <div style={{ fontSize:13, color:'#94A3B8', lineHeight:1.6 }}>선택한 도시의 날씨를 상단에 표시해드려요<br/>나중에 날씨 버튼을 탭하면 바꿀 수 있어요</div>
