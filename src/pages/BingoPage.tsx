@@ -621,22 +621,22 @@ fontFamily: ff,
           <button style={{
             height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
             border: 'none',
-            background: showPhotos ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)',
-            color: showPhotos ? '#29B6D0' : '#fff', fontSize:11, fontWeight:700,
+            background: showPhotos ? '#29B6D0' : 'rgba(255,255,255,0.85)',
+            color: showPhotos ? '#fff' : '#555E68', fontSize:11, fontWeight:700,
             display:'flex', alignItems:'center', justifyContent:'center', gap:3,
             cursor:'pointer', fontFamily:ff,
           }} onClick={() => setShowPhotos(p => { const next = !p; try { localStorage.setItem('bingo-show-photos', String(next)) } catch {} return next })}>
-            <Icon icon="ph:camera" width={12} height={12} color={showPhotos ? '#29B6D0' : '#fff'} />
+            <Icon icon="ph:camera" width={12} height={12} color={showPhotos ? '#fff' : '#555E68'} />
             인증샷 보기
           </button>
           <button onClick={() => setShowReset(true)} style={{
             height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
-            border:'none', background:'rgba(255,255,255,0.5)',
-            color: '#fff', fontSize: 11, fontWeight: 700,
+            border:'none', background:'rgba(255,255,255,0.85)',
+            color: '#DC2626', fontSize: 11, fontWeight: 700,
             display:'flex', alignItems:'center', justifyContent:'center', gap:3,
             cursor:'pointer', fontFamily:ff,
           }}>
-            <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color='#fff' />
+            <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color='#DC2626' />
             전체 리셋
           </button>
         </div>
