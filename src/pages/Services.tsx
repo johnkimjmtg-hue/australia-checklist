@@ -116,30 +116,30 @@ function AddressAutocomplete({ value, onChange }: { value: string; onChange: (v:
               borderBottom:`1px solid ${colors.gray100}`, color:colors.textPrimary,
               display:'flex', alignItems:'center', gap:8,
             }}
-              onMouseEnter={e => (e.currentTarget.style.background='rgba(16,185,129,0.12)')}
+              onMouseEnter={e => (e.currentTarget.style.background='rgba(212,112,58,0.12)')}
               onMouseLeave={e => (e.currentTarget.style.background=colors.bgCard)}
             >
-              <Icon icon="ph:map-pin-simple" width={14} height={14} color={'#10B981'} />
+              <Icon icon="ph:map-pin-simple" width={14} height={14} color={'#D4703A'} />
               {s.placePrediction?.text?.text || ''}
             </div>
           ))}
           <div onClick={() => { setSuggestions([]); setManualMode(true); onChange('') }} style={{
             padding:'10px 14px', fontSize:font.size.sm, cursor:'pointer',
-            color:'#10B981', fontWeight:font.weight.bold,
+            color:'#D4703A', fontWeight:font.weight.bold,
             display:'flex', alignItems:'center', gap:8,
-            borderTop:`1px solid ${colors.border}`, background:'rgba(16,185,129,0.12)',
+            borderTop:`1px solid ${colors.border}`, background:'rgba(212,112,58,0.12)',
           }}
             onMouseEnter={e => (e.currentTarget.style.opacity='0.8')}
             onMouseLeave={e => (e.currentTarget.style.opacity='1')}
           >
-            <Icon icon="ph:pencil-simple" width={14} height={14} color={'#10B981'} />
+            <Icon icon="ph:pencil-simple" width={14} height={14} color={'#D4703A'} />
             찾는 주소가 없어요 — 직접 입력하기
           </div>
         </div>
       )}
       {!loadingAc && !suggestions.length && value.length >= 3 && (
         <button onClick={() => setManualMode(true)} style={{
-          background:'none', border:'none', fontSize:11, color:'#10B981',
+          background:'none', border:'none', fontSize:11, color:'#D4703A',
           cursor:'pointer', marginTop:4, padding:0, fontWeight:font.weight.bold,
         }}>
           주소를 찾을 수 없나요? 직접 입력하기 →
@@ -188,7 +188,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
       <div style={{ fontSize:48, marginBottom:16 }}>🎉</div>
       <div style={{ fontSize:font.size.lg, fontWeight:font.weight.bold, color:colors.textPrimary, marginBottom:8 }}>신청이 완료됐어요!</div>
       <div style={{ fontSize:font.size.sm, color:colors.textSecondary, lineHeight:1.6, marginBottom:24 }}>검토 후 등록해드릴게요.<br/>감사합니다 🙏</div>
-      <button onClick={onClose} style={{ width:'100%', height:48, background:'rgba(16,185,129,0.12)', color:'#10B981', border:`1px solid ${colors.border}`, borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>확인</button>
+      <button onClick={onClose} style={{ width:'100%', height:48, background:'rgba(212,112,58,0.12)', color:'#D4703A', border:`1px solid ${colors.border}`, borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold, cursor:'pointer', fontFamily:ff }}>확인</button>
     </div>
   )
 
@@ -200,7 +200,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
           {lbl('카테고리 *')}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
             {businessCats.map(cat => (
-              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:radius.sm, border: form.category===cat.id ? `1.5px solid ${'#10B981'}` : `1px solid ${colors.border}`, cursor:'pointer', background: form.category===cat.id ? 'rgba(16,185,129,0.12)' : colors.bgCard, color: form.category===cat.id ? '#10B981' : colors.textSecondary, fontSize:font.size.sm, fontWeight: form.category===cat.id ? font.weight.bold : font.weight.regular, fontFamily:ff }}>{cat.label}</button>
+              <button key={cat.id} onClick={() => set('category', cat.id)} style={{ height:36, borderRadius:radius.sm, border: form.category===cat.id ? `1.5px solid ${'#D4703A'}` : `1px solid ${colors.border}`, cursor:'pointer', background: form.category===cat.id ? 'rgba(212,112,58,0.12)' : colors.bgCard, color: form.category===cat.id ? '#D4703A' : colors.textSecondary, fontSize:font.size.sm, fontWeight: form.category===cat.id ? font.weight.bold : font.weight.regular, fontFamily:ff }}>{cat.label}</button>
             ))}
           </div>
         </div>
@@ -214,7 +214,7 @@ function RequestForm({ onClose }: { onClose: () => void }) {
         <div>{lbl('웹사이트')}<input value={form.website} onChange={e => set('website', e.target.value)} placeholder="https://..." style={iStyle} /></div>
       </div>
       {error && <div style={{ marginTop:10, padding:'8px 12px', background:colors.dangerLight, borderRadius:radius.sm, fontSize:font.size.sm, color:colors.danger, fontWeight:font.weight.bold }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:'#10B981', color:'#fff', border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, fontFamily:ff }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', marginTop:16, height:50, background:'#D4703A', color:'#fff', border:'none', borderRadius:radius.sm, fontSize:font.size.md, fontWeight:font.weight.bold, cursor: submitting?'default':'pointer', opacity: submitting?0.7:1, fontFamily:ff }}>{submitting ? '제출 중...' : '등록 신청하기'}</button>
     </div>
   )
 }
@@ -365,15 +365,15 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             const isActive = serviceTab === tab
             const iconName = tab === 'all' ? 'ph:list-bullets' : tab === 'korean' ? 'ph:flag' : tab === 'bookmarks' ? 'ph:bookmark-simple-fill' : 'ph:bell-fill'
             const label = tab === 'all' ? '전체 업종' : tab === 'korean' ? '한인업체' : tab === 'bookmarks' ? `내 북마크${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}` : '비상연락처'
-            const activeColor = tab === 'emergency' ? colors.danger : '#10B981'
-            const iconColor = isActive ? (tab === 'emergency' ? colors.danger : '#10B981') : tab === 'korean' ? '#EA580C' : tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? colors.danger : colors.textTertiary
+            const activeColor = tab === 'emergency' ? colors.danger : '#D4703A'
+            const iconColor = isActive ? (tab === 'emergency' ? colors.danger : '#D4703A') : tab === 'korean' ? '#EA580C' : tab === 'bookmarks' ? '#FFB800' : tab === 'emergency' ? colors.danger : colors.textTertiary
             return (
               <button key={tab} onClick={() => { setServiceTab(tab); setCategory(''); setSearch('') }}
                 className="svc-btn"
                 style={{
                   height:34, padding:`0 ${spacing[3]}px`, borderRadius:radius.full,
                   cursor:'pointer', fontSize:font.size.sm, fontWeight:font.weight.bold,
-                  background: isActive ? (tab === 'emergency' ? colors.dangerLight : tab === 'korean' ? '#FFF7ED' : 'rgba(16,185,129,0.12)') : colors.bgCard,
+                  background: isActive ? (tab === 'emergency' ? colors.dangerLight : tab === 'korean' ? '#FFF7ED' : 'rgba(212,112,58,0.12)') : colors.bgCard,
                   color: isActive ? (tab === 'korean' ? '#EA580C' : activeColor) : colors.textSecondary,
                   border: isActive ? `1.5px solid ${tab === 'korean' ? '#FED7AA' : activeColor}` : `1px solid ${colors.border}`,
                   display:'flex', alignItems:'center', gap:5,
@@ -415,7 +415,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             onClick={() => setShowRequestForm(true)}
             style={{
               flexShrink:0, height:42, padding:`0 ${spacing[3]}px`,
-              background:'#10B981', color:'#fff',
+              background:'#D4703A', color:'#fff',
               border:'none', borderRadius:radius.sm,
               fontSize:font.size.sm, fontWeight:font.weight.bold,
               cursor:'pointer', display:'flex', alignItems:'center', gap:4,
@@ -438,12 +438,12 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
                 onClick={() => { setCategory(isActive ? '' : cat.id) }}
                 style={{
                   height:34, borderRadius:radius.sm,
-                  background: isActive ? '#10B981' : colors.bgCard,
+                  background: isActive ? '#D4703A' : colors.bgCard,
                   color: isActive ? '#fff' : colors.gray600,
                   fontSize:font.size.sm, fontWeight:font.weight.bold,
                   cursor:'pointer', flexShrink:0,
                   padding:`0 ${spacing[3]}px`,
-                  border: isActive ? `2px solid ${'#10B981'}` : `1px solid ${colors.gray300}`,
+                  border: isActive ? `2px solid ${'#D4703A'}` : `1px solid ${colors.gray300}`,
                   display:'flex', alignItems:'center', gap:4,
                   whiteSpace:'nowrap', fontFamily:ff,
                   WebkitTapHighlightColor:'transparent',
@@ -470,7 +470,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             </div>
           ) : (
             <>
-              <SectionLabel icon="ph:bookmark-simple-fill" label={`내 북마크 (${bookmarked.length})`} color={'#10B981'} />
+              <SectionLabel icon="ph:bookmark-simple-fill" label={`내 북마크 (${bookmarked.length})`} color={'#D4703A'} />
               <div style={{ display:'flex', flexDirection:'column', gap:spacing[3] }}>
                 {sortByName(bookmarked).map(b => <BusinessCard key={b.id} business={b} />)}
               </div>
@@ -653,7 +653,7 @@ const EMERGENCY_DATA = [
   },
   {
     section: '로드사이드 어시스턴스', icon: 'ph:car',
-    color: '#10B981',
+    color: '#D4703A',
     bg: '#EFF6FF',
     border: '#BFDBFE',
     items: [
@@ -689,7 +689,7 @@ const EMERGENCY_DATA = [
     section: '여행자 / 외국인', icon: 'ph:airplane',
     color: '#059669',
     bg: '#ECFDF5',
-    border: '#A7F3D0',
+    border: 'rgba(212,112,58,0.3)',
     items: [
       { label: '통역 서비스', number: '13 14 50', desc: 'Interpreter Service' },
       { label: '호주 영사관 긴급', number: '1300 555 135', desc: '호주 정부 영사 긴급' },
