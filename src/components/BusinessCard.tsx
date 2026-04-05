@@ -8,7 +8,7 @@ type Props = { business: Business; accentColor?: string }
 
 const ff = '"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif'
 
-export default function BusinessCard({ business, accentColor = '#D4703A' }: Props) {
+export default function BusinessCard({ business, accentColor = '#29B6D0' }: Props) {
   const { name, description, phone, website, kakao, address, city, is_featured, tags } = business
   const fullAddress = address || ''
   const mapsUrl = fullAddress
@@ -168,7 +168,7 @@ export default function BusinessCard({ business, accentColor = '#D4703A' }: Prop
                 </span>
               )}
               {tags && tags.map(tag => (
-                <span key={tag} style={{ background:`rgba(${accentColor === '#F59E0B' ? '245,158,11' : '212,112,58'},0.1)`, color:accentColor, fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:`1px solid ${accentColor === '#F59E0B' ? 'rgba(245,158,11,0.3)' : 'rgba(212,112,58,0.3)'}` }}>{tag}</span>
+                <span key={tag} style={{ background:`rgba(${accentColor === '#F59E0B' ? '245,158,11' : '41,182,208'},0.1)`, color:accentColor, fontSize:11, fontWeight:700, borderRadius:6, padding:'4px 10px', border:`1px solid ${accentColor === '#F59E0B' ? 'rgba(245,158,11,0.3)' : 'rgba(41,182,208,0.3)'}` }}>{tag}</span>
               ))}
             </div>
           )}
