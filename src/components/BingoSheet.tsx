@@ -16,7 +16,7 @@ export default function BingoSheet({ onClose }: Props) {
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430,
-        background:'linear-gradient(180deg, #8E9EAB 0%, #CFD9DF 50%, #BEC8D0 100%)', borderRadius:'20px 20px 0 0',
+        background:'linear-gradient(180deg, #6B3F2A 0%, #C4956A 45%, #F5E6D0 100%)', borderRadius:'20px 20px 0 0',
         maxHeight:'85vh', overflowY:'auto', zIndex:801,
         animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
         display:'flex', flexDirection:'column',
@@ -30,14 +30,14 @@ export default function BingoSheet({ onClose }: Props) {
 
         {/* 헤더 */}
         <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px 0' }}>
-          <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>☕ 카페 빙고</div>
+          <div style={{ fontSize:16, fontWeight:700, color:'#fff' }}>☕ 카페 빙고</div>
           <button onClick={onClose} style={{
             width:28, height:28, borderRadius:'50%',
-            background:'rgba(0,0,0,0.10)', border:'none',
+            background:'rgba(255,255,255,0.2)', border:'none',
             display:'flex', alignItems:'center', justifyContent:'center',
             cursor:'pointer', WebkitTapHighlightColor:'transparent',
           }}>
-            <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
+            <Icon icon="ph:x" width={16} height={16} color="#fff" />
           </button>
         </div>
 
