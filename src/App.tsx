@@ -76,9 +76,8 @@ function MainApp() {
   if (!trip) {
     return (
       <div className="app-shell">
-        <LandingPage onComplete={async (t) => {
-          const updated = await syncDataCache()
-          if (updated) setCacheStamp(s => s + 1)
+        <LandingPage onComplete={(t) => {
+          syncDataCache().then(updated => { if (updated) setCacheStamp(s => s + 1) })
           setTrip(t)
           setActiveTab(null)
         }} />

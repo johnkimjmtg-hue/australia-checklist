@@ -4,7 +4,7 @@
 // 날씨 버튼 3개 + ⋮ 메뉴 버튼
 // src/components/AppHeader.tsx
 // ─────────────────────────────────────────────
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import TermsPage from '../pages/TermsPage'
 
 const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
@@ -228,7 +228,7 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
             position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
             width:'calc(100% - 48px)', maxWidth:360,
             background:'#ffffff', borderRadius:20, zIndex:1201,
-            animation:'fadeIn 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
+            animation:'none', boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
             padding:'24px 20px 32px', fontFamily:ff,
           }}>
             <div style={{ textAlign:'center', marginBottom:20 }}>

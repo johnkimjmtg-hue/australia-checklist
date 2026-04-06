@@ -153,12 +153,7 @@ export default function LandingPage({ onComplete }: Props) {
       {/* ── 상단 히어로 */}
       <div style={{ position:'relative', overflow:'hidden', background:'transparent', padding:'52px 28px 36px', minHeight:280 }}>
         <div className="drop1" style={{ position:'absolute', top:-40, right:-30 }}>
-          <div className="wdrop wdrop-lg" style={{ display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
-            <div style={{ position:'absolute', transform:'scaleY(0.75) rotate(12deg)', textAlign:'center', top:'38%', left:'10%' }}>
-              <div style={{ fontSize:18, fontWeight:800, color:'#0D3349', letterSpacing:-0.5, whiteSpace:'nowrap', opacity:1 }}>호주가자</div>
-              <div style={{ fontSize:9, fontWeight:600, color:'#0D4F6E', whiteSpace:'nowrap', opacity:1, marginTop:2 }}>hojugaja.com</div>
-            </div>
-          </div>
+          <div className="wdrop wdrop-lg" />
           <div className="wdrop-shadow-lg" />
         </div>
         <div className="drop2" style={{ position:'absolute', top:60, left:-20 }}>
