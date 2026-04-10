@@ -77,17 +77,21 @@ export default function LandingPage({ onComplete }: Props) {
           style={{
             aspectRatio: '1', display:'flex', alignItems:'center', justifyContent:'center',
             borderRadius: radius, background: bg,
-            color: (isToday && !isStart && !isEnd) ? '#00BCD4' : color,
-            fontWeight: (isToday && !isStart && !isEnd) ? 800 : fw,
-            fontSize: 12,
-            textDecoration: (isToday && !isStart && !isEnd) ? 'underline' : 'none',
-            textDecorationColor: (isToday && !isStart && !isEnd) ? '#D4703A' : 'transparent',
-            textUnderlineOffset: '3px',
             cursor: isPast ? 'default' : 'pointer',
             border: 'none',
             WebkitTapHighlightColor: 'transparent',
           }}
-        >{d}</div>
+        >
+          <div style={{
+            width: 18, height: 18,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderRadius: (isToday && !isStart && !isEnd) ? '50%' : radius,
+            background: (isToday && !isStart && !isEnd) ? 'rgba(0,131,143,0.12)' : 'transparent',
+            color: (isToday && !isStart && !isEnd) ? '#00838F' : color,
+            fontWeight: (isToday && !isStart && !isEnd) ? 800 : fw,
+            fontSize: 11,
+          }}>{d}</div>
+        </div>
       )
     }
     return cells
@@ -135,10 +139,11 @@ export default function LandingPage({ onComplete }: Props) {
         padding: '52px 24px 0',
         animation: 'fadeIn 0.8s ease both',
       }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.85)', letterSpacing: 2, marginBottom: 6 }}>
-          ✈️ HOJUGAJA
+        <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom: 6 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.85)', letterSpacing: 2 }}>HOJUGAJA</div>
+          <img src="/suitcase.png" alt="가방" style={{ width: 16, height: 16, objectFit:'contain' }} />
         </div>
-        <div style={{ fontSize: 32, fontWeight: 800, color: '#fff', lineHeight: 1.3, marginBottom: 10 }}>
+        <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.3, marginBottom: 10 }}>
           호주 여행,<br />언제 떠나세요?
         </div>
         <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.9)', lineHeight: 1.65 }}>
@@ -160,7 +165,7 @@ export default function LandingPage({ onComplete }: Props) {
       }}>
 
         {/* 날짜 칩 */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:14 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:14 }}>
           {[
             { label:'✈️ 출발일', val: sDate ? fmt(sDate) : null },
             { label:'🏠 귀국일', val: eDate ? fmt(eDate) : null },
@@ -169,10 +174,11 @@ export default function LandingPage({ onComplete }: Props) {
               background: c.val ? 'rgba(0,188,212,0.08)' : '#F8FAFC',
               borderRadius: 12, padding: '10px 14px',
               border: c.val ? '1.5px solid rgba(0,188,212,0.3)' : '1.5px solid #E2E8F0',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
-              <div style={{ fontSize:11, color:'#94A3B8', marginBottom:3, fontWeight:600 }}>{c.label}</div>
-              <div style={{ fontSize:14, fontWeight: c.val ? 700 : 400, color: c.val ? '#0D3349' : '#94A3B8' }}>
-                {c.val ?? '날짜 선택'}
+              <div style={{ fontSize:11, color:'#64748B', fontWeight:600 }}>{c.label}</div>
+              <div style={{ fontSize:13, fontWeight: c.val ? 700 : 400, color: c.val ? '#0D3349' : '#94A3B8' }}>
+                {c.val ?? '선택'}
               </div>
             </div>
           ))}
@@ -199,7 +205,7 @@ export default function LandingPage({ onComplete }: Props) {
         )}
 
         {/* 달력 */}
-        <div style={{ marginBottom:14 }}>
+        <div style={{ marginBottom:14, maxWidth:'85%', margin:'0 auto 14px' }}>
           {/* 달력 헤더 */}
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
             <button onClick={() => chgMo(-1)} style={{ background:'none', border:'none', fontSize:20, color:'#64748B', cursor:'pointer', padding:'4px 8px', borderRadius:8, WebkitTapHighlightColor:'transparent' }}>‹</button>
