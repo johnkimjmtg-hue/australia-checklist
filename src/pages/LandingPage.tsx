@@ -127,10 +127,10 @@ export default function LandingPage({ onComplete }: Props) {
           <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.85)', letterSpacing: 2 }}>HOJUGAJA</div>
           <img src="/suitcase.png" alt="가방" style={{ width: 16, height: 16, objectFit:'contain' }} />
         </div>
-        <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.3, marginBottom: 10 }}>
+        <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.3, marginBottom: 10, textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
           호주 여행,<br />언제 떠나세요?
         </div>
-        <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.9)', lineHeight: 1.65 }}>
+        <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.9)', lineHeight: 1.65, textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
           호주가자와 함께<br />완벽한 호주 여행을 경험해보세요 ✈️
         </div>
       </div>
