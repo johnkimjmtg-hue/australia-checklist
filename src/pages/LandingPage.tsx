@@ -75,7 +75,8 @@ export default function LandingPage({ onComplete }: Props) {
       cells.push(
         <div key={d} onClick={isPast ? undefined : () => pick(dt)}
           style={{
-            aspectRatio: '1', display:'flex', alignItems:'center', justifyContent:'center',
+            height: 28,
+            display:'flex', alignItems:'center', justifyContent:'center',
             borderRadius: radius, background: bg,
             cursor: isPast ? 'default' : 'pointer',
             border: 'none',
@@ -165,14 +166,14 @@ export default function LandingPage({ onComplete }: Props) {
       }}>
 
         {/* 날짜 칩 */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:14 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:10 }}>
           {[
             { label:'✈️ 출발일', val: sDate ? fmt(sDate) : null },
             { label:'🏠 귀국일', val: eDate ? fmt(eDate) : null },
           ].map((c, i) => (
             <div key={i} style={{
               background: c.val ? 'rgba(0,188,212,0.08)' : '#F8FAFC',
-              borderRadius: 12, padding: '10px 14px',
+              borderRadius: 12, padding: '7px 12px',
               border: c.val ? '1.5px solid rgba(0,188,212,0.3)' : '1.5px solid #E2E8F0',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
@@ -224,14 +225,14 @@ export default function LandingPage({ onComplete }: Props) {
           </div>
 
           {/* 요일 */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', marginBottom:4 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', marginBottom:2 }}>
             {['일','월','화','수','목','금','토'].map(d => (
               <div key={d} style={{ textAlign:'center', fontSize:11, color:'#94A3B8', fontWeight:600, padding:'2px 0' }}>{d}</div>
             ))}
           </div>
 
           {/* 날짜 */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:0 }}>
             {renderCal()}
           </div>
         </div>
@@ -239,8 +240,8 @@ export default function LandingPage({ onComplete }: Props) {
         {/* 버튼 */}
         <button className="main-btn" onClick={handleComplete} disabled={!canNext}
           style={{
-            width:'100%', padding:16, border:'none', borderRadius:14,
-            fontSize:16, fontWeight: canNext ? 800 : 400,
+            width:'100%', padding:12, border:'none', borderRadius:14,
+            fontSize:15, fontWeight: canNext ? 800 : 400,
             cursor: canNext ? 'pointer' : 'default',
             background: canNext ? '#00BCD4' : '#F1F5F9',
             color: canNext ? '#fff' : '#94A3B8',
