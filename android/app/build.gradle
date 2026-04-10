@@ -7,7 +7,7 @@ android {
         applicationId "com.hojugaja.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode System.currentTimeMillis().intdiv(1000).toInteger()  // 빌드할 때마다 자동 증가
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
