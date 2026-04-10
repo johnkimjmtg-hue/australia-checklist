@@ -75,18 +75,16 @@ export default function LandingPage({ onComplete }: Props) {
       cells.push(
         <div key={d} onClick={isPast ? undefined : () => pick(dt)}
           style={{
-            height: 28,
-            display:'flex', alignItems:'center', justifyContent:'center',
+            aspectRatio: '1', display:'flex', alignItems:'center', justifyContent:'center',
             borderRadius: radius, background: bg,
             cursor: isPast ? 'default' : 'pointer',
-            border: 'none',
-            WebkitTapHighlightColor: 'transparent',
+            border: 'none', WebkitTapHighlightColor: 'transparent',
           }}
         >
           <div style={{
-            width: 18, height: 18,
+            width: 22, height: 22,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            borderRadius: (isToday && !isStart && !isEnd) ? '50%' : radius,
+            borderRadius: '50%',
             background: (isToday && !isStart && !isEnd) ? 'rgba(0,131,143,0.12)' : 'transparent',
             color: (isToday && !isStart && !isEnd) ? '#00838F' : color,
             fontWeight: (isToday && !isStart && !isEnd) ? 800 : fw,
@@ -102,44 +100,29 @@ export default function LandingPage({ onComplete }: Props) {
 
   return (
     <div style={{
-      height: '100dvh',
-      maxWidth: 430,
-      margin: '0 auto',
-      fontFamily: ff,
-      position: 'relative',
-      overflow: 'hidden',
-      display: 'flex',
-      flexDirection: 'column',
+      height: '100dvh', maxWidth: 430, margin: '0 auto', fontFamily: ff,
+      position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column',
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes popIn { from{transform:translate(-50%,-50%) scale(0.85);opacity:0} to{transform:translate(-50%,-50%) scale(1);opacity:1} }
         .pick-item { padding:10px 6px; text-align:center; border-radius:12px; font-size:13px; font-weight:600; color:#555; cursor:pointer; border:1.5px solid transparent; transition:all 0.12s; }
-        .pick-item:hover { border-color:#00838F; color:#00838F; }
         .pick-item.sel { background:#00838F; color:#fff; border-color:#00838F; }
         .main-btn { transition: transform 0.12s, opacity 0.12s; }
         .main-btn:active { transform: scale(0.97); opacity: 0.9; }
-        .nav-hover:active { opacity: 0.6; }
       `}</style>
 
-      {/* ── 배경 이미지 */}
+      {/* 배경 이미지 */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: 'url(/sydney-bg.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center top',
-        zIndex: 0,
+        backgroundSize: 'cover', backgroundPosition: 'center top', zIndex: 0,
       }} />
 
-
-
-      {/* ── 상단 브랜드 */}
-      <div style={{
-        position: 'relative', zIndex: 2,
-        padding: '52px 24px 0',
-        animation: 'fadeIn 0.8s ease both',
-      }}>
+      {/* 상단 브랜드 */}
+      <div style={{ position: 'relative', zIndex: 2, padding: '52px 24px 0', animation: 'fadeIn 0.8s ease both' }}>
         <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom: 6 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.85)', letterSpacing: 2 }}>HOJUGAJA</div>
           <img src="/suitcase.png" alt="가방" style={{ width: 16, height: 16, objectFit:'contain' }} />
@@ -152,17 +135,14 @@ export default function LandingPage({ onComplete }: Props) {
         </div>
       </div>
 
-      {/* ── 스페이서 */}
+      {/* 스페이서 */}
       <div style={{ flex: 1, zIndex: 2 }} />
 
-      {/* ── 하단 흰색 카드 */}
+      {/* 하단 흰색 카드 */}
       <div style={{
-        position: 'relative', zIndex: 2,
-        background: '#fff',
-        borderRadius: '24px 24px 0 0',
-        padding: '20px 16px 36px',
-        boxShadow: '0 -8px 32px rgba(0,0,0,0.15)',
-        animation: 'slideUp 0.5s 0.2s both',
+        position: 'relative', zIndex: 2, background: '#fff',
+        borderRadius: '24px 24px 0 0', padding: '20px 16px 36px',
+        boxShadow: '0 -8px 32px rgba(0,0,0,0.15)', animation: 'slideUp 0.5s 0.2s both',
       }}>
 
         {/* 날짜 칩 */}
@@ -173,7 +153,7 @@ export default function LandingPage({ onComplete }: Props) {
           ].map((c, i) => (
             <div key={i} style={{
               background: c.val ? 'rgba(0,188,212,0.08)' : '#F8FAFC',
-              borderRadius: 12, padding: '7px 12px',
+              borderRadius: 12, padding: '12px 14px',
               border: c.val ? '1.5px solid rgba(0,188,212,0.3)' : '1.5px solid #E2E8F0',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
@@ -190,8 +170,7 @@ export default function LandingPage({ onComplete }: Props) {
           <div style={{ marginBottom:10, background:'#F8FAFC', borderRadius:14, padding:12, display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
             {Array.from({ length: MAX_Y - MIN_Y + 1 }, (_, i) => MIN_Y + i).map(y => (
               <div key={y} className={`pick-item${y === vy ? ' sel' : ''}`}
-                onClick={() => { setVy(y); setPicker('none') }}
-              >{y}년</div>
+                onClick={() => { setVy(y); setPicker('none') }}>{y}년</div>
             ))}
           </div>
         )}
@@ -199,58 +178,78 @@ export default function LandingPage({ onComplete }: Props) {
           <div style={{ marginBottom:10, background:'#F8FAFC', borderRadius:14, padding:12, display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6 }}>
             {MONTHS.map((m, i) => (
               <div key={i} className={`pick-item${i === vm ? ' sel' : ''}`}
-                onClick={() => { setVm(i); setPicker('none') }}
-              >{m}</div>
+                onClick={() => { setVm(i); setPicker('none') }}>{m}</div>
             ))}
           </div>
         )}
 
         {/* 달력 */}
-        <div style={{ marginBottom:14, maxWidth:'85%', margin:'0 auto 14px' }}>
-          {/* 달력 헤더 */}
+        <div style={{ maxWidth:'85%', margin:'0 auto' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
             <button onClick={() => chgMo(-1)} style={{ background:'none', border:'none', fontSize:20, color:'#64748B', cursor:'pointer', padding:'4px 8px', borderRadius:8, WebkitTapHighlightColor:'transparent' }}>‹</button>
             <div style={{ display:'flex', gap:4, alignItems:'center' }}>
               <button onClick={() => setPicker(picker==='year'?'none':'year')}
-                style={{ background:'none', border:'none', cursor:'pointer', padding:'4px 8px', borderRadius:8, fontSize:14, fontWeight:700, color:'#00838F', fontFamily:ff }}>
-                {vy}년
-              </button>
+                style={{ background:'none', border:'none', cursor:'pointer', padding:'4px 8px', borderRadius:8, fontSize:14, fontWeight:700, color:'#00838F', fontFamily:ff }}>{vy}년</button>
               <span style={{ fontSize:12, color:'#CBD5E1' }}>•</span>
               <button onClick={() => setPicker(picker==='month'?'none':'month')}
-                style={{ background:'none', border:'none', cursor:'pointer', padding:'4px 8px', borderRadius:8, fontSize:14, fontWeight:700, color:'#0D3349', fontFamily:ff }}>
-                {MONTHS[vm]}
-              </button>
+                style={{ background:'none', border:'none', cursor:'pointer', padding:'4px 8px', borderRadius:8, fontSize:14, fontWeight:700, color:'#0D3349', fontFamily:ff }}>{MONTHS[vm]}</button>
             </div>
             <button onClick={() => chgMo(1)} style={{ background:'none', border:'none', fontSize:20, color:'#64748B', cursor:'pointer', padding:'4px 8px', borderRadius:8, WebkitTapHighlightColor:'transparent' }}>›</button>
           </div>
-
-          {/* 요일 */}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', marginBottom:2 }}>
             {['일','월','화','수','목','금','토'].map(d => (
               <div key={d} style={{ textAlign:'center', fontSize:11, color:'#94A3B8', fontWeight:600, padding:'2px 0' }}>{d}</div>
             ))}
           </div>
-
-          {/* 날짜 */}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:0 }}>
             {renderCal()}
           </div>
         </div>
-
-        {/* 버튼 */}
-        <button className="main-btn" onClick={handleComplete} disabled={!canNext}
-          style={{
-            width:'100%', padding:12, border:'none', borderRadius:14,
-            fontSize:15, fontWeight: canNext ? 800 : 400,
-            cursor: canNext ? 'pointer' : 'default',
-            background: canNext ? '#00BCD4' : '#F1F5F9',
-            color: canNext ? '#fff' : '#94A3B8',
-            transition: 'all 0.2s',
-          }}
-        >
-          {canNext ? '시작하기 →' : '출발일과 귀국일을 선택해주세요'}
-        </button>
       </div>
+
+      {/* 시작하기 팝업 - 화면 정가운데 */}
+      {canNext && (
+        <>
+          <div onClick={() => { setSDate(null); setEDate(null) }} style={{
+            position: 'fixed', inset: 0, zIndex: 900,
+            background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)',
+          }} />
+          <div style={{
+            position: 'fixed',
+            top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 'calc(100% - 48px)', maxWidth: 340,
+            background: '#ffffff',
+            borderRadius: 24,
+            padding: '24px 24px 20px',
+            zIndex: 901,
+            animation: 'popIn 0.25s ease both',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+          }}>
+            {/* 출발/귀국일 표시 */}
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
+              <div>
+                <div style={{ fontSize:11, color:'#94A3B8', fontWeight:600, marginBottom:4 }}>✈️ 출발일</div>
+                <div style={{ fontSize:18, fontWeight:800, color:'#0D3349' }}>{sDate ? fmt(sDate) : ''}</div>
+              </div>
+              <div style={{ fontSize:22, color:'#CBD5E1' }}>→</div>
+              <div style={{ textAlign:'right' }}>
+                <div style={{ fontSize:11, color:'#94A3B8', fontWeight:600, marginBottom:4 }}>🏠 귀국일</div>
+                <div style={{ fontSize:18, fontWeight:800, color:'#0D3349' }}>{eDate ? fmt(eDate) : ''}</div>
+              </div>
+            </div>
+            <button className="main-btn" onClick={handleComplete}
+              style={{
+                width:'100%', padding:16, border:'none', borderRadius:14,
+                fontSize:16, fontWeight:800, cursor:'pointer',
+                background: '#00BCD4', color: '#fff',
+                boxShadow: '0 4px 20px rgba(0,188,212,0.4)',
+              }}>
+              시작하기 →
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
