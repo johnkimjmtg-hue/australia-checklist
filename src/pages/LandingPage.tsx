@@ -79,7 +79,7 @@ export default function LandingPage({ onComplete }: Props) {
             borderRadius: radius, background: bg,
             color: (isToday && !isStart && !isEnd) ? '#00BCD4' : color,
             fontWeight: (isToday && !isStart && !isEnd) ? 800 : fw,
-            fontSize: (isToday && !isStart && !isEnd) ? 15 : 13,
+            fontSize: 12,
             textDecoration: (isToday && !isStart && !isEnd) ? 'underline' : 'none',
             textDecorationColor: (isToday && !isStart && !isEnd) ? '#D4703A' : 'transparent',
             textUnderlineOffset: '3px',
@@ -97,162 +97,153 @@ export default function LandingPage({ onComplete }: Props) {
 
   return (
     <div style={{
-      minHeight: '100dvh', background: 'linear-gradient(180deg, #00BCD4 0%, #80DEEA 28%, #FFF0C8 50%, #F5C97A 70%, #D4703A 100%)', fontFamily: ff,
-      maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column',
+      height: '100dvh',
+      maxWidth: 430,
+      margin: '0 auto',
+      fontFamily: ff,
+      position: 'relative',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
     }}>
       <style>{`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        @keyframes floatA { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-14px) scale(1.04)} }
-        @keyframes floatB { 0%,100%{transform:translateY(0) scale(1) rotate(0deg)} 50%{transform:translateY(-10px) scale(1.06) rotate(8deg)} }
-        @keyframes bounceIn { 0%{transform:scale(0.5) translateY(30px);opacity:0} 60%{transform:scale(1.08) translateY(-6px);opacity:1} 80%{transform:scale(0.96) translateY(2px)} 100%{transform:scale(1) translateY(0);opacity:1} }
         @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
-        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-        @keyframes ripple { 0%{transform:scale(0.8);opacity:0.6} 100%{transform:scale(2.2);opacity:0} }
-        .drop1 { animation: floatA 7s ease-in-out infinite; }
-        .drop2 { animation: floatA 5s ease-in-out infinite; animation-delay:1s; }
-        .drop3 { animation: floatB 5.5s ease-in-out infinite; animation-delay:0.5s; }
-        .wdrop {
-          position:relative;
-          background: linear-gradient(150deg, rgba(255,255,255,0.22) 0%, rgba(200,240,255,0.10) 40%, rgba(0,180,220,0.18) 100%);
-          border: 1.5px solid rgba(255,255,255,0.75);
-          box-shadow: inset 0 -4px 8px rgba(0,150,200,0.2), inset 0 6px 12px rgba(255,255,255,0.3), 0 4px 10px rgba(0,100,150,0.18);
-        }
-        .wdrop::after {
-          content:""; position:absolute; background:rgba(255,255,255,0.82); border-radius:50%; transform:rotate(-30deg); filter:blur(1.5px);
-        }
-        .wdrop::before {
-          content:""; position:absolute; background:rgba(255,255,255,0.6); border-radius:50%; filter:blur(0.8px);
-        }
-        .wdrop-lg { width:180px; height:180px; border-radius:50% 50% 48% 48% / 55% 55% 45% 45%; }
-        .wdrop-lg::after { width:38px; height:18px; top:18%; left:20%; }
-        .wdrop-lg::before { width:15px; height:15px; top:13%; left:48%; }
-        .wdrop-md { width:120px; height:120px; border-radius:50% 50% 48% 48% / 55% 55% 45% 45%; }
-        .wdrop-md::after { width:26px; height:13px; top:18%; left:20%; }
-        .wdrop-md::before { width:10px; height:10px; top:13%; left:48%; }
-        .wdrop-sm { width:90px; height:90px; border-radius:50% 50% 48% 48% / 55% 55% 45% 45%; }
-        .wdrop-sm::after { width:18px; height:9px; top:18%; left:20%; }
-        .wdrop-sm::before { width:7px; height:7px; top:13%; left:48%; }
-        .wdrop-shadow-lg { width:140px; height:10px; background:rgba(0,100,140,0.18); border-radius:50%; margin:-4px auto 0; filter:blur(3px); }
-        .wdrop-shadow-md { width:95px; height:7px; background:rgba(0,100,140,0.15); border-radius:50%; margin:-3px auto 0; filter:blur(2px); }
-        .wdrop-shadow-sm { width:70px; height:5px; background:rgba(0,100,140,0.13); border-radius:50%; margin:-2px auto 0; filter:blur(1.5px); }
-        .icon-bounce { animation: bounceIn 0.7s cubic-bezier(.4,0,.2,1) both; }
-        .icon-pulse { animation: pulse 3s ease-in-out infinite; }
-        .ripple-anim { animation: ripple 2s ease-out infinite; }
-        .title-anim { animation: slideUp 0.6s 0.2s both; }
-        .sub-anim { animation: slideUp 0.6s 0.35s both; }
-        .cal-day-hover:hover { background: #E0F7FA !important; }
-        .nav-hover:hover { background: #E0F7FA; color: #FF7043 !important; }
-        .hdr-btn-hover:hover { background: #E0F7FA; }
-        .pick-item { padding:11px 6px; text-align:center; border-radius:12px; font-size:14px; font-weight:600; color:#555; cursor:pointer; border:1.5px solid transparent; transition:all 0.12s; }
-        .pick-item:hover { border-color:#00838F; color:#00838F; background:#FFF0EA; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        .pick-item { padding:10px 6px; text-align:center; border-radius:12px; font-size:13px; font-weight:600; color:#555; cursor:pointer; border:1.5px solid transparent; transition:all 0.12s; }
+        .pick-item:hover { border-color:#00838F; color:#00838F; }
         .pick-item.sel { background:#00838F; color:#fff; border-color:#00838F; }
         .main-btn { transition: transform 0.12s, opacity 0.12s; }
         .main-btn:active { transform: scale(0.97); opacity: 0.9; }
+        .nav-hover:active { opacity: 0.6; }
       `}</style>
 
-      {/* ── 상단 히어로 */}
-      <div style={{ position:'relative', overflow:'hidden', background:'transparent', padding:'52px 28px 36px', minHeight:280 }}>
-        <div className="drop1" style={{ position:'absolute', top:-40, right:-30 }}>
-          <div className="wdrop wdrop-lg" />
-          <div className="wdrop-shadow-lg" />
-        </div>
-        <div className="drop2" style={{ position:'absolute', top:60, left:-20 }}>
-          <div className="wdrop wdrop-md" />
-          <div className="wdrop-shadow-md" />
-        </div>
-        <div className="drop3" style={{ position:'absolute', bottom:40, right:30 }}>
-          <div className="wdrop wdrop-sm" />
-          <div className="wdrop-shadow-sm" />
-        </div>
+      {/* ── 배경 이미지 */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'url(/sydney-bg.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center top',
+        zIndex: 0,
+      }} />
 
-        <div className="icon-bounce" style={{ position:'relative', display:'inline-block', marginBottom:20 }}>
-          <div className="ripple-anim" style={{ position:'absolute', inset:-8, borderRadius:'50%', background:'rgba(0,172,193,0.2)' }} />
-          <div className="icon-pulse" style={{ width:72, height:72, position:'relative', zIndex:1 }}>
-            <img src="/suitcase.png" alt="가방" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
-          </div>
-        </div>
+      {/* ── 어두운 오버레이 */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.55) 100%)',
+        zIndex: 1,
+      }} />
 
-        <h1 className="title-anim" style={{ fontSize:32, fontWeight:800, color:'#0D3349', lineHeight:1.3, margin:0 }}>
+      {/* ── 상단 브랜드 */}
+      <div style={{
+        position: 'relative', zIndex: 2,
+        padding: '52px 24px 0',
+        animation: 'fadeIn 0.8s ease both',
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.85)', letterSpacing: 2, marginBottom: 6 }}>
+          ✈️ HOJUGAJA
+        </div>
+        <div style={{ fontSize: 26, fontWeight: 800, color: '#fff', lineHeight: 1.3 }}>
           호주 여행,<br />언제 떠나세요?
-        </h1>
-        <p className="sub-anim" style={{ fontSize:16, color:'#0D4F6E', marginTop:10, lineHeight:1.65 }}>
-          호주가자와 함께<br />완벽한 호주 여행을 경험해보세요 ✈️
-        </p>
+        </div>
       </div>
 
-      {/* ── 날짜 칩 */}
-      <div style={{ padding:'20px 18px 0', display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-        {[
-          { label:'✈️ 출발일', val: sDate ? fmt(sDate) : null },
-          { label:'🏠 귀국일', val: eDate ? fmt(eDate) : null },
-        ].map((c, i) => (
-          <div key={i} style={{ background:'rgba(255,255,255,0.88)', borderRadius:16, padding:'12px 14px', border:'none', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
-            <div style={{ fontSize:11, color:'#1565A0', marginBottom:3, fontWeight:600 }}>{c.label}</div>
-            <div style={{ fontSize:14, fontWeight: c.val ? 700 : 400, color: c.val ? '#0D3349' : '#1565A0' }}>
-              {c.val ?? '날짜 선택'}
+      {/* ── 스페이서 */}
+      <div style={{ flex: 1, zIndex: 2 }} />
+
+      {/* ── 하단 흰색 카드 */}
+      <div style={{
+        position: 'relative', zIndex: 2,
+        background: '#fff',
+        borderRadius: '24px 24px 0 0',
+        padding: '20px 16px 36px',
+        boxShadow: '0 -8px 32px rgba(0,0,0,0.15)',
+        animation: 'slideUp 0.5s 0.2s both',
+      }}>
+
+        {/* 날짜 칩 */}
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:14 }}>
+          {[
+            { label:'✈️ 출발일', val: sDate ? fmt(sDate) : null },
+            { label:'🏠 귀국일', val: eDate ? fmt(eDate) : null },
+          ].map((c, i) => (
+            <div key={i} style={{
+              background: c.val ? 'rgba(0,188,212,0.08)' : '#F8FAFC',
+              borderRadius: 12, padding: '10px 14px',
+              border: c.val ? '1.5px solid rgba(0,188,212,0.3)' : '1.5px solid #E2E8F0',
+            }}>
+              <div style={{ fontSize:11, color:'#94A3B8', marginBottom:3, fontWeight:600 }}>{c.label}</div>
+              <div style={{ fontSize:14, fontWeight: c.val ? 700 : 400, color: c.val ? '#0D3349' : '#94A3B8' }}>
+                {c.val ?? '날짜 선택'}
+              </div>
             </div>
+          ))}
+        </div>
+
+        {/* 피커 */}
+        {picker === 'year' && (
+          <div style={{ marginBottom:10, background:'#F8FAFC', borderRadius:14, padding:12, display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
+            {Array.from({ length: MAX_Y - MIN_Y + 1 }, (_, i) => MIN_Y + i).map(y => (
+              <div key={y} className={`pick-item${y === vy ? ' sel' : ''}`}
+                onClick={() => { setVy(y); setPicker('none') }}
+              >{y}년</div>
+            ))}
           </div>
-        ))}
-      </div>
-
-      {/* ── 피커 시트 */}
-      {picker === 'year' && (
-        <div style={{ margin:'12px 18px 0', background:'rgba(255,255,255,0.88)', borderRadius:16, padding:14, border:'none', display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
-          {Array.from({ length: MAX_Y - MIN_Y + 1 }, (_, i) => MIN_Y + i).map(y => (
-            <div key={y} className={`pick-item${y === vy ? ' sel' : ''}`}
-              onClick={() => { setVy(y); setPicker('none') }}
-            >{y}년</div>
-          ))}
-        </div>
-      )}
-      {picker === 'month' && (
-        <div style={{ margin:'12px 18px 0', background:'rgba(255,255,255,0.88)', borderRadius:16, padding:14, border:'none', display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8, boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
-          {MONTHS.map((m, i) => (
-            <div key={i} className={`pick-item${i === vm ? ' sel' : ''}`}
-              onClick={() => { setVm(i); setPicker('none') }}
-            >{m}</div>
-          ))}
-        </div>
-      )}
-
-      {/* ── 달력 */}
-      <div style={{ margin:'12px 18px 0', background:'rgba(255,255,255,0.88)', borderRadius:22, border:'none', overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.12)' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px 10px' }}>
-          <button className="nav-hover" onClick={() => chgMo(-1)}
-            style={{ background:'none', border:'none', fontSize:22, color:'#1565A0', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>‹</button>
-          <div style={{ display:'flex', gap:4, alignItems:'center' }}>
-            <button className="hdr-btn-hover" onClick={() => setPicker(picker==='year'?'none':'year')}
-              style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#00838F' }}>{vy}년</button>
-            <span style={{ fontSize:13, color:'#1565A0' }}>•</span>
-            <button className="hdr-btn-hover" onClick={() => setPicker(picker==='month'?'none':'month')}
-              style={{ background:'none', border:'none', cursor:'pointer', padding:'5px 10px', borderRadius:10, fontSize:15, fontWeight:700, color:'#0D3349' }}>{MONTHS[vm]}</button>
+        )}
+        {picker === 'month' && (
+          <div style={{ marginBottom:10, background:'#F8FAFC', borderRadius:14, padding:12, display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6 }}>
+            {MONTHS.map((m, i) => (
+              <div key={i} className={`pick-item${i === vm ? ' sel' : ''}`}
+                onClick={() => { setVm(i); setPicker('none') }}
+              >{m}</div>
+            ))}
           </div>
-          <button className="nav-hover" onClick={() => chgMo(1)}
-            style={{ background:'none', border:'none', fontSize:22, color:'#1565A0', cursor:'pointer', padding:'4px 8px', borderRadius:8 }}>›</button>
+        )}
+
+        {/* 달력 */}
+        <div style={{ marginBottom:14 }}>
+          {/* 달력 헤더 */}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
+            <button onClick={() => chgMo(-1)} style={{ background:'none', border:'none', fontSize:20, color:'#64748B', cursor:'pointer', padding:'4px 8px', borderRadius:8, WebkitTapHighlightColor:'transparent' }}>‹</button>
+            <div style={{ display:'flex', gap:4, alignItems:'center' }}>
+              <button onClick={() => setPicker(picker==='year'?'none':'year')}
+                style={{ background:'none', border:'none', cursor:'pointer', padding:'4px 8px', borderRadius:8, fontSize:14, fontWeight:700, color:'#00838F', fontFamily:ff }}>
+                {vy}년
+              </button>
+              <span style={{ fontSize:12, color:'#CBD5E1' }}>•</span>
+              <button onClick={() => setPicker(picker==='month'?'none':'month')}
+                style={{ background:'none', border:'none', cursor:'pointer', padding:'4px 8px', borderRadius:8, fontSize:14, fontWeight:700, color:'#0D3349', fontFamily:ff }}>
+                {MONTHS[vm]}
+              </button>
+            </div>
+            <button onClick={() => chgMo(1)} style={{ background:'none', border:'none', fontSize:20, color:'#64748B', cursor:'pointer', padding:'4px 8px', borderRadius:8, WebkitTapHighlightColor:'transparent' }}>›</button>
+          </div>
+
+          {/* 요일 */}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', marginBottom:4 }}>
+            {['일','월','화','수','목','금','토'].map(d => (
+              <div key={d} style={{ textAlign:'center', fontSize:11, color:'#94A3B8', fontWeight:600, padding:'2px 0' }}>{d}</div>
+            ))}
+          </div>
+
+          {/* 날짜 */}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2 }}>
+            {renderCal()}
+          </div>
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'0 10px' }}>
-          {['일','월','화','수','목','금','토'].map(d => (
-            <div key={d} style={{ textAlign:'center', fontSize:11, color:'#1565A0', fontWeight:600, padding:'4px 0 6px' }}>{d}</div>
-          ))}
-        </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, padding:'0 10px 14px' }}>
-          {renderCal()}
-        </div>
-      </div>
-
-      {/* ── 하단 버튼 */}
-      <div style={{ flex:1 }} />
-      <div style={{ padding:'20px 18px 48px' }}>
+        {/* 버튼 */}
         <button className="main-btn" onClick={handleComplete} disabled={!canNext}
           style={{
-            width:'100%', padding:18, border:'none', borderRadius:50,
-            fontSize:17, fontWeight: 400, cursor: canNext ? 'pointer' : 'default',
-            background: 'rgba(255,255,255,0.88)',
-            color: '#0D3349',
+            width:'100%', padding:16, border:'none', borderRadius:14,
+            fontSize:16, fontWeight: canNext ? 800 : 400,
+            cursor: canNext ? 'pointer' : 'default',
+            background: canNext ? '#00BCD4' : '#F1F5F9',
+            color: canNext ? '#fff' : '#94A3B8',
+            transition: 'all 0.2s',
           }}
         >
-          {canNext ? '시작하기' : '출발일과 귀국일을 선택해주세요'}
+          {canNext ? '시작하기 →' : '출발일과 귀국일을 선택해주세요'}
         </button>
       </div>
     </div>
