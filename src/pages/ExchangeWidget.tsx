@@ -2,6 +2,7 @@
 // ExchangeWidget.tsx
 // src/pages/ExchangeWidget.tsx
 // AUD ↔ KRW 환율 계산기
+// Capacitor Android 대응: 다중 API fallback
 // ─────────────────────────────────────────────
 import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
@@ -11,11 +12,46 @@ const RATE_KEY = 'exchange-rate-cache'
 const RATE_TS_KEY = 'exchange-rate-ts'
 const RATE_TTL = 1000 * 60 * 60 // 1시간
 
+// 여러 API를 순서대로 시도 (하나 실패하면 다음으로)
+const fetchRateFromAPIs = async (): Promise<number | null> => {
+  // 1순위: exchangerate-api (CORS 허용)
+  try {
+    const res = await fetch('https://api.exchangerate-api.com/v4/latest/AUD', {
+      headers: { 'Accept': 'application/json' },
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (data.rates?.KRW) return data.rates.KRW
+    }
+  } catch {}
+
+  // 2순위: open.er-api.com
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/AUD')
+    if (res.ok) {
+      const data = await res.json()
+      if (data.rates?.KRW) return data.rates.KRW
+    }
+  } catch {}
+
+  // 3순위: frankfurter (EUR 기준으로 AUD→KRW 계산)
+  try {
+    const res = await fetch('https://api.frankfurter.app/latest?from=AUD&to=KRW')
+    if (res.ok) {
+      const data = await res.json()
+      if (data.rates?.KRW) return data.rates.KRW
+    }
+  } catch {}
+
+  return null
+}
+
 export default function ExchangeWidget({ onClose }: { onClose: () => void }) {
   const [rate, setRate] = useState<number | null>(() => {
     try { return parseFloat(localStorage.getItem(RATE_KEY) ?? '') || null } catch { return null }
   })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<string>(() => {
     try {
       const ts = localStorage.getItem(RATE_TS_KEY)
@@ -28,24 +64,30 @@ export default function ExchangeWidget({ onClose }: { onClose: () => void }) {
 
   const fetchRate = async () => {
     setLoading(true)
-    try {
-      const res = await fetch('https://api.exchangerate-api.com/v4/latest/AUD')
-      const data = await res.json()
-      const r = data.rates?.KRW
-      if (r) {
-        setRate(r)
-        const now = Date.now()
+    setError(false)
+    const r = await fetchRateFromAPIs()
+    if (r) {
+      setRate(r)
+      const now = Date.now()
+      try {
         localStorage.setItem(RATE_KEY, String(r))
         localStorage.setItem(RATE_TS_KEY, String(now))
-        setLastUpdated(new Date(now).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }))
-      }
-    } catch {}
+      } catch {}
+      setLastUpdated(new Date(now).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }))
+      setError(false)
+    } else {
+      setError(true)
+    }
     setLoading(false)
   }
 
   useEffect(() => {
-    const ts = parseInt(localStorage.getItem(RATE_TS_KEY) ?? '0')
-    if (!rate || Date.now() - ts > RATE_TTL) fetchRate()
+    try {
+      const ts = parseInt(localStorage.getItem(RATE_TS_KEY) ?? '0')
+      if (!rate || Date.now() - ts > RATE_TTL) fetchRate()
+    } catch {
+      fetchRate()
+    }
   }, [])
 
   const handleAudChange = (v: string) => {
@@ -76,7 +118,6 @@ export default function ExchangeWidget({ onClose }: { onClose: () => void }) {
     }
   }
 
-  // 빠른 계산 버튼
   const QUICK = [10, 20, 50, 100, 200, 500]
 
   return (
@@ -84,7 +125,14 @@ export default function ExchangeWidget({ onClose }: { onClose: () => void }) {
       {/* 환율 정보 */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
-          {rate ? (
+          {loading ? (
+            <div style={{ fontSize: 14, color: '#94A3B8' }}>환율 불러오는 중...</div>
+          ) : error ? (
+            <div>
+              <div style={{ fontSize: 13, color: '#DC2626' }}>환율을 불러오지 못했어요</div>
+              {rate && <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>마지막 저장 환율 사용 중</div>}
+            </div>
+          ) : rate ? (
             <>
               <div style={{ fontSize: 13, color: '#94A3B8' }}>현재 환율</div>
               <div style={{ fontSize: 22, fontWeight: 800, color: '#0D3349' }}>
