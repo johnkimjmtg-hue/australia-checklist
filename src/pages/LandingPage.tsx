@@ -243,9 +243,17 @@ export default function LandingPage({ onComplete }: Props) {
                 width:'100%', padding:16, border:'none', borderRadius:14,
                 fontSize:16, fontWeight:800, cursor:'pointer',
                 background: '#00BCD4', color: '#fff',
-                boxShadow: '0 4px 20px rgba(0,188,212,0.4)',
+                marginBottom: 10,
               }}>
               시작하기 →
+            </button>
+            <button onClick={() => { setSDate(null); setEDate(null) }}
+              style={{
+                width:'100%', padding:12, border:'1.5px solid #E2E8F0', borderRadius:14,
+                fontSize:14, fontWeight:600, cursor:'pointer',
+                background: '#fff', color: '#64748B',
+              }}>
+              날짜 수정하기
             </button>
           </div>
         </>
