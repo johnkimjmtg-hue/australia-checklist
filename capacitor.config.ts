@@ -5,11 +5,10 @@ const config: CapacitorConfig = {
   appName: '호주가자',
   webDir: 'dist',
   server: {
-    url: 'https://hojugaja.com',  // 항상 최신 웹 버전 로드
-    cleartext: false,
+    androidScheme: 'https',
   },
   android: {
-    overScrollMode: 'always',  // 스크롤 끝 바운스 효과
+    overScrollMode: 'always',
   },
   plugins: {
     SplashScreen: {

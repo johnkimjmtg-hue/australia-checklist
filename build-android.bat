@@ -1,33 +1,33 @@
 @echo off
 echo.
 echo ================================
-echo   호주가자 Android 빌드 시작
+echo   Android Build Start
 echo ================================
 echo.
 
-echo [1/2] React 앱 빌드 중...
+set JAVA_HOME=C:\Program Files\Android\Android Studio\jbr
+set PATH=%JAVA_HOME%in;%PATH%
+
+echo [1/2] React build...
 call npm run build
 if %errorlevel% neq 0 (
-    echo.
-    echo [오류] npm run build 실패!
+    echo Build failed!
     pause
     exit /b 1
 )
 
 echo.
-echo [2/2] Capacitor 동기화 중...
+echo [2/2] Capacitor sync...
 call npx cap sync android
 if %errorlevel% neq 0 (
-    echo.
-    echo [오류] cap sync 실패!
+    echo Sync failed!
     pause
     exit /b 1
 )
 
 echo.
 echo ================================
-echo   완료! Android Studio에서
-echo   AAB 빌드 후 업로드하세요.
+echo   Done! Now build AAB in Android Studio.
+echo   Build - Generate Signed Bundle / APK
 echo ================================
-echo.
 pause
