@@ -127,12 +127,7 @@ export default function LandingPage({ onComplete }: Props) {
         zIndex: 0,
       }} />
 
-      {/* ── 어두운 오버레이 */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.55) 100%)',
-        zIndex: 1,
-      }} />
+
 
       {/* ── 상단 브랜드 */}
       <div style={{
@@ -143,8 +138,11 @@ export default function LandingPage({ onComplete }: Props) {
         <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.85)', letterSpacing: 2, marginBottom: 6 }}>
           ✈️ HOJUGAJA
         </div>
-        <div style={{ fontSize: 26, fontWeight: 800, color: '#fff', lineHeight: 1.3 }}>
+        <div style={{ fontSize: 32, fontWeight: 800, color: '#fff', lineHeight: 1.3, marginBottom: 10 }}>
           호주 여행,<br />언제 떠나세요?
+        </div>
+        <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.9)', lineHeight: 1.65 }}>
+          호주가자와 함께<br />완벽한 호주 여행을 경험해보세요 ✈️
         </div>
       </div>
 
