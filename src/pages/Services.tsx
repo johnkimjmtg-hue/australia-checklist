@@ -390,9 +390,9 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
         {(serviceTab === 'all' || serviceTab === 'korean') && (<>
         <div style={{ display:'flex', alignItems:'center', gap:spacing[2], marginBottom:spacing[3], width:'100%', boxSizing:'border-box' }}>
           <div style={{
-            flex:1, display:'flex', alignItems:'center', gap:spacing[2],
+            flex:1, minWidth:0, display:'flex', alignItems:'center', gap:spacing[2],
             background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`,
-            border:`1.5px solid ${colors.border}`, height:42,
+            border:`1.5px solid ${colors.border}`, height:42, overflow:'hidden',
           }}>
             <Icon icon="ph:magnifying-glass" width={16} height={16} color={colors.textTertiary} />
             <input
