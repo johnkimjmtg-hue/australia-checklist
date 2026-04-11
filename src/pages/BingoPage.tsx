@@ -3,6 +3,7 @@ import { Icon } from '@iconify/react'
 import { supabase } from '../lib/supabase'
 import { getCachedBingo, getCachedBusinesses } from '../lib/dataCache'
 import BusinessCard from '../components/BusinessCard'
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 
 const ff = "-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif"
 
@@ -287,6 +288,34 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const photoInputRef = useRef<HTMLInputElement>(null)
   const [pendingPhoto, setPendingPhoto] = useState<{ idx: number; url: string; file: Blob } | null>(null)
+
+  // 앱/웹 감지 후 카메라 처리
+  const handlePhotoClick = async (currentIdx: number) => {
+    const isApp = !!(window as any).Capacitor?.isNativePlatform?.()
+    if (isApp) {
+      try {
+        const photo = await Camera.getPhoto({
+          quality: 80,
+          allowEditing: false,
+          resultType: CameraResultType.DataUrl,
+          source: CameraSource.Prompt,
+          promptLabelHeader: '사진 선택',
+          promptLabelCancel: '취소',
+          promptLabelPhoto: '갤러리에서 선택',
+          promptLabelPicture: '카메라로 촬영',
+        })
+        if (!photo.dataUrl) return
+        setUploadingPhoto(true)
+        const res = await fetch(photo.dataUrl)
+        const blob = await res.blob()
+        const previewUrl = URL.createObjectURL(blob)
+        setPendingPhoto({ idx: currentIdx, url: previewUrl, file: blob })
+        setUploadingPhoto(false)
+      } catch {}
+    } else {
+      photoInputRef.current?.click()
+    }
+  }
 
   const completedLines = getCompletedLines(checked)
   const bingoCount = completedLines.length
@@ -777,7 +806,7 @@ fontFamily: ff,
                       <Icon icon="ph:x-circle" width={20} height={20} color='#DC2626' />
                       방문 취소
                     </button>
-                    <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
+                    <button onClick={() => handlePhotoClick(idx)} disabled={uploadingPhoto} style={{
                       flex:1, height:50, borderRadius:12,
                       border:'1px solid rgba(0,0,0,0.08)', background:'rgba(255,255,255,0.88)',
                       color:'#64748B', fontSize:13, fontWeight:700,
@@ -805,7 +834,7 @@ fontFamily: ff,
                       <Icon icon="ph:check-circle" width={20} height={20} color="#fff" />
                       방문완료
                     </button>
-                    <button onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} style={{
+                    <button onClick={() => handlePhotoClick(idx)} disabled={uploadingPhoto} style={{
                       flex:1, height:50, borderRadius:12,
                       border:'1px solid rgba(0,0,0,0.08)', background:'rgba(255,255,255,0.88)',
                       color:'#64748B', fontSize:13, fontWeight:700,

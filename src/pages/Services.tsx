@@ -341,7 +341,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
   const isFiltered  = isSearch || isCatFilter
 
   return (
-    <div style={{ minHeight:'100dvh', background:'#ffffff', fontFamily:ff, paddingBottom:130 }}>
+    <div style={{ minHeight:'100dvh', background:'#ffffff', fontFamily:ff, paddingBottom:130, overflowX:'hidden', width:'100%', boxSizing:'border-box' }}>
       <style>{`
         .chip-btn { transition: all .12s; -webkit-tap-highlight-color: transparent; }
         .svc-btn  { transition: all .12s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
