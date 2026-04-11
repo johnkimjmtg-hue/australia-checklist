@@ -1,44 +1,81 @@
-// ── 리스트 데이터 캐시 유틸
-// 어드민 배포 버튼 → cache_version 버전 업 → 다음 방문 시 해당 데이터만 재다운로드
-// 캐시 있고 버전 같으면 절대 DB 재다운로드 안 함 (새로고침 포함)
-// TTL(5분) 기반 버전 체크 → cache_version 조회 횟수 최소화
+// ── 리스트 데이터 캐시 유틸 (IndexedDB + 메모리 캐시)
+// localStorage 5MB 제한 해결
+// 기존 동기 API 완전 호환 유지 (메모리 캐시로 동기 접근 가능)
 import { supabase } from './supabase'
 
-const CACHE_KEYS = {
-  checklist:    'cache-checklist',
-  businesses:   'cache-businesses',
-  shopping:     'cache-shopping',
-  bingo:        'cache-bingo',
-  events:       'cache-events',
-  packing:      'cache-packing',
-  version:      'cache-version',
-  lastChecked:  'cache-last-checked',
-}
-
-// 5분마다 한 번만 cache_version DB 조회
-const VERSION_CHECK_INTERVAL = 5 * 60 * 1000
+const DB_NAME = 'hojugaja-cache'
+const DB_VERSION = 1
+const STORE_NAME = 'cache'
+const VERSION_CHECK_INTERVAL = 5 * 60 * 1000 // 5분
 
 type CacheVersion = { checklist: number; businesses: number; shopping: number; bingo: number; events: number; packing: number }
 const DEFAULT_VERSION: CacheVersion = { checklist: 0, businesses: 0, shopping: 0, bingo: 0, events: 0, packing: 0 }
 
-function getLocalVersion(): CacheVersion {
-  try { return JSON.parse(localStorage.getItem(CACHE_KEYS.version) ?? 'null') ?? DEFAULT_VERSION }
-  catch { return DEFAULT_VERSION }
+// ── 메모리 캐시 (동기 접근용)
+const MEM: Record<string, any> = {}
+
+// ── IndexedDB
+let _db: IDBDatabase | null = null
+function openDB(): Promise<IDBDatabase> {
+  if (_db) return Promise.resolve(_db)
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION)
+    req.onupgradeneeded = (e) => {
+      const db = (e.target as IDBOpenDBRequest).result
+      if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME)
+    }
+    req.onsuccess = (e) => { _db = (e.target as IDBOpenDBRequest).result; resolve(_db) }
+    req.onerror = () => reject(req.error)
+  })
 }
-function saveLocalVersion(v: CacheVersion) {
-  try { localStorage.setItem(CACHE_KEYS.version, JSON.stringify(v)) } catch {}
+
+async function idbGet<T>(key: string): Promise<T | null> {
+  // 메모리에 있으면 바로 반환
+  if (MEM[key] !== undefined) return MEM[key]
+  try {
+    const db = await openDB()
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readonly')
+      const req = tx.objectStore(STORE_NAME).get(key)
+      req.onsuccess = () => {
+        const val = req.result ?? null
+        if (val !== null) MEM[key] = val // 메모리에 저장
+        resolve(val)
+      }
+      req.onerror = () => resolve(null)
+    })
+  } catch { return null }
 }
-function getCache<T>(key: string): T | null {
+
+async function idbSet<T>(key: string, value: T): Promise<void> {
+  MEM[key] = value // 메모리에도 저장
+  try {
+    const db = await openDB()
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite')
+      tx.objectStore(STORE_NAME).put(value, key)
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => resolve()
+    })
+  } catch {}
+}
+
+// ── localStorage (버전/타임스탬프 등 작은 데이터)
+function lsGet<T>(key: string): T | null {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null } catch { return null }
 }
-function setCache<T>(key: string, data: T) {
+function lsSet<T>(key: string, data: T) {
   try { localStorage.setItem(key, JSON.stringify(data)) } catch {}
 }
+function getLocalVersion(): CacheVersion {
+  return lsGet<CacheVersion>('cache-version') ?? DEFAULT_VERSION
+}
+function saveLocalVersion(v: CacheVersion) { lsSet('cache-version', v) }
 function getLastChecked(): number {
-  return parseInt(localStorage.getItem(CACHE_KEYS.lastChecked) ?? '0')
+  return parseInt(localStorage.getItem('cache-last-checked') ?? '0')
 }
 function saveLastChecked() {
-  try { localStorage.setItem(CACHE_KEYS.lastChecked, Date.now().toString()) } catch {}
+  try { localStorage.setItem('cache-last-checked', Date.now().toString()) } catch {}
 }
 
 async function fetchServerVersions(): Promise<CacheVersion> {
@@ -55,9 +92,10 @@ async function fetchChecklist() {
     supabase.from('checklist_items').select('*').eq('is_active', true).order('sort_order'),
   ])
   const data = { categories: cats.data ?? [], items: items.data ?? [] }
-  setCache(CACHE_KEYS.checklist, data)
+  await idbSet('cache-checklist', data)
   return data
 }
+
 async function fetchBusinesses() {
   const PAGE = 1000
   let all: any[] = []
@@ -65,7 +103,7 @@ async function fetchBusinesses() {
   while (true) {
     const { data, error } = await supabase
       .from('businesses')
-      .select('*')
+      .select('id,name,category,description,phone,website,kakao,address,city,is_featured,is_active,tags,google_place_id,google_rating,google_review_count,latitude,longitude,is_korean,source')
       .eq('is_active', true)
       .order('is_featured', { ascending: false })
       .order('name')
@@ -75,57 +113,63 @@ async function fetchBusinesses() {
     if (data.length < PAGE) break
     from += PAGE
   }
-  setCache(CACHE_KEYS.businesses, all)
+  await idbSet('cache-businesses', all)
   return all
 }
+
 async function fetchShopping() {
   const [cats, prods] = await Promise.all([
     supabase.from('shopping_categories').select('*').eq('is_active', true).order('sort_order'),
     supabase.from('shopping_products').select('*').eq('is_active', true).order('sort_order'),
   ])
   const data = { categories: cats.data ?? [], products: prods.data ?? [] }
-  setCache(CACHE_KEYS.shopping, data)
+  await idbSet('cache-shopping', data)
   return data
 }
+
 async function fetchBingo() {
   const { data } = await supabase.from('bingo_cafes').select('*').eq('is_active', true)
     .order('city').order('sort_order')
-  setCache(CACHE_KEYS.bingo, data ?? [])
+  await idbSet('cache-bingo', data ?? [])
   return data ?? []
 }
+
 async function fetchPacking() {
   const [cats, items] = await Promise.all([
     supabase.from('packing_categories').select('*').order('sort_order'),
     supabase.from('packing_items').select('*').eq('is_active', true).order('sort_order'),
   ])
   const data = { categories: cats.data ?? [], items: items.data ?? [] }
-  setCache(CACHE_KEYS.packing, data)
-  // 홈 배지용 total 저장 (🔴 제외)
+  await idbSet('cache-packing', data)
   const checkableCount = (items.data ?? []).filter((i: any) => !i.tips?.startsWith('🔴')).length
   try { localStorage.setItem('packing-total', String(checkableCount)) } catch {}
   return data
 }
+
 async function fetchEvents() {
   const { data } = await supabase.from('events').select('*').eq('is_active', true)
     .order('start_date')
-  setCache(CACHE_KEYS.events, data ?? [])
+  await idbSet('cache-events', data ?? [])
   return data ?? []
 }
 
+// ── 앱 시작 시 메모리 캐시 워밍업 (IndexedDB → 메모리)
+async function warmupMemoryCache() {
+  const keys = ['cache-checklist', 'cache-businesses', 'cache-shopping', 'cache-bingo', 'cache-events', 'cache-packing']
+  await Promise.all(keys.map(k => idbGet(k))) // 메모리에 로드
+}
+
 // ── 메인 캐시 동기화
-// 반환값: true = 새 데이터 다운로드됨 (리렌더 필요), false = 캐시 그대로
 export async function syncDataCache(): Promise<boolean> {
   try {
+    // 먼저 메모리 캐시 워밍업
+    await warmupMemoryCache()
+
     const allCached =
-      getCache(CACHE_KEYS.checklist) &&
-      getCache(CACHE_KEYS.businesses) &&
-      getCache(CACHE_KEYS.shopping) &&
-      getCache(CACHE_KEYS.bingo) &&
-      getCache(CACHE_KEYS.events) &&
-      getCache(CACHE_KEYS.packing)
+      MEM['cache-checklist'] && MEM['cache-businesses'] && MEM['cache-shopping'] &&
+      MEM['cache-bingo'] && MEM['cache-events'] && MEM['cache-packing']
 
     if (!allCached) {
-      // 캐시 자체가 없으면 무조건 전체 다운로드 (TTL 무시)
       const serverVer = await fetchServerVersions()
       await Promise.all([fetchChecklist(), fetchBusinesses(), fetchShopping(), fetchBingo(), fetchEvents(), fetchPacking()])
       saveLocalVersion(serverVer)
@@ -133,12 +177,8 @@ export async function syncDataCache(): Promise<boolean> {
       return true
     }
 
-    // 5분 이내에 이미 체크했으면 DB 조회 자체를 스킵
-    if (Date.now() - getLastChecked() < VERSION_CHECK_INTERVAL) {
-      return false
-    }
+    if (Date.now() - getLastChecked() < VERSION_CHECK_INTERVAL) return false
 
-    // 5분 지났으면 cache_version 체크
     const [serverVer, localVer] = [await fetchServerVersions(), getLocalVersion()]
     const tasks: Promise<any>[] = []
     if (serverVer.checklist > localVer.checklist)   tasks.push(fetchChecklist())
@@ -155,7 +195,6 @@ export async function syncDataCache(): Promise<boolean> {
       return true
     }
 
-    // 버전 동일 — 체크 시간만 갱신
     saveLastChecked()
     return false
   } catch (e) {
@@ -164,21 +203,22 @@ export async function syncDataCache(): Promise<boolean> {
   }
 }
 
+// ── 동기 접근 API (기존 코드 호환 - 메모리 캐시 사용)
 export function getCachedChecklist() {
-  return getCache<{ categories: any[]; items: any[] }>(CACHE_KEYS.checklist)
+  return MEM['cache-checklist'] as { categories: any[]; items: any[] } | null
 }
 export function getCachedBusinesses() {
-  return getCache<any[]>(CACHE_KEYS.businesses)
+  return MEM['cache-businesses'] as any[] | null
 }
 export function getCachedShopping() {
-  return getCache<{ categories: any[]; products: any[] }>(CACHE_KEYS.shopping)
+  return MEM['cache-shopping'] as { categories: any[]; products: any[] } | null
 }
 export function getCachedBingo() {
-  return getCache<any[]>(CACHE_KEYS.bingo)
+  return MEM['cache-bingo'] as any[] | null
 }
 export function getCachedPacking() {
-  return getCache<{ categories: any[]; items: any[] }>(CACHE_KEYS.packing)
+  return MEM['cache-packing'] as { categories: any[]; items: any[] } | null
 }
 export function getCachedEvents() {
-  return getCache<any[]>(CACHE_KEYS.events)
+  return MEM['cache-events'] as any[] | null
 }
