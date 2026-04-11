@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { HashRouter, Routes, Route, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import { loadState, loadTrip, resetAll, clearTrip, AppState, TripInfo } from './store/state'
 import { syncDataCache } from './lib/dataCache'
@@ -129,8 +129,8 @@ function AdminWrapper() {
 
 export default function App() {
   return (
-    // ← HashRouter: Capacitor 파일 기반 라우팅 대응
-    <HashRouter>
+    // ← BrowserRouter: Capacitor 파일 기반 라우팅 대응
+    <BrowserRouter>
       <Routes>
         <Route path="/"       element={<MainApp />} />
         <Route path="/app"    element={<MainApp />} />
@@ -138,6 +138,6 @@ export default function App() {
         <Route path="*"       element={<MainApp />} />
       </Routes>
       <Analytics />
-    </HashRouter>
+    </BrowserRouter>
   )
 }
