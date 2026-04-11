@@ -414,11 +414,11 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
           <button
             onClick={() => setShowRequestForm(true)}
             style={{
-              flexShrink:0, height:42, padding:`0 ${spacing[3]}px`,
+              flexShrink:0, height:42, width:80,
               background:'#29B6D0', color:'#fff',
               border:'none', borderRadius:radius.sm,
               fontSize:font.size.sm, fontWeight:font.weight.bold,
-              cursor:'pointer', display:'flex', alignItems:'center', gap:4,
+              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
               fontFamily:ff, whiteSpace:'nowrap',
               WebkitTapHighlightColor:'transparent',
             }}
