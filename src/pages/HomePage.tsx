@@ -731,11 +731,11 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
                     )}
                   </svg>
                   <div style={{ position:'relative', zIndex:1, padding:'20px 22px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                    <div>
+                    <div style={{ flex:1, minWidth:0, marginRight:12 }}>
                       <div style={{ fontSize:52, fontWeight:900, color:'#ffffff', lineHeight:1 }}>{ddayText}</div>
-                      <div style={{ fontSize:15, color:'rgba(255,255,255,0.85)', marginTop:6 }}>{ddayLabel}</div>
+                      <div style={{ fontSize:15, color:'rgba(255,255,255,0.85)', marginTop:6, wordBreak:'keep-all' }}>{ddayLabel}</div>
                     </div>
-                    <div style={{ textAlign:'right', fontSize:13, color:'rgba(255,255,255,0.85)', lineHeight:2 }}>
+                    <div style={{ textAlign:'right', fontSize:13, color:'rgba(255,255,255,0.85)', lineHeight:2, flexShrink:0 }}>
                       <div>✈️ {fmtDate(startDate)} 출발</div>
                       <div>🏠 {fmtDate(endDate)} 귀국</div>
                       <div style={{ marginTop:6, fontSize:13, color:'rgba(255,255,255,0.9)', fontWeight:700 }}>{tripNights}박 {tripNights+1}일</div>
