@@ -388,7 +388,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
 
         {/* 검색창 + 카테고리 — 전체 탭만 */}
         {(serviceTab === 'all' || serviceTab === 'korean') && (<>
-        <div style={{ display:'flex', alignItems:'center', gap:spacing[2], marginBottom:spacing[3] }}>
+        <div style={{ display:'flex', alignItems:'center', gap:spacing[2], marginBottom:spacing[3], width:'100%', boxSizing:'border-box' }}>
           <div style={{
             flex:1, display:'flex', alignItems:'center', gap:spacing[2],
             background:colors.bgCard, borderRadius:radius.sm, padding:`0 ${spacing[3]}px`,
