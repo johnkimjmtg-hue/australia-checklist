@@ -671,6 +671,7 @@ fontFamily: ff,
           }
         }
         const handleVisitWithPhoto = async () => {
+          alert('pendingPhoto: ' + (pendingPhoto ? pendingPhoto.idx : 'null') + ' / idx: ' + idx)
           // pendingPhoto 있으면 방문완료 시 Cloudinary 업로드
           if (pendingPhoto && pendingPhoto.idx === idx) {
             setUploadingPhoto(true)
