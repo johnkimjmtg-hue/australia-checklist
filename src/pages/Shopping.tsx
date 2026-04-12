@@ -310,7 +310,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
               background: '#ffffff', borderRadius: radius.md,
               border:`1px solid ${colors.border}`,
               overflow:'hidden',
-
+              animation:`fadeUp 0.25s ease ${i * 0.04}s both`,
               position:'relative',
               boxShadow: shadow.card,
             }}>
