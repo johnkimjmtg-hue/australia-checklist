@@ -283,17 +283,7 @@ export default function PackingPage({ onClose }: Props) {
                         background: isChecked ? 'rgba(139,92,246,0.06)' : '#F8FAFC',
                         borderRadius:12, padding:'12px 14px',
                         border: isChecked ? '1px solid rgba(139,92,246,0.25)' : '1px solid rgba(0,0,0,0.06)',
-                        position:'relative',
                       }}>
-                        <button onClick={() => removeCustomItem(item.id)} style={{
-                          position:'absolute', top:6, right:6,
-                          width:18, height:18, borderRadius:'50%',
-                          background:'rgba(0,0,0,0.08)', border:'none',
-                          display:'flex', alignItems:'center', justifyContent:'center',
-                          cursor:'pointer', padding:0, WebkitTapHighlightColor:'transparent',
-                        }}>
-                          <Icon icon="ph:x-bold" width={9} height={9} color="#94A3B8" />
-                        </button>
                         <button onClick={() => toggleCheck(item.id)} style={{
                           width:26, height:26, borderRadius:8, flexShrink:0,
                           border: isChecked ? 'none' : '1.5px solid #CBD5E1',
@@ -306,9 +296,17 @@ export default function PackingPage({ onClose }: Props) {
                         <div style={{ width:40, height:40, borderRadius:10, flexShrink:0, background:'rgba(139,92,246,0.1)', display:'flex', alignItems:'center', justifyContent:'center' }}>
                           <Icon icon="ph:bag-simple" width={20} height={20} color="#8B5CF6" />
                         </div>
-                        <div style={{ fontSize:14, fontWeight:600, color: isChecked ? '#94A3B8' : '#0D3349', textDecoration: isChecked ? 'line-through' : 'none', flex:1, paddingRight:16 }}>
+                        <div style={{ fontSize:14, fontWeight:600, color: isChecked ? '#94A3B8' : '#0D3349', textDecoration: isChecked ? 'line-through' : 'none', flex:1 }}>
                           {item.label}
                         </div>
+                        <button onClick={() => removeCustomItem(item.id)} style={{
+                          width:32, height:32, borderRadius:8, flexShrink:0,
+                          border:'none', background:'rgba(0,0,0,0.05)',
+                          display:'flex', alignItems:'center', justifyContent:'center',
+                          cursor:'pointer', padding:0, WebkitTapHighlightColor:'transparent',
+                        }}>
+                          <Icon icon="ph:trash" width={16} height={16} color="#94A3B8" />
+                        </button>
                       </div>
                     )
                   })}
