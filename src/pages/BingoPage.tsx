@@ -876,7 +876,7 @@ fontFamily: ff,
                     })
                     // 로컬 미리보기만 — Cloudinary 업로드는 방문완료 시
                     const previewUrl = URL.createObjectURL(compressed)
-                    setPendingPhoto({ idx, url: previewUrl, file: compressed })
+                    setPendingPhoto({ idx: pendingPhotoIdx, url: previewUrl, file: compressed })
                   } catch { alert('이미지 처리 실패') }
                   setUploadingPhoto(false)
                   e.target.value = ''
