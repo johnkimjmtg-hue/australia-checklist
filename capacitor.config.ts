@@ -19,6 +19,10 @@ const config: CapacitorConfig = {
       backgroundColor: '#E0F7FA',
       showSpinner: false,
     },
+    Keyboard: {
+      resize: 'body',
+      scrollAssist: true,
+    },
   },
 }
 

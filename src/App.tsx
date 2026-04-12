@@ -17,48 +17,6 @@ function MainApp() {
   const [activeTab, setActiveTab] = useState<string|null>(null)
   const [showChangeDateWarning, setShowChangeDateWarning] = useState(false)
 
-  // 키보드 올라올 때 입력창 자동 스크롤 (visualViewport 방식)
-  useEffect(() => {
-    const PADDING = 56
-
-    const findScrollableParent = (el: HTMLElement): HTMLElement | null => {
-      let parent = el.parentElement
-      while (parent) {
-        const { overflowY } = window.getComputedStyle(parent)
-        if ((overflowY === 'auto' || overflowY === 'scroll') && parent.scrollHeight > parent.clientHeight) {
-          return parent
-        }
-        parent = parent.parentElement
-      }
-      return null
-    }
-
-    const handleViewportResize = () => {
-      const focused = document.activeElement as HTMLElement
-      if (!focused || !['INPUT', 'TEXTAREA'].includes(focused.tagName)) return
-
-      const vv = window.visualViewport
-      if (!vv) return
-
-      const rect = focused.getBoundingClientRect()
-      const viewportBottom = vv.offsetTop + vv.height
-      const inputBottom = rect.bottom
-
-      if (inputBottom > viewportBottom - PADDING) {
-        const scrollAmount = inputBottom - viewportBottom + PADDING
-        const scrollable = findScrollableParent(focused)
-        if (scrollable) {
-          scrollable.scrollBy({ top: scrollAmount, behavior: 'smooth' })
-        } else {
-          window.scrollBy({ top: scrollAmount, behavior: 'smooth' })
-        }
-      }
-    }
-
-    window.visualViewport?.addEventListener('resize', handleViewportResize)
-    return () => window.visualViewport?.removeEventListener('resize', handleViewportResize)
-  }, [])
-
   useEffect(() => {
     const sync = async () => {
       const updated = await syncDataCache()
