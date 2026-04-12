@@ -876,7 +876,7 @@ fontFamily: ff,
 
               {/* 숨겨진 파일 입력 */}
               <input ref={photoInputRef} type="file" accept="image/*" style={{ display:'none' }}
-                onChange={async e => { const file = e.target.files?.[0]; if (file) await processFile(file); e.target.value = '' }}
+                onChange={async e => { const file = e.target.files?.[0]; if (file) { pendingIdxRef.current = selectedCafe?.idx ?? pendingIdxRef.current; await processFile(file) } e.target.value = '' }}
               />
               <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" style={{ display:'none' }}
                 onChange={async e => { const file = e.target.files?.[0]; if (file) await processFile(file); e.target.value = '' }}
