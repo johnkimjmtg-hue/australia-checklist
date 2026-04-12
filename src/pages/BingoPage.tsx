@@ -924,7 +924,7 @@ fontFamily: ff,
         </>
       )}
 
-      {/* ── 저장 확인 팝업 */}}
+      {/* ── 저장 확인 팝업 */}
       {showSaveConfirm && (
         <>
           <div onClick={() => setShowSaveConfirm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:700 }} />
