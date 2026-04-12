@@ -289,19 +289,54 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   const photoInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
-  const [pendingPhoto, setPendingPhoto] = useState<{ idx: number; url: string; file: Blob } | null>(null)
+  const pendingIdxRef = useRef<number>(0)
   const [showPhotoChoice, setShowPhotoChoice] = useState(false)
-  const [pendingPhotoIdx, setPendingPhotoIdx] = useState<number>(0)
+  const [pendingPhoto, setPendingPhoto] = useState<{ idx: number; url: string; file: Blob } | null>(null)
 
-  const isApp = /android/i.test(navigator.userAgent)
+  // 앱/웹 감지 후 카메라 처리
+  const isAndroid = /android/i.test(navigator.userAgent)
 
   const handlePhotoClick = async (currentIdx: number) => {
-    setPendingPhotoIdx(currentIdx)
-    if (isApp) {
+    pendingIdxRef.current = currentIdx
+    if (isAndroid) {
       setShowPhotoChoice(true)
     } else {
       photoInputRef.current?.click()
     }
+  }
+
+  const processFile = async (file: File) => {
+    setUploadingPhoto(true)
+    try {
+      const compressed = await new Promise<Blob>((resolve, reject) => {
+        const img = new Image()
+        const url = URL.createObjectURL(file)
+        img.onload = () => {
+          let w = img.width, h = img.height
+          const max = 800
+          if (w > max || h > max) {
+            if (w > h) { h = Math.round(h * max / w); w = max }
+            else { w = Math.round(w * max / h); h = max }
+          }
+          const canvas = document.createElement('canvas')
+          canvas.width = w; canvas.height = h
+          canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
+          const tryBlob = (type: string, quality: number) => {
+            canvas.toBlob(blob => {
+              if (blob) { URL.revokeObjectURL(url); resolve(blob) }
+              else if (type === 'image/webp') tryBlob('image/jpeg', 0.75)
+              else reject(new Error('toBlob failed'))
+            }, type, quality)
+          }
+          tryBlob('image/webp', 0.8)
+        }
+        img.onerror = () => reject(new Error('image load failed'))
+        img.src = url
+      })
+      const previewUrl = URL.createObjectURL(compressed)
+      setPendingPhoto({ idx: pendingIdxRef.current, url: previewUrl, file: compressed })
+    } catch { alert('이미지 처리 실패') }
+    setUploadingPhoto(false)
   }
 
   const completedLines = getCompletedLines(checked)
@@ -840,130 +875,23 @@ fontFamily: ff,
               </div>
 
               {/* 숨겨진 파일 입력 */}
-              <input
-                ref={photoInputRef}
-                type="file" accept="image/*"
-                style={{ display:'none' }}
-                onChange={async e => {
-                  const file = e.target.files?.[0]
-                  if (!file) return
-                  setUploadingPhoto(true)
-                  try {
-                    const compressed = await new Promise<Blob>((resolve, reject) => {
-                      const img = new Image()
-                      const url = URL.createObjectURL(file)
-                      img.onload = () => {
-                        let w = img.width, h = img.height
-                        const max = 800
-                        if (w > max || h > max) {
-                          if (w > h) { h = Math.round(h * max / w); w = max }
-                          else { w = Math.round(w * max / h); h = max }
-                        }
-                        const canvas = document.createElement('canvas')
-                        canvas.width = w; canvas.height = h
-                        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
-                        const tryBlob = (type: string, quality: number) => {
-                          canvas.toBlob(blob => {
-                            if (blob) { URL.revokeObjectURL(url); resolve(blob) }
-                            else if (type === 'image/webp') tryBlob('image/jpeg', 0.75)
-                            else reject(new Error('toBlob failed'))
-                          }, type, quality)
-                        }
-                        tryBlob('image/webp', 0.8)
-                      }
-                      img.onerror = () => reject(new Error('image load failed'))
-                      img.src = url
-                    })
-                    // 로컬 미리보기만 — Cloudinary 업로드는 방문완료 시
-                    const previewUrl = URL.createObjectURL(compressed)
-                    setPendingPhoto({ idx: pendingPhotoIdx, url: previewUrl, file: compressed })
-                  } catch { alert('이미지 처리 실패') }
-                  setUploadingPhoto(false)
-                  e.target.value = ''
-                }}
+              <input ref={photoInputRef} type="file" accept="image/*" style={{ display:'none' }}
+                onChange={async e => { const file = e.target.files?.[0]; if (file) await processFile(file); e.target.value = '' }}
               />
               <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" style={{ display:'none' }}
-                onChange={async e => {
-                  const file = e.target.files?.[0]
-                  if (!file) return
-                  setUploadingPhoto(true)
-                  try {
-                    const compressed = await new Promise<Blob>((resolve, reject) => {
-                      const img = new Image()
-                      const url = URL.createObjectURL(file)
-                      img.onload = () => {
-                        let w = img.width, h = img.height
-                        const max = 800
-                        if (w > max || h > max) {
-                          if (w > h) { h = Math.round(h * max / w); w = max }
-                          else { w = Math.round(w * max / h); h = max }
-                        }
-                        const canvas = document.createElement('canvas')
-                        canvas.width = w; canvas.height = h
-                        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
-                        const tryBlob = (type: string, quality: number) => {
-                          canvas.toBlob(blob => {
-                            if (blob) { URL.revokeObjectURL(url); resolve(blob) }
-                            else if (type === 'image/webp') tryBlob('image/jpeg', 0.75)
-                            else reject(new Error('toBlob failed'))
-                          }, type, quality)
-                        }
-                        tryBlob('image/webp', 0.8)
-                      }
-                      img.onerror = () => reject(new Error('image load failed'))
-                      img.src = url
-                    })
-                    const previewUrl = URL.createObjectURL(compressed)
-                    setPendingPhoto({ idx: pendingPhotoIdx, url: previewUrl, file: compressed })
-                  } catch { alert('이미지 처리 실패') }
-                  setUploadingPhoto(false)
-                  e.target.value = ''
-                }}
+                onChange={async e => { const file = e.target.files?.[0]; if (file) await processFile(file); e.target.value = '' }}
               />
               <input ref={galleryInputRef} type="file" accept="image/*" style={{ display:'none' }}
-                onChange={async e => {
-                  const file = e.target.files?.[0]
-                  if (!file) return
-                  setUploadingPhoto(true)
-                  try {
-                    const compressed = await new Promise<Blob>((resolve, reject) => {
-                      const img = new Image()
-                      const url = URL.createObjectURL(file)
-                      img.onload = () => {
-                        let w = img.width, h = img.height
-                        const max = 800
-                        if (w > max || h > max) {
-                          if (w > h) { h = Math.round(h * max / w); w = max }
-                          else { w = Math.round(w * max / h); h = max }
-                        }
-                        const canvas = document.createElement('canvas')
-                        canvas.width = w; canvas.height = h
-                        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
-                        const tryBlob = (type: string, quality: number) => {
-                          canvas.toBlob(blob => {
-                            if (blob) { URL.revokeObjectURL(url); resolve(blob) }
-                            else if (type === 'image/webp') tryBlob('image/jpeg', 0.75)
-                            else reject(new Error('toBlob failed'))
-                          }, type, quality)
-                        }
-                        tryBlob('image/webp', 0.8)
-                      }
-                      img.onerror = () => reject(new Error('image load failed'))
-                      img.src = url
-                    })
-                    const previewUrl = URL.createObjectURL(compressed)
-                    setPendingPhoto({ idx: pendingPhotoIdx, url: previewUrl, file: compressed })
-                  } catch { alert('이미지 처리 실패') }
-                  setUploadingPhoto(false)
-                  e.target.value = ''
-                }}
+                onChange={async e => { const file = e.target.files?.[0]; if (file) await processFile(file); e.target.value = '' }}
               />
             </div>
           </div>
         )
       })()}
 
-      {/* 카메라/갤러리 선택 팝업 (앱 전용) */}
+
+
+      {/* 카메라/갤러리 선택 팝업 (Android 전용) */}
       {showPhotoChoice && (
         <>
           <div onClick={() => setShowPhotoChoice(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1200 }} />
@@ -976,15 +904,15 @@ fontFamily: ff,
           }}>
             <div style={{ fontSize:15, fontWeight:700, color:'#0D3349', textAlign:'center', marginBottom:16 }}>사진 선택</div>
             <div style={{ display:'flex', gap:10 }}>
-              <button onClick={() => { setShowPhotoChoice(false); setTimeout(() => cameraInputRef.current?.click(), 100) }} style={{
+              <button onClick={() => { setShowPhotoChoice(false); setTimeout(() => cameraInputRef.current?.click(), 300) }} style={{
                 flex:1, height:52, borderRadius:14, border:'none',
                 background:'#FF6B9D', color:'#fff', fontSize:14, fontWeight:700,
-                cursor:'pointer', fontFamily:ff, display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+                cursor:'pointer', fontFamily:ff,
               }}>📷 카메라</button>
-              <button onClick={() => { setShowPhotoChoice(false); setTimeout(() => galleryInputRef.current?.click(), 100) }} style={{
+              <button onClick={() => { setShowPhotoChoice(false); setTimeout(() => galleryInputRef.current?.click(), 300) }} style={{
                 flex:1, height:52, borderRadius:14, border:'none',
                 background:'#FF6B9D', color:'#fff', fontSize:14, fontWeight:700,
-                cursor:'pointer', fontFamily:ff, display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+                cursor:'pointer', fontFamily:ff,
               }}>🖼️ 갤러리</button>
             </div>
             <button onClick={() => setShowPhotoChoice(false)} style={{
@@ -996,9 +924,7 @@ fontFamily: ff,
         </>
       )}
 
-
-
-      {/* ── 저장 확인 팝업 */}
+      {/* ── 저장 확인 팝업 */}}
       {showSaveConfirm && (
         <>
           <div onClick={() => setShowSaveConfirm(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:700 }} />
