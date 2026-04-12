@@ -684,7 +684,6 @@ fontFamily: ff,
               fd.append('folder', 'bingo-photos')
               const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:'POST', body:fd })
               const data = await res.json()
-              alert('업로드 결과: ' + JSON.stringify(data).substring(0, 200))
               if (data.secure_url) {
                 const next = { ...photos, [idx]: data.secure_url }
                 setPhotos(next)
