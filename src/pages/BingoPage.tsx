@@ -297,6 +297,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
   const handlePhotoClick = async (currentIdx: number) => {
     setPendingPhotoIdx(currentIdx)
+    alert('isApp: ' + isApp + ' / Capacitor: ' + JSON.stringify((window as any).Capacitor))
     if (isApp) {
       setShowPhotoChoice(true)
     } else {
