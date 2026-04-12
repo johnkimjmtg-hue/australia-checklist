@@ -671,7 +671,6 @@ fontFamily: ff,
           }
         }
         const handleVisitWithPhoto = async () => {
-          alert('pendingPhoto: ' + (pendingPhoto ? pendingPhoto.idx : 'null') + ' / idx: ' + idx)
           // pendingPhoto 있으면 방문완료 시 Cloudinary 업로드
           if (pendingPhoto && pendingPhoto.idx === idx) {
             setUploadingPhoto(true)
@@ -685,11 +684,12 @@ fontFamily: ff,
               fd.append('folder', 'bingo-photos')
               const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:'POST', body:fd })
               const data = await res.json()
+              alert('업로드 결과: ' + JSON.stringify(data).substring(0, 200))
               if (data.secure_url) {
                 const next = { ...photos, [idx]: data.secure_url }
                 setPhotos(next)
               }
-            } catch { alert('업로드 실패') }
+            } catch (err) { alert('업로드 실패: ' + String(err)) }
             setUploadingPhoto(false)
             setPendingPhoto(null)
           }
