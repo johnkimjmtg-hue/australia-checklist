@@ -702,7 +702,7 @@ fontFamily: ff,
             <div style={{
               position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
               width:'calc(100% - 32px)', maxWidth:398,
-              maxHeight:'85vh', overflowY:'auto',
+              maxHeight:'calc(100dvh - 60px)', overflowY:'auto',
               borderRadius:20,
               background: '#ffffff',
               padding:'12px 12px 32px',
