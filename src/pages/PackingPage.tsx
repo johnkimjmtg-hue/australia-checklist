@@ -144,20 +144,8 @@ export default function PackingPage({ onClose }: Props) {
         background: isChecked ? 'rgba(41,182,208,0.06)' : '#F8FAFC',
         borderRadius:12, padding:'12px 14px',
         border: isChecked ? '1px solid rgba(41,182,208,0.25)' : '1px solid rgba(0,0,0,0.06)',
-        cursor:'pointer', WebkitTapHighlightColor:'transparent', position:'relative',
+        cursor:'pointer', WebkitTapHighlightColor:'transparent',
       }} onClick={() => openDetail(item)}>
-        {/* X 제외 버튼 - 우상단 */}
-        {showExcludeBtn && (
-          <button onClick={e => { e.stopPropagation(); toggleExclude(item.id) }} style={{
-            position:'absolute', top:6, right:6,
-            width:18, height:18, borderRadius:'50%',
-            background:'rgba(0,0,0,0.08)', border:'none',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            cursor:'pointer', padding:0, WebkitTapHighlightColor:'transparent',
-          }}>
-            <Icon icon="ph:x-bold" width={9} height={9} color="#94A3B8" />
-          </button>
-        )}
         {/* 체크 버튼 - 왼쪽 (제외 탭에서는 숨김) */}
         {filterTab !== 'excluded' && (
           <div onClick={e => e.stopPropagation()}>
@@ -196,17 +184,26 @@ export default function PackingPage({ onClose }: Props) {
           )}
         </div>
 
-        {/* 제외 탭에서 복원 버튼 */}
-        {filterTab === 'excluded' && (
-          <div onClick={e => e.stopPropagation()}>
+        {/* 오른쪽 버튼 영역 */}
+        <div onClick={e => e.stopPropagation()}>
+          {filterTab === 'excluded' ? (
             <button onClick={() => toggleExclude(item.id)} style={{
               height:26, padding:'0 10px', borderRadius:8, flexShrink:0,
               border:'1.5px solid #CBD5E1', background:'#ffffff',
               fontSize:11, fontWeight:700, color:'#64748B',
               cursor:'pointer', fontFamily:ff, WebkitTapHighlightColor:'transparent',
             }}>복원</button>
-          </div>
-        )}
+          ) : showExcludeBtn ? (
+            <button onClick={() => toggleExclude(item.id)} style={{
+              width:32, height:32, borderRadius:8, flexShrink:0,
+              border:'none', background:'rgba(0,0,0,0.05)',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              cursor:'pointer', padding:0, WebkitTapHighlightColor:'transparent',
+            }}>
+              <Icon icon="ph:trash" width={16} height={16} color="#94A3B8" />
+            </button>
+          ) : null}
+        </div>
       </div>
     )
   }
