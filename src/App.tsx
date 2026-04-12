@@ -17,6 +17,47 @@ function MainApp() {
   const [activeTab, setActiveTab] = useState<string|null>(null)
   const [showChangeDateWarning, setShowChangeDateWarning] = useState(false)
 
+  // 키보드 올라올 때 입력창 자동 스크롤
+  useEffect(() => {
+    const KEYBOARD_HEIGHT = 320 // 평균 키보드 높이 (px)
+    const PADDING = 16
+
+    const handleFocus = (e: FocusEvent) => {
+      const target = e.target as HTMLElement
+      if (!target || !['INPUT', 'TEXTAREA'].includes(target.tagName)) return
+
+      setTimeout(() => {
+        const rect = target.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+        const keyboardTop = windowHeight - KEYBOARD_HEIGHT
+        if (rect.bottom > keyboardTop - PADDING) {
+          const scrollAmount = rect.bottom - keyboardTop + PADDING
+          const scrollable = findScrollableParent(target)
+          if (scrollable) {
+            scrollable.scrollBy({ top: scrollAmount, behavior: 'smooth' })
+          } else {
+            window.scrollBy({ top: scrollAmount, behavior: 'smooth' })
+          }
+        }
+      }, 300) // 키보드 애니메이션 후
+    }
+
+    const findScrollableParent = (el: HTMLElement): HTMLElement | null => {
+      let parent = el.parentElement
+      while (parent) {
+        const { overflowY } = window.getComputedStyle(parent)
+        if ((overflowY === 'auto' || overflowY === 'scroll') && parent.scrollHeight > parent.clientHeight) {
+          return parent
+        }
+        parent = parent.parentElement
+      }
+      return null
+    }
+
+    document.addEventListener('focusin', handleFocus)
+    return () => document.removeEventListener('focusin', handleFocus)
+  }, [])
+
   useEffect(() => {
     const sync = async () => {
       const updated = await syncDataCache()
