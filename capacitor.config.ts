@@ -6,6 +6,9 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     androidScheme: 'https',
+    url: 'https://hojugaja.com',
+    cleartext: false,
+    allowNavigation: ['hojugaja.com', '*.hojugaja.com'],
   },
   android: {
     overScrollMode: 'always',
