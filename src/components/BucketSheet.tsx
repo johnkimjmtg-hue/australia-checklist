@@ -144,7 +144,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:430, background:'#ffffff',
-            borderRadius:'20px 20px 0 0', maxHeight:'72vh', overflowY:'auto',
+            borderRadius:'20px 20px 0 0', maxHeight:'calc(100dvh - 60px)', overflowY:'auto',
             zIndex:1101, animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
             fontFamily:"-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif",
             display:'flex', flexDirection:'column',
