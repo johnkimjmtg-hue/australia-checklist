@@ -311,7 +311,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
         const previewUrl = URL.createObjectURL(blob)
         setPendingPhoto({ idx: currentIdx, url: previewUrl, file: blob })
         setUploadingPhoto(false)
-      } catch (err) { alert('카메라 오류: ' + String(err)) }
+      } catch {}
     } else {
       photoInputRef.current?.click()
     }
