@@ -542,7 +542,7 @@ export default function Services({ onSelectBusiness, onBack }: Props) {
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:430, background:'#ffffff',
             borderRadius:'20px 20px 0 0', zIndex:1101,
-            animation:'slideUpSheet 0.25s ease', maxHeight:'72vh', overflowY:'auto',
+            animation:'slideUpSheet 0.25s ease', maxHeight:'calc(100dvh - 60px)', overflowY:'auto',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
             display:'flex', flexDirection:'column',
           }}>
