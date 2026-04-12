@@ -17,7 +17,7 @@ export default function BingoSheet({ onClose }: Props) {
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430,
         background:'linear-gradient(180deg, #FF6B9D 0%, #FF8FA3 45%, #FFB7C5 100%)', borderRadius:'20px 20px 0 0',
-        maxHeight:'85vh', overflowY:'auto', zIndex:801,
+        maxHeight:'calc(100dvh - 20px)', overflowY:'auto', zIndex:801,
         animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
         display:'flex', flexDirection:'column',
       }}>

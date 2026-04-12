@@ -15,7 +15,7 @@ export default function IPCSheet({ onClose }: Props) {
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430,
         background:'#ffffff', borderRadius:'20px 20px 0 0',
-        height:'85vh', zIndex:801,
+        height:'calc(100dvh - 20px)', zIndex:801,
         animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
         display:'flex', flexDirection:'column',
       }}>
