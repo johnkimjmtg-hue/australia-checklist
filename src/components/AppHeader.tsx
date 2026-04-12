@@ -177,12 +177,12 @@ export default function AppHeader({ paddingTop = 26, onChangeDates }: Props) {
           {/* 여행 취소 버튼 */}
           {onChangeDates && (
             <div onClick={onChangeDates} style={{
-              background:'rgba(220,38,38,0.12)', borderRadius:20, padding:'6px 12px',
-              boxShadow:'0 4px 20px rgba(0,0,0,0.08)',
+              background:'rgba(255,255,255,0.85)', borderRadius:20, padding:'6px 12px',
+              boxShadow:'0 4px 20px rgba(0,0,0,0.10)',
               cursor:'pointer', WebkitTapHighlightColor:'transparent',
-              display:'flex', alignItems:'center', gap:4, flexShrink:0,
+              display:'flex', alignItems:'center', flexShrink:0,
             }}>
-              <span style={{ fontSize:13, fontWeight:700, color:'#DC2626', whiteSpace:'nowrap' }}>✈️ 여행 취소</span>
+              <span style={{ fontSize:12, fontWeight:700, color:'#0D3349', whiteSpace:'nowrap' }}>여행 취소</span>
             </div>
           )}
           {/* ⋮ 메뉴 버튼 */}
