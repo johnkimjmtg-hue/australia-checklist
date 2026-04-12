@@ -19,7 +19,7 @@ function MainApp() {
 
   // 키보드 올라올 때 입력창 자동 스크롤 (visualViewport 방식)
   useEffect(() => {
-    const PADDING = 16
+    const PADDING = 56
 
     const findScrollableParent = (el: HTMLElement): HTMLElement | null => {
       let parent = el.parentElement
