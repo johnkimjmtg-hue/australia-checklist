@@ -293,11 +293,10 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   const [showPhotoChoice, setShowPhotoChoice] = useState(false)
   const [pendingPhotoIdx, setPendingPhotoIdx] = useState<number>(0)
 
-  const isApp = /android/i.test(navigator.userAgent) && !/chrome/i.test(navigator.userAgent) || (window as any).__CAPACITOR_NATIVE__ === true
+  const isApp = /android/i.test(navigator.userAgent)
 
   const handlePhotoClick = async (currentIdx: number) => {
     setPendingPhotoIdx(currentIdx)
-    alert('UA: ' + navigator.userAgent.substring(0, 100))
     if (isApp) {
       setShowPhotoChoice(true)
     } else {
