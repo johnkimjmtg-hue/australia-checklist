@@ -287,56 +287,34 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
   }
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const photoInputRef = useRef<HTMLInputElement>(null)
-  const cameraInputRef = useRef<HTMLInputElement>(null)
-  const galleryInputRef = useRef<HTMLInputElement>(null)
-  const pendingIdxRef = useRef<number>(0)
-  const [showPhotoChoice, setShowPhotoChoice] = useState(false)
   const [pendingPhoto, setPendingPhoto] = useState<{ idx: number; url: string; file: Blob } | null>(null)
 
   // 앱/웹 감지 후 카메라 처리
-  const isAndroid = /android/i.test(navigator.userAgent)
-
   const handlePhotoClick = async (currentIdx: number) => {
-    pendingIdxRef.current = currentIdx
-    if (isAndroid) {
-      setShowPhotoChoice(true)
+    const isApp = !!(window as any).Capacitor?.isNativePlatform?.()
+    if (isApp) {
+      try {
+        const photo = await Camera.getPhoto({
+          quality: 80,
+          allowEditing: false,
+          resultType: CameraResultType.DataUrl,
+          source: CameraSource.Prompt,
+          promptLabelHeader: '사진 선택',
+          promptLabelCancel: '취소',
+          promptLabelPhoto: '갤러리에서 선택',
+          promptLabelPicture: '카메라로 촬영',
+        })
+        if (!photo.dataUrl) return
+        setUploadingPhoto(true)
+        const res = await fetch(photo.dataUrl)
+        const blob = await res.blob()
+        const previewUrl = URL.createObjectURL(blob)
+        setPendingPhoto({ idx: currentIdx, url: previewUrl, file: blob })
+        setUploadingPhoto(false)
+      } catch {}
     } else {
       photoInputRef.current?.click()
     }
-  }
-
-  const processFile = async (file: File) => {
-    setUploadingPhoto(true)
-    try {
-      const compressed = await new Promise<Blob>((resolve, reject) => {
-        const img = new Image()
-        const url = URL.createObjectURL(file)
-        img.onload = () => {
-          let w = img.width, h = img.height
-          const max = 800
-          if (w > max || h > max) {
-            if (w > h) { h = Math.round(h * max / w); w = max }
-            else { w = Math.round(w * max / h); h = max }
-          }
-          const canvas = document.createElement('canvas')
-          canvas.width = w; canvas.height = h
-          canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
-          const tryBlob = (type: string, quality: number) => {
-            canvas.toBlob(blob => {
-              if (blob) { URL.revokeObjectURL(url); resolve(blob) }
-              else if (type === 'image/webp') tryBlob('image/jpeg', 0.75)
-              else reject(new Error('toBlob failed'))
-            }, type, quality)
-          }
-          tryBlob('image/webp', 0.8)
-        }
-        img.onerror = () => reject(new Error('image load failed'))
-        img.src = url
-      })
-      const previewUrl = URL.createObjectURL(compressed)
-      setPendingPhoto({ idx: pendingIdxRef.current, url: previewUrl, file: compressed })
-    } catch { alert('이미지 처리 실패') }
-    setUploadingPhoto(false)
   }
 
   const completedLines = getCompletedLines(checked)
@@ -875,14 +853,47 @@ fontFamily: ff,
               </div>
 
               {/* 숨겨진 파일 입력 */}
-              <input ref={photoInputRef} type="file" accept="image/*" style={{ display:'none' }}
-                onChange={async e => { const file = e.target.files?.[0]; if (file) { pendingIdxRef.current = selectedCafe?.idx ?? pendingIdxRef.current; await processFile(file) } e.target.value = '' }}
-              />
-              <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" style={{ display:'none' }}
-                onChange={async e => { const file = e.target.files?.[0]; if (file) await processFile(file); e.target.value = '' }}
-              />
-              <input ref={galleryInputRef} type="file" accept="image/*" style={{ display:'none' }}
-                onChange={async e => { const file = e.target.files?.[0]; if (file) await processFile(file); e.target.value = '' }}
+              <input
+                ref={photoInputRef}
+                type="file" accept="image/*"
+                style={{ display:'none' }}
+                onChange={async e => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  setUploadingPhoto(true)
+                  try {
+                    const compressed = await new Promise<Blob>((resolve, reject) => {
+                      const img = new Image()
+                      const url = URL.createObjectURL(file)
+                      img.onload = () => {
+                        let w = img.width, h = img.height
+                        const max = 800
+                        if (w > max || h > max) {
+                          if (w > h) { h = Math.round(h * max / w); w = max }
+                          else { w = Math.round(w * max / h); h = max }
+                        }
+                        const canvas = document.createElement('canvas')
+                        canvas.width = w; canvas.height = h
+                        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
+                        const tryBlob = (type: string, quality: number) => {
+                          canvas.toBlob(blob => {
+                            if (blob) { URL.revokeObjectURL(url); resolve(blob) }
+                            else if (type === 'image/webp') tryBlob('image/jpeg', 0.75)
+                            else reject(new Error('toBlob failed'))
+                          }, type, quality)
+                        }
+                        tryBlob('image/webp', 0.8)
+                      }
+                      img.onerror = () => reject(new Error('image load failed'))
+                      img.src = url
+                    })
+                    // 로컬 미리보기만 — Cloudinary 업로드는 방문완료 시
+                    const previewUrl = URL.createObjectURL(compressed)
+                    setPendingPhoto({ idx, url: previewUrl, file: compressed })
+                  } catch { alert('이미지 처리 실패') }
+                  setUploadingPhoto(false)
+                  e.target.value = ''
+                }}
               />
             </div>
           </div>
@@ -890,39 +901,6 @@ fontFamily: ff,
       })()}
 
 
-
-      {/* 카메라/갤러리 선택 팝업 (Android 전용) */}
-      {showPhotoChoice && (
-        <>
-          <div onClick={() => setShowPhotoChoice(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1200 }} />
-          <div style={{
-            position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)',
-            width:'calc(100% - 32px)', maxWidth:398,
-            background:'#fff', borderRadius:20, zIndex:1201,
-            padding:'20px 16px', fontFamily:ff,
-            boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
-          }}>
-            <div style={{ fontSize:15, fontWeight:700, color:'#0D3349', textAlign:'center', marginBottom:16 }}>사진 선택</div>
-            <div style={{ display:'flex', gap:10 }}>
-              <button onClick={() => { setShowPhotoChoice(false); setTimeout(() => cameraInputRef.current?.click(), 300) }} style={{
-                flex:1, height:52, borderRadius:14, border:'none',
-                background:'#FF6B9D', color:'#fff', fontSize:14, fontWeight:700,
-                cursor:'pointer', fontFamily:ff,
-              }}>📷 카메라</button>
-              <button onClick={() => { setShowPhotoChoice(false); setTimeout(() => galleryInputRef.current?.click(), 300) }} style={{
-                flex:1, height:52, borderRadius:14, border:'none',
-                background:'#FF6B9D', color:'#fff', fontSize:14, fontWeight:700,
-                cursor:'pointer', fontFamily:ff,
-              }}>🖼️ 갤러리</button>
-            </div>
-            <button onClick={() => setShowPhotoChoice(false)} style={{
-              width:'100%', height:44, marginTop:10, borderRadius:14,
-              border:'1px solid rgba(0,0,0,0.1)', background:'#F8FAFC',
-              color:'#64748B', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:ff,
-            }}>취소</button>
-          </div>
-        </>
-      )}
 
       {/* ── 저장 확인 팝업 */}
       {showSaveConfirm && (
