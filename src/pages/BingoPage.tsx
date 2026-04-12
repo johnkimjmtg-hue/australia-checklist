@@ -291,30 +291,7 @@ const BingoPage = forwardRef<BingoRef, Props>(function BingoPage({ onBack, embed
 
   // 앱/웹 감지 후 카메라 처리
   const handlePhotoClick = async (currentIdx: number) => {
-    const isApp = !!(window as any).Capacitor?.isNativePlatform?.()
-    if (isApp) {
-      try {
-        const photo = await Camera.getPhoto({
-          quality: 80,
-          allowEditing: false,
-          resultType: CameraResultType.DataUrl,
-          source: CameraSource.Prompt,
-          promptLabelHeader: '사진 선택',
-          promptLabelCancel: '취소',
-          promptLabelPhoto: '갤러리에서 선택',
-          promptLabelPicture: '카메라로 촬영',
-        })
-        if (!photo.dataUrl) return
-        setUploadingPhoto(true)
-        const res = await fetch(photo.dataUrl)
-        const blob = await res.blob()
-        const previewUrl = URL.createObjectURL(blob)
-        setPendingPhoto({ idx: currentIdx, url: previewUrl, file: blob })
-        setUploadingPhoto(false)
-      } catch {}
-    } else {
-      photoInputRef.current?.click()
-    }
+    photoInputRef.current?.click()
   }
 
   const completedLines = getCompletedLines(checked)
