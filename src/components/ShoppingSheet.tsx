@@ -76,7 +76,7 @@ export default function ShoppingSheet({ onClose, trip }: Props) {
 
         {/* 내용 */}
         <div style={{ flex:1, overflowY:'auto' }}>
-          {view === 'mylist' ? (
+          <div style={{ display: view === 'mylist' ? 'block' : 'none' }}>
             <MyShoppingView
               myList={myList}
               myChecked={myChecked}
@@ -86,7 +86,8 @@ export default function ShoppingSheet({ onClose, trip }: Props) {
               onLanding={onClose}
               trip={trip}
             />
-          ) : (
+          </div>
+          <div style={{ display: view === 'shopping' ? 'block' : 'none' }}>
             <Shopping
               myList={myList}
               myChecked={myChecked}
@@ -94,7 +95,7 @@ export default function ShoppingSheet({ onClose, trip }: Props) {
               onMyCheckedChange={handleMyCheckedChange}
               onGoToMyList={() => setView('mylist')}
             />
-          )}
+          </div>
         </div>
       </div>
     </>
