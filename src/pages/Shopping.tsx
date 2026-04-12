@@ -310,7 +310,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
               background: '#ffffff', borderRadius: radius.md,
               border:`1px solid ${colors.border}`,
               overflow:'hidden',
-              animation:`fadeUp 0.25s ease ${i * 0.04}s both`,
+
               position:'relative',
               boxShadow: shadow.card,
             }}>
@@ -395,7 +395,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
           <div onClick={e => e.stopPropagation()} style={{
             position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
             width:'100%', maxWidth:430, background:'#ffffff',
-            borderRadius:'20px 20px 0 0', maxHeight:'calc(100dvh - 60px)', overflowY:'auto',
+            borderRadius:'20px 20px 0 0', maxHeight:'72vh', overflowY:'auto',
             zIndex:1101, animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
             fontFamily:"inherit", display:'flex', flexDirection:'column',
           }}>
