@@ -2,7 +2,7 @@
 // ShoppingSheet.tsx
 // src/components/ShoppingSheet.tsx
 // ─────────────────────────────────────────────
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { TripInfo } from '../store/state'
 import { Icon } from '@iconify/react'
 import MyShoppingView from '../pages/MyShoppingView'
@@ -17,6 +17,9 @@ type Props = {
 
 export default function ShoppingSheet({ onClose, trip }: Props) {
   const [view, setView] = useState<View>('mylist')
+  const mounted = useRef(false)
+  const animStyle = mounted.current ? 'none' : 'slideUpSheet 0.25s ease'
+  if (!mounted.current) mounted.current = true
   const [myList, setMyList] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] }
   })
@@ -41,8 +44,8 @@ export default function ShoppingSheet({ onClose, trip }: Props) {
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430,
         background:'#ffffff', borderRadius:'20px 20px 0 0',
-        maxHeight:'calc(100dvh - 20px)', overflowY:'auto', zIndex:801,
-        animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
+        maxHeight:'85vh', overflowY:'auto', zIndex:801,
+        animation:animStyle, boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
         display:'flex', flexDirection:'column',
       }}>
         <style>{`
