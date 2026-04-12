@@ -43,11 +43,12 @@ function getWeatherIcon(code: string): string {
 
 type Props = {
   paddingTop?: number  // 기본 26px, 페이지마다 다를 수 있음
+  onChangeDates?: () => void
 }
 
 const CITY_PREF_KEY = 'header-city'
 
-export default function AppHeader({ paddingTop = 26 }: Props) {
+export default function AppHeader({ paddingTop = 26, onChangeDates }: Props) {
   const [cityData, setCityData] = useState<Record<string, CityData>>({})
   const [weatherSheet, setWeatherSheet] = useState<CityKey | null>(null)
   const [showMenu, setShowMenu] = useState(false)
@@ -173,6 +174,17 @@ export default function AppHeader({ paddingTop = 26 }: Props) {
               </span>
             )}
           </div>
+          {/* 여행 취소 버튼 */}
+          {onChangeDates && (
+            <div onClick={onChangeDates} style={{
+              background:'rgba(220,38,38,0.12)', borderRadius:20, padding:'6px 12px',
+              boxShadow:'0 4px 20px rgba(0,0,0,0.08)',
+              cursor:'pointer', WebkitTapHighlightColor:'transparent',
+              display:'flex', alignItems:'center', gap:4, flexShrink:0,
+            }}>
+              <span style={{ fontSize:13, fontWeight:700, color:'#DC2626', whiteSpace:'nowrap' }}>✈️ 여행 취소</span>
+            </div>
+          )}
           {/* ⋮ 메뉴 버튼 */}
           <div onClick={() => setShowMenu(true)} style={{
             background:'#EFFCFC', borderRadius:'50%', width:36, height:36,

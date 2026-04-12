@@ -325,7 +325,7 @@ export default function HomePage({ trip, state, setState, onNavigate, onChangeDa
       `}</style>
 
       {/* 공통 헤더 (날씨 + 메뉴) */}
-      <AppHeader />
+      <AppHeader onChangeDates={onChangeDates} />
 
       {/* 달력 / 일별뷰 */}
       <div style={{ padding:'0 18px 18px' }}>
