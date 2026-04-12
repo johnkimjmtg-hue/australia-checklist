@@ -628,22 +628,22 @@ fontFamily: ff,
           <button style={{
             height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
             border: 'none',
-            background: showPhotos ? '#FF6B9D' : 'rgba(255,255,255,0.85)',
-            color: showPhotos ? '#fff' : '#FF6B9D', fontSize:11, fontWeight:700,
+            background: showPhotos ? '#00838F' : 'rgba(255,255,255,0.85)',
+            color: showPhotos ? '#fff' : '#00838F', fontSize:11, fontWeight:700,
             display:'flex', alignItems:'center', justifyContent:'center', gap:3,
             cursor:'pointer', fontFamily:ff,
           }} onClick={() => setShowPhotos(p => { const next = !p; try { localStorage.setItem('bingo-show-photos', String(next)) } catch {} return next })}>
-            <Icon icon="ph:camera" width={12} height={12} color={showPhotos ? '#fff' : '#FF6B9D'} />
+            <Icon icon="ph:camera" width={12} height={12} color={showPhotos ? '#fff' : '#00838F'} />
             인증샷 보기
           </button>
           <button onClick={() => setShowReset(true)} style={{
             height:28, paddingLeft:10, paddingRight:10, borderRadius:8,
             border:'none', background:'rgba(255,255,255,0.85)',
-            color: '#FF6B9D', fontSize: 11, fontWeight: 700,
+            color: '#00838F', fontSize: 11, fontWeight: 700,
             display:'flex', alignItems:'center', justifyContent:'center', gap:3,
             cursor:'pointer', fontFamily:ff,
           }}>
-            <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color='#FF6B9D' />
+            <Icon icon="ph:arrow-counter-clockwise" width={12} height={12} color='#00838F' />
             전체 리셋
           </button>
         </div>
@@ -970,12 +970,12 @@ fontFamily: ff,
             <div style={{ display:'flex', gap:10 }}>
               <button onClick={() => { setShowPhotoChoice(false); setTimeout(() => cameraInputRef.current?.click(), 300) }} style={{
                 flex:1, height:52, borderRadius:14, border:'none',
-                background:'#FF6B9D', color:'#fff', fontSize:14, fontWeight:700,
+                background:'#00838F', color:'#fff', fontSize:14, fontWeight:700,
                 cursor:'pointer', fontFamily:ff,
               }}>📷 카메라</button>
               <button onClick={() => { setShowPhotoChoice(false); setTimeout(() => galleryInputRef.current?.click(), 300) }} style={{
                 flex:1, height:52, borderRadius:14, border:'none',
-                background:'#FF6B9D', color:'#fff', fontSize:14, fontWeight:700,
+                background:'#00838F', color:'#fff', fontSize:14, fontWeight:700,
                 cursor:'pointer', fontFamily:ff,
               }}>🖼️ 갤러리</button>
             </div>
