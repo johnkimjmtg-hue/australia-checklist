@@ -512,7 +512,7 @@ fontFamily: ff,
       </div>
 
       {/* ── 5x5 빙고판 */}
-      <div style={{ flex:1, padding:`8px 12px ${embedded ? '60px' : '20px'}`, overflowY:'auto', minHeight:0 }}>
+      <div style={{ flex:1, padding:`20px 12px ${embedded ? '60px' : '20px'}`, overflowY:'auto', minHeight:0 }}>
         <div ref={gridRef} style={{
           display:'grid', gridTemplateColumns:'repeat(5, 1fr)',
           gap:6, position:'relative',
