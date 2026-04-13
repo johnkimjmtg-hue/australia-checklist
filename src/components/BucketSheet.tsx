@@ -230,6 +230,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
           </div>
         </>
       )}
+    </>
     <>
       {selProduct && (
         <>
