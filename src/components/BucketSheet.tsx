@@ -24,6 +24,26 @@ type CheckItem = { id: string; categoryId: string; label: string; emoji: string 
 
 const PRICE_LABEL: Record<string, string> = { '$': '저렴', '$$': '보통', '$$$': '프리미엄' }
 const PRICE_COLOR: Record<string, string> = { '$': '#16A34A', '$$': '#D97706', '$$$': '#7C3AED' }
+const TAG_COLOR: Record<string, { bg: string; color: string }> = {
+  '인기':          { bg: '#FEF3C7', color: '#D97706' },
+  '강추':          { bg: '#DCFCE7', color: '#16A34A' },
+  '필수템':        { bg: '#FEE2E2', color: '#DC2626' },
+  '선물용':        { bg: '#EDE9FE', color: '#7C3AED' },
+  '선물':          { bg: '#EDE9FE', color: '#7C3AED' },
+  '프리미엄':      { bg: '#F0F9FF', color: '#0369A1' },
+  '체험':          { bg: '#FFF7ED', color: '#C2410C' },
+  '기념':          { bg: '#F0FDF4', color: '#15803D' },
+  '가성비':        { bg: '#FFF1F2', color: '#E11D48' },
+  '안사면 후회':   { bg: '#FFF7ED', color: '#EA580C' },
+  '없어서 못삼':   { bg: '#FDF4FF', color: '#A21CAF' },
+  '한국보다 저렴': { bg: '#F0FDF4', color: '#15803D' },
+  '호주 한정':     { bg: '#EFF6FF', color: '#1D4ED8' },
+  '약국 인기':     { bg: '#ECFDF5', color: '#059669' },
+  '마트 필수':     { bg: '#FFFBEB', color: '#B45309' },
+  '현지인 추천':   { bg: '#FFF1F2', color: '#BE123C' },
+  '유아동':        { bg: '#F0F9FF', color: '#0284C7' },
+  '건강식품':      { bg: '#F0FDF4', color: '#16A34A' },
+}
 type View = 'bucket' | 'checklist'
 
 type Props = {
@@ -217,7 +237,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
                           {p.tags?.length > 0 && (
                             <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
                               {p.tags.slice(0,3).map((tag: string) => (
-                                <span key={tag} style={{ fontSize:10, fontWeight:700, padding:'2px 6px', borderRadius:4, background:'rgba(41,182,208,0.1)', color:'#29B6D0' }}>{tag}</span>
+                                <span key={tag} style={{ fontSize:10, fontWeight:700, padding:'2px 6px', borderRadius:4, background: TAG_COLOR[tag]?.bg ?? '#f5f5f5', color: TAG_COLOR[tag]?.color ?? '#666' }}>{tag}</span>
                               ))}
                             </div>
                           )}
@@ -258,7 +278,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
               <div style={{ padding:'16px 16px 40px' }}>
                 <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, alignItems:'center' }}>
                   {selProduct.tags?.map((tag: string) => (
-                    <span key={tag} style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:6, background:'rgba(41,182,208,0.1)', color:'#29B6D0' }}>{tag}</span>
+                    <span key={tag} style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:6, background: TAG_COLOR[tag]?.bg ?? '#f5f5f5', color: TAG_COLOR[tag]?.color ?? '#666' }}>{tag}</span>
                   ))}
                   <span style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:6, background:'#fff0f5', color: PRICE_COLOR[selProduct.price_range] ?? '#666', border:`1px solid ${PRICE_COLOR[selProduct.price_range] ?? '#ccc'}`, marginLeft:'auto' }}>
                     {selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}
@@ -279,6 +299,16 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
                     </div>
                   </div>
                 )}
+                <button onClick={() => {}} style={{
+                  width:'100%', height:48, borderRadius:12, border:'1.5px solid #FF6B9D', cursor:'pointer',
+                  background:'#ffffff', color:'#FF6B9D',
+                  fontSize:15, fontWeight:700,
+                  display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+                  WebkitTapHighlightColor:'transparent',
+                }}>
+                  <Icon icon="ph:shopping-bag" width={18} height={18} color="#FF6B9D" />
+                  쇼핑리스트에서 보기
+                </button>
               </div>
             </div>
           </div>
