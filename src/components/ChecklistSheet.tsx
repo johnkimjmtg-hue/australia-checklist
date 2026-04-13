@@ -29,6 +29,7 @@ export default function ChecklistSheet({ state, setState, onClose }: Props) {
   const [detailProducts, setDetailProducts] = useState<any[]>([])
 
   const handleDetailItem = (item: DBItem | null) => {
+    alert('handleDetailItem 호출됨: ' + item?.label + ' / related_product_ids: ' + JSON.stringify(item?.related_product_ids))
     setDetailItem(item)
     if (item?.related_business_ids?.length) {
       const cached = getCachedBusinesses()
@@ -38,11 +39,8 @@ export default function ChecklistSheet({ state, setState, onClose }: Props) {
     }
     if (item?.related_product_ids?.length) {
       const cached = getCachedShopping()
-      const filtered = cached?.products?.filter((p: any) => item.related_product_ids!.includes(p.id)) ?? []
-      alert('related_product_ids: ' + JSON.stringify(item.related_product_ids) + '\n캐시 상품수: ' + (cached?.products?.length ?? 0) + '\n매칭: ' + filtered.length)
-      setDetailProducts(filtered)
+      setDetailProducts(cached?.products?.filter((p: any) => item.related_product_ids!.includes(p.id)) ?? [])
     } else {
-      alert('related_product_ids 없음')
       setDetailProducts([])
     }
   }
