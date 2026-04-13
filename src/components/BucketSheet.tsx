@@ -37,6 +37,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
   const [detailItem, setDetailItem] = useState<DBItem|null>(null)
   const [detailBizCards, setDetailBizCards] = useState<Business[]>([])
   const [detailProducts, setDetailProducts] = useState<any[]>([])
+  const [selProduct, setSelProduct] = useState<any|null>(null)
 
   useEffect(() => {
     const cached = getCachedChecklist()
@@ -202,7 +203,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
                   <div style={{ fontSize:11, fontWeight:700, color:'#1565A0', marginBottom:8 }}>🛍️ 관련 상품</div>
                   <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                     {detailProducts.map((p: any) => (
-                      <div key={p.id} style={{ display:'flex', gap:12, background:'#F8FAFC', borderRadius:12, padding:12, border:'1px solid rgba(0,0,0,0.06)' }}>
+                      <div key={p.id} onClick={() => setSelProduct(p)} style={{ display:'flex', gap:12, background:'#F8FAFC', borderRadius:12, padding:12, border:'1px solid rgba(0,0,0,0.06)', cursor:'pointer' }}>
                         {p.image_url
                           ? <img src={p.image_url} alt={p.name} style={{ width:60, height:60, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
                           : <div style={{ width:60, height:60, borderRadius:8, background:'#E2E8F0', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:24 }}>🛍️</div>
@@ -225,6 +226,58 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
                 </div>
               )}
             </div>
+            </div>
+          </div>
+        </>
+      )}
+    <>
+      {selProduct && (
+        <>
+          <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:1200 }} />
+          <div onClick={e => e.stopPropagation()} style={{
+            position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+            width:'100%', maxWidth:430, background:'#ffffff',
+            borderRadius:'20px 20px 0 0', maxHeight:'calc(100dvh - 60px)', overflowY:'auto',
+            zIndex:1201, animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
+            fontFamily:"-apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif",
+            display:'flex', flexDirection:'column',
+          }}>
+            <div style={{ flexShrink:0, display:'flex', justifyContent:'flex-end', padding:'12px 12px 0' }}>
+              <button onClick={() => setSelProduct(null)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(0,0,0,0.08)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
+                <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
+              </button>
+            </div>
+            <div style={{ flex:1, overflowY:'auto' }}>
+              {selProduct.image_url && (
+                <div style={{ width:'100%', height:220, overflow:'hidden' }}>
+                  <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                </div>
+              )}
+              <div style={{ padding:'16px 16px 40px' }}>
+                <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, alignItems:'center' }}>
+                  {selProduct.tags?.map((tag: string) => (
+                    <span key={tag} style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:6, background:'rgba(41,182,208,0.1)', color:'#29B6D0' }}>{tag}</span>
+                  ))}
+                  <span style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:6, background:'#fff0f5', color:'#FF6B9D', border:'1px solid rgba(255,107,157,0.3)', marginLeft:'auto' }}>
+                    {selProduct.price_range}
+                  </span>
+                </div>
+                <div style={{ fontSize:18, fontWeight:700, color:'#0D3349', marginBottom:4, lineHeight:1.4 }}>{selProduct.name}</div>
+                <div style={{ fontSize:13, color:'#7BAAB5', marginBottom:12 }}>{selProduct.brand}</div>
+                {selProduct.description && (
+                  <div style={{ fontSize:14, color:'#475569', lineHeight:1.7, marginBottom:16 }}>{selProduct.description}</div>
+                )}
+                {selProduct.where_to_buy?.length > 0 && (
+                  <div style={{ marginBottom:16 }}>
+                    <div style={{ fontSize:11, fontWeight:700, color:'#1565A0', marginBottom:8 }}>어디서 살 수 있어요?</div>
+                    <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                      {selProduct.where_to_buy.map((store: string) => (
+                        <span key={store} style={{ fontSize:12, fontWeight:600, padding:'5px 10px', borderRadius:8, background:'rgba(255,107,157,0.08)', color:'#FF6B9D', border:'1px solid rgba(255,107,157,0.2)' }}>🏪 {store}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </>
