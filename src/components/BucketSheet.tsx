@@ -21,6 +21,9 @@ type DBItem = {
   image_url?: string | null; tips?: string | null; related_product_ids?: string[] | null
 }
 type CheckItem = { id: string; categoryId: string; label: string; emoji: string }
+
+const PRICE_LABEL: Record<string, string> = { '$': '저렴', '$$': '보통', '$$$': '프리미엄' }
+const PRICE_COLOR: Record<string, string> = { '$': '#16A34A', '$$': '#D97706', '$$$': '#7C3AED' }
 type View = 'bucket' | 'checklist'
 
 type Props = {
@@ -219,7 +222,7 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
                             </div>
                           )}
                         </div>
-                        <div style={{ fontSize:12, fontWeight:700, color:'#29B6D0', flexShrink:0 }}>{p.price_range}</div>
+                        <div style={{ fontSize:11, fontWeight:700, color: PRICE_COLOR[p.price_range] ?? '#29B6D0', flexShrink:0 }}>{p.price_range} · {PRICE_LABEL[p.price_range]}</div>
                       </div>
                     ))}
                   </div>
@@ -257,8 +260,8 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
                   {selProduct.tags?.map((tag: string) => (
                     <span key={tag} style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:6, background:'rgba(41,182,208,0.1)', color:'#29B6D0' }}>{tag}</span>
                   ))}
-                  <span style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:6, background:'#fff0f5', color:'#FF6B9D', border:'1px solid rgba(255,107,157,0.3)', marginLeft:'auto' }}>
-                    {selProduct.price_range}
+                  <span style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:6, background:'#fff0f5', color: PRICE_COLOR[selProduct.price_range] ?? '#666', border:`1px solid ${PRICE_COLOR[selProduct.price_range] ?? '#ccc'}`, marginLeft:'auto' }}>
+                    {selProduct.price_range} · {PRICE_LABEL[selProduct.price_range]}
                   </span>
                 </div>
                 <div style={{ fontSize:18, fontWeight:700, color:'#0D3349', marginBottom:4, lineHeight:1.4 }}>{selProduct.name}</div>
