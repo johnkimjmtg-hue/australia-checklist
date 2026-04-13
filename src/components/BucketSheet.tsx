@@ -230,8 +230,6 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
           </div>
         </>
       )}
-    </>
-    <>
       {selProduct && (
         <>
           <div onClick={() => setSelProduct(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(6px)', zIndex:1200 }} />
