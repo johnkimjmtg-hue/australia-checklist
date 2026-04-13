@@ -38,8 +38,11 @@ export default function ChecklistSheet({ state, setState, onClose }: Props) {
     }
     if (item?.related_product_ids?.length) {
       const cached = getCachedShopping()
-      setDetailProducts(cached?.products?.filter((p: any) => item.related_product_ids!.includes(p.id)) ?? [])
+      const filtered = cached?.products?.filter((p: any) => item.related_product_ids!.includes(p.id)) ?? []
+      alert('related_product_ids: ' + JSON.stringify(item.related_product_ids) + '\n캐시 상품수: ' + (cached?.products?.length ?? 0) + '\n매칭: ' + filtered.length)
+      setDetailProducts(filtered)
     } else {
+      alert('related_product_ids 없음')
       setDetailProducts([])
     }
   }
