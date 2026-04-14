@@ -16,7 +16,7 @@ export default function BingoSheet({ onClose }: Props) {
       <div style={{
         position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
         width:'100%', maxWidth:430,
-        background:'#26C6DA', borderRadius:'20px 20px 0 0',
+        background:'#ffffff', borderRadius:'20px 20px 0 0',
         height:'calc(100dvh - 20px)', overflowY:'auto', zIndex:801,
         animation:'slideUpSheet 0.25s ease', boxShadow:'0 8px 32px rgba(0,0,0,0.20)',
         display:'flex', flexDirection:'column',
@@ -30,14 +30,14 @@ export default function BingoSheet({ onClose }: Props) {
 
         {/* 헤더 */}
         <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px 0' }}>
-          <div style={{ fontSize:16, fontWeight:700, color:'#fff' }}>☕ 카페 빙고</div>
+          <div style={{ fontSize:16, fontWeight:700, color:'#0D3349' }}>☕ 카페 빙고</div>
           <button onClick={onClose} style={{
             width:28, height:28, borderRadius:'50%',
-            background:'rgba(255,255,255,0.2)', border:'none',
+            background:'rgba(0,0,0,0.08)', border:'none',
             display:'flex', alignItems:'center', justifyContent:'center',
             cursor:'pointer', WebkitTapHighlightColor:'transparent',
           }}>
-            <Icon icon="ph:x" width={16} height={16} color="#fff" />
+            <Icon icon="ph:x" width={16} height={16} color="#0D3349" />
           </button>
         </div>
 
