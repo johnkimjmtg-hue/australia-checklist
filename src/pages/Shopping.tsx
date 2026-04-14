@@ -406,7 +406,7 @@ export default function Shopping({ myList, myChecked, onMyListChange, onMyChecke
             </div>
             <div style={{ flex:1, overflowY:'auto' }}>
               {selProduct.image_url && (
-                <div style={{ width:'100%', height:220, overflow:'hidden' }}>
+                <div style={{ width:'100%', height:220, overflow:'hidden', marginTop:8 }}>
                   <img src={selProduct.image_url} alt={selProduct.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                 </div>
               )}
