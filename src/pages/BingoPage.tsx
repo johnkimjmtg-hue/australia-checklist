@@ -549,7 +549,7 @@ fontFamily: ff,
                       key={li}
                       x1={from.x} y1={from.y}
                       x2={to.x} y2={to.y}
-                      stroke="#fff"
+                      stroke="#DC2626"
                       strokeWidth={7.5}
                       strokeLinecap="round"
                       opacity={0.9}
@@ -573,9 +573,9 @@ fontFamily: ff,
                   borderRadius:10,
                   overflow:'hidden',
                   cursor:'pointer',
-                  border: isHighlight ? '2.5px solid #29B6D0' : '1px solid #D1D5DB',
+                  border: isHighlight ? '2.5px solid #DC2626' : '1px solid #D1D5DB',
                   background: 'rgba(255,255,255,0.9)',
-                  boxShadow: isHighlight ? '0 4px 16px rgba(255,255,255,0.6)' : '0 2px 8px rgba(0,0,0,0.06)',
+                  boxShadow: isHighlight ? '0 4px 16px rgba(220,38,38,0.3)' : '0 2px 8px rgba(0,0,0,0.06)',
                   transition:'all 0.2s',
                   aspectRatio:'1',
                   display:'flex',
