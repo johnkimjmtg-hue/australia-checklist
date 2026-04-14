@@ -462,7 +462,7 @@ fontFamily: ff,
       <div style={{
         position:'sticky', top:0, zIndex:30,
         background:'transparent',
-        borderBottom:'1px solid rgba(255,255,255,0.3)',
+        borderBottom:'1px solid rgba(0,0,0,0.08)',
       }}>
         <div style={{ display:'flex' }}>
           {([
@@ -473,9 +473,9 @@ fontFamily: ff,
               flex:1, height:44, border:'none', cursor:'pointer',
               fontWeight: city===c.id ? 700 : 400,
               fontSize:15,
-              color: city===c.id ? '#fff' : 'rgba(255,255,255,0.6)',
+              color: city===c.id ? '#0D3349' : '#94A3B8',
               background: 'none',
-              borderBottom: city===c.id ? '2px solid #fff' : '2px solid transparent',
+              borderBottom: city===c.id ? '2px solid #29B6D0' : '2px solid transparent',
               transition:'all 0.15s',
               WebkitTapHighlightColor: 'transparent',
               fontFamily: ff,
@@ -490,10 +490,10 @@ fontFamily: ff,
       <div style={{ padding:'12px 16px 0', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
         {/* 메시지 */}
         <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:3, lineHeight:1.3 }}>
+          <div style={{ fontSize:15, fontWeight:700, color:'#0D3349', marginBottom:3, lineHeight:1.3 }}>
             {getStatusMsg(checked.size, bingoCount, city).title}
           </div>
-          <div style={{ fontSize:12, color:'rgba(255,255,255,0.85)', fontWeight:400, lineHeight:1.5 }}>
+          <div style={{ fontSize:12, color:'#475569', fontWeight:400, lineHeight:1.5 }}>
             {lastCheckedCafe && checked.has(lastCheckedCafe.idx)
               ? (city === 'melbourne'
                   ? MEL_CAFE_MSG[lastCheckedCafe.sort_order]
@@ -502,12 +502,12 @@ fontFamily: ff,
           </div>
         </div>
         {/* 카운터 */}
-        <div style={{ textAlign:'center', flexShrink:0, background:'rgba(255,255,255,0.35)', borderRadius:14, padding:'8px 14px' }}>
+        <div style={{ textAlign:'center', flexShrink:0, background:'rgba(41,182,208,0.1)', borderRadius:14, padding:'8px 14px' }}>
           <div style={{ display:'flex', alignItems:'baseline', gap:2 }}>
-            <span style={{ fontSize:28, fontWeight:900, color:'#fff', lineHeight:1 }}>{checked.size}</span>
-            <span style={{ fontSize:13, color:'rgba(255,255,255,0.8)', fontWeight:500 }}>/25</span>
+            <span style={{ fontSize:28, fontWeight:900, color:'#0D3349', lineHeight:1 }}>{checked.size}</span>
+            <span style={{ fontSize:13, color:'#94A3B8', fontWeight:500 }}>/25</span>
           </div>
-          <div style={{ fontSize:10, color:'rgba(255,255,255,0.8)', fontWeight:600, marginTop:2 }}>카페 방문</div>
+          <div style={{ fontSize:10, color:'#94A3B8', fontWeight:600, marginTop:2 }}>카페 방문</div>
         </div>
       </div>
 
