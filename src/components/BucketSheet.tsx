@@ -61,6 +61,15 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
   const [detailBizCards, setDetailBizCards] = useState<Business[]>([])
   const [detailProducts, setDetailProducts] = useState<any[]>([])
   const [selProduct, setSelProduct] = useState<any|null>(null)
+  const [myList, setMyList] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('my-shopping-list') ?? '[]') } catch { return [] }
+  })
+
+  const toggleMyList = (id: string) => {
+    const next = myList.includes(id) ? myList.filter(i => i !== id) : [...myList, id]
+    setMyList(next)
+    try { localStorage.setItem('my-shopping-list', JSON.stringify(next)) } catch {}
+  }
 
   useEffect(() => {
     const cached = getCachedChecklist()
@@ -299,15 +308,16 @@ export default function BucketSheet({ trip, state, setState, onClose }: Props) {
                     </div>
                   </div>
                 )}
-                <button onClick={() => {}} style={{
+                <button onClick={() => toggleMyList(selProduct.id)} style={{
                   width:'100%', height:48, borderRadius:12, border:'1.5px solid #FF6B9D', cursor:'pointer',
-                  background:'#ffffff', color:'#FF6B9D',
+                  background: myList.includes(selProduct.id) ? '#FF6B9D' : '#ffffff',
+                  color: myList.includes(selProduct.id) ? '#fff' : '#FF6B9D',
                   fontSize:15, fontWeight:700,
                   display:'flex', alignItems:'center', justifyContent:'center', gap:8,
                   WebkitTapHighlightColor:'transparent',
                 }}>
-                  <Icon icon="ph:shopping-bag" width={18} height={18} color="#FF6B9D" />
-                  쇼핑리스트에서 보기
+                  <Icon icon={myList.includes(selProduct.id) ? 'ph:check-circle-fill' : 'ph:heart'} width={18} height={18} color={myList.includes(selProduct.id) ? '#fff' : '#FF6B9D'} />
+                  {myList.includes(selProduct.id) ? '내 쇼핑리스트에서 제거' : '내 쇼핑리스트에 추가'}
                 </button>
               </div>
             </div>
